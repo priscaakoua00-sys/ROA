@@ -1,0 +1,100 @@
+{
+  "app": {
+    "name": "ROA"
+  },
+  "language": {
+    "label": "Langue",
+    "nl": "Néerlandais",
+    "en": "Anglais",
+    "fr": "Français"
+  },
+  "theme": {
+    "label": "Thème",
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système"
+  },
+  "home": {
+    "eyebrow": "Phase 0 · Fondation technique",
+    "title": "Votre siège social numérique",
+    "signature": "Répond. Organise. Apprend.",
+    "subtitle": "Un espace de travail calme et soigné où votre employé IA répond, organise et apprend — pour qu'aucune demande ne soit perdue.",
+    "primaryCta": "Explorer la fondation",
+    "secondaryCta": "Lire la philosophie",
+    "today": {
+      "title": "Aujourd'hui",
+      "badge": "Exemple",
+      "leads": "Nouvelles demandes",
+      "urgent": "Urgent",
+      "appointments": "Rendez-vous",
+      "quotes": "Devis"
+    },
+    "pillars": {
+      "title": "Trois promesses",
+      "respond": {
+        "title": "Répond",
+        "body": "Chaque demande reçoit une réponse immédiate, humaine et professionnelle, jour et nuit."
+      },
+      "organize": {
+        "title": "Organise",
+        "body": "Clients, véhicules et rendez-vous se rangent tout seuls, sans administration."
+      },
+      "learn": {
+        "title": "Apprend",
+        "body": "Le système retient vos préférences et s'améliore un peu chaque semaine."
+      },
+      "kicker": "La fondation"
+    },
+    "memories": {
+      "title": "Trois mémoires",
+      "intro": "La vraie intelligence vient du fait de retenir au bon niveau.",
+      "garage": {
+        "title": "Mémoire de l'entreprise",
+        "body": "Connaît vos horaires, votre équipe, votre ton et vos préférences. Reste privée."
+      },
+      "trade": {
+        "title": "Mémoire du métier",
+        "body": "Connaît les réparations, les pièces, les urgences et les questions du secteur."
+      },
+      "global": {
+        "title": "Mémoire partagée",
+        "body": "Apprend anonymement quelles réponses et relances fonctionnent le mieux."
+      },
+      "kicker": "La philosophie"
+    },
+    "checklist": {
+      "title": "Ce que cette page vérifie",
+      "intro": "Une petite page témoin pour valider les fondations.",
+      "items": {
+        "language": "Changement de langue (NL · EN · FR)",
+        "persistence": "La langue choisie est mémorisée",
+        "theme": "Thème global (clair et sombre)",
+        "components": "Composants shadcn/ui",
+        "responsive": "Affichage responsive",
+        "a11y": "Accessibilité de base"
+      },
+      "kicker": "Vérification"
+    },
+    "phase": {
+      "label": "Phase 0",
+      "note": "Fondation technique uniquement. Pas encore de connexion, de tableau de bord ni d'IA réelle."
+    },
+    "assistant": {
+      "role": "Votre employé IA",
+      "badge": "Proposition",
+      "message": "Une nouvelle demande de Mme De Vries semble urgente. J'ai préparé une réponse et proposé deux créneaux.",
+      "approve": "Approuver",
+      "view": "Voir",
+      "youDecide": "Vous décidez"
+    }
+  },
+  "footer": {
+    "signature": "Répond. Organise. Apprend.",
+    "rights": "Version de fondation interne. Pas pour la production."
+  },
+  "a11y": {
+    "skipToContent": "Aller au contenu",
+    "openLanguageMenu": "Ouvrir le menu des langues",
+    "openThemeMenu": "Ouvrir le menu des thèmes"
+  }
+}

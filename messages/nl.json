@@ -1,0 +1,100 @@
+{
+  "app": {
+    "name": "ROA"
+  },
+  "language": {
+    "label": "Taal",
+    "nl": "Nederlands",
+    "en": "Engels",
+    "fr": "Frans"
+  },
+  "theme": {
+    "label": "Thema",
+    "light": "Licht",
+    "dark": "Donker",
+    "system": "Systeem"
+  },
+  "home": {
+    "eyebrow": "Fase 0 · Technische basis",
+    "title": "Uw digitale hoofdkantoor",
+    "signature": "Reageert. Organiseert. Leert.",
+    "subtitle": "Een rustige, verzorgde werkplek waar uw AI-medewerker reageert, organiseert en leert — zodat geen enkele aanvraag verloren gaat.",
+    "primaryCta": "Bekijk de basis",
+    "secondaryCta": "Lees de filosofie",
+    "today": {
+      "title": "Vandaag",
+      "badge": "Voorbeeld",
+      "leads": "Nieuwe aanvragen",
+      "urgent": "Urgent",
+      "appointments": "Afspraken",
+      "quotes": "Offertes"
+    },
+    "pillars": {
+      "title": "Drie beloften",
+      "respond": {
+        "title": "Reageert",
+        "body": "Elke aanvraag krijgt direct een menselijk en professioneel antwoord, dag en nacht."
+      },
+      "organize": {
+        "title": "Organiseert",
+        "body": "Klanten, voertuigen en afspraken worden vanzelf geordend, zonder administratie."
+      },
+      "learn": {
+        "title": "Leert",
+        "body": "Het systeem onthoudt uw voorkeuren en wordt elke week een beetje beter."
+      },
+      "kicker": "De basis"
+    },
+    "memories": {
+      "title": "Drie soorten geheugen",
+      "intro": "Echte intelligentie ontstaat door te onthouden op het juiste niveau.",
+      "garage": {
+        "title": "Geheugen van het bedrijf",
+        "body": "Kent uw uren, uw team, uw toon en uw voorkeuren. Blijft privé bij u."
+      },
+      "trade": {
+        "title": "Geheugen van het vak",
+        "body": "Kent reparaties, onderdelen, urgenties en veelgestelde vragen in de branche."
+      },
+      "global": {
+        "title": "Gedeeld geheugen",
+        "body": "Leert anoniem welke antwoorden en herinneringen het best werken."
+      },
+      "kicker": "De filosofie"
+    },
+    "checklist": {
+      "title": "Wat deze pagina controleert",
+      "intro": "Een kleine testpagina om de fundamenten te verifiëren.",
+      "items": {
+        "language": "Taal wisselen (NL · EN · FR)",
+        "persistence": "Taalkeuze wordt onthouden",
+        "theme": "Globaal thema (licht en donker)",
+        "components": "shadcn/ui-componenten",
+        "responsive": "Responsive weergave",
+        "a11y": "Basis toegankelijkheid"
+      },
+      "kicker": "Verificatie"
+    },
+    "phase": {
+      "label": "Fase 0",
+      "note": "Alleen de technische basis. Nog geen login, dashboard of echte AI."
+    },
+    "assistant": {
+      "role": "Uw AI-medewerker",
+      "badge": "Voorstel",
+      "message": "Een nieuwe aanvraag van mevrouw De Vries lijkt urgent. Ik heb een antwoord opgesteld en twee tijdslots voorgesteld.",
+      "approve": "Goedkeuren",
+      "view": "Bekijken",
+      "youDecide": "Jij beslist"
+    }
+  },
+  "footer": {
+    "signature": "Reageert. Organiseert. Leert.",
+    "rights": "Interne basisversie. Niet voor productie."
+  },
+  "a11y": {
+    "skipToContent": "Naar inhoud gaan",
+    "openLanguageMenu": "Taalmenu openen",
+    "openThemeMenu": "Thememenu openen"
+  }
+}

@@ -1,0 +1,200 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * ROA design tokens — "digital head office".
+ * Warm, premium, immersive. Lightly tinted ivory surfaces (never pure white),
+ * a calm deep-teal primary, a restrained champagne accent, and suspended panels
+ * with very discreet layered shadows. Luxury comes from space + depth, not noise.
+ */
+
+@layer base {
+  :root {
+    --background: 40 33% 97%;
+    --foreground: 30 14% 12%;
+
+    --surface: 40 30% 95%;
+
+    --card: 40 44% 99%;
+    --card-foreground: 30 14% 12%;
+    --card-highlight: 255 255 255;
+    --card-highlight-a: 0.7;
+
+    --popover: 40 44% 99%;
+    --popover-foreground: 30 14% 12%;
+
+    --primary: 188 44% 22%;
+    --primary-foreground: 40 40% 98%;
+
+    --secondary: 40 20% 92%;
+    --secondary-foreground: 30 16% 20%;
+
+    --muted: 40 20% 93%;
+    --muted-foreground: 32 9% 42%;
+
+    --accent: 38 34% 90%;
+    --accent-foreground: 30 16% 20%;
+
+    --gold: 36 44% 50%;
+    --urgent: 8 62% 48%;
+
+    --success: 158 42% 34%;
+    --success-foreground: 158 40% 97%;
+
+    --destructive: 0 66% 45%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 36 24% 88%;
+    --input: 36 24% 88%;
+    --ring: 188 40% 30%;
+
+    --brand: var(--primary);
+    --brand-foreground: var(--primary-foreground);
+
+    --sh: 32 34% 26%;
+    --radius: 0.9rem;
+  }
+
+  .dark {
+    --background: 28 14% 8%;
+    --foreground: 40 18% 92%;
+
+    --surface: 28 14% 10%;
+
+    --card: 28 14% 13%;
+    --card-foreground: 40 18% 92%;
+    --card-highlight: 255 255 255;
+    --card-highlight-a: 0.05;
+
+    --popover: 28 14% 13%;
+    --popover-foreground: 40 18% 92%;
+
+    --primary: 184 46% 56%;
+    --primary-foreground: 190 45% 10%;
+
+    --secondary: 28 12% 17%;
+    --secondary-foreground: 40 18% 90%;
+
+    --muted: 28 12% 16%;
+    --muted-foreground: 36 12% 65%;
+
+    --accent: 28 12% 18%;
+    --accent-foreground: 40 18% 92%;
+
+    --gold: 38 48% 62%;
+    --urgent: 8 66% 60%;
+
+    --success: 158 44% 50%;
+    --success-foreground: 158 40% 8%;
+
+    --destructive: 0 60% 55%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 30 12% 21%;
+    --input: 30 12% 23%;
+    --ring: 184 45% 52%;
+
+    --brand: var(--primary);
+    --brand-foreground: var(--primary-foreground);
+
+    --sh: 20 45% 2%;
+  }
+
+  [data-tenant='demo'] {
+    --primary: 231 44% 40%;
+    --ring: 231 44% 46%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+    text-rendering: optimizeLegibility;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+@layer components {
+  /* Refined, suspended background shapes (fixed, non-interactive). */
+  .app-decor {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(42% 40% at 10% 6%, hsl(var(--primary) / 0.1), transparent 70%),
+      radial-gradient(40% 38% at 90% 4%, hsl(var(--gold) / 0.13), transparent 72%),
+      radial-gradient(46% 48% at 82% 92%, hsl(var(--primary) / 0.07), transparent 72%),
+      radial-gradient(60% 60% at 50% 120%, hsl(var(--gold) / 0.06), transparent 70%);
+  }
+
+  /* Localized hero glow. */
+  .hero-aura {
+    position: absolute;
+    inset: -20% -10% auto -10%;
+    height: 130%;
+    pointer-events: none;
+    background:
+      radial-gradient(50% 60% at 20% 0%, hsl(var(--primary) / 0.08), transparent 70%),
+      radial-gradient(40% 50% at 95% 5%, hsl(var(--gold) / 0.1), transparent 72%);
+  }
+
+  /* Smooth lift on interactive panels. */
+  .lift {
+    transition:
+      box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .lift:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      inset 0 1px 0 0 rgb(var(--card-highlight) / var(--card-highlight-a)),
+      0 2px 3px hsl(var(--sh) / 0.06),
+      0 30px 60px -22px hsl(var(--sh) / 0.3);
+  }
+
+  /* Brand signature with a champagne-to-teal rule. */
+  .signature {
+    position: relative;
+    padding-left: 0.9rem;
+  }
+  .signature::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.15rem;
+    bottom: 0.15rem;
+    width: 2px;
+    border-radius: 2px;
+    background: linear-gradient(hsl(var(--gold)), hsl(var(--primary)));
+  }
+
+  /* Section kicker with a short champagne rule. */
+  .kicker::before {
+    content: '';
+    display: inline-block;
+    width: 1.4rem;
+    height: 1px;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+    background: hsl(var(--gold));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

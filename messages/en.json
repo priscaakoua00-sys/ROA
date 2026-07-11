@@ -1,0 +1,100 @@
+{
+  "app": {
+    "name": "ROA"
+  },
+  "language": {
+    "label": "Language",
+    "nl": "Dutch",
+    "en": "English",
+    "fr": "French"
+  },
+  "theme": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "home": {
+    "eyebrow": "Phase 0 · Technical foundation",
+    "title": "Your digital head office",
+    "signature": "Responds. Organizes. Learns.",
+    "subtitle": "A calm, considered workspace where your AI employee responds, organizes and learns — so no request is ever lost.",
+    "primaryCta": "Explore the foundation",
+    "secondaryCta": "Read the philosophy",
+    "today": {
+      "title": "Today",
+      "badge": "Example",
+      "leads": "New requests",
+      "urgent": "Urgent",
+      "appointments": "Appointments",
+      "quotes": "Quotes"
+    },
+    "pillars": {
+      "title": "Three promises",
+      "respond": {
+        "title": "Responds",
+        "body": "Every request gets an immediate, human and professional reply, day and night."
+      },
+      "organize": {
+        "title": "Organizes",
+        "body": "Customers, vehicles and appointments are sorted on their own, without admin."
+      },
+      "learn": {
+        "title": "Learns",
+        "body": "The system remembers your preferences and gets a little better every week."
+      },
+      "kicker": "The foundation"
+    },
+    "memories": {
+      "title": "Three kinds of memory",
+      "intro": "Real intelligence comes from remembering at the right level.",
+      "garage": {
+        "title": "Company memory",
+        "body": "Knows your hours, your team, your tone and your preferences. Stays private to you."
+      },
+      "trade": {
+        "title": "Trade memory",
+        "body": "Knows repairs, parts, emergencies and the questions common to the industry."
+      },
+      "global": {
+        "title": "Shared memory",
+        "body": "Learns anonymously which replies and reminders work best."
+      },
+      "kicker": "The philosophy"
+    },
+    "checklist": {
+      "title": "What this page verifies",
+      "intro": "A small witness page to check the foundations.",
+      "items": {
+        "language": "Language switching (NL · EN · FR)",
+        "persistence": "Language choice is remembered",
+        "theme": "Global theme (light and dark)",
+        "components": "shadcn/ui components",
+        "responsive": "Responsive layout",
+        "a11y": "Basic accessibility"
+      },
+      "kicker": "Verification"
+    },
+    "phase": {
+      "label": "Phase 0",
+      "note": "Technical foundation only. No login, dashboard or real AI yet."
+    },
+    "assistant": {
+      "role": "Your AI employee",
+      "badge": "Proposal",
+      "message": "A new request from Ms. De Vries looks urgent. I've drafted a reply and proposed two time slots.",
+      "approve": "Approve",
+      "view": "View",
+      "youDecide": "You decide"
+    }
+  },
+  "footer": {
+    "signature": "Responds. Organizes. Learns.",
+    "rights": "Internal foundation build. Not for production."
+  },
+  "a11y": {
+    "skipToContent": "Skip to content",
+    "openLanguageMenu": "Open language menu",
+    "openThemeMenu": "Open theme menu"
+  }
+}
