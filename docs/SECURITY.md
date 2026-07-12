@@ -1,6 +1,6 @@
 # Security
 
-ROA is multi-tenant and will hold customer conversations and business data.
+Roavaa is multi-tenant and will hold customer conversations and business data.
 Security is a first-class design constraint, not an afterthought.
 
 ## Multi-tenancy isolation

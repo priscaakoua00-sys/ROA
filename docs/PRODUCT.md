@@ -1,11 +1,11 @@
 # Product
 
-> Brand name: **ROA** — from Répond · Organise · Apprend (Responds · Organizes ·
+> Brand name: **Roavaa** — from Répond · Organise · Apprend (Responds · Organizes ·
 > Learns). The name is the same in every language; only the slogan is translated.
 
 ## Vision
 
-ROA wants to become the **first AI employee** of small and medium
+Roavaa wants to become the **first AI employee** of small and medium
 businesses. The first product targets **independent car garages in the
 Netherlands**.
 

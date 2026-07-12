@@ -1,13 +1,13 @@
-# ROA
+# Roavaa
 
-**ROA — Responds. Organizes. Learns.**
-The brand name is **ROA**, built from its three promises:
+**Roavaa — Responds. Organizes. Learns.**
+The brand name is **Roavaa**, built from its three promises:
 
 - **R**esponds (FR: Répond · NL: Reageert)
 - **O**rganizes (FR: Organise · NL: Organiseert)
 - **A**pprend / Learns (FR: Apprend · NL: Leert)
 
-The brand name **ROA** is identical in every language. Only the slogan is
+The brand name **Roavaa** is identical in every language. Only the slogan is
 translated:
 
 | Language | Slogan |
@@ -16,7 +16,7 @@ translated:
 | Dutch | Reageert. Organiseert. Leert. |
 | English | Responds. Organizes. Learns. |
 
-ROA is a multi-tenant B2B SaaS: an **AI employee for small and medium
+Roavaa is a multi-tenant B2B SaaS: an **AI employee for small and medium
 businesses**. The first product targets independent car garages in the
 Netherlands. Its first mission is simple: **no lead is ever lost because the
 garage did not answer fast enough.**
@@ -33,7 +33,7 @@ WhatsApp, no billing and no real AI yet.
 - Trust beats artificial intelligence.
 - Speed beats animation.
 - The result for the customer beats the technology used.
-- ROA removes repetitive tasks so entrepreneurs focus on their craft and their
+- Roavaa removes repetitive tasks so entrepreneurs focus on their craft and their
   customers. It is not built to replace them.
 
 ## Tech stack

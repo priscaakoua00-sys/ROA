@@ -14,7 +14,7 @@ concurrency:
 env:
   NEXT_TELEMETRY_DISABLED: '1'
   # Phase 0 needs no real secrets. Dummy public values keep any env reads safe.
-  NEXT_PUBLIC_APP_NAME: 'ROA'
+  NEXT_PUBLIC_APP_NAME: 'Roavaa'
 
 jobs:
   verify:

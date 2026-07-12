@@ -1,8 +1,8 @@
 {
-  "name": "roa",
+  "name": "roavaa",
   "version": "0.1.0",
   "private": true,
-  "description": "ROA — AI employee for SMBs. Responds. Organizes. Learns.",
+  "description": "Roavaa — AI employee for SMBs. Responds. Organizes. Learns.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
