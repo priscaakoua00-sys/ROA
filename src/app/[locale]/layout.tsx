@@ -19,7 +19,7 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: 'app' });
   const home = await getTranslations({ locale, namespace: 'home' });
   return {
-    title: `${t('name')} — ${home('signature')}`,
+    title: `${t('name')} · ${home('signature')}`,
     description: home('subtitle'),
   };
 }
@@ -44,6 +44,13 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+          rel="stylesheet"
+        />
         <div className="app-decor" aria-hidden="true" />
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider
