@@ -14,6 +14,11 @@ export async function submitPublicRequestAction(formData: FormData) {
     ? (rawLang as Locale)
     : 'nl';
 
+  // Anti-spam honeypot: bots fill this hidden field. Silently accept, store nothing.
+  if (String(formData.get('company_website') ?? '').trim().length > 0) {
+    redirect(`/${language}/request/${slug}?sent=1`);
+  }
+
   const clean = (key: string): string | undefined => {
     const v = formData.get(key);
     const s = typeof v === 'string' ? v.trim() : '';

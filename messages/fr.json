@@ -48,7 +48,9 @@
       "daySummary": "Aujourd'hui : {count} nouvelles demandes, {urgent} urgentes, {upcoming} rendez-vous prévus.",
       "statConversion": "Conversion",
       "statTeam": "Équipe active",
-      "priorityTitle": "Priorité"
+      "priorityTitle": "Priorité",
+      "openKnowledge": "Connaissances",
+      "openAutomations": "Relances"
     },
     "roles": {
       "owner": "Proprietaire",
@@ -212,6 +214,42 @@
         "nl": "Nederlands",
         "en": "English",
         "fr": "Français"
+      }
+    },
+    "knowledge": {
+      "title": "Base de connaissances",
+      "intro": "Le savoir-faire de votre garage. Roavaa l'utilisera plus tard pour mieux répondre.",
+      "addTitle": "Ajouter",
+      "categoryLabel": "Catégorie",
+      "titleLabel": "Titre",
+      "contentLabel": "Contenu",
+      "contentPlaceholder": "Décrivez brièvement...",
+      "add": "Ajouter",
+      "empty": "Rien pour l'instant. Ajoutez votre première connaissance.",
+      "category": {
+        "failure": "Pannes fréquentes",
+        "intervention_time": "Temps d'intervention",
+        "part": "Pièces",
+        "faq": "Questions fréquentes",
+        "safety": "Règles de sécurité"
+      }
+    },
+    "automations": {
+      "title": "Relances",
+      "intro": "Ce que Roavaa relancerait aujourd'hui. Vous décidez et envoyez.",
+      "empty": "Rien à relancer. Tout est à jour.",
+      "done": "Fait",
+      "kind": {
+        "reminder": "Rappels (rendez-vous sous 48h)",
+        "unanswered": "Demandes sans réponse",
+        "post_repair": "Suivi après réparation",
+        "reactivate": "Réactiver les prospects perdus"
+      },
+      "msg": {
+        "reminder": "Rappelez le rendez-vous à {name} et confirmez l'heure.",
+        "unanswered": "Répondez à {name} : la demande attend encore.",
+        "post_repair": "Demandez à {name} si tout va bien et sollicitez un avis Google.",
+        "reactivate": "Recontactez {name} avec une offre."
       }
     }
   },

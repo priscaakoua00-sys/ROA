@@ -147,6 +147,12 @@ export default async function DashboardPage({
             <Link href="/team">
               <Button variant="outline" size="sm">{t('dashboard.openTeam')}</Button>
             </Link>
+            <Link href="/automations">
+              <Button variant="outline" size="sm">{t('dashboard.openAutomations')}</Button>
+            </Link>
+            <Link href="/knowledge">
+              <Button variant="outline" size="sm">{t('dashboard.openKnowledge')}</Button>
+            </Link>
             <Link href="/settings">
               <Button variant="outline" size="sm">{t('dashboard.openSettings')}</Button>
             </Link>

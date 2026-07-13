@@ -54,6 +54,14 @@ export default async function PublicRequestPage({
       <form action={submitPublicRequestAction} className="space-y-4 rounded-xl border border-border bg-card p-6 shadow-soft">
         <input type="hidden" name="slug" value={slug} />
         <input type="hidden" name="language" value={locale} />
+        <input
+          type="text"
+          name="company_website"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          className="absolute left-[-9999px] h-0 w-0 opacity-0"
+        />
 
         <div className="grid grid-cols-2 gap-3">
           <Field label={t('fields.firstName')} name="firstName" autoComplete="given-name" />

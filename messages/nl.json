@@ -48,7 +48,9 @@
       "daySummary": "Vandaag: {count} nieuwe aanvragen, {urgent} urgent, {upcoming} afspraken gepland.",
       "statConversion": "Conversie",
       "statTeam": "Team actief",
-      "priorityTitle": "Prioriteit"
+      "priorityTitle": "Prioriteit",
+      "openKnowledge": "Kennisbank",
+      "openAutomations": "Opvolging"
     },
     "roles": {
       "owner": "Eigenaar",
@@ -212,6 +214,42 @@
         "nl": "Nederlands",
         "en": "English",
         "fr": "Français"
+      }
+    },
+    "knowledge": {
+      "title": "Kennisbank",
+      "intro": "De vakkennis van uw garage. Roavaa gebruikt dit later om beter te antwoorden.",
+      "addTitle": "Toevoegen",
+      "categoryLabel": "Categorie",
+      "titleLabel": "Titel",
+      "contentLabel": "Inhoud",
+      "contentPlaceholder": "Beschrijf kort...",
+      "add": "Toevoegen",
+      "empty": "Nog niets. Voeg uw eerste kennis toe.",
+      "category": {
+        "failure": "Veelvoorkomende storingen",
+        "intervention_time": "Interventietijden",
+        "part": "Onderdelen",
+        "faq": "Veelgestelde vragen",
+        "safety": "Veiligheidsregels"
+      }
+    },
+    "automations": {
+      "title": "Opvolging",
+      "intro": "Wat Roavaa vandaag zou opvolgen. U beslist en verstuurt zelf.",
+      "empty": "Niets op te volgen. Alles bij.",
+      "done": "Gedaan",
+      "kind": {
+        "reminder": "Herinneringen (afspraak binnen 48u)",
+        "unanswered": "Onbeantwoorde aanvragen",
+        "post_repair": "Opvolging na reparatie",
+        "reactivate": "Verloren prospects heractiveren"
+      },
+      "msg": {
+        "reminder": "Herinner {name} aan de afspraak en bevestig het tijdstip.",
+        "unanswered": "Reageer op {name}: de aanvraag wacht nog op antwoord.",
+        "post_repair": "Vraag {name} of alles goed is en vraag om een Google-review.",
+        "reactivate": "Neem opnieuw contact op met {name} met een aanbod."
       }
     }
   },

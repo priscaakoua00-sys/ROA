@@ -48,7 +48,9 @@
       "daySummary": "Today: {count} new requests, {urgent} urgent, {upcoming} appointments scheduled.",
       "statConversion": "Conversion",
       "statTeam": "Team active",
-      "priorityTitle": "Priority"
+      "priorityTitle": "Priority",
+      "openKnowledge": "Knowledge",
+      "openAutomations": "Follow-ups"
     },
     "roles": {
       "owner": "Owner",
@@ -212,6 +214,42 @@
         "nl": "Nederlands",
         "en": "English",
         "fr": "Français"
+      }
+    },
+    "knowledge": {
+      "title": "Knowledge base",
+      "intro": "Your garage's know-how. Roavaa will use it later to answer better.",
+      "addTitle": "Add",
+      "categoryLabel": "Category",
+      "titleLabel": "Title",
+      "contentLabel": "Content",
+      "contentPlaceholder": "Describe briefly...",
+      "add": "Add",
+      "empty": "Nothing yet. Add your first knowledge.",
+      "category": {
+        "failure": "Common failures",
+        "intervention_time": "Intervention times",
+        "part": "Parts",
+        "faq": "FAQ",
+        "safety": "Safety rules"
+      }
+    },
+    "automations": {
+      "title": "Follow-ups",
+      "intro": "What Roavaa would follow up today. You decide and send.",
+      "empty": "Nothing to follow up. All clear.",
+      "done": "Done",
+      "kind": {
+        "reminder": "Reminders (appointment within 48h)",
+        "unanswered": "Unanswered requests",
+        "post_repair": "Post-repair follow-up",
+        "reactivate": "Reactivate lost prospects"
+      },
+      "msg": {
+        "reminder": "Remind {name} of the appointment and confirm the time.",
+        "unanswered": "Reply to {name}: the request is still waiting.",
+        "post_repair": "Ask {name} if all is well and request a Google review.",
+        "reactivate": "Reach out to {name} again with an offer."
       }
     }
   },
