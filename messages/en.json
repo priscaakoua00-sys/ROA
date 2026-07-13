@@ -1,6 +1,219 @@
 {
   "app": {
-    "name": "Roavaa"
+    "name": "Roavaa",
+    "onboarding": {
+      "title": "Set up your garage",
+      "subtitle": "One step before you begin.",
+      "name": "Your garage name",
+      "namePlaceholder": "e.g. Garage De Vries",
+      "businessType": "Business type",
+      "cta": "Create garage",
+      "error": "Could not create. Please try again."
+    },
+    "businessType": {
+      "garage": "Car garage",
+      "plumber": "Plumber",
+      "electrician": "Electrician",
+      "hvac": "Heating & AC",
+      "dentist": "Dentist",
+      "real_estate": "Real estate",
+      "other": "Other"
+    },
+    "dashboard": {
+      "welcome": "Welcome back",
+      "signOut": "Sign out",
+      "setupTitle": "Your next steps",
+      "setupIntro": "Your workspace is ready. The following parts are coming soon.",
+      "next": {
+        "leads": "Receive and qualify customer requests",
+        "agenda": "Manage your calendar and appointments",
+        "team": "Invite your team"
+      },
+      "incomingTitle": "Incoming requests",
+      "incomingEmpty": "No requests yet. Share your form link below to get started.",
+      "shareTitle": "Your request form",
+      "shareIntro": "Share this link with your customers. Every request lands here automatically.",
+      "openForm": "Open form",
+      "openAgenda": "Agenda",
+      "statNewToday": "New today",
+      "statOpen": "Open requests",
+      "statUrgent": "Urgent",
+      "statUpcoming": "Upcoming appointments",
+      "notifications": "new notifications",
+      "openTeam": "Team",
+      "openCustomers": "Customers",
+      "openWorkOrders": "Work orders",
+      "openVehicles": "Vehicles",
+      "openSettings": "Settings",
+      "daySummary": "Today: {count} new requests, {urgent} urgent, {upcoming} appointments scheduled.",
+      "statConversion": "Conversion",
+      "statTeam": "Team active",
+      "priorityTitle": "Priority"
+    },
+    "roles": {
+      "owner": "Owner",
+      "admin": "Admin",
+      "receptionist": "Receptionist",
+      "mechanic": "Mechanic",
+      "viewer": "Viewer"
+    },
+    "leads": {
+      "anonymous": "Unknown customer",
+      "review": "Human review",
+      "urgency": {
+        "low": "Low",
+        "normal": "Normal",
+        "high": "High",
+        "critical": "Critical"
+      },
+      "status": {
+        "new": "New",
+        "qualifying": "Qualifying",
+        "qualified": "Qualified",
+        "appointment_proposed": "Appointment proposed",
+        "booked": "Booked",
+        "won": "Won",
+        "lost": "Lost",
+        "archived": "Archived"
+      }
+    },
+    "lead": {
+      "back": "Back to overview",
+      "contact": "Contact",
+      "vehicle": "Vehicle",
+      "proposeTitle": "Schedule an appointment",
+      "proposeIntro": "Pick a proposed time. You decide.",
+      "noSlots": "No free times found. Check your opening hours.",
+      "book": "Choose this time",
+      "booked": "Appointment scheduled.",
+      "alreadyBooked": "This request already has an appointment.",
+      "viewAgenda": "View agenda",
+      "error": "Something went wrong. Please try again.",
+      "assignedTo": "Assigned to",
+      "unassigned": "Nobody",
+      "assign": "Assign",
+      "createWorkOrder": "Create work order",
+      "viewWorkOrder": "View work order"
+    },
+    "agenda": {
+      "title": "Agenda",
+      "empty": "No appointments scheduled yet."
+    },
+    "appointmentStatus": {
+      "proposed": "Proposed",
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "no_show": "No show"
+    },
+    "conversation": {
+      "title": "Conversation",
+      "replyLabel": "Your reply",
+      "aiDrafted": "Drafted by Roavaa",
+      "handoff": "Safety: this looks urgent. Contact the customer directly, no automatic reply.",
+      "placeholder": "Type your reply...",
+      "note": "You send it. Roavaa only proposes.",
+      "send": "Send",
+      "sent": "Reply saved."
+    },
+    "team": {
+      "title": "Team",
+      "invited": "Invitation created.",
+      "error": "Something went wrong.",
+      "pending": "Invited",
+      "disabled": "Disabled",
+      "save": "Save",
+      "enable": "Enable",
+      "disable": "Disable",
+      "inviteTitle": "Invite a member",
+      "inviteIntro": "Add a colleague with a role.",
+      "email": "Email",
+      "invite": "Invite",
+      "inviteNote": "The invitation is ready. Email delivery comes in a later step."
+    },
+    "customers": {
+      "title": "Customers",
+      "search": "Search by name, phone or email",
+      "empty": "No customers yet. They appear here as requests come in.",
+      "back": "Back to customers",
+      "vehiclesTitle": "Vehicles",
+      "noVehicles": "No vehicle yet.",
+      "vehicle": "Vehicle",
+      "plate": "Plate",
+      "make": "Make",
+      "model": "Model",
+      "mileage": "Mileage",
+      "addVehicle": "Add vehicle",
+      "historyTitle": "History",
+      "noHistory": "No history yet."
+    },
+    "workOrders": {
+      "title": "Work orders",
+      "empty": "No work orders yet.",
+      "back": "Back to work orders",
+      "viewLead": "View request",
+      "tasksTitle": "Tasks",
+      "noTasks": "No tasks yet.",
+      "newTask": "New task",
+      "addTask": "Add"
+    },
+    "workOrderStatus": {
+      "open": "Open",
+      "in_progress": "In progress",
+      "waiting_parts": "Waiting for parts",
+      "done": "Done",
+      "cancelled": "Cancelled"
+    },
+    "vehicles": {
+      "title": "Vehicles",
+      "search": "Search by plate, make or model",
+      "empty": "No vehicles yet.",
+      "back": "Back to vehicles",
+      "saved": "Saved.",
+      "year": "Year",
+      "historyTitle": "History"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "markAll": "Mark all read",
+      "empty": "No notifications.",
+      "new": "New",
+      "open": "Open",
+      "markRead": "Mark read"
+    },
+    "settings": {
+      "title": "Settings",
+      "saved": "Saved.",
+      "companyTitle": "Company",
+      "name": "Name",
+      "language": "Default language",
+      "hoursTitle": "Opening hours",
+      "hoursIntro": "Controls which times Roavaa can propose.",
+      "servicesTitle": "Services",
+      "servicesIntro": "Duration and buffer shape the proposed times.",
+      "serviceName": "Name",
+      "duration": "Duration (min)",
+      "buffer": "Buffer (min)",
+      "active": "Active",
+      "delete": "Delete",
+      "newService": "New service",
+      "addService": "Add",
+      "weekday": {
+        "0": "Sunday",
+        "1": "Monday",
+        "2": "Tuesday",
+        "3": "Wednesday",
+        "4": "Thursday",
+        "5": "Friday",
+        "6": "Saturday"
+      },
+      "lang": {
+        "nl": "Nederlands",
+        "en": "English",
+        "fr": "Français"
+      }
+    }
   },
   "language": {
     "label": "Language",
@@ -96,5 +309,66 @@
     "skipToContent": "Skip to content",
     "openLanguageMenu": "Open language menu",
     "openThemeMenu": "Open theme menu"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Welcome back to Roavaa.",
+      "cta": "Sign in",
+      "forgot": "Forgot password?",
+      "toSignup": "Create account"
+    },
+    "signup": {
+      "title": "Create account",
+      "subtitle": "Get started with Roavaa for your garage.",
+      "cta": "Create account",
+      "hasAccount": "Already have an account?",
+      "toLogin": "Sign in"
+    },
+    "forgot": {
+      "title": "Forgot password",
+      "subtitle": "We will send you a reset link.",
+      "cta": "Send reset link",
+      "back": "Back to sign in"
+    },
+    "reset": {
+      "title": "New password",
+      "subtitle": "Choose a new password.",
+      "cta": "Save password"
+    },
+    "fields": {
+      "fullName": "Full name",
+      "email": "Email",
+      "password": "Password",
+      "newPassword": "New password"
+    },
+    "messages": {
+      "checkEmail": "Almost there. Check your email to confirm your account.",
+      "resetSent": "If that email exists, a reset link has been sent."
+    },
+    "errors": {
+      "generic": "Something went wrong. Check your details and try again."
+    }
+  },
+  "request": {
+    "title": "Request your appointment",
+    "subtitle": "Tell us briefly what is wrong with your car. We will get back to you soon.",
+    "submit": "Send request",
+    "privacy": "By submitting, you agree that we may contact you about your request.",
+    "error": "Something went wrong. Check your details and try again.",
+    "sentTitle": "Thank you, your request has been sent.",
+    "sentBody": "{garage} has received your request and will contact you soon.",
+    "descriptionPlaceholder": "e.g. my brakes have been squeaking for a week.",
+    "fields": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "phone": "Phone",
+      "email": "Email",
+      "licensePlate": "Licence plate",
+      "make": "Make",
+      "model": "Model",
+      "mileage": "Mileage",
+      "description": "What is wrong with your car?"
+    }
   }
 }

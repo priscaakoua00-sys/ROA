@@ -1,7 +1,7 @@
 /**
- * AI layer — shared types.
+ * AI layer: shared types.
  *
- * Design rules (Phase 0):
+ * Design rules:
  *  - The AI layer NEVER accesses the database directly.
  *  - Every structured output is validated with Zod before use (see schemas.ts).
  *  - The provider can always say "I don't know" -> status: 'handoff'.

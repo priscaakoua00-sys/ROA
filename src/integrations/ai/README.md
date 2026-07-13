@@ -29,7 +29,7 @@ This keeps the product independent of any single AI company.
 1. Create `anthropic-provider.ts` (or `openai-provider.ts`) implementing `AIProvider`.
 2. Read the API key **only** from `process.env` on the server (e.g. `ANTHROPIC_API_KEY`).
 3. Ask the model for JSON, then `schema.parse(...)` the result. On parse failure,
-   return `status: 'handoff'` — never pass raw output downstream.
+   return `status: 'handoff'`: never pass raw output downstream.
 4. Register it in the `switch` inside `getAIProvider()`.
 5. Set `AI_PROVIDER="anthropic"` (or `"openai"`) in the environment.
 

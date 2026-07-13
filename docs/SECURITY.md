@@ -8,7 +8,7 @@ Security is a first-class design constraint, not an afterthought.
 - Every business row is scoped by `organization_id`.
 - Isolation is enforced at the database with **Supabase Row Level Security**
   (Phase 1). The application never relies on client-side filtering alone.
-- One organization must never read or write another organization's data —
+- One organization must never read or write another organization's data,
   including through the AI layer.
 
 ## Secrets
@@ -36,8 +36,8 @@ Security is a first-class design constraint, not an afterthought.
   confirms a repair, promises a fixed price, or invents availability on its own.
 - Every provider validates its output against a Zod schema before the app trusts
   it. Unvalidated model output is never used.
-- The provider can return `status: 'handoff'` — "I don't know / a human must
-  take over" — on low confidence, missing information, or a safety trigger.
+- The provider can return `status: 'handoff'`, "I don't know / a human must
+  take over", on low confidence, missing information, or a safety trigger.
 - **Emergency detection.** Safety-critical keywords (smoke, fire, fuel leak,
   brakes not working, ...) are detected per language. On a match, the assistant
   does not try to resolve the request itself; it hands off and flags immediate

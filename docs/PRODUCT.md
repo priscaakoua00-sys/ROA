@@ -1,6 +1,6 @@
 # Product
 
-> Brand name: **Roavaa** — from Répond · Organise · Apprend (Responds · Organizes ·
+> Brand name: **Roavaa**, from Répond · Organise · Apprend (Responds · Organizes ·
 > Learns). The name is the same in every language; only the slogan is translated.
 
 ## Vision
@@ -32,7 +32,7 @@ money, does it reduce the customer's stress? If not, it is not built now.
   conversation, summary, proposal.
 - **Everything configurable without code.** Hours, appointment durations, tone,
   automated messages, languages, urgencies, logo, colors, signature.
-- **A personal universe.** Each business feels the product is *theirs* — logo,
+- **A personal universe.** Each business feels the product is *theirs*, logo,
   name, colors, assistant name, personalized welcome.
 
 ## Languages
@@ -47,17 +47,19 @@ The owner can work in English while the assistant answers one customer in Dutch
 and another in French. A known preferred language is respected; the AI does not
 switch language without reason.
 
-## Phase 0 scope (this repository)
+## Current scope
 
-Included: project foundation, layered architecture, full i18n (NL/EN/FR) with a
-working, persistent language selector, theme system (light/dark), multi-tenant
-CSS-variable theming prepared, shadcn/ui components, the `AIProvider` interface
-with a `MockAIProvider`, Supabase clients wired (not called), tests, CI, docs.
+Phase 1 (core business) is built and connected to Supabase: authentication,
+organizations with RLS, onboarding, customers, vehicles, leads with emergency
+detection and AI qualification, team and roles, appointments and agenda, work
+orders, public request form, dashboard, and internal conversations with
+AI-drafted replies. Full i18n (NL/EN/FR), tests, and CI.
 
-Explicitly **not** in Phase 0: authentication, business screens, telephony,
-WhatsApp, billing, final business tables, real AI, real secrets.
+Still simulated or not connected: the AI provider is a deterministic mock (no
+real model), and no real channels (email, WhatsApp, phone) are wired. See
+PILOT_READINESS.md.
 
-## First functional scope (Phase 1 target)
+## First functional scope (Phase 1, delivered)
 
 Account creation; create a garage organization; invite members; configure hours;
 create/edit customers and vehicles; receive a request via a public form; auto-
@@ -69,5 +71,5 @@ hand off to a human when confidence is low.
 
 The dashboard explains numbers, it does not just display them. Each
 recommendation shows the data used, a confidence level, the proposed action, the
-expected result, and accept/ignore. When data is insufficient it says so —
+expected result, and accept/ignore. When data is insufficient it says so,
 it never invents a conclusion.

@@ -3,7 +3,7 @@ import { createBrowserClient } from '@supabase/ssr';
 /**
  * Browser Supabase client (uses the public anon key, protected by RLS).
  *
- * Phase 0: not called anywhere yet. It reads env at call-time and throws a
+ * It reads env at call-time and throws a
  * clear error only if actually used without configuration, so install/build
  * stay green with no real keys.
  *

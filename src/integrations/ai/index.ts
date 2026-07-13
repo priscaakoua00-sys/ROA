@@ -1,8 +1,8 @@
 /**
  * Public entry point for the AI layer.
  *
- * The rest of the app imports from '@/integrations/ai' only — never a vendor
- * SDK. In Phase 0 the factory always returns the offline MockAIProvider, so no
+ * The rest of the app imports from '@/integrations/ai' only, never a vendor
+ * SDK. By default the factory returns the offline MockAIProvider, so no
  * API key is needed to install, test or deploy.
  *
  * Later (Phase 1+), `getAIProvider()` will read process.env.AI_PROVIDER and
@@ -20,7 +20,8 @@ export { findEmergencyKeywords, EMERGENCY_KEYWORDS } from './emergency-keywords'
 let cached: AIProvider | null = null;
 
 /**
- * Return the active AI provider (singleton). Phase 0: always the mock.
+ * Return the active AI provider (singleton). Default: the mock; a real
+ * provider can be selected via env when configured.
  */
 export function getAIProvider(): AIProvider {
   if (cached) return cached;

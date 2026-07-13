@@ -19,10 +19,10 @@
 src/
 ├── app/[locale]/        Presentation (App Router, locale-scoped)
 │   ├── layout.tsx       Root layout: i18n provider + theme provider
-│   ├── page.tsx         Phase 0 witness page
+│   ├── page.tsx         Marketing landing page
 │   └── globals.css      Design tokens (light/dark) + multi-tenant CSS vars
 ├── components/          UI (shadcn/ui in components/ui, app components alongside)
-├── core/                Business logic (framework-agnostic) — Phase 1
+├── core/                Business logic (framework-agnostic): Phase 1
 ├── data/
 │   └── supabase/        Data access: browser + server clients (server-only guard)
 ├── integrations/
@@ -39,7 +39,7 @@ Not yet created (added as needed in later phases): `automation/`, `auth/`,
 
 - `next-intl` with locales `['nl', 'en', 'fr']`, default `nl`,
   `localePrefix: 'always'` (URLs are `/nl`, `/en`, `/fr`).
-- Strings live in `messages/{nl,en,fr}.json` — never hard-coded in components.
+- Strings live in `messages/{nl,en,fr}.json`: never hard-coded in components.
   A test enforces identical keys across all three bundles.
 - The middleware detects the browser language, persists the manual choice in the
   `NEXT_LOCALE` cookie, and redirects `/` accordingly.
@@ -51,7 +51,7 @@ Not yet created (added as needed in later phases): `automation/`, `auth/`,
 - Colors and radius are CSS variables in `globals.css`, consumed by Tailwind via
   `hsl(var(--token))`. Light and dark are full token sets.
 - `--brand` defaults to `--primary`. A per-tenant theme (Phase 1) overrides
-  `--primary` / `--brand` on a wrapper element at runtime — no component change.
+  `--primary` / `--brand` on a wrapper element at runtime: no component change.
   A `[data-tenant='demo']` example proves the mechanism.
 - `next-themes` provides light / dark / system with no flash and respects
   `prefers-reduced-motion` (handled globally in CSS).
@@ -65,7 +65,7 @@ integrations/ai/
 ├── types.ts               shared types + AIResult envelope + inputs
 ├── schemas.ts             Zod schemas for every structured output (source of truth)
 ├── provider.ts            AIProvider interface
-├── mock-provider.ts       offline deterministic provider (Phase 0 default)
+├── mock-provider.ts       offline deterministic provider (current default)
 ├── emergency-keywords.ts  safety-critical keyword detection per language
 └── index.ts               getAIProvider() factory
 ```
@@ -75,26 +75,27 @@ integrations/ai/
   safety trigger).
 - Providers validate output with the Zod schema before returning. Raw model
   output is never trusted.
-- Phase 0 ships only `MockAIProvider` — no key, no network. `getAIProvider()`
-  will select a real provider from `process.env.AI_PROVIDER` in Phase 1.
+- The current default is `MockAIProvider` (no key, no network).
+  `getAIProvider()` selects a real provider from `process.env.AI_PROVIDER` when
+  configured (Phase 2).
 
 ## Data layer
 
-- `data/supabase/client.ts` — browser client (anon key, RLS-protected).
-- `data/supabase/server.ts` — server client with `import 'server-only'` so it
+- `data/supabase/client.ts`: browser client (anon key, RLS-protected).
+- `data/supabase/server.ts`: server client with `import 'server-only'` so it
   cannot be imported into a client bundle. The service-role key is intentionally
-  **not** used here; it belongs to dedicated audited server actions (Phase 1).
-- Both read env at call-time and are not invoked anywhere in Phase 0, so
-  install/build stay green without real credentials.
+  **not** used here; it belongs to dedicated audited server actions.
+- Both read env at call-time; clients are created lazily, so install and build
+  stay green even without real credentials.
 
 ## The three memories (intelligence roadmap)
 
-A responsible learning design, prepared but not built in Phase 0:
+A responsible learning design, prepared but not yet built (Phase 2):
 
-1. **Company memory** — this garage's hours, team, tone, preferences, approved
+1. **Company memory**: this garage's hours, team, tone, preferences, approved
    replies, corrections. Stays scoped to the organization.
-2. **Trade memory** — repairs, parts, urgencies, common qualification questions.
-3. **Shared memory** — anonymized, aggregated, GDPR-compliant global trends
+2. **Trade memory**: repairs, parts, urgencies, common qualification questions.
+3. **Shared memory**: anonymized, aggregated, GDPR-compliant global trends
    (best follow-up time, effective reminders, phrasings that convert).
 
 Early versions do **not** retrain a model automatically. Intelligence grows via

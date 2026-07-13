@@ -2,7 +2,7 @@ import type { SupportedLanguage } from './types';
 
 /**
  * Safety-critical keywords per language. If any appears in a customer message,
- * the assistant must NOT try to handle it alone — it hands off to a human and
+ * the assistant must NOT try to handle it alone, it hands off to a human and
  * flags immediate contact. Sourced from the product safety rules.
  */
 export const EMERGENCY_KEYWORDS: Record<SupportedLanguage, string[]> = {

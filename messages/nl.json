@@ -1,6 +1,219 @@
 {
   "app": {
-    "name": "Roavaa"
+    "name": "Roavaa",
+    "onboarding": {
+      "title": "Uw garage instellen",
+      "subtitle": "Nog een stap voordat u begint.",
+      "name": "Naam van uw garage",
+      "namePlaceholder": "bijv. Garage De Vries",
+      "businessType": "Type onderneming",
+      "cta": "Garage aanmaken",
+      "error": "Aanmaken mislukt. Probeer opnieuw."
+    },
+    "businessType": {
+      "garage": "Autogarage",
+      "plumber": "Loodgieter",
+      "electrician": "Elektricien",
+      "hvac": "CV en airco",
+      "dentist": "Tandarts",
+      "real_estate": "Vastgoed",
+      "other": "Overig"
+    },
+    "dashboard": {
+      "welcome": "Welkom terug",
+      "signOut": "Uitloggen",
+      "setupTitle": "Uw volgende stappen",
+      "setupIntro": "Uw werkplek is klaar. De volgende onderdelen komen er binnenkort aan.",
+      "next": {
+        "leads": "Klantaanvragen ontvangen en kwalificeren",
+        "agenda": "Agenda en afspraken beheren",
+        "team": "Uw team uitnodigen"
+      },
+      "incomingTitle": "Binnenkomende aanvragen",
+      "incomingEmpty": "Nog geen aanvragen. Deel uw formulier-link hieronder om te beginnen.",
+      "shareTitle": "Uw aanvraagformulier",
+      "shareIntro": "Deel deze link met uw klanten. Elke aanvraag komt hier automatisch binnen.",
+      "openForm": "Formulier openen",
+      "openAgenda": "Agenda",
+      "statNewToday": "Nieuw vandaag",
+      "statOpen": "Open aanvragen",
+      "statUrgent": "Urgent",
+      "statUpcoming": "Komende afspraken",
+      "notifications": "nieuwe meldingen",
+      "openTeam": "Team",
+      "openCustomers": "Klanten",
+      "openWorkOrders": "Werkorders",
+      "openVehicles": "Voertuigen",
+      "openSettings": "Instellingen",
+      "daySummary": "Vandaag: {count} nieuwe aanvragen, {urgent} urgent, {upcoming} afspraken gepland.",
+      "statConversion": "Conversie",
+      "statTeam": "Team actief",
+      "priorityTitle": "Prioriteit"
+    },
+    "roles": {
+      "owner": "Eigenaar",
+      "admin": "Beheerder",
+      "receptionist": "Receptie",
+      "mechanic": "Monteur",
+      "viewer": "Kijker"
+    },
+    "leads": {
+      "anonymous": "Onbekende klant",
+      "review": "Menselijke controle",
+      "urgency": {
+        "low": "Laag",
+        "normal": "Normaal",
+        "high": "Hoog",
+        "critical": "Kritiek"
+      },
+      "status": {
+        "new": "Nieuw",
+        "qualifying": "In behandeling",
+        "qualified": "Gekwalificeerd",
+        "appointment_proposed": "Afspraak voorgesteld",
+        "booked": "Ingepland",
+        "won": "Gewonnen",
+        "lost": "Verloren",
+        "archived": "Gearchiveerd"
+      }
+    },
+    "lead": {
+      "back": "Terug naar overzicht",
+      "contact": "Contact",
+      "vehicle": "Voertuig",
+      "proposeTitle": "Plan een afspraak",
+      "proposeIntro": "Kies een voorgesteld moment. U beslist.",
+      "noSlots": "Geen vrije momenten gevonden. Controleer uw openingstijden.",
+      "book": "Kies dit moment",
+      "booked": "Afspraak ingepland.",
+      "alreadyBooked": "Er is al een afspraak voor deze aanvraag.",
+      "viewAgenda": "Bekijk agenda",
+      "error": "Er ging iets mis. Probeer opnieuw.",
+      "assignedTo": "Toegewezen aan",
+      "unassigned": "Niemand",
+      "assign": "Toewijzen",
+      "createWorkOrder": "Reparatieorder aanmaken",
+      "viewWorkOrder": "Bekijk reparatieorder"
+    },
+    "agenda": {
+      "title": "Agenda",
+      "empty": "Nog geen afspraken ingepland."
+    },
+    "appointmentStatus": {
+      "proposed": "Voorgesteld",
+      "pending": "In afwachting",
+      "confirmed": "Bevestigd",
+      "completed": "Afgerond",
+      "cancelled": "Geannuleerd",
+      "no_show": "Niet verschenen"
+    },
+    "conversation": {
+      "title": "Gesprek",
+      "replyLabel": "Uw antwoord",
+      "aiDrafted": "Voorstel van Roavaa",
+      "handoff": "Veiligheid: dit lijkt urgent. Neem zelf direct contact op, geen automatisch antwoord.",
+      "placeholder": "Typ uw antwoord...",
+      "note": "U verstuurt zelf. Roavaa stelt alleen voor.",
+      "send": "Versturen",
+      "sent": "Antwoord opgeslagen."
+    },
+    "team": {
+      "title": "Team",
+      "invited": "Uitnodiging aangemaakt.",
+      "error": "Er ging iets mis.",
+      "pending": "Uitgenodigd",
+      "disabled": "Gedeactiveerd",
+      "save": "Opslaan",
+      "enable": "Activeren",
+      "disable": "Deactiveren",
+      "inviteTitle": "Medewerker uitnodigen",
+      "inviteIntro": "Voeg een collega toe met een rol.",
+      "email": "E-mailadres",
+      "invite": "Uitnodigen",
+      "inviteNote": "De uitnodiging staat klaar. E-mailverzending volgt in een latere stap."
+    },
+    "customers": {
+      "title": "Klanten",
+      "search": "Zoek op naam, telefoon of e-mail",
+      "empty": "Nog geen klanten. Ze verschijnen hier zodra er aanvragen binnenkomen.",
+      "back": "Terug naar klanten",
+      "vehiclesTitle": "Voertuigen",
+      "noVehicles": "Nog geen voertuig.",
+      "vehicle": "Voertuig",
+      "plate": "Kenteken",
+      "make": "Merk",
+      "model": "Model",
+      "mileage": "Km-stand",
+      "addVehicle": "Voertuig toevoegen",
+      "historyTitle": "Geschiedenis",
+      "noHistory": "Nog geen geschiedenis."
+    },
+    "workOrders": {
+      "title": "Reparatieorders",
+      "empty": "Nog geen reparatieorders.",
+      "back": "Terug naar reparatieorders",
+      "viewLead": "Bekijk aanvraag",
+      "tasksTitle": "Taken",
+      "noTasks": "Nog geen taken.",
+      "newTask": "Nieuwe taak",
+      "addTask": "Toevoegen"
+    },
+    "workOrderStatus": {
+      "open": "Open",
+      "in_progress": "Bezig",
+      "waiting_parts": "Wacht op onderdelen",
+      "done": "Klaar",
+      "cancelled": "Geannuleerd"
+    },
+    "vehicles": {
+      "title": "Voertuigen",
+      "search": "Zoek op kenteken, merk of model",
+      "empty": "Nog geen voertuigen.",
+      "back": "Terug naar voertuigen",
+      "saved": "Opgeslagen.",
+      "year": "Bouwjaar",
+      "historyTitle": "Geschiedenis"
+    },
+    "notifications": {
+      "title": "Meldingen",
+      "markAll": "Alles als gelezen",
+      "empty": "Geen meldingen.",
+      "new": "Nieuw",
+      "open": "Openen",
+      "markRead": "Gelezen"
+    },
+    "settings": {
+      "title": "Instellingen",
+      "saved": "Opgeslagen.",
+      "companyTitle": "Bedrijf",
+      "name": "Naam",
+      "language": "Standaardtaal",
+      "hoursTitle": "Openingstijden",
+      "hoursIntro": "Bepaalt welke momenten Roavaa kan voorstellen.",
+      "servicesTitle": "Diensten",
+      "servicesIntro": "Duur en buffer bepalen de voorgestelde momenten.",
+      "serviceName": "Naam",
+      "duration": "Duur (min)",
+      "buffer": "Buffer (min)",
+      "active": "Actief",
+      "delete": "Verwijderen",
+      "newService": "Nieuwe dienst",
+      "addService": "Toevoegen",
+      "weekday": {
+        "0": "Zondag",
+        "1": "Maandag",
+        "2": "Dinsdag",
+        "3": "Woensdag",
+        "4": "Donderdag",
+        "5": "Vrijdag",
+        "6": "Zaterdag"
+      },
+      "lang": {
+        "nl": "Nederlands",
+        "en": "English",
+        "fr": "Français"
+      }
+    }
   },
   "language": {
     "label": "Taal",
@@ -96,5 +309,66 @@
     "skipToContent": "Naar inhoud gaan",
     "openLanguageMenu": "Taalmenu openen",
     "openThemeMenu": "Thememenu openen"
+  },
+  "auth": {
+    "login": {
+      "title": "Inloggen",
+      "subtitle": "Welkom terug bij Roavaa.",
+      "cta": "Inloggen",
+      "forgot": "Wachtwoord vergeten?",
+      "toSignup": "Account aanmaken"
+    },
+    "signup": {
+      "title": "Account aanmaken",
+      "subtitle": "Begin met Roavaa voor uw garage.",
+      "cta": "Account aanmaken",
+      "hasAccount": "Al een account?",
+      "toLogin": "Inloggen"
+    },
+    "forgot": {
+      "title": "Wachtwoord vergeten",
+      "subtitle": "We sturen u een herstellink.",
+      "cta": "Stuur herstellink",
+      "back": "Terug naar inloggen"
+    },
+    "reset": {
+      "title": "Nieuw wachtwoord",
+      "subtitle": "Kies een nieuw wachtwoord.",
+      "cta": "Wachtwoord opslaan"
+    },
+    "fields": {
+      "fullName": "Volledige naam",
+      "email": "E-mailadres",
+      "password": "Wachtwoord",
+      "newPassword": "Nieuw wachtwoord"
+    },
+    "messages": {
+      "checkEmail": "Bijna klaar. Controleer uw e-mail om uw account te bevestigen.",
+      "resetSent": "Als dit e-mailadres bestaat, is er een herstellink verstuurd."
+    },
+    "errors": {
+      "generic": "Er ging iets mis. Controleer uw gegevens en probeer opnieuw."
+    }
+  },
+  "request": {
+    "title": "Vraag uw afspraak aan",
+    "subtitle": "Vertel ons kort wat er met uw auto is. U hoort snel van ons.",
+    "submit": "Aanvraag versturen",
+    "privacy": "Door te versturen gaat u akkoord dat wij contact met u opnemen over uw aanvraag.",
+    "error": "Er ging iets mis. Controleer uw gegevens en probeer opnieuw.",
+    "sentTitle": "Bedankt, uw aanvraag is verstuurd.",
+    "sentBody": "{garage} heeft uw aanvraag ontvangen en neemt snel contact met u op.",
+    "descriptionPlaceholder": "Bijv. mijn remmen piepen al een week.",
+    "fields": {
+      "firstName": "Voornaam",
+      "lastName": "Achternaam",
+      "phone": "Telefoon",
+      "email": "E-mail",
+      "licensePlate": "Kenteken",
+      "make": "Merk",
+      "model": "Model",
+      "mileage": "Kilometerstand",
+      "description": "Wat is er met uw auto?"
+    }
   }
 }

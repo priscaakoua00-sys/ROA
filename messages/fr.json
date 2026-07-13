@@ -1,6 +1,219 @@
 {
   "app": {
-    "name": "Roavaa"
+    "name": "Roavaa",
+    "onboarding": {
+      "title": "Configurez votre garage",
+      "subtitle": "Une etape avant de commencer.",
+      "name": "Nom de votre garage",
+      "namePlaceholder": "ex. Garage De Vries",
+      "businessType": "Type d'entreprise",
+      "cta": "Creer le garage",
+      "error": "Creation impossible. Reessayez."
+    },
+    "businessType": {
+      "garage": "Garage auto",
+      "plumber": "Plombier",
+      "electrician": "Electricien",
+      "hvac": "Chauffage et clim",
+      "dentist": "Dentiste",
+      "real_estate": "Immobilier",
+      "other": "Autre"
+    },
+    "dashboard": {
+      "welcome": "Bon retour",
+      "signOut": "Se deconnecter",
+      "setupTitle": "Vos prochaines etapes",
+      "setupIntro": "Votre espace est pret. Les elements suivants arrivent bientot.",
+      "next": {
+        "leads": "Recevoir et qualifier les demandes clients",
+        "agenda": "Gerer l'agenda et les rendez-vous",
+        "team": "Inviter votre equipe"
+      },
+      "incomingTitle": "Demandes entrantes",
+      "incomingEmpty": "Aucune demande pour l'instant. Partagez le lien de votre formulaire ci-dessous pour commencer.",
+      "shareTitle": "Votre formulaire de demande",
+      "shareIntro": "Partagez ce lien avec vos clients. Chaque demande arrive ici automatiquement.",
+      "openForm": "Ouvrir le formulaire",
+      "openAgenda": "Agenda",
+      "statNewToday": "Nouveau aujourd'hui",
+      "statOpen": "Demandes ouvertes",
+      "statUrgent": "Urgent",
+      "statUpcoming": "Rendez-vous à venir",
+      "notifications": "nouvelles notifications",
+      "openTeam": "Équipe",
+      "openCustomers": "Clients",
+      "openWorkOrders": "Ordres",
+      "openVehicles": "Véhicules",
+      "openSettings": "Paramètres",
+      "daySummary": "Aujourd'hui : {count} nouvelles demandes, {urgent} urgentes, {upcoming} rendez-vous prévus.",
+      "statConversion": "Conversion",
+      "statTeam": "Équipe active",
+      "priorityTitle": "Priorité"
+    },
+    "roles": {
+      "owner": "Proprietaire",
+      "admin": "Administrateur",
+      "receptionist": "Reception",
+      "mechanic": "Mecanicien",
+      "viewer": "Observateur"
+    },
+    "leads": {
+      "anonymous": "Client inconnu",
+      "review": "Contrôle humain",
+      "urgency": {
+        "low": "Faible",
+        "normal": "Normal",
+        "high": "Élevé",
+        "critical": "Critique"
+      },
+      "status": {
+        "new": "Nouveau",
+        "qualifying": "En qualification",
+        "qualified": "Qualifié",
+        "appointment_proposed": "RDV proposé",
+        "booked": "Planifié",
+        "won": "Gagné",
+        "lost": "Perdu",
+        "archived": "Archivé"
+      }
+    },
+    "lead": {
+      "back": "Retour à la vue d'ensemble",
+      "contact": "Contact",
+      "vehicle": "Véhicule",
+      "proposeTitle": "Planifier un rendez-vous",
+      "proposeIntro": "Choisissez un créneau proposé. Vous décidez.",
+      "noSlots": "Aucun créneau libre trouvé. Vérifiez vos horaires d'ouverture.",
+      "book": "Choisir ce créneau",
+      "booked": "Rendez-vous planifié.",
+      "alreadyBooked": "Cette demande a déjà un rendez-vous.",
+      "viewAgenda": "Voir l'agenda",
+      "error": "Une erreur est survenue. Réessayez.",
+      "assignedTo": "Assigné à",
+      "unassigned": "Personne",
+      "assign": "Assigner",
+      "createWorkOrder": "Créer un ordre de réparation",
+      "viewWorkOrder": "Voir l'ordre de réparation"
+    },
+    "agenda": {
+      "title": "Agenda",
+      "empty": "Aucun rendez-vous planifié pour le moment."
+    },
+    "appointmentStatus": {
+      "proposed": "Proposé",
+      "pending": "En attente",
+      "confirmed": "Confirmé",
+      "completed": "Terminé",
+      "cancelled": "Annulé",
+      "no_show": "Absent"
+    },
+    "conversation": {
+      "title": "Conversation",
+      "replyLabel": "Votre réponse",
+      "aiDrafted": "Proposé par Roavaa",
+      "handoff": "Sécurité : cela semble urgent. Contactez le client directement, pas de réponse automatique.",
+      "placeholder": "Tapez votre réponse...",
+      "note": "C'est vous qui envoyez. Roavaa ne fait que proposer.",
+      "send": "Envoyer",
+      "sent": "Réponse enregistrée."
+    },
+    "team": {
+      "title": "Équipe",
+      "invited": "Invitation créée.",
+      "error": "Une erreur est survenue.",
+      "pending": "Invité",
+      "disabled": "Désactivé",
+      "save": "Enregistrer",
+      "enable": "Activer",
+      "disable": "Désactiver",
+      "inviteTitle": "Inviter un membre",
+      "inviteIntro": "Ajoutez un collègue avec un rôle.",
+      "email": "E-mail",
+      "invite": "Inviter",
+      "inviteNote": "L'invitation est prête. L'envoi par e-mail viendra plus tard."
+    },
+    "customers": {
+      "title": "Clients",
+      "search": "Rechercher par nom, téléphone ou e-mail",
+      "empty": "Aucun client pour l'instant. Ils apparaissent ici dès qu'une demande arrive.",
+      "back": "Retour aux clients",
+      "vehiclesTitle": "Véhicules",
+      "noVehicles": "Aucun véhicule.",
+      "vehicle": "Véhicule",
+      "plate": "Plaque",
+      "make": "Marque",
+      "model": "Modèle",
+      "mileage": "Km",
+      "addVehicle": "Ajouter un véhicule",
+      "historyTitle": "Historique",
+      "noHistory": "Aucun historique."
+    },
+    "workOrders": {
+      "title": "Ordres de réparation",
+      "empty": "Aucun ordre de réparation.",
+      "back": "Retour aux ordres",
+      "viewLead": "Voir la demande",
+      "tasksTitle": "Tâches",
+      "noTasks": "Aucune tâche.",
+      "newTask": "Nouvelle tâche",
+      "addTask": "Ajouter"
+    },
+    "workOrderStatus": {
+      "open": "Ouvert",
+      "in_progress": "En cours",
+      "waiting_parts": "Attente pièces",
+      "done": "Terminé",
+      "cancelled": "Annulé"
+    },
+    "vehicles": {
+      "title": "Véhicules",
+      "search": "Rechercher par plaque, marque ou modèle",
+      "empty": "Aucun véhicule.",
+      "back": "Retour aux véhicules",
+      "saved": "Enregistré.",
+      "year": "Année",
+      "historyTitle": "Historique"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "markAll": "Tout marquer comme lu",
+      "empty": "Aucune notification.",
+      "new": "Nouveau",
+      "open": "Ouvrir",
+      "markRead": "Marquer comme lu"
+    },
+    "settings": {
+      "title": "Paramètres",
+      "saved": "Enregistré.",
+      "companyTitle": "Entreprise",
+      "name": "Nom",
+      "language": "Langue par défaut",
+      "hoursTitle": "Horaires d'ouverture",
+      "hoursIntro": "Détermine les créneaux que Roavaa peut proposer.",
+      "servicesTitle": "Services",
+      "servicesIntro": "La durée et le tampon façonnent les créneaux proposés.",
+      "serviceName": "Nom",
+      "duration": "Durée (min)",
+      "buffer": "Tampon (min)",
+      "active": "Actif",
+      "delete": "Supprimer",
+      "newService": "Nouveau service",
+      "addService": "Ajouter",
+      "weekday": {
+        "0": "Dimanche",
+        "1": "Lundi",
+        "2": "Mardi",
+        "3": "Mercredi",
+        "4": "Jeudi",
+        "5": "Vendredi",
+        "6": "Samedi"
+      },
+      "lang": {
+        "nl": "Nederlands",
+        "en": "English",
+        "fr": "Français"
+      }
+    }
   },
   "language": {
     "label": "Langue",
@@ -96,5 +309,66 @@
     "skipToContent": "Aller au contenu",
     "openLanguageMenu": "Ouvrir le menu des langues",
     "openThemeMenu": "Ouvrir le menu des thèmes"
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "subtitle": "Bon retour sur Roavaa.",
+      "cta": "Se connecter",
+      "forgot": "Mot de passe oublie ?",
+      "toSignup": "Creer un compte"
+    },
+    "signup": {
+      "title": "Creer un compte",
+      "subtitle": "Demarrez avec Roavaa pour votre garage.",
+      "cta": "Creer un compte",
+      "hasAccount": "Deja un compte ?",
+      "toLogin": "Se connecter"
+    },
+    "forgot": {
+      "title": "Mot de passe oublie",
+      "subtitle": "Nous vous enverrons un lien de reinitialisation.",
+      "cta": "Envoyer le lien",
+      "back": "Retour a la connexion"
+    },
+    "reset": {
+      "title": "Nouveau mot de passe",
+      "subtitle": "Choisissez un nouveau mot de passe.",
+      "cta": "Enregistrer"
+    },
+    "fields": {
+      "fullName": "Nom complet",
+      "email": "E-mail",
+      "password": "Mot de passe",
+      "newPassword": "Nouveau mot de passe"
+    },
+    "messages": {
+      "checkEmail": "Presque fini. Verifiez votre e-mail pour confirmer votre compte.",
+      "resetSent": "Si cet e-mail existe, un lien de reinitialisation a ete envoye."
+    },
+    "errors": {
+      "generic": "Une erreur est survenue. Verifiez vos informations et reessayez."
+    }
+  },
+  "request": {
+    "title": "Demandez votre rendez-vous",
+    "subtitle": "Dites-nous brièvement ce qui ne va pas avec votre voiture. Nous revenons vers vous rapidement.",
+    "submit": "Envoyer la demande",
+    "privacy": "En envoyant, vous acceptez que nous vous contactions au sujet de votre demande.",
+    "error": "Une erreur est survenue. Vérifiez vos informations et réessayez.",
+    "sentTitle": "Merci, votre demande a été envoyée.",
+    "sentBody": "{garage} a bien reçu votre demande et vous contactera bientôt.",
+    "descriptionPlaceholder": "ex. mes freins grincent depuis une semaine.",
+    "fields": {
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "phone": "Téléphone",
+      "email": "E-mail",
+      "licensePlate": "Plaque",
+      "make": "Marque",
+      "model": "Modèle",
+      "mileage": "Kilométrage",
+      "description": "Quel est le problème avec votre voiture ?"
+    }
   }
 }
