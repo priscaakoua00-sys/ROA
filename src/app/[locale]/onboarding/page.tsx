@@ -5,7 +5,6 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { AuthShell, Field } from '@/components/auth/auth-shell';
 import { Button } from '@/components/ui/button';
 import { createSupabaseServerClient } from '@/data/supabase/server';
-import { BUSINESS_TYPES } from '@/lib/validation/auth';
 import { createOrgAction } from '@/data/orgs/actions';
 
 export default async function OnboardingPage({
@@ -44,11 +43,7 @@ export default async function OnboardingPage({
             defaultValue="garage"
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
           >
-            {BUSINESS_TYPES.map((bt) => (
-              <option key={bt} value={bt}>
-                {t(`businessType.${bt}`)}
-              </option>
-            ))}
+            <option value="garage">{t('businessType.garage')}</option>
           </select>
         </label>
         <Button type="submit" className="w-full">{t('onboarding.cta')}</Button>
