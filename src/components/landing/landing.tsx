@@ -6,7 +6,10 @@ const LOCALES: Locale[] = ['nl', 'en', 'fr'];
 
 /** Cinematic Roavaa marketing homepage. Self-contained styles (see .lp in globals.css). */
 export function Landing({ locale }: { locale: Locale }) {
-  const c = COPY[locale];
+  const safeLocale: Locale = (['nl', 'en', 'fr'] as const).includes(locale)
+    ? locale
+    : 'nl';
+  const c = COPY[safeLocale];
 
   return (
     <div className="lp">
@@ -25,7 +28,7 @@ export function Landing({ locale }: { locale: Locale }) {
                 </a>
               ))}
             </span>
-            <a className="lp-btn" href="#demo">{c.nav.demo}</a>
+            <a className="lp-btn" href={`/${safeLocale}/signup`}>{c.nav.demo}</a>
           </nav>
         </div>
       </header>
@@ -43,7 +46,7 @@ export function Landing({ locale }: { locale: Locale }) {
               </h1>
               <p className="lp-sub">{c.hero.sub}</p>
               <div className="lp-cta">
-                <a className="lp-btn" href="#demo">{c.hero.ctaPrimary} →</a>
+                <a className="lp-btn" href={`/${safeLocale}/signup`}>{c.hero.ctaPrimary} →</a>
                 <a className="lp-btn ghost" href="#werk">{c.hero.ctaSecondary}</a>
               </div>
               <div className="lp-sig">
@@ -58,7 +61,7 @@ export function Landing({ locale }: { locale: Locale }) {
                 <span className="t">{c.device.head}</span>
                 <span className="lp-live lp-mono"><span className="pulse" />{c.device.live}</span>
               </div>
-              <LiveStream locale={locale} />
+              <LiveStream locale={safeLocale} />
               <div className="lp-device-foot">
                 <span className="decide">{c.device.decide}<b>{c.device.decideB}</b></span>
                 <span className="mini"><span className="go">{c.device.approve}</span><span>{c.device.view}</span></span>
@@ -158,8 +161,8 @@ export function Landing({ locale }: { locale: Locale }) {
               </h2>
             </Reveal>
             <Reveal className="lp-cta lp-cta-center">
-              <a className="lp-btn" href="#">{c.close.ctaPrimary} →</a>
-              <a className="lp-btn ghost" href="#">{c.close.ctaSecondary}</a>
+              <a className="lp-btn" href={`/${safeLocale}/signup`}>{c.close.ctaPrimary} →</a>
+              <a className="lp-btn ghost" href={`/${safeLocale}/login`}>{c.close.ctaSecondary}</a>
             </Reveal>
             <Reveal className="lp-close-sig">
               <span className="lp-brand lp-serif">Roavaa<span className="lp-dot">.</span></span>

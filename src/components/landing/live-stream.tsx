@@ -5,7 +5,7 @@ import { STREAM, type Locale } from './content';
 
 /** The signature hero element: incoming customer requests handled live by Roavaa. */
 export function LiveStream({ locale }: { locale: Locale }) {
-  const queue = STREAM[locale];
+  const queue = STREAM[locale] ?? STREAM.nl;
   const MAX = 4;
   const [items, setItems] = useState(() =>
     queue.slice(0, MAX).map((m, k) => ({ ...m, key: k, fresh: false })),
