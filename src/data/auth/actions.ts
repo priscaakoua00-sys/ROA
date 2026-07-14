@@ -61,9 +61,17 @@ export async function signUpAction(formData: FormData) {
   });
   if (error) redirect(`/${locale}/signup?error=signup`);
 
-  // If email confirmation is disabled, a session exists → go straight to onboarding.
+  // New users are auto-confirmed (DB trigger). Go straight in.
   if (data.session) redirect(`/${locale}/onboarding`);
-  // Otherwise the user must confirm via the email link.
+
+  // No session returned: sign in right away (the account is already confirmed).
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: parsed.data.email,
+    password: parsed.data.password,
+  });
+  if (!signInError) redirect(`/${locale}/onboarding`);
+
+  // Fallback only if sign-in somehow failed.
   redirect(`/${locale}/login?message=check_email`);
 }
 

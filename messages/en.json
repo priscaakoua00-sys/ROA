@@ -50,7 +50,30 @@
       "statTeam": "Team active",
       "priorityTitle": "Priority",
       "openKnowledge": "Knowledge",
-      "openAutomations": "Follow-ups"
+      "openAutomations": "Follow-ups",
+      "greetMorning": "Good morning {name}.",
+      "greetAfternoon": "Good afternoon {name}.",
+      "greetEvening": "Good evening {name}.",
+      "robinName": "Robin",
+      "robinIntro": "I am Robin, your AI employee. Today I am keeping an eye on everything.",
+      "robinSummary": "There are {count} new requests, {waiting} waiting for a reply and {upcoming} appointments scheduled.",
+      "robinAsk": "What would you like me to do?",
+      "actReply": "Reply to waiting customer",
+      "actNewCustomer": "New customer",
+      "actFollowups": "View follow-ups",
+      "actAgenda": "Open agenda",
+      "nudge": "I see {count} customer(s) who have been waiting more than 30 minutes. Shall I take care of them?",
+      "nudgeCta": "Take the first one",
+      "doneTitle": "What I did today",
+      "doneReplies": "{count} replies sent",
+      "doneAppts": "{count} appointments made",
+      "doneFollowups": "{count} follow-ups done",
+      "doneWaiting": "{count} customers waiting",
+      "startTitle": "Robin is ready",
+      "startIntro": "Here is how to start:",
+      "step1": "Share your request form with customers.",
+      "step2": "Add your first customer.",
+      "step3": "Invite a mechanic."
     },
     "roles": {
       "owner": "Owner",
@@ -251,6 +274,19 @@
         "post_repair": "Ask {name} if all is well and request a Google review.",
         "reactivate": "Reach out to {name} again with an offer."
       }
+    },
+    "newCustomer": {
+      "title": "New customer",
+      "intro": "Add a customer, and a vehicle right away if you like.",
+      "customer": "Customer",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "phone": "Phone",
+      "email": "Email",
+      "vehicle": "Vehicle (optional)",
+      "vehicleHint": "Leave empty to add only the customer.",
+      "save": "Save customer",
+      "add": "New customer"
     }
   },
   "language": {

@@ -1,7 +1,9 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { sendEmail } from '@/integrations/email';
 
 type Locale = 'nl' | 'en' | 'fr';
 const ROLES = ['owner', 'admin', 'receptionist', 'mechanic', 'viewer'] as const;
@@ -34,6 +36,17 @@ export async function inviteMemberAction(formData: FormData) {
     status: 'invited',
   });
   if (error) redirect(`/${locale}/team?error=1`);
+
+  // Best-effort invite email with a link to create the account (if configured).
+  const h = await headers();
+  const origin = h.get('origin') ?? (h.get('host') ? `https://${h.get('host')}` : '');
+  if (origin) {
+    await sendEmail({
+      to: email,
+      subject: 'Uitnodiging voor Roavaa',
+      text: `U bent uitgenodigd om samen te werken in Roavaa. Maak hier uw account aan: ${origin}/${locale}/signup`,
+    });
+  }
   redirect(`/${locale}/team?invited=1`);
 }
 

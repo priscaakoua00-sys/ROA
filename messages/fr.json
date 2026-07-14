@@ -50,7 +50,30 @@
       "statTeam": "Équipe active",
       "priorityTitle": "Priorité",
       "openKnowledge": "Connaissances",
-      "openAutomations": "Relances"
+      "openAutomations": "Relances",
+      "greetMorning": "Bonjour {name}.",
+      "greetAfternoon": "Bon après-midi {name}.",
+      "greetEvening": "Bonsoir {name}.",
+      "robinName": "Robin",
+      "robinIntro": "Je suis Robin, votre employé IA. Aujourd'hui, je garde un œil sur tout.",
+      "robinSummary": "Il y a {count} nouvelles demandes, {waiting} en attente de réponse et {upcoming} rendez-vous prévus.",
+      "robinAsk": "Que souhaitez-vous que je fasse ?",
+      "actReply": "Répondre au client en attente",
+      "actNewCustomer": "Nouveau client",
+      "actFollowups": "Voir les relances",
+      "actAgenda": "Ouvrir l'agenda",
+      "nudge": "Je vois {count} client(s) qui attendent depuis plus de 30 minutes. Voulez-vous que je m en occupe ?",
+      "nudgeCta": "Prendre le premier",
+      "doneTitle": "Ce que j'ai fait aujourd'hui",
+      "doneReplies": "{count} réponses envoyées",
+      "doneAppts": "{count} rendez-vous créés",
+      "doneFollowups": "{count} relances effectuées",
+      "doneWaiting": "{count} clients en attente",
+      "startTitle": "Robin est prêt",
+      "startIntro": "Voici comment commencer :",
+      "step1": "Partagez votre formulaire de demande avec vos clients.",
+      "step2": "Ajoutez votre premier client.",
+      "step3": "Invitez un mécanicien."
     },
     "roles": {
       "owner": "Proprietaire",
@@ -251,6 +274,19 @@
         "post_repair": "Demandez à {name} si tout va bien et sollicitez un avis Google.",
         "reactivate": "Recontactez {name} avec une offre."
       }
+    },
+    "newCustomer": {
+      "title": "Nouveau client",
+      "intro": "Ajoutez un client, et tout de suite un véhicule si vous voulez.",
+      "customer": "Client",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "phone": "Téléphone",
+      "email": "E-mail",
+      "vehicle": "Véhicule (optionnel)",
+      "vehicleHint": "Laissez vide pour ajouter seulement le client.",
+      "save": "Enregistrer le client",
+      "add": "Nouveau client"
     }
   },
   "language": {

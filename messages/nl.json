@@ -50,7 +50,30 @@
       "statTeam": "Team actief",
       "priorityTitle": "Prioriteit",
       "openKnowledge": "Kennisbank",
-      "openAutomations": "Opvolging"
+      "openAutomations": "Opvolging",
+      "greetMorning": "Goedemorgen {name}.",
+      "greetAfternoon": "Goedemiddag {name}.",
+      "greetEvening": "Goedenavond {name}.",
+      "robinName": "Robin",
+      "robinIntro": "Ik ben Robin, uw AI-medewerker. Vandaag hou ik alles voor u in de gaten.",
+      "robinSummary": "Er zijn {count} nieuwe aanvragen, {waiting} wachten op antwoord en {upcoming} afspraken gepland.",
+      "robinAsk": "Wat wilt u dat ik doe?",
+      "actReply": "Antwoord wachtende klant",
+      "actNewCustomer": "Nieuwe klant",
+      "actFollowups": "Bekijk opvolging",
+      "actAgenda": "Open agenda",
+      "nudge": "Ik zie {count} klant(en) die al langer dan 30 minuten wachten. Wilt u dat ik ze oppak?",
+      "nudgeCta": "Pak de eerste op",
+      "doneTitle": "Wat ik vandaag heb gedaan",
+      "doneReplies": "{count} antwoorden verstuurd",
+      "doneAppts": "{count} afspraken gemaakt",
+      "doneFollowups": "{count} opvolgingen afgerond",
+      "doneWaiting": "{count} klanten in afwachting",
+      "startTitle": "Robin staat klaar",
+      "startIntro": "Zo begint u:",
+      "step1": "Deel uw aanvraagformulier met klanten.",
+      "step2": "Voeg uw eerste klant toe.",
+      "step3": "Nodig een monteur uit."
     },
     "roles": {
       "owner": "Eigenaar",
@@ -251,6 +274,19 @@
         "post_repair": "Vraag {name} of alles goed is en vraag om een Google-review.",
         "reactivate": "Neem opnieuw contact op met {name} met een aanbod."
       }
+    },
+    "newCustomer": {
+      "title": "Nieuwe klant",
+      "intro": "Voeg een klant toe, en meteen een voertuig als u wilt.",
+      "customer": "Klant",
+      "firstName": "Voornaam",
+      "lastName": "Achternaam",
+      "phone": "Telefoon",
+      "email": "E-mail",
+      "vehicle": "Voertuig (optioneel)",
+      "vehicleHint": "Laat leeg als u alleen de klant toevoegt.",
+      "save": "Klant opslaan",
+      "add": "Nieuwe klant"
     }
   },
   "language": {

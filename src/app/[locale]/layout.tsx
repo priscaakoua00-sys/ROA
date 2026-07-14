@@ -21,6 +21,7 @@ export async function generateMetadata({
   return {
     title: `${t('name')} · ${home('signature')}`,
     description: home('subtitle'),
+    verification: { google: 'B3jewEyxlRg7bAwRSN10vFGEkNCd_QRSvdwWT6qmt0w' },
   };
 }
 

@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { sendEmail } from '@/integrations/email';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -26,7 +27,7 @@ export async function sendReplyAction(formData: FormData) {
 
   const { data: conv } = await supabase
     .from('conversations')
-    .select('id, organization_id')
+    .select('id, organization_id, customer_id')
     .eq('id', conversationId)
     .maybeSingle();
   if (!conv) redirect(`/${locale}/leads/${leadId}?error=1`);
@@ -51,6 +52,18 @@ export async function sendReplyAction(formData: FormData) {
     .update({ read: true })
     .eq('conversation_id', conv.id)
     .eq('direction', 'inbound');
+
+  // Best-effort: also deliver the reply to the customer by email (if configured).
+  if (conv.customer_id) {
+    const { data: cust } = await supabase
+      .from('customers')
+      .select('email')
+      .eq('id', conv.customer_id)
+      .maybeSingle();
+    if (cust?.email) {
+      await sendEmail({ to: cust.email, subject: 'Bericht van uw garage', text: body });
+    }
+  }
 
   redirect(`/${locale}/leads/${leadId}?sent=1`);
 }

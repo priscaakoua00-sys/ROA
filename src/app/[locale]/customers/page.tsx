@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { Button } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
 
 interface Customer {
@@ -58,9 +59,14 @@ export default async function CustomersPage({
     <div className="container max-w-2xl py-10">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">{t('customers.title')}</h1>
-        <Link href="/dashboard" className="text-sm text-muted-foreground hover:underline">
-          {t('lead.back')}
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/customers/new">
+            <Button size="sm">{t('newCustomer.add')}</Button>
+          </Link>
+          <Link href="/dashboard" className="text-sm text-muted-foreground hover:underline">
+            {t('lead.back')}
+          </Link>
+        </div>
       </div>
 
       <form className="mt-4" action={`/${locale}/customers`} method="get">
