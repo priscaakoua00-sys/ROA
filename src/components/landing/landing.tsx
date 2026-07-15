@@ -153,6 +153,22 @@ export function Landing({ locale }: { locale: Locale }) {
         </section>
 
         {/* CLOSE */}
+        <section className="lp-light lp-founder">
+          <div className="lp-wrap lp-founder-grid">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/founder.jpg" alt={c.founder.name} className="lp-photo" />
+            <div>
+              <span className="lp-mono">{c.founder.eyebrow}</span>
+              <h2 className="lp-founder-name">{c.founder.name}</h2>
+              <p className="lp-founder-role">{c.founder.role}</p>
+              {c.founder.story.map((para, i) => (
+                <p key={i} className="lp-founder-story">{para}</p>
+              ))}
+              <p className="lp-founder-sig">“{c.founder.signature}”</p>
+            </div>
+          </div>
+        </section>
+
         <section className="lp-close" id="demo">
           <div className="lp-wrap">
             <Reveal>
