@@ -2,6 +2,7 @@ import 'server-only';
 
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 /**
  * Server Supabase client. The `server-only` import makes it a build error to
@@ -11,7 +12,7 @@ import { createServerClient } from '@supabase/ssr';
  * intentionally NOT used here; it belongs to dedicated, audited server actions
  * only (Phase 1) and must never reach the browser.
  */
-export async function createSupabaseServerClient() {
+export async function createSupabaseServerClient(): Promise<SupabaseClient> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 

@@ -43,6 +43,39 @@ export async function createWorkOrderAction(formData: FormData) {
   redirect(`/${locale}/work-orders/${wo.id}`);
 }
 
+export async function createManualWorkOrderAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const customerId = String(formData.get('customerId') ?? '');
+  const vehicleId = String(formData.get('vehicleId') ?? '') || null;
+  const title = String(formData.get('title') ?? '').trim();
+  const description = String(formData.get('description') ?? '').trim() || null;
+  if (!customerId || !title) redirect(`/${locale}/work-orders/new?customerId=${customerId}&error=1`);
+
+  const supabase = await createSupabaseServerClient();
+  const { data: customer } = await supabase
+    .from('customers')
+    .select('organization_id')
+    .eq('id', customerId)
+    .maybeSingle();
+  if (!customer) redirect(`/${locale}/work-orders/new?error=1`);
+
+  const { data: wo, error } = await supabase
+    .from('work_orders')
+    .insert({
+      organization_id: customer.organization_id,
+      customer_id: customerId,
+      vehicle_id: vehicleId,
+      title,
+      description,
+      status: 'open',
+    })
+    .select('id')
+    .maybeSingle();
+  if (error || !wo) redirect(`/${locale}/work-orders/new?customerId=${customerId}&error=1`);
+
+  redirect(`/${locale}/work-orders/${wo.id}`);
+}
+
 export async function updateWorkOrderStatusAction(formData: FormData) {
   const locale = localeOf(formData);
   const woId = String(formData.get('woId') ?? '');

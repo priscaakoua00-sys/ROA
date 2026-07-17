@@ -4,7 +4,21 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { isAppLocale, routing } from '@/i18n/routing';
 import { ThemeProvider } from '@/components/theme-provider';
+import { createSupabaseServerClient } from '@/data/supabase/server';
+import { RobinChat } from '@/components/robin-chat';
 import '../globals.css';
+
+export const dynamic = 'force-dynamic';
+
+async function currentOrgId(): Promise<string | null> {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
+  return orgs?.[0]?.id ?? null;
+}
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -41,6 +55,7 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   const messages = await getMessages();
+  const orgId = await currentOrgId();
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -61,6 +76,7 @@ export default async function LocaleLayout({
             disableTransitionOnChange
           >
             {children}
+            {orgId ? <RobinChat orgId={orgId} /> : null}
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

@@ -19,6 +19,7 @@ export async function addVehicleAction(formData: FormData) {
     return s.length > 0 ? s : null;
   };
   const mileageRaw = clean('mileage');
+  const yearRaw = clean('year');
 
   const supabase = await createSupabaseServerClient();
   const { data: cust } = await supabase
@@ -34,6 +35,7 @@ export async function addVehicleAction(formData: FormData) {
     license_plate: clean('licensePlate'),
     make: clean('make'),
     model: clean('model'),
+    year: yearRaw ? Number(yearRaw) : null,
     mileage: mileageRaw ? Number(mileageRaw) : null,
   });
   redirect(`/${locale}/customers/${customerId}`);
