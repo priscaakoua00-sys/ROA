@@ -96,7 +96,19 @@
       "metricFollowupsDone": "Follow-ups completed",
       "metricTimeSaved": "Time saved (estimate)",
       "metricResponseRate": "Response rate",
-      "minutesShort": "{count} min"
+      "minutesShort": "{count} min",
+      "metricsEmptyNew": "No activity yet. As soon as your first request comes in, I'll keep track of everything here.",
+      "metricsEmptyQuiet": "Quiet day. Everything's under control — Robin is keeping an eye on your business.",
+      "vehicleCall": "Call customer",
+      "insight": {
+        "emptyGarage": "You don't have any customers yet. Share your request form — I'll catch every new request automatically and organize the rest.",
+        "urgentLead": "{name} just sent an urgent request. I'd recommend looking at this now.",
+        "waitingCustomers": "{count} customer(s) have been waiting a while for a reply. Should I get the first one ready for you?",
+        "followupsDue": "I have {count} follow-up(s) ready for today.",
+        "appointmentSoon": "You still have {count} appointment(s) today.",
+        "allClear": "Everything's under control. Nothing urgent right now — I'll keep watching the rest.",
+        "viewRequest": "View request"
+      }
     },
     "robinChat": {
       "launcher": "Ask Robin",
@@ -106,6 +118,7 @@
       "send": "Send",
       "close": "Close",
       "thinking": "Robin is thinking...",
+      "greetingPrefix": "Hi!",
       "emptyTitle": "What can I help with?",
       "emptyHint": "Try one of these questions, or type your own.",
       "suggestion1": "How many appointments do I have tomorrow?",
@@ -123,6 +136,8 @@
         "callNotFound": "I couldn't find a customer with that name. Try the full name.",
         "callNoPhone": "I don't have a phone number for {name}.",
         "callFound": "{name}: {phone}. I can't place calls myself yet, but the number is ready for you.",
+        "greeting": "Hello! Good to see you. What can I help with?",
+        "thanks": "You're welcome! I'll keep watching things in the background.",
         "fallback": "I can help with tomorrow's appointments, vehicles waiting, customers without a reply, or calling a customer. Try \"Call [name]\"."
       }
     },

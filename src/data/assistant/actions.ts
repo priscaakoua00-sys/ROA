@@ -3,6 +3,7 @@
 import { getTranslations } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { formatTimeUTC } from '@/lib/datetime';
+import { loadRobinInsight } from '@/data/robin/load';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -14,6 +15,7 @@ export interface RobinChatLink {
 export interface RobinChatAnswer {
   text: string;
   links: RobinChatLink[];
+  topic: IntentKind;
 }
 
 const CALL_PREFIXES = ['bel ', 'bellen ', 'call ', 'appeler ', 'appelle '];
@@ -36,15 +38,35 @@ const UNANSWERED_PHRASES = [
   'sans réponse',
   'sans reponse',
 ];
+const GREETING_WORDS = ['hallo', 'hoi', 'hey', 'hi', 'hello', 'goedemorgen', 'goedemiddag', 'goedenavond', 'bonjour', 'salut', 'coucou'];
+const THANKS_WORDS = ['dank', 'bedankt', 'thanks', 'thank you', 'thx', 'merci'];
+const HOWS_MY_DAY_PHRASES = [
+  'hoe gaat het',
+  'hoe staat het ervoor',
+  'hoe is mijn dag',
+  'hoe gaat het vandaag',
+  'how is my day',
+  "how's my day",
+  'how are things',
+  "comment ça va",
+  'comment ca va',
+  'comment se passe ma journée',
+];
+const CONTINUABLE_TOPICS: IntentKind[] = ['appts_tomorrow', 'vehicles_waiting', 'unanswered'];
 
-type Intent =
-  | { kind: 'call'; name: string }
-  | { kind: 'appts_tomorrow' }
-  | { kind: 'vehicles_waiting' }
-  | { kind: 'unanswered' }
-  | { kind: 'fallback' };
+type IntentKind =
+  | 'call'
+  | 'appts_tomorrow'
+  | 'vehicles_waiting'
+  | 'unanswered'
+  | 'greeting'
+  | 'thanks'
+  | 'hows_my_day'
+  | 'fallback';
 
-function detectIntent(raw: string): Intent {
+type Intent = { kind: IntentKind; name?: string };
+
+function detectIntent(raw: string, previousTopic?: string): Intent {
   const message = raw.trim().toLowerCase();
 
   for (const prefix of CALL_PREFIXES) {
@@ -52,23 +74,23 @@ function detectIntent(raw: string): Intent {
       return { kind: 'call', name: raw.trim().slice(prefix.length).trim() };
     }
   }
-  if (CALL_BARE.includes(message)) {
-    return { kind: 'call', name: '' };
-  }
+  if (CALL_BARE.includes(message)) return { kind: 'call', name: '' };
 
-  if (TOMORROW_WORDS.some((w) => message.includes(w))) {
-    return { kind: 'appts_tomorrow' };
-  }
-
-  if (
-    VEHICLE_WORDS.some((w) => message.includes(w)) &&
-    WAIT_WORDS.some((w) => message.includes(w))
-  ) {
+  if (HOWS_MY_DAY_PHRASES.some((p) => message.includes(p))) return { kind: 'hows_my_day' };
+  if (TOMORROW_WORDS.some((w) => message.includes(w))) return { kind: 'appts_tomorrow' };
+  if (VEHICLE_WORDS.some((w) => message.includes(w)) && WAIT_WORDS.some((w) => message.includes(w))) {
     return { kind: 'vehicles_waiting' };
   }
+  if (UNANSWERED_PHRASES.some((p) => message.includes(p))) return { kind: 'unanswered' };
+  if (THANKS_WORDS.some((w) => message.includes(w))) return { kind: 'thanks' };
+  if (GREETING_WORDS.some((w) => message === w || message.startsWith(`${w} `) || message.startsWith(`${w}!`))) {
+    return { kind: 'greeting' };
+  }
 
-  if (UNANSWERED_PHRASES.some((p) => message.includes(p))) {
-    return { kind: 'unanswered' };
+  // Short follow-ups ("en morgen?", "and tomorrow?") stay on the same topic as the last answer.
+  const wordCount = message.split(/\s+/).filter(Boolean).length;
+  if (previousTopic && wordCount <= 4 && CONTINUABLE_TOPICS.includes(previousTopic as IntentKind)) {
+    return { kind: previousTopic as IntentKind };
   }
 
   return { kind: 'fallback' };
@@ -78,10 +100,39 @@ function localeOf(raw: string): Locale {
   return (['nl', 'en', 'fr'] as const).includes(raw as Locale) ? (raw as Locale) : 'nl';
 }
 
+function insightLink(
+  insight: Awaited<ReturnType<typeof loadRobinInsight>>,
+  t: Awaited<ReturnType<typeof getTranslations>>,
+): RobinChatLink[] {
+  if (insight.kind === 'urgentLead' && insight.refId) {
+    return [{ label: t('dashboard.insight.viewRequest'), href: `/leads/${insight.refId}` }];
+  }
+  if (insight.kind === 'waitingCustomers' && insight.refId) {
+    return [{ label: t('dashboard.actReply'), href: `/leads/${insight.refId}` }];
+  }
+  if (insight.kind === 'followupsDue') {
+    return [{ label: t('dashboard.actFollowups'), href: '/automations' }];
+  }
+  if (insight.kind === 'appointmentSoon') {
+    return [{ label: t('dashboard.actAgenda'), href: '/agenda' }];
+  }
+  return [];
+}
+
+export async function getRobinGreetingAction(orgId: string, rawLocale: string): Promise<RobinChatAnswer> {
+  const locale = localeOf(rawLocale);
+  const t = await getTranslations({ locale, namespace: 'app' });
+  const supabase = await createSupabaseServerClient();
+  const insight = await loadRobinInsight(supabase, orgId, t('leads.anonymous'));
+  const text = `${t('robinChat.greetingPrefix')} ${t(`dashboard.insight.${insight.kind}`, { name: insight.name ?? '', count: insight.count ?? 0 })}`;
+  return { text, links: insightLink(insight, t), topic: 'fallback' };
+}
+
 export async function askRobinAction(
   orgId: string,
   rawLocale: string,
   question: string,
+  previousTopic?: string,
 ): Promise<RobinChatAnswer> {
   const locale = localeOf(rawLocale);
   const t = await getTranslations({ locale, namespace: 'app' });
@@ -91,7 +142,24 @@ export async function askRobinAction(
   const nameOf = (row: { first_name: string | null; last_name: string | null } | null) =>
     [row?.first_name, row?.last_name].filter(Boolean).join(' ') || anon;
 
-  const intent = detectIntent(question);
+  const intent = detectIntent(question, previousTopic);
+
+  if (intent.kind === 'greeting') {
+    return { text: t('robinChat.answers.greeting'), links: [], topic: 'greeting' };
+  }
+
+  if (intent.kind === 'thanks') {
+    return { text: t('robinChat.answers.thanks'), links: [], topic: 'thanks' };
+  }
+
+  if (intent.kind === 'hows_my_day') {
+    const insight = await loadRobinInsight(supabase, orgId, anon);
+    return {
+      text: t(`dashboard.insight.${insight.kind}`, { name: insight.name ?? '', count: insight.count ?? 0 }),
+      links: insightLink(insight, t),
+      topic: 'hows_my_day',
+    };
+  }
 
   if (intent.kind === 'appts_tomorrow') {
     const now = new Date();
@@ -116,12 +184,13 @@ export async function askRobinAction(
     }[];
 
     if (rows.length === 0) {
-      return { text: t('robinChat.answers.apptsTomorrowNone'), links: [{ label: t('dashboard.actAgenda'), href: '/agenda' }] };
+      return { text: t('robinChat.answers.apptsTomorrowNone'), links: [{ label: t('dashboard.actAgenda'), href: '/agenda' }], topic: 'appts_tomorrow' };
     }
     const list = rows.map((r) => `${formatTimeUTC(r.starts_at, locale)} ${nameOf(r.customers)}`).join(', ');
     return {
       text: t('robinChat.answers.apptsTomorrowCount', { count: rows.length, list }),
       links: [{ label: t('dashboard.actAgenda'), href: '/agenda' }],
+      topic: 'appts_tomorrow',
     };
   }
 
@@ -140,7 +209,7 @@ export async function askRobinAction(
     }[];
 
     if (rows.length === 0) {
-      return { text: t('robinChat.answers.vehiclesWaitingNone'), links: [{ label: t('dashboard.openWorkOrders'), href: '/work-orders' }] };
+      return { text: t('robinChat.answers.vehiclesWaitingNone'), links: [{ label: t('dashboard.openWorkOrders'), href: '/work-orders' }], topic: 'vehicles_waiting' };
     }
     const list = rows
       .map((r) => {
@@ -152,6 +221,7 @@ export async function askRobinAction(
     return {
       text: t('robinChat.answers.vehiclesWaitingCount', { count: rows.length, list }),
       links: [{ label: t('dashboard.openWorkOrders'), href: '/work-orders' }],
+      topic: 'vehicles_waiting',
     };
   }
 
@@ -169,18 +239,19 @@ export async function askRobinAction(
     }[];
 
     if (rows.length === 0) {
-      return { text: t('robinChat.answers.unansweredNone'), links: [] };
+      return { text: t('robinChat.answers.unansweredNone'), links: [], topic: 'unanswered' };
     }
     const list = rows.map((r) => nameOf(r.customers)).join(', ');
     return {
       text: t('robinChat.answers.unansweredCount', { count: rows.length, list }),
       links: rows.slice(0, 5).map((r) => ({ label: nameOf(r.customers), href: `/leads/${r.id}` })),
+      topic: 'unanswered',
     };
   }
 
   if (intent.kind === 'call') {
     if (!intent.name) {
-      return { text: t('robinChat.answers.callWho'), links: [] };
+      return { text: t('robinChat.answers.callWho'), links: [], topic: 'call' };
     }
     const term = intent.name.trim().toLowerCase();
     const { data } = await supabase
@@ -202,20 +273,22 @@ export async function askRobinAction(
     });
 
     if (!customer) {
-      return { text: t('robinChat.answers.callNotFound'), links: [] };
+      return { text: t('robinChat.answers.callNotFound'), links: [], topic: 'call' };
     }
     const name = nameOf(customer);
     if (!customer.phone) {
       return {
         text: t('robinChat.answers.callNoPhone', { name }),
         links: [{ label: name, href: `/customers/${customer.id}` }],
+        topic: 'call',
       };
     }
     return {
       text: t('robinChat.answers.callFound', { name, phone: customer.phone }),
       links: [{ label: name, href: `/customers/${customer.id}` }],
+      topic: 'call',
     };
   }
 
-  return { text: t('robinChat.answers.fallback'), links: [] };
+  return { text: t('robinChat.answers.fallback'), links: [], topic: 'fallback' };
 }

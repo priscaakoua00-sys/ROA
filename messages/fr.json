@@ -96,7 +96,19 @@
       "metricFollowupsDone": "Relances effectuées",
       "metricTimeSaved": "Temps gagné (estimation)",
       "metricResponseRate": "Taux de réponse",
-      "minutesShort": "{count} min"
+      "minutesShort": "{count} min",
+      "metricsEmptyNew": "Pas encore d'activité. Dès que votre première demande arrive, je garde tout en mémoire ici.",
+      "metricsEmptyQuiet": "Journée calme. Tout est sous contrôle — Robin surveille votre activité.",
+      "vehicleCall": "Appeler le client",
+      "insight": {
+        "emptyGarage": "Vous n'avez pas encore de clients. Partagez votre formulaire de demande — je capte automatiquement chaque nouvelle demande et j'organise le reste.",
+        "urgentLead": "{name} vient d'envoyer une demande urgente. Je vous recommande de la consulter maintenant.",
+        "waitingCustomers": "{count} client(s) attendent une réponse depuis un moment. Voulez-vous que je prépare le premier ?",
+        "followupsDue": "J'ai {count} relance(s) prête(s) pour aujourd'hui.",
+        "appointmentSoon": "Il vous reste {count} rendez-vous aujourd'hui.",
+        "allClear": "Tout est sous contrôle. Rien d'urgent pour le moment — je surveille le reste.",
+        "viewRequest": "Voir la demande"
+      }
     },
     "robinChat": {
       "launcher": "Parler à Robin",
@@ -106,6 +118,7 @@
       "send": "Envoyer",
       "close": "Fermer",
       "thinking": "Robin réfléchit...",
+      "greetingPrefix": "Salut !",
       "emptyTitle": "En quoi puis-je aider ?",
       "emptyHint": "Essayez une de ces questions, ou tapez la vôtre.",
       "suggestion1": "Combien de rendez-vous ai-je demain ?",
@@ -123,6 +136,8 @@
         "callNotFound": "Je n'ai trouvé aucun client avec ce nom. Essayez le nom complet.",
         "callNoPhone": "Je n'ai pas de numéro de téléphone pour {name}.",
         "callFound": "{name} : {phone}. Je ne peux pas encore appeler moi-même, mais le numéro est prêt pour vous.",
+        "greeting": "Bonjour ! Ravi de vous voir. En quoi puis-je aider ?",
+        "thanks": "Avec plaisir ! Je continue à surveiller les choses en arrière-plan.",
         "fallback": "Je peux vous aider avec les rendez-vous de demain, les véhicules en attente, les clients sans réponse, ou appeler un client. Essayez \"Appeler [nom]\"."
       }
     },

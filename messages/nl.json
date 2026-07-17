@@ -96,7 +96,19 @@
       "metricFollowupsDone": "Opvolgingen afgerond",
       "metricTimeSaved": "Tijd bespaard (schatting)",
       "metricResponseRate": "Reactiesnelheid",
-      "minutesShort": "{count} min"
+      "minutesShort": "{count} min",
+      "metricsEmptyNew": "Nog geen activiteit. Zodra uw eerste aanvraag binnenkomt, houd ik hier alles voor u bij.",
+      "metricsEmptyQuiet": "Rustige dag. Alles onder controle — Robin houdt uw bedrijf in de gaten.",
+      "vehicleCall": "Klant bellen",
+      "insight": {
+        "emptyGarage": "U heeft nog geen klanten. Deel uw aanvraagformulier — ik vang elke nieuwe aanvraag automatisch op en organiseer de rest.",
+        "urgentLead": "{name} heeft zojuist een urgente aanvraag gestuurd. Ik raad aan dit nu te bekijken.",
+        "waitingCustomers": "{count} klant(en) wachten al even op antwoord. Zal ik de eerste voor u klaarzetten?",
+        "followupsDue": "Ik heb {count} opvolging(en) klaarstaan voor vandaag.",
+        "appointmentSoon": "U heeft vandaag nog {count} afspraak/afspraken gepland.",
+        "allClear": "Alles is onder controle. Geen urgente zaken op dit moment — ik hou de rest in de gaten.",
+        "viewRequest": "Bekijk aanvraag"
+      }
     },
     "robinChat": {
       "launcher": "Praat met Robin",
@@ -106,6 +118,7 @@
       "send": "Verstuur",
       "close": "Sluiten",
       "thinking": "Robin denkt na...",
+      "greetingPrefix": "Hoi!",
       "emptyTitle": "Waarmee kan ik helpen?",
       "emptyHint": "Probeer een van deze vragen, of typ uw eigen vraag.",
       "suggestion1": "Hoeveel afspraken heb ik morgen?",
@@ -123,6 +136,8 @@
         "callNotFound": "Ik kon geen klant vinden met die naam. Probeer de volledige naam.",
         "callNoPhone": "Ik heb geen telefoonnummer voor {name}.",
         "callFound": "{name}: {phone}. Ik kan nog niet zelf bellen, maar het nummer staat klaar voor u.",
+        "greeting": "Hallo! Fijn dat u er bent. Waarmee kan ik helpen?",
+        "thanks": "Graag gedaan! Ik blijf op de achtergrond meekijken.",
         "fallback": "Ik kan u helpen met afspraken van morgen, voertuigen die wachten, klanten zonder antwoord, of een klant bellen. Probeer bijvoorbeeld \"Bel [naam]\"."
       }
     },
