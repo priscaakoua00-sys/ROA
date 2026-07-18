@@ -1,6 +1,24 @@
 {
   "app": {
     "name": "Roavaa",
+    "nav": {
+      "dashboard": "Dashboard",
+      "agenda": "Agenda",
+      "customers": "Klanten",
+      "vehicles": "Voertuigen",
+      "workOrders": "Reparatieorders",
+      "automations": "Opvolging",
+      "knowledge": "Kennisbank",
+      "team": "Team",
+      "settings": "Instellingen",
+      "notifications": "Meldingen",
+      "more": "Meer",
+      "openRobin": "Praat met Robin",
+      "menu": "Menu",
+      "closeMenu": "Menu sluiten",
+      "signedInAs": "Aangemeld als",
+      "signOut": "Uitloggen"
+    },
     "onboarding": {
       "title": "Uw garage instellen",
       "subtitle": "Nog een stap voordat u begint.",

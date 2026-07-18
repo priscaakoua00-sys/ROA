@@ -238,17 +238,6 @@ export default async function DashboardPage({
     { label: t('dashboard.metricResponseRate'), value: `${responseRate}%` },
   ];
 
-  const navLinks: { href: string; label: string }[] = [
-    { href: '/agenda', label: t('dashboard.openAgenda') },
-    { href: '/customers', label: t('dashboard.openCustomers') },
-    { href: '/vehicles', label: t('dashboard.openVehicles') },
-    { href: '/work-orders', label: t('dashboard.openWorkOrders') },
-    { href: '/team', label: t('dashboard.openTeam') },
-    { href: '/automations', label: t('dashboard.openAutomations') },
-    { href: '/knowledge', label: t('dashboard.openKnowledge') },
-    { href: '/settings', label: t('dashboard.openSettings') },
-  ];
-
   const quickActions = [
     { href: '/customers/new', label: t('dashboard.actNewCustomer'), icon: UserPlus },
     { href: '/vehicles/new', label: t('dashboard.actNewVehicle'), icon: Car },
@@ -547,14 +536,6 @@ export default async function DashboardPage({
             </ul>
           )}
         </section>
-
-        <div className="mt-8 flex flex-wrap gap-2">
-          {navLinks.map((n) => (
-            <Link key={n.href} href={n.href}>
-              <Button variant="outline" size="sm">{n.label}</Button>
-            </Link>
-          ))}
-        </div>
 
         <section className="mt-8 rounded-xl border border-border bg-card p-6 shadow-soft">
           <h2 className="text-base font-semibold tracking-tight">{t('dashboard.shareTitle')}</h2>
