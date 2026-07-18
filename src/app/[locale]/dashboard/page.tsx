@@ -2,12 +2,14 @@ export const dynamic = 'force-dynamic';
 
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+import Image from 'next/image';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { UserPlus, AlertTriangle, Clock, CalendarClock, Sparkles, Car, Wrench, Phone, CalendarDays } from 'lucide-react';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { signOutAction } from '@/data/auth/actions';
 import { loadFollowUpsDueCount } from '@/data/automations/due';
 import { computeRobinInsight } from '@/data/robin/insight';
+import { getModuleImageSrc } from '@/lib/module-images';
 import { formatDateTimeUTC } from '@/lib/datetime';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -178,6 +180,7 @@ export default async function DashboardPage({
     followUpsDue,
     apptsStartingToday: apptsStartingToday.count ?? 0,
   });
+  const robinAvatar = getModuleImageSrc('robin');
 
   // Vehicles currently on the shop floor (active work order), falling back to the most recent vehicles.
   const vehiclesInShop = (vehiclesInShopData ?? []) as unknown as VehicleCardRow[];
@@ -295,9 +298,16 @@ export default async function DashboardPage({
         </section>
 
         <section className="mt-5 rounded-2xl border border-gold/25 bg-gradient-to-br from-gold/10 to-transparent p-6 shadow-soft animate-in fade-in slide-in-from-top-2 duration-500">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.15em] text-gold">
-            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-gold" />
-            {t('dashboard.robinName')}
+          <div className="flex items-center gap-2">
+            {robinAvatar ? (
+              <span className="relative size-7 shrink-0 overflow-hidden rounded-full border border-gold/30">
+                <Image src={robinAvatar} alt="" fill sizes="28px" className="object-cover" />
+              </span>
+            ) : null}
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.15em] text-gold">
+              <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-gold" />
+              {t('dashboard.robinName')}
+            </div>
           </div>
           <h1 className="mt-2 text-2xl font-semibold tracking-tight">{greeting}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{t('dashboard.robinIntro')}</p>

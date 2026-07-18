@@ -110,6 +110,13 @@
         "viewRequest": "Bekijk aanvraag"
       }
     },
+    "moduleBanner": {
+      "repairs": "Voertuigen & reparaties",
+      "appointments": "Klantafspraken",
+      "invoices": "Reparatieorders",
+      "diagnostics": "Technische kennisbank",
+      "history": "Voertuiggeschiedenis"
+    },
     "robinChat": {
       "launcher": "Praat met Robin",
       "title": "Robin",
@@ -299,6 +306,21 @@
     "settings": {
       "title": "Instellingen",
       "saved": "Opgeslagen.",
+      "billingTitle": "Abonnement",
+      "billingIntro": "Wat Roavaa kost, zodra facturatie wordt geactiveerd.",
+      "billingFreeBadge": "Nu gratis",
+      "billingPlanName": "Roavaa",
+      "billingPerMonth": "/ maand",
+      "billingFreeNote": "U gebruikt Roavaa momenteel volledig gratis tijdens de lancering. Deze prijs wordt vooraf aangekondigd voordat er ooit wordt gefactureerd.",
+      "billingComingSoon": "Facturatie is nog niet actief.",
+      "billingFeature": {
+        "robin": "Robin, uw AI-medewerker",
+        "vehicles": "Onbeperkt voertuigen en klanten",
+        "workOrders": "Onbeperkt werkorders",
+        "agenda": "Agenda en afspraken",
+        "team": "Teamleden en rollen",
+        "knowledge": "Kennisbank"
+      },
       "companyTitle": "Bedrijf",
       "name": "Naam",
       "language": "Standaardtaal",

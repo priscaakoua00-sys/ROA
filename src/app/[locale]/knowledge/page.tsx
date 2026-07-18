@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { redirect } from 'next/navigation';
+import { Stethoscope } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import {
@@ -8,6 +9,7 @@ import {
   updateArticleAction,
   deleteArticleAction,
 } from '@/data/knowledge/actions';
+import { ModuleBanner } from '@/components/module-banner';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
@@ -56,6 +58,8 @@ export default async function KnowledgePage({
 
   return (
     <div className="container max-w-2xl py-10">
+      <ModuleBanner moduleKey="diagnostics" label={t('moduleBanner.diagnostics')} icon={Stethoscope} />
+
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">{t('knowledge.title')}</h1>
         <Link href="/dashboard" className="text-sm text-muted-foreground hover:underline">

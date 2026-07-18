@@ -1,8 +1,10 @@
 export const dynamic = 'force-dynamic';
 
 import { redirect } from 'next/navigation';
+import { Car } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { ModuleBanner } from '@/components/module-banner';
 import { Link } from '@/i18n/navigation';
 
 interface V {
@@ -56,6 +58,8 @@ export default async function VehiclesPage({
 
   return (
     <div className="container max-w-2xl py-10">
+      <ModuleBanner moduleKey="repairs" label={t('moduleBanner.repairs')} icon={Car} />
+
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">{t('vehicles.title')}</h1>
         <Link href="/dashboard" className="text-sm text-muted-foreground hover:underline">

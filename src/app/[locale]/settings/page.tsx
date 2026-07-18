@@ -13,6 +13,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
+import { CheckCircle2 } from 'lucide-react';
+import { LAUNCH_FREE, PLAN_FEATURE_KEYS, formatMonthlyPrice } from '@/lib/pricing';
 
 const WEEKDAYS = [1, 2, 3, 4, 5, 6, 0];
 const LANGS = ['nl', 'en', 'fr'] as const;
@@ -82,6 +84,47 @@ export default async function SettingsPage({
 
       {saved ? <p className="mt-3 text-sm text-success">{t('settings.saved')}</p> : null}
       {error ? <p className="mt-3 text-sm text-urgent">{t('team.error')}</p> : null}
+
+      {/* Billing / plan */}
+      <section className="mt-6 rounded-xl border border-border bg-card p-6 shadow-soft">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-base font-semibold tracking-tight">{t('settings.billingTitle')}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t('settings.billingIntro')}</p>
+          </div>
+          {LAUNCH_FREE ? (
+            <span className="whitespace-nowrap rounded-full bg-success/15 px-3 py-1 text-xs font-medium text-success">
+              {t('settings.billingFreeBadge')}
+            </span>
+          ) : null}
+        </div>
+
+        <div className="mt-4 rounded-lg border border-border bg-background p-4">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <span className="text-sm font-semibold">{t('settings.billingPlanName')}</span>
+            <span className="text-lg font-semibold tracking-tight">
+              {formatMonthlyPrice(locale)}
+              <span className="text-sm font-normal text-muted-foreground">
+                {' '}
+                {t('settings.billingPerMonth')}
+              </span>
+            </span>
+          </div>
+
+          <ul className="mt-3 space-y-1.5">
+            {PLAN_FEATURE_KEYS.map((key) => (
+              <li key={key} className="flex items-center gap-2 text-sm text-muted-foreground">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
+                {t(`settings.billingFeature.${key}`)}
+              </li>
+            ))}
+          </ul>
+
+          <p className="mt-4 text-xs text-muted-foreground">
+            {LAUNCH_FREE ? t('settings.billingFreeNote') : t('settings.billingComingSoon')}
+          </p>
+        </div>
+      </section>
 
       {/* Company */}
       <section className="mt-6 rounded-xl border border-border bg-card p-6 shadow-soft">

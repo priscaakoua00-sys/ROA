@@ -1,8 +1,10 @@
 export const dynamic = 'force-dynamic';
 
 import { redirect } from 'next/navigation';
+import { ClipboardList } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { ModuleBanner } from '@/components/module-banner';
 import { Badge } from '@/components/ui/badge';
 import { Link } from '@/i18n/navigation';
 
@@ -54,6 +56,8 @@ export default async function WorkOrdersPage({
 
   return (
     <div className="container max-w-2xl py-10">
+      <ModuleBanner moduleKey="invoices" label={t('moduleBanner.invoices')} icon={ClipboardList} />
+
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">{t('workOrders.title')}</h1>
         <Link href="/dashboard" className="text-sm text-muted-foreground hover:underline">

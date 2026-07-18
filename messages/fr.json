@@ -110,6 +110,13 @@
         "viewRequest": "Voir la demande"
       }
     },
+    "moduleBanner": {
+      "repairs": "Véhicules & réparations",
+      "appointments": "Rendez-vous clients",
+      "invoices": "Ordres de réparation",
+      "diagnostics": "Base de connaissances technique",
+      "history": "Historique du véhicule"
+    },
     "robinChat": {
       "launcher": "Parler à Robin",
       "title": "Robin",
@@ -299,6 +306,21 @@
     "settings": {
       "title": "Paramètres",
       "saved": "Enregistré.",
+      "billingTitle": "Abonnement",
+      "billingIntro": "Ce que Roavaa coûtera, une fois la facturation activée.",
+      "billingFreeBadge": "Gratuit pour l'instant",
+      "billingPlanName": "Roavaa",
+      "billingPerMonth": "/ mois",
+      "billingFreeNote": "Vous utilisez actuellement Roavaa gratuitement pendant le lancement. Ce prix sera annoncé bien à l'avance, avant toute facturation.",
+      "billingComingSoon": "La facturation n'est pas encore active.",
+      "billingFeature": {
+        "robin": "Robin, votre employé IA",
+        "vehicles": "Véhicules et clients illimités",
+        "workOrders": "Ordres de réparation illimités",
+        "agenda": "Agenda et rendez-vous",
+        "team": "Membres d'équipe et rôles",
+        "knowledge": "Base de connaissances"
+      },
       "companyTitle": "Entreprise",
       "name": "Nom",
       "language": "Langue par défaut",

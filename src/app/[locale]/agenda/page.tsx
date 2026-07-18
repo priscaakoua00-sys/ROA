@@ -1,9 +1,11 @@
 export const dynamic = 'force-dynamic';
 
 import { redirect } from 'next/navigation';
+import { CalendarClock } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { formatDayUTC, formatTimeUTC } from '@/lib/datetime';
+import { ModuleBanner } from '@/components/module-banner';
 import { Badge } from '@/components/ui/badge';
 import { Link } from '@/i18n/navigation';
 
@@ -60,6 +62,8 @@ export default async function AgendaPage({
 
   return (
     <div className="container max-w-2xl py-10">
+      <ModuleBanner moduleKey="appointments" label={t('moduleBanner.appointments')} icon={CalendarClock} />
+
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">{t('agenda.title')}</h1>
         <Link href="/dashboard" className="text-sm text-muted-foreground hover:underline">

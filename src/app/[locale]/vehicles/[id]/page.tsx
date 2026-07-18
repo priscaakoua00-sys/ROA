@@ -1,10 +1,12 @@
 export const dynamic = 'force-dynamic';
 
 import { notFound, redirect } from 'next/navigation';
+import { History } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { updateVehicleAction } from '@/data/vehicles/actions';
 import { formatDateTimeUTC } from '@/lib/datetime';
+import { ModuleBanner } from '@/components/module-banner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Field } from '@/components/auth/auth-shell';
@@ -47,6 +49,8 @@ export default async function VehicleDetailPage({
 
   return (
     <div className="container max-w-2xl py-10">
+      <ModuleBanner moduleKey="history" label={t('moduleBanner.history')} icon={History} />
+
       <Link href="/vehicles" className="text-sm text-muted-foreground hover:underline">
         {t('vehicles.back')}
       </Link>

@@ -3,102 +3,102 @@
 @tailwind utilities;
 
 /*
- * Roavaa design tokens: "digital head office".
- * Warm, premium, immersive. Lightly tinted ivory surfaces (never pure white),
- * a calm deep-teal primary, a restrained champagne accent, and suspended panels
- * with very discreet layered shadows. Luxury comes from space + depth, not noise.
+ * Roavaa design tokens: "professional command center".
+ * Sober, premium, technical. Neutral anthracite/white surfaces, a deep-blue
+ * primary, a restrained steel-blue accent, and green reserved for positive
+ * actions. Confidence comes from clarity + precision, not warmth.
  */
 
 @layer base {
   :root {
-    --background: 40 33% 97%;
-    --foreground: 30 14% 12%;
+    --background: 210 20% 98%;
+    --foreground: 220 22% 12%;
 
-    --surface: 40 30% 95%;
+    --surface: 210 18% 96%;
 
-    --card: 40 44% 99%;
-    --card-foreground: 30 14% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 22% 12%;
     --card-highlight: 255 255 255;
     --card-highlight-a: 0.7;
 
-    --popover: 40 44% 99%;
-    --popover-foreground: 30 14% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 22% 12%;
 
-    --primary: 188 44% 22%;
-    --primary-foreground: 40 40% 98%;
+    --primary: 221 55% 27%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 40 20% 92%;
-    --secondary-foreground: 30 16% 20%;
+    --secondary: 214 18% 93%;
+    --secondary-foreground: 220 20% 20%;
 
-    --muted: 40 20% 93%;
-    --muted-foreground: 32 9% 42%;
+    --muted: 214 18% 94%;
+    --muted-foreground: 218 10% 42%;
 
-    --accent: 38 34% 90%;
-    --accent-foreground: 30 16% 20%;
+    --accent: 214 20% 92%;
+    --accent-foreground: 220 20% 20%;
 
-    --gold: 36 44% 50%;
-    --urgent: 8 62% 48%;
+    --gold: 215 25% 45%;
+    --urgent: 4 70% 48%;
 
-    --success: 158 42% 34%;
-    --success-foreground: 158 40% 97%;
+    --success: 152 45% 32%;
+    --success-foreground: 152 40% 97%;
 
     --destructive: 0 66% 45%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 36 24% 88%;
-    --input: 36 24% 88%;
-    --ring: 188 40% 30%;
+    --border: 214 16% 88%;
+    --input: 214 16% 88%;
+    --ring: 221 50% 40%;
 
     --brand: var(--primary);
     --brand-foreground: var(--primary-foreground);
 
-    --sh: 32 34% 26%;
+    --sh: 220 30% 15%;
     --radius: 0.9rem;
   }
 
   .dark {
-    --background: 28 14% 8%;
-    --foreground: 40 18% 92%;
+    --background: 220 20% 9%;
+    --foreground: 210 20% 92%;
 
-    --surface: 28 14% 10%;
+    --surface: 220 17% 11%;
 
-    --card: 28 14% 13%;
-    --card-foreground: 40 18% 92%;
+    --card: 220 16% 13%;
+    --card-foreground: 210 20% 92%;
     --card-highlight: 255 255 255;
     --card-highlight-a: 0.05;
 
-    --popover: 28 14% 13%;
-    --popover-foreground: 40 18% 92%;
+    --popover: 220 16% 13%;
+    --popover-foreground: 210 20% 92%;
 
-    --primary: 184 46% 56%;
-    --primary-foreground: 190 45% 10%;
+    --primary: 212 58% 60%;
+    --primary-foreground: 220 40% 10%;
 
-    --secondary: 28 12% 17%;
-    --secondary-foreground: 40 18% 90%;
+    --secondary: 220 14% 17%;
+    --secondary-foreground: 210 18% 90%;
 
-    --muted: 28 12% 16%;
-    --muted-foreground: 36 12% 65%;
+    --muted: 220 13% 16%;
+    --muted-foreground: 216 10% 65%;
 
-    --accent: 28 12% 18%;
-    --accent-foreground: 40 18% 92%;
+    --accent: 220 13% 18%;
+    --accent-foreground: 210 18% 92%;
 
-    --gold: 38 48% 62%;
-    --urgent: 8 66% 60%;
+    --gold: 215 22% 68%;
+    --urgent: 4 70% 62%;
 
-    --success: 158 44% 50%;
-    --success-foreground: 158 40% 8%;
+    --success: 152 45% 50%;
+    --success-foreground: 152 40% 8%;
 
     --destructive: 0 60% 55%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 30 12% 21%;
-    --input: 30 12% 23%;
-    --ring: 184 45% 52%;
+    --border: 220 13% 21%;
+    --input: 220 13% 23%;
+    --ring: 212 55% 55%;
 
     --brand: var(--primary);
     --brand-foreground: var(--primary-foreground);
 
-    --sh: 20 45% 2%;
+    --sh: 220 40% 2%;
   }
 
   [data-tenant='demo'] {
@@ -160,7 +160,7 @@
       0 30px 60px -22px hsl(var(--sh) / 0.3);
   }
 
-  /* Brand signature with a champagne-to-teal rule. */
+  /* Brand signature with a steel-to-blue rule. */
   .signature {
     position: relative;
     padding-left: 0.9rem;
@@ -176,7 +176,7 @@
     background: linear-gradient(hsl(var(--gold)), hsl(var(--primary)));
   }
 
-  /* Section kicker with a short champagne rule. */
+  /* Section kicker with a short accent rule. */
   .kicker::before {
     content: '';
     display: inline-block;
