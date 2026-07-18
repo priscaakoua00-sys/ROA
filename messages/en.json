@@ -1,24 +1,6 @@
 {
   "app": {
     "name": "Roavaa",
-    "nav": {
-      "dashboard": "Dashboard",
-      "agenda": "Agenda",
-      "customers": "Customers",
-      "vehicles": "Vehicles",
-      "workOrders": "Work orders",
-      "automations": "Follow-ups",
-      "knowledge": "Knowledge base",
-      "team": "Team",
-      "settings": "Settings",
-      "notifications": "Notifications",
-      "more": "More",
-      "openRobin": "Ask Robin",
-      "menu": "Menu",
-      "closeMenu": "Close menu",
-      "signedInAs": "Signed in as",
-      "signOut": "Sign out"
-    },
     "onboarding": {
       "title": "Set up your garage",
       "subtitle": "One step before you begin.",

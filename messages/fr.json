@@ -1,24 +1,6 @@
 {
   "app": {
     "name": "Roavaa",
-    "nav": {
-      "dashboard": "Tableau de bord",
-      "agenda": "Agenda",
-      "customers": "Clients",
-      "vehicles": "Véhicules",
-      "workOrders": "Ordres de réparation",
-      "automations": "Relances",
-      "knowledge": "Base de connaissances",
-      "team": "Équipe",
-      "settings": "Paramètres",
-      "notifications": "Notifications",
-      "more": "Plus",
-      "openRobin": "Parler à Robin",
-      "menu": "Menu",
-      "closeMenu": "Fermer le menu",
-      "signedInAs": "Connecté en tant que",
-      "signOut": "Se deconnecter"
-    },
     "onboarding": {
       "title": "Configurez votre garage",
       "subtitle": "Une etape avant de commencer.",

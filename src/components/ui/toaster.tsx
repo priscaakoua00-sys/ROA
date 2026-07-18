@@ -5,19 +5,18 @@ import { Toaster as Sonner } from 'sonner';
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
-/** App-wide toast host for confirmations and error messages. Mounted once in the root layout. */
+/** Sonner wired to the app's theme + design tokens (border/card/foreground). */
 function Toaster({ ...props }: ToasterProps) {
-  const { theme = 'system' } = useTheme();
+  const { resolvedTheme } = useTheme();
 
   return (
     <Sonner
-      theme={theme as ToasterProps['theme']}
+      theme={resolvedTheme as ToasterProps['theme']}
       className="toaster group"
-      position="bottom-right"
       toastOptions={{
         classNames: {
           toast:
-            'group toast group-[.toaster]:bg-card group-[.toaster]:text-card-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lifted group-[.toaster]:rounded-xl',
+            'group toast group-[.toaster]:bg-card group-[.toaster]:text-card-foreground group-[.toaster]:border-border group-[.toaster]:shadow-soft',
           description: 'group-[.toast]:text-muted-foreground',
           actionButton: 'group-[.toast]:bg-primary group-[.toast]:text-primary-foreground',
           cancelButton: 'group-[.toast]:bg-muted group-[.toast]:text-muted-foreground',
@@ -29,4 +28,3 @@ function Toaster({ ...props }: ToasterProps) {
 }
 
 export { Toaster };
-export { toast } from 'sonner';

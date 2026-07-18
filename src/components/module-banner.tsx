@@ -5,9 +5,10 @@ import { cn } from '@/lib/utils';
 
 /**
  * A photo strip for a module page. Renders the matching photo from
- * /public/images/modules/<moduleKey>.* when one exists, or a themed
- * placeholder otherwise — either way the page never needs to change once a
- * real photo is dropped in.
+ * /public/images/modules/<moduleKey>.* when one exists, or a designed
+ * brand illustration otherwise (large watermark icon + fine grid, built
+ * from theme tokens only — no external assets) — either way the page
+ * never needs to change once a real photo is dropped in.
  */
 export function ModuleBanner({
   moduleKey,
@@ -33,10 +34,30 @@ export function ModuleBanner({
         <div
           className="absolute inset-0"
           style={{
-            background:
-              'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)) 55%, hsl(var(--gold)) 100%)',
+            background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)) 55%, hsl(var(--gold)) 100%)',
           }}
-        />
+        >
+          <div
+            className="absolute inset-0 opacity-[0.14]"
+            style={{
+              backgroundImage:
+                'radial-gradient(rgb(255 255 255 / 0.9) 1px, transparent 1px)',
+              backgroundSize: '18px 18px',
+            }}
+            aria-hidden
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: 'radial-gradient(60% 90% at 8% 100%, hsl(var(--gold) / 0.35), transparent 70%)' }}
+            aria-hidden
+          />
+          <Icon
+            className="absolute -bottom-6 -right-5 size-32 text-white/[0.16] sm:size-40"
+            style={{ transform: 'rotate(-9deg)' }}
+            strokeWidth={1.1}
+            aria-hidden
+          />
+        </div>
       )}
       <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 p-4">
         <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm">

@@ -303,7 +303,14 @@ export default async function DashboardPage({
               <span className="relative size-7 shrink-0 overflow-hidden rounded-full border border-gold/30">
                 <Image src={robinAvatar} alt="" fill sizes="28px" className="object-cover" />
               </span>
-            ) : null}
+            ) : (
+              <span
+                className="relative flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-full border border-gold/30 text-white"
+                style={{ background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--gold)))' }}
+              >
+                <Sparkles className="size-3.5" aria-hidden />
+              </span>
+            )}
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.15em] text-gold">
               <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-gold" />
               {t('dashboard.robinName')}

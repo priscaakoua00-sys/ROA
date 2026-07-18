@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link } from '@/i18n/navigation';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export function AuthShell({
   title,
@@ -51,17 +53,17 @@ export function Field({
   defaultValue?: string;
 }) {
   return (
-    <label className="block space-y-1.5">
-      <span className="text-sm font-medium">{label}</span>
-      <input
+    <div className="space-y-1.5">
+      <Label htmlFor={name}>{label}</Label>
+      <Input
+        id={name}
         name={name}
         type={type}
         autoComplete={autoComplete}
         required={required}
         placeholder={placeholder}
         defaultValue={defaultValue}
-        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
       />
-    </label>
+    </div>
   );
 }

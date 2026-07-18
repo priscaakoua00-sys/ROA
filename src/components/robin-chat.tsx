@@ -14,9 +14,6 @@ interface ChatMessage {
   links?: RobinChatLink[];
 }
 
-/** Dispatched by any "Ask Robin" entry point (e.g. the app header) to open this panel. */
-export const ROBIN_OPEN_EVENT = 'robin:open';
-
 function ThinkingDots() {
   return (
     <span className="inline-flex items-center gap-1">
@@ -39,12 +36,6 @@ export function RobinChat({ orgId }: { orgId: string }) {
   const topicRef = useRef<string | undefined>(undefined);
 
   const suggestions = [t('suggestion1'), t('suggestion2'), t('suggestion3'), t('suggestion4')];
-
-  useEffect(() => {
-    const openFromEvent = () => setOpen(true);
-    window.addEventListener(ROBIN_OPEN_EVENT, openFromEvent);
-    return () => window.removeEventListener(ROBIN_OPEN_EVENT, openFromEvent);
-  }, []);
 
   useEffect(() => {
     if (!open || hasOpened) return;
@@ -75,7 +66,7 @@ export function RobinChat({ orgId }: { orgId: string }) {
     <>
       <Button
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-20 right-5 z-50 rounded-full shadow-soft transition-transform duration-200 hover:scale-105 active:scale-95 md:bottom-5"
+        className="fixed bottom-5 right-5 z-50 rounded-full shadow-soft transition-transform duration-200 hover:scale-105 active:scale-95"
         size="lg"
       >
         <MessageCircle className="size-4" aria-hidden />

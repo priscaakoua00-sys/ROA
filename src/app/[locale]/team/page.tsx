@@ -10,7 +10,9 @@ import {
 } from '@/data/team/actions';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Select } from '@/components/ui/select';
 import { Field } from '@/components/auth/auth-shell';
+import { FlashToast } from '@/components/flash-toast';
 import { Link } from '@/i18n/navigation';
 
 const ROLES = ['owner', 'admin', 'receptionist', 'mechanic', 'viewer'] as const;
@@ -64,8 +66,7 @@ export default async function TeamPage({
         </Link>
       </div>
 
-      {invited ? <p className="mt-3 text-sm text-success">{t('team.invited')}</p> : null}
-      {error ? <p className="mt-3 text-sm text-urgent">{t('team.error')}</p> : null}
+      <FlashToast success={invited ? t('team.invited') : null} error={error ? t('team.error') : null} />
 
       <ul className="mt-6 space-y-2">
         {members.map((m) => (
@@ -91,17 +92,13 @@ export default async function TeamPage({
                 <form action={updateMemberRoleAction} className="flex items-center gap-1">
                   <input type="hidden" name="locale" value={locale} />
                   <input type="hidden" name="membershipId" value={m.membership_id} />
-                  <select
-                    name="role"
-                    defaultValue={m.role}
-                    className="rounded-md border border-input bg-background px-2 py-1 text-xs"
-                  >
+                  <Select name="role" defaultValue={m.role} className="h-9 py-1 text-xs">
                     {ROLES.map((r) => (
                       <option key={r} value={r}>
                         {t(`roles.${r}`)}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                   <Button type="submit" variant="outline" size="sm">
                     {t('team.save')}
                   </Button>
@@ -133,17 +130,13 @@ export default async function TeamPage({
             <div className="min-w-[200px] flex-1">
               <Field label={t('team.email')} name="email" type="email" required />
             </div>
-            <select
-              name="role"
-              defaultValue="mechanic"
-              className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-            >
+            <Select name="role" defaultValue="mechanic" className="w-auto">
               {ROLES.filter((r) => r !== 'owner').map((r) => (
                 <option key={r} value={r}>
                   {t(`roles.${r}`)}
                 </option>
               ))}
-            </select>
+            </Select>
             <Button type="submit">{t('team.invite')}</Button>
           </form>
           <p className="mt-2 text-xs text-muted-foreground">{t('team.inviteNote')}</p>
