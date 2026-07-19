@@ -1,0 +1,24 @@
+NOUVEAU DESIGN — ECRAN VOERTUIGEN (app Roavaa, repo ROA)
+========================================================
+
+3 fichiers, a placer EXACTEMENT a ces chemins :
+  1. src/components/vehicles/car-illustration.tsx   (NOUVEAU)
+  2. src/components/vehicles/vehicle-card.tsx        (NOUVEAU)
+  3. src/app/[locale]/vehicles/page.tsx             (REMPLACE l'existant)
+
+Ce que ca change :
+  La liste texte des voitures devient une grille de cartes : illustration du
+  vehicule, plaque jaune NL avec le kenteken, marque + modele, Bouwjaar,
+  kilometrage et proprietaire. Reutilise les composants et tokens existants.
+  AUCUNE nouvelle dependance. AUCUNE modification de base de donnees.
+  La requete vehicles ajoute simplement year et mileage au select
+  (colonnes deja existantes).
+
+Deja teste : typecheck, lint et npm run build passent au vert (nl/en/fr).
+
+A faire : placer les 3 fichiers, lancer npm run build pour confirmer,
+puis commit et push sur la branche de travail habituelle.
+
+Etape suivante (PAS maintenant) : vraies photos (le garage prend une photo
+par voiture) + badges de statut. Ca demandera une petite colonne photo_url
+et l'upload. La carte est deja prete a afficher une photo si elle existe.

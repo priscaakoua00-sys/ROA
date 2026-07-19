@@ -5,8 +5,8 @@ import { Car } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { ModuleBanner } from '@/components/module-banner';
-import { PlateBadge, countryForLanguage } from '@/components/plate-badge';
 import { Link } from '@/i18n/navigation';
+import { VehicleCard } from '@/components/vehicles/vehicle-card';
 
 interface V {
   id: string;
@@ -16,20 +16,6 @@ interface V {
   year: number | null;
   mileage: number | null;
   customers: { first_name: string | null; last_name: string | null } | null;
-}
-
-const CARD_TONES = [
-  'from-[#eef1f6] to-[#dbe1ea]',
-  'from-[#eaeef6] to-[#d6deee]',
-  'from-[#f4edef] to-[#e4dce1]',
-  'from-[#ecf3f0] to-[#dae8e1]',
-  'from-[#eef2f7] to-[#dde6ee]',
-] as const;
-
-function cardTone(seed: string): string {
-  let hash = 0;
-  for (let i = 0; i < seed.length; i += 1) hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
-  return CARD_TONES[hash % CARD_TONES.length] ?? CARD_TONES[0];
 }
 
 export default async function VehiclesPage({
@@ -50,10 +36,9 @@ export default async function VehiclesPage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: orgs } = await supabase.from('organizations').select('id, default_language').limit(1);
+  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
   const org = orgs?.[0];
   if (!org) redirect(`/${locale}/onboarding`);
-  const plateCountry = countryForLanguage(org.default_language);
 
   let query = supabase
     .from('vehicles')
@@ -74,12 +59,18 @@ export default async function VehiclesPage({
     [v.customers?.first_name, v.customers?.last_name].filter(Boolean).join(' ') ||
     t('leads.anonymous');
 
+  const labels = {
+    year: t('vehicles.year'),
+    km: t('customers.mileage'),
+    vehicle: t('customers.vehicle'),
+  };
+
   return (
-    <div className="container max-w-2xl py-10">
+    <div className="container max-w-3xl py-10">
       <ModuleBanner moduleKey="repairs" label={t('moduleBanner.repairs')} icon={Car} />
 
       <div className="flex items-center justify-between">
-        <h1 className="font-serif text-2xl font-semibold tracking-tight">{t('vehicles.title')}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{t('vehicles.title')}</h1>
         <Link href="/dashboard" className="text-sm text-muted-foreground hover:underline">
           {t('lead.back')}
         </Link>
@@ -99,49 +90,21 @@ export default async function VehiclesPage({
           {t('vehicles.empty')}
         </div>
       ) : (
-        <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {vehicles.map((v) => {
-            const ownerName = owner(v);
-            const initials = ownerName
-              .split(' ')
-              .filter(Boolean)
-              .slice(0, 2)
-              .map((p) => p.charAt(0).toUpperCase())
-              .join('');
-            return (
-              <li key={v.id}>
-                <Link
-                  href={`/vehicles/${v.id}`}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-gold/40"
-                >
-                  <div className={`relative flex aspect-[16/10] items-center justify-center bg-gradient-to-br ${cardTone(v.id)}`}>
-                    <Car className="size-14 text-foreground/25" aria-hidden />
-                  </div>
-                  <div className="p-3.5">
-                    {v.license_plate ? <PlateBadge plate={v.license_plate} country={plateCountry} /> : null}
-                    <div className="mt-2 truncate font-serif text-sm font-semibold">
-                      {[v.make, v.model].filter(Boolean).join(' ') || t('customers.vehicle')}
-                    </div>
-                    {v.year ? (
-                      <div className="mt-0.5 text-xs text-muted-foreground">{t('vehicles.year')} {v.year}</div>
-                    ) : null}
-                    <div className="mt-2.5 flex items-center gap-2 border-t border-border pt-2.5">
-                      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-semibold text-primary">
-                        {initials || <Car className="size-3" aria-hidden />}
-                      </span>
-                      <span className="truncate text-xs text-muted-foreground">{ownerName}</span>
-                      {v.mileage ? (
-                        <span className="ml-auto shrink-0 font-mono text-[11px] font-semibold text-muted-foreground">
-                          {new Intl.NumberFormat(locale).format(v.mileage)} km
-                        </span>
-                      ) : null}
-                    </div>
-                  </div>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {vehicles.map((v) => (
+            <VehicleCard
+              key={v.id}
+              href={`/vehicles/${v.id}`}
+              make={v.make}
+              model={v.model}
+              plate={v.license_plate}
+              year={v.year}
+              mileage={v.mileage}
+              owner={owner(v)}
+              labels={labels}
+            />
+          ))}
+        </div>
       )}
     </div>
   );
