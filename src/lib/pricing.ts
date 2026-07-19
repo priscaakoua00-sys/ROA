@@ -24,3 +24,7 @@ export function formatMonthlyPrice(locale: string): string {
     maximumFractionDigits: 0,
   }).format(MONTHLY_PRICE);
 }
+
+export function formatCurrency(amount: number, locale: string): string {
+  return new Intl.NumberFormat(locale, { style: 'currency', currency: CURRENCY }).format(amount);
+}

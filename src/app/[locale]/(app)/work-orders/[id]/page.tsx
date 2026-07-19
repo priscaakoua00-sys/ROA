@@ -39,19 +39,20 @@ export default async function WorkOrderDetailPage({
   const { data: wo } = await supabase
     .from('work_orders')
     .select(
-      'id, organization_id, title, description, status, assigned_to, lead_id, customers(first_name,last_name), vehicles(license_plate,make,model)',
+      'id, organization_id, title, description, status, assigned_to, lead_id, customer_id, customers(first_name,last_name), vehicles(license_plate,make,model)',
     )
     .eq('id', id)
     .maybeSingle();
   if (!wo) notFound();
 
-  const [{ data: taskData }, { data: memData }] = await Promise.all([
+  const [{ data: taskData }, { data: memData }, { data: invoiceData }] = await Promise.all([
     supabase
       .from('work_order_tasks')
       .select('id, description, done')
       .eq('work_order_id', id)
       .order('created_at', { ascending: true }),
     supabase.rpc('org_members', { p_org: wo.organization_id }),
+    supabase.from('invoices').select('id, invoice_number').eq('work_order_id', id).maybeSingle(),
   ]);
   const tasks = (taskData ?? []) as Task[];
   const members = ((memData ?? []) as {
@@ -105,6 +106,20 @@ export default async function WorkOrderDetailPage({
         <Link href={`/leads/${wo.lead_id}`} className="mt-3 inline-block text-sm text-gold hover:underline">
           {t('workOrders.viewLead')}
         </Link>
+      ) : null}
+
+      {wo.customer_id ? (
+        <div className="mt-3">
+          {invoiceData ? (
+            <Link href={`/invoices/${invoiceData.id}`} className="inline-block text-sm text-gold hover:underline">
+              {t('workOrders.viewInvoice', { number: invoiceData.invoice_number })}
+            </Link>
+          ) : wo.status === 'done' ? (
+            <Link href={`/invoices/new?workOrderId=${wo.id}`}>
+              <Button variant="outline" size="sm">{t('workOrders.createInvoice')}</Button>
+            </Link>
+          ) : null}
+        </div>
       ) : null}
 
       {/* Tasks */}
