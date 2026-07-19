@@ -8,6 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
+/** Event other components (e.g. the app header) dispatch on window to open Robin. */
+export const ROBIN_OPEN_EVENT = 'robin:open';
+
 interface ChatMessage {
   role: 'user' | 'robin';
   text: string;
@@ -46,6 +49,14 @@ export function RobinChat({ orgId }: { orgId: string }) {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, hasOpened]);
+
+  useEffect(() => {
+    function handleOpen() {
+      setOpen(true);
+    }
+    window.addEventListener(ROBIN_OPEN_EVENT, handleOpen);
+    return () => window.removeEventListener(ROBIN_OPEN_EVENT, handleOpen);
+  }, []);
 
   function ask(question: string) {
     const text = question.trim();

@@ -6,12 +6,15 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { ModuleBanner } from '@/components/module-banner';
 import { Link } from '@/i18n/navigation';
+import { VehicleCard } from '@/components/vehicles/vehicle-card';
 
 interface V {
   id: string;
   license_plate: string | null;
   make: string | null;
   model: string | null;
+  year: number | null;
+  mileage: number | null;
   customers: { first_name: string | null; last_name: string | null } | null;
 }
 
@@ -39,7 +42,7 @@ export default async function VehiclesPage({
 
   let query = supabase
     .from('vehicles')
-    .select('id, license_plate, make, model, customers(first_name,last_name)')
+    .select('id, license_plate, make, model, year, mileage, customers(first_name,last_name)')
     .eq('organization_id', org.id)
     .order('created_at', { ascending: false })
     .limit(50);
@@ -56,8 +59,14 @@ export default async function VehiclesPage({
     [v.customers?.first_name, v.customers?.last_name].filter(Boolean).join(' ') ||
     t('leads.anonymous');
 
+  const labels = {
+    year: t('vehicles.year'),
+    km: t('customers.mileage'),
+    vehicle: t('customers.vehicle'),
+  };
+
   return (
-    <div className="container max-w-2xl py-10">
+    <div className="container max-w-3xl py-10">
       <ModuleBanner moduleKey="repairs" label={t('moduleBanner.repairs')} icon={Car} />
 
       <div className="flex items-center justify-between">
@@ -81,24 +90,21 @@ export default async function VehiclesPage({
           {t('vehicles.empty')}
         </div>
       ) : (
-        <ul className="mt-4 space-y-2">
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {vehicles.map((v) => (
-            <li key={v.id}>
-              <Link
-                href={`/vehicles/${v.id}`}
-                className="block rounded-xl border border-border bg-card p-4 shadow-soft transition hover:border-gold/40"
-              >
-                <div className="text-sm font-medium">
-                  {[v.make, v.model].filter(Boolean).join(' ') || t('customers.vehicle')}
-                  {v.license_plate ? (
-                    <span className="text-muted-foreground"> · {v.license_plate}</span>
-                  ) : null}
-                </div>
-                <div className="text-xs text-muted-foreground">{owner(v)}</div>
-              </Link>
-            </li>
+            <VehicleCard
+              key={v.id}
+              href={`/vehicles/${v.id}`}
+              make={v.make}
+              model={v.model}
+              plate={v.license_plate}
+              year={v.year}
+              mileage={v.mileage}
+              owner={owner(v)}
+              labels={labels}
+            />
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
