@@ -1,6 +1,18 @@
 {
   "app": {
     "name": "Roavaa",
+    "nav": {
+      "dashboard": "Dashboard",
+      "agenda": "Agenda",
+      "customers": "Klanten",
+      "vehicles": "Voertuigen",
+      "workOrders": "Werkorders",
+      "invoices": "Facturen",
+      "automations": "Opvolging",
+      "knowledge": "Kennisbank",
+      "team": "Team",
+      "settings": "Instellingen"
+    },
     "onboarding": {
       "title": "Uw garage instellen",
       "subtitle": "Nog een stap voordat u begint.",
@@ -108,7 +120,15 @@
         "appointmentSoon": "U heeft vandaag nog {count} afspraak/afspraken gepland.",
         "allClear": "Alles is onder controle. Geen urgente zaken op dit moment — ik hou de rest in de gaten.",
         "viewRequest": "Bekijk aanvraag"
-      }
+      },
+      "notifNewCustomers": "Nieuwe klanten",
+      "notifMessages": "Berichten te beantwoorden",
+      "notifInvoices": "Facturen op te stellen",
+      "apptsTodayTitle": "Afspraken vandaag",
+      "apptsTodayEmpty": "Geen afspraken vandaag.",
+      "urgentWorkTitle": "Urgente reparaties",
+      "invoicesTitle": "Facturen",
+      "messagesTitle": "Berichten die een antwoord nodig hebben"
     },
     "moduleBanner": {
       "repairs": "Voertuigen & reparaties",
@@ -277,13 +297,54 @@
       "tasksTitle": "Taken",
       "noTasks": "Nog geen taken.",
       "newTask": "Nieuwe taak",
-      "addTask": "Toevoegen"
+      "addTask": "Toevoegen",
+      "viewInvoice": "Bekijk factuur {number}",
+      "createInvoice": "Factuur maken"
     },
     "workOrderStatus": {
       "open": "Open",
       "in_progress": "Bezig",
       "waiting_parts": "Wacht op onderdelen",
       "done": "Klaar",
+      "cancelled": "Geannuleerd"
+    },
+    "invoices": {
+      "title": "Facturen",
+      "new": "Nieuwe factuur",
+      "newTitle": "Nieuwe factuur",
+      "empty": "Nog geen facturen.",
+      "back": "Terug naar facturen",
+      "saved": "Opgeslagen.",
+      "error": "Er ging iets mis. Probeer opnieuw.",
+      "statToPrepare": "Op te stellen",
+      "statSent": "Verstuurd",
+      "statOverdue": "Te laat",
+      "statPaidToday": "Vandaag betaald",
+      "statRevenueToday": "Omzet vandaag",
+      "statRevenueMonth": "Omzet deze maand",
+      "subtotal": "Bedrag excl. btw",
+      "vatRate": "Btw-tarief (%)",
+      "vat": "Btw ({rate}%)",
+      "total": "Totaal incl. btw",
+      "paidAmount": "Betaald",
+      "balance": "Openstaand",
+      "dueDate": "Vervaldatum",
+      "issueDate": "Factuurdatum",
+      "notes": "Notities",
+      "forCustomer": "Nieuwe factuur voor {name}",
+      "noVehicle": "Geen voertuig",
+      "save": "Factuur opslaan",
+      "recordPayment": "Bedrag",
+      "addPayment": "Betaling registreren",
+      "paymentsTitle": "Betalingen"
+    },
+    "invoiceStatus": {
+      "draft": "Concept",
+      "to_prepare": "Op te stellen",
+      "sent": "Verstuurd",
+      "partially_paid": "Deels betaald",
+      "paid": "Betaald",
+      "overdue": "Te laat",
       "cancelled": "Geannuleerd"
     },
     "vehicles": {

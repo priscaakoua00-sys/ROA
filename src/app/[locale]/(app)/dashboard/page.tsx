@@ -4,16 +4,32 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { UserPlus, AlertTriangle, Clock, CalendarClock, Sparkles, Car, Wrench, Phone, CalendarDays } from 'lucide-react';
+import {
+  UserPlus,
+  AlertTriangle,
+  Clock,
+  CalendarClock,
+  Sparkles,
+  Car,
+  Wrench,
+  Phone,
+  CalendarDays,
+  MessageCircle,
+  Receipt,
+  UserRoundPlus,
+} from 'lucide-react';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { signOutAction } from '@/data/auth/actions';
 import { loadFollowUpsDueCount } from '@/data/automations/due';
 import { computeRobinInsight } from '@/data/robin/insight';
 import { getModuleImageSrc } from '@/lib/module-images';
 import { formatDateTimeUTC } from '@/lib/datetime';
+import { formatCurrency } from '@/lib/pricing';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Link } from '@/i18n/navigation';
+
+type InvoiceStatus = 'draft' | 'to_prepare' | 'sent' | 'partially_paid' | 'paid' | 'overdue' | 'cancelled';
 
 type Urgency = 'low' | 'normal' | 'high' | 'critical';
 const URGENCY_VARIANT: Record<Urgency, 'muted' | 'default' | 'gold' | 'urgent'> = {
@@ -66,6 +82,39 @@ interface VehicleCardRow {
   status: string | null;
   vehicles: { id: string; make: string | null; model: string | null; license_plate: string | null } | null;
   customers: { first_name: string | null; last_name: string | null; phone: string | null } | null;
+}
+
+interface TodayApptRow {
+  id: string;
+  starts_at: string;
+  status: string;
+  customers: { first_name: string | null; last_name: string | null } | null;
+  vehicles: { make: string | null; model: string | null; license_plate: string | null } | null;
+  services: { name: string | null } | null;
+}
+
+interface UrgentWorkOrderRow {
+  id: string;
+  title: string;
+  status: string;
+  vehicles: { make: string | null; model: string | null; license_plate: string | null } | null;
+  customers: { first_name: string | null; last_name: string | null } | null;
+}
+
+interface UnreadMessageRow {
+  id: string;
+  body: string;
+  created_at: string;
+  conversations: {
+    lead_id: string | null;
+    customer_id: string | null;
+    customers: { first_name: string | null; last_name: string | null } | null;
+  } | null;
+}
+
+interface InvoiceSummaryRow {
+  status: InvoiceStatus;
+  due_date: string | null;
 }
 
 export default async function DashboardPage({
@@ -148,6 +197,55 @@ export default async function DashboardPage({
     loadFollowUpsDueCount(supabase, org.id, now, anon),
   ]);
 
+  const [
+    newCustomersToday,
+    { data: todayApptsData },
+    { data: urgentWorkOrdersData },
+    { data: unreadMessagesData },
+    { data: invoicesSummaryData },
+    { data: paymentsTodayData },
+  ] = await Promise.all([
+    supabase.from('customers').select('id', { count: 'exact', head: true }).eq('organization_id', org.id).gte('created_at', todayISO),
+    supabase
+      .from('appointments')
+      .select('id, starts_at, status, customers(first_name,last_name), vehicles(make,model,license_plate), services(name)')
+      .eq('organization_id', org.id)
+      .neq('status', 'cancelled')
+      .gte('starts_at', todayISO)
+      .lt('starts_at', todayEndISO)
+      .order('starts_at', { ascending: true })
+      .limit(8),
+    supabase
+      .from('work_orders')
+      .select('id, title, status, vehicles(make,model,license_plate), customers(first_name,last_name), leads!inner(urgency)')
+      .eq('organization_id', org.id)
+      .in('status', ['open', 'in_progress', 'waiting_parts'])
+      .in('leads.urgency', ['high', 'critical'])
+      .order('updated_at', { ascending: false })
+      .limit(6),
+    supabase
+      .from('messages')
+      .select('id, body, created_at, conversations(lead_id, customer_id, customers(first_name,last_name))')
+      .eq('organization_id', org.id)
+      .eq('direction', 'inbound')
+      .eq('read', false)
+      .order('created_at', { ascending: false })
+      .limit(6),
+    supabase
+      .from('invoices')
+      .select('status, due_date')
+      .eq('organization_id', org.id)
+      .in('status', ['to_prepare', 'sent', 'partially_paid', 'overdue']),
+    supabase.from('invoice_payments').select('amount').eq('organization_id', org.id).gte('paid_at', todayISO),
+  ]);
+
+  const monthStartISO = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
+  const { data: paymentsMonthData } = await supabase
+    .from('invoice_payments')
+    .select('amount')
+    .eq('organization_id', org.id)
+    .gte('paid_at', monthStartISO);
+
   const leads = (leadsData ?? []) as unknown as LeadRow[];
   const waiting = (waitingData ?? []) as unknown as WaitingRow[];
   const h = await headers();
@@ -214,19 +312,34 @@ export default async function DashboardPage({
     ].filter((id): id is string => Boolean(id)),
   ).size;
 
-  const robinDoneCount = (repliesToday.count ?? 0) + (apptsToday.count ?? 0) + (handledToday.count ?? 0);
   const responseRate = (newToday.count ?? 0) > 0 ? Math.min(100, Math.round(((repliesToday.count ?? 0) / (newToday.count ?? 1)) * 100)) : 100;
   const timeSavedMinutes = (repliesToday.count ?? 0) * 4 + (handledToday.count ?? 0) * 3 + (apptsToday.count ?? 0) * 5;
   const allCaughtUp = (newToday.count ?? 0) === 0 && (urgent.count ?? 0) === 0 && followUpsDue === 0 && (apptsStartingToday.count ?? 0) === 0;
   const metricsAllZero =
     customersServedToday === 0 && (repliesToday.count ?? 0) === 0 && (apptsToday.count ?? 0) === 0 && (handledToday.count ?? 0) === 0;
 
+  // Today's appointments, urgent open work, unanswered messages and the invoices pipeline.
+  const todayAppts = (todayApptsData ?? []) as unknown as TodayApptRow[];
+  const urgentWorkOrders = (urgentWorkOrdersData ?? []) as unknown as UrgentWorkOrderRow[];
+  const unreadMessages = (unreadMessagesData ?? []) as unknown as UnreadMessageRow[];
+  const invoicesSummary = (invoicesSummaryData ?? []) as InvoiceSummaryRow[];
+  const todayStr = todayISO.slice(0, 10);
+  const invoicesToPrepare = invoicesSummary.filter((i) => i.status === 'to_prepare').length;
+  const invoicesOverdue = invoicesSummary.filter(
+    (i) => i.status === 'overdue' || ((i.status === 'sent' || i.status === 'partially_paid') && !!i.due_date && i.due_date < todayStr),
+  ).length;
+  const sumAmounts = (rows: { amount: number }[] | null) => (rows ?? []).reduce((acc, r) => acc + Number(r.amount), 0);
+  const revenueToday = sumAmounts(paymentsTodayData);
+  const revenueMonth = sumAmounts(paymentsMonthData);
+
   const notifChips: { icon: typeof UserPlus; label: string; value: number; href: string; tone: 'urgent' | 'default' }[] = [
     { icon: UserPlus, label: t('dashboard.notifNewRequests'), value: newToday.count ?? 0, href: '#incoming', tone: 'default' },
+    { icon: UserRoundPlus, label: t('dashboard.notifNewCustomers'), value: newCustomersToday.count ?? 0, href: '/customers', tone: 'default' },
     { icon: AlertTriangle, label: t('dashboard.notifUrgent'), value: urgent.count ?? 0, href: '#priority', tone: 'urgent' },
+    { icon: MessageCircle, label: t('dashboard.notifMessages'), value: unreadMessages.length, href: '#messages', tone: 'default' },
+    { icon: CalendarClock, label: t('dashboard.notifApptsToday'), value: apptsStartingToday.count ?? 0, href: '#appointments', tone: 'default' },
     { icon: Clock, label: t('dashboard.notifFollowups'), value: followUpsDue, href: '/automations', tone: 'default' },
-    { icon: CalendarClock, label: t('dashboard.notifApptsToday'), value: apptsStartingToday.count ?? 0, href: '/agenda', tone: 'default' },
-    { icon: Sparkles, label: t('dashboard.notifRobinDone'), value: robinDoneCount, href: '#', tone: 'default' },
+    { icon: Receipt, label: t('dashboard.notifInvoices'), value: invoicesToPrepare, href: '/invoices', tone: 'default' },
   ];
 
   const metrics: { label: string; value: string | number }[] = [
@@ -260,7 +373,7 @@ export default async function DashboardPage({
           <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
             {t('dashboard.notifCenterTitle')}
           </h2>
-          <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
             {notifChips.map((c) => {
               const Icon = c.icon;
               const highlighted = c.tone === 'urgent' && c.value > 0;
@@ -394,6 +507,41 @@ export default async function DashboardPage({
           </section>
         ) : null}
 
+        {/* Today's appointments */}
+        <section id="appointments" className="mt-8 scroll-mt-20 animate-in fade-in duration-700">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-semibold tracking-tight">{t('dashboard.apptsTodayTitle')}</h2>
+            <Link href="/agenda" className="shrink-0 text-sm text-muted-foreground hover:underline">
+              {t('dashboard.vehiclesViewAll')}
+            </Link>
+          </div>
+          {todayAppts.length === 0 ? (
+            <div className="mt-3 rounded-xl border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
+              {t('dashboard.apptsTodayEmpty')}
+            </div>
+          ) : (
+            <ul className="mt-3 space-y-2">
+              {todayAppts.map((a) => (
+                <li key={a.id} className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-4 shadow-soft">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="shrink-0 rounded-lg bg-gold/12 px-2 py-1 text-xs font-semibold text-gold">
+                      {formatDateTimeUTC(a.starts_at, locale)}
+                    </span>
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-medium">{fullName(a.customers)}</div>
+                      <div className="truncate text-xs text-muted-foreground">
+                        {a.services?.name ?? ''}
+                        {a.vehicles ? ` · ${[a.vehicles.make, a.vehicles.model].filter(Boolean).join(' ')}` : ''}
+                      </div>
+                    </div>
+                  </div>
+                  <Badge variant="muted">{t(`appointmentStatus.${a.status}`)}</Badge>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
         {/* Vehicles on the shop floor */}
         <section className="mt-8 animate-in fade-in duration-700">
           <div className="flex items-center justify-between">
@@ -462,6 +610,32 @@ export default async function DashboardPage({
           )}
         </section>
 
+        {/* Urgent work orders */}
+        {urgentWorkOrders.length > 0 ? (
+          <section className="mt-8 animate-in fade-in duration-700">
+            <h2 className="text-base font-semibold tracking-tight">{t('dashboard.urgentWorkTitle')}</h2>
+            <ul className="mt-3 space-y-2">
+              {urgentWorkOrders.map((w) => (
+                <li key={w.id}>
+                  <Link
+                    href={`/work-orders/${w.id}`}
+                    className="flex items-center justify-between gap-3 rounded-xl border border-urgent/30 bg-urgent/5 p-4 shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-urgent/50"
+                  >
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-medium">{w.title}</div>
+                      <div className="truncate text-xs text-muted-foreground">
+                        {fullName(w.customers)}
+                        {w.vehicles ? ` · ${[w.vehicles.make, w.vehicles.model].filter(Boolean).join(' ')}` : ''}
+                      </div>
+                    </div>
+                    <Badge variant={WO_STATUS_VARIANT[w.status] ?? 'muted'}>{t(`workOrderStatus.${w.status}`)}</Badge>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
         {/* Business metrics */}
         <section className="mt-8 animate-in fade-in duration-700">
           <h2 className="text-base font-semibold tracking-tight">{t('dashboard.metricsTitle')}</h2>
@@ -484,6 +658,29 @@ export default async function DashboardPage({
           )}
         </section>
 
+        {/* Invoices */}
+        <section className="mt-8 animate-in fade-in duration-700">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-semibold tracking-tight">{t('dashboard.invoicesTitle')}</h2>
+            <Link href="/invoices" className="shrink-0 text-sm text-muted-foreground hover:underline">
+              {t('dashboard.vehiclesViewAll')}
+            </Link>
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {[
+              { label: t('invoices.statToPrepare'), value: invoicesToPrepare },
+              { label: t('invoices.statOverdue'), value: invoicesOverdue },
+              { label: t('invoices.statRevenueToday'), value: formatCurrency(revenueToday, locale) },
+              { label: t('invoices.statRevenueMonth'), value: formatCurrency(revenueMonth, locale) },
+            ].map((s) => (
+              <div key={s.label} className="rounded-xl border border-border bg-card p-4 shadow-soft">
+                <div className="text-2xl font-semibold tracking-tight">{s.value}</div>
+                <div className="mt-0.5 text-xs text-muted-foreground">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {priority.length > 0 ? (
           <section id="priority" className="mt-8 scroll-mt-20 animate-in fade-in duration-700">
             <h2 className="text-base font-semibold tracking-tight">{t('dashboard.priorityTitle')}</h2>
@@ -504,6 +701,34 @@ export default async function DashboardPage({
                   </Link>
                 </li>
               ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {/* Messages needing a reply */}
+        {unreadMessages.length > 0 ? (
+          <section id="messages" className="mt-8 scroll-mt-20 animate-in fade-in duration-700">
+            <h2 className="text-base font-semibold tracking-tight">{t('dashboard.messagesTitle')}</h2>
+            <ul className="mt-3 space-y-2">
+              {unreadMessages.map((m) => {
+                const conv = m.conversations;
+                const href = conv?.lead_id
+                  ? `/leads/${conv.lead_id}`
+                  : conv?.customer_id
+                    ? `/customers/${conv.customer_id}`
+                    : '/notifications';
+                return (
+                  <li key={m.id}>
+                    <Link href={href} className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-4 shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-gold/40">
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium">{fullName(conv?.customers ?? null)}</div>
+                        <p className="mt-1 truncate text-sm text-muted-foreground">{m.body}</p>
+                      </div>
+                      <span className="shrink-0 text-xs text-muted-foreground">{formatDateTimeUTC(m.created_at, locale)}</span>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </section>
         ) : null}

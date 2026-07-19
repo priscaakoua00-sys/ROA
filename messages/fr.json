@@ -1,6 +1,18 @@
 {
   "app": {
     "name": "Roavaa",
+    "nav": {
+      "dashboard": "Tableau de bord",
+      "agenda": "Agenda",
+      "customers": "Clients",
+      "vehicles": "Véhicules",
+      "workOrders": "Ordres",
+      "invoices": "Factures",
+      "automations": "Relances",
+      "knowledge": "Connaissances",
+      "team": "Équipe",
+      "settings": "Paramètres"
+    },
     "onboarding": {
       "title": "Configurez votre garage",
       "subtitle": "Une etape avant de commencer.",
@@ -108,7 +120,15 @@
         "appointmentSoon": "Il vous reste {count} rendez-vous aujourd'hui.",
         "allClear": "Tout est sous contrôle. Rien d'urgent pour le moment — je surveille le reste.",
         "viewRequest": "Voir la demande"
-      }
+      },
+      "notifNewCustomers": "Nouveaux clients",
+      "notifMessages": "Messages à répondre",
+      "notifInvoices": "Factures à préparer",
+      "apptsTodayTitle": "Rendez-vous du jour",
+      "apptsTodayEmpty": "Aucun rendez-vous aujourd'hui.",
+      "urgentWorkTitle": "Réparations urgentes",
+      "invoicesTitle": "Factures",
+      "messagesTitle": "Messages en attente de réponse"
     },
     "moduleBanner": {
       "repairs": "Véhicules & réparations",
@@ -277,7 +297,9 @@
       "tasksTitle": "Tâches",
       "noTasks": "Aucune tâche.",
       "newTask": "Nouvelle tâche",
-      "addTask": "Ajouter"
+      "addTask": "Ajouter",
+      "viewInvoice": "Voir la facture {number}",
+      "createInvoice": "Créer une facture"
     },
     "workOrderStatus": {
       "open": "Ouvert",
@@ -285,6 +307,45 @@
       "waiting_parts": "Attente pièces",
       "done": "Terminé",
       "cancelled": "Annulé"
+    },
+    "invoices": {
+      "title": "Factures",
+      "new": "Nouvelle facture",
+      "newTitle": "Nouvelle facture",
+      "empty": "Aucune facture pour l'instant.",
+      "back": "Retour aux factures",
+      "saved": "Enregistré.",
+      "error": "Une erreur est survenue. Réessayez.",
+      "statToPrepare": "À préparer",
+      "statSent": "Envoyées",
+      "statOverdue": "En retard",
+      "statPaidToday": "Payées aujourd'hui",
+      "statRevenueToday": "Chiffre d'affaires du jour",
+      "statRevenueMonth": "Chiffre d'affaires du mois",
+      "subtotal": "Montant HT",
+      "vatRate": "Taux de TVA (%)",
+      "vat": "TVA ({rate}%)",
+      "total": "Total TTC",
+      "paidAmount": "Payé",
+      "balance": "Solde dû",
+      "dueDate": "Date d'échéance",
+      "issueDate": "Date de facturation",
+      "notes": "Notes",
+      "forCustomer": "Nouvelle facture pour {name}",
+      "noVehicle": "Aucun véhicule",
+      "save": "Enregistrer la facture",
+      "recordPayment": "Montant",
+      "addPayment": "Enregistrer le paiement",
+      "paymentsTitle": "Paiements"
+    },
+    "invoiceStatus": {
+      "draft": "Brouillon",
+      "to_prepare": "À préparer",
+      "sent": "Envoyée",
+      "partially_paid": "Partiellement payée",
+      "paid": "Payée",
+      "overdue": "En retard",
+      "cancelled": "Annulée"
     },
     "vehicles": {
       "title": "Véhicules",

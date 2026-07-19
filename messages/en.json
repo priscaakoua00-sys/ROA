@@ -1,6 +1,18 @@
 {
   "app": {
     "name": "Roavaa",
+    "nav": {
+      "dashboard": "Dashboard",
+      "agenda": "Agenda",
+      "customers": "Customers",
+      "vehicles": "Vehicles",
+      "workOrders": "Work orders",
+      "invoices": "Invoices",
+      "automations": "Follow-ups",
+      "knowledge": "Knowledge",
+      "team": "Team",
+      "settings": "Settings"
+    },
     "onboarding": {
       "title": "Set up your garage",
       "subtitle": "One step before you begin.",
@@ -108,7 +120,15 @@
         "appointmentSoon": "You still have {count} appointment(s) today.",
         "allClear": "Everything's under control. Nothing urgent right now — I'll keep watching the rest.",
         "viewRequest": "View request"
-      }
+      },
+      "notifNewCustomers": "New customers",
+      "notifMessages": "Messages to answer",
+      "notifInvoices": "Invoices to prepare",
+      "apptsTodayTitle": "Today's appointments",
+      "apptsTodayEmpty": "No appointments today.",
+      "urgentWorkTitle": "Urgent repairs",
+      "invoicesTitle": "Invoices",
+      "messagesTitle": "Messages needing a reply"
     },
     "moduleBanner": {
       "repairs": "Vehicles & repairs",
@@ -277,13 +297,54 @@
       "tasksTitle": "Tasks",
       "noTasks": "No tasks yet.",
       "newTask": "New task",
-      "addTask": "Add"
+      "addTask": "Add",
+      "viewInvoice": "View invoice {number}",
+      "createInvoice": "Create invoice"
     },
     "workOrderStatus": {
       "open": "Open",
       "in_progress": "In progress",
       "waiting_parts": "Waiting for parts",
       "done": "Done",
+      "cancelled": "Cancelled"
+    },
+    "invoices": {
+      "title": "Invoices",
+      "new": "New invoice",
+      "newTitle": "New invoice",
+      "empty": "No invoices yet.",
+      "back": "Back to invoices",
+      "saved": "Saved.",
+      "error": "Something went wrong. Please try again.",
+      "statToPrepare": "To prepare",
+      "statSent": "Sent",
+      "statOverdue": "Overdue",
+      "statPaidToday": "Paid today",
+      "statRevenueToday": "Revenue today",
+      "statRevenueMonth": "Revenue this month",
+      "subtotal": "Amount excl. VAT",
+      "vatRate": "VAT rate (%)",
+      "vat": "VAT ({rate}%)",
+      "total": "Total incl. VAT",
+      "paidAmount": "Paid",
+      "balance": "Balance due",
+      "dueDate": "Due date",
+      "issueDate": "Issue date",
+      "notes": "Notes",
+      "forCustomer": "New invoice for {name}",
+      "noVehicle": "No vehicle",
+      "save": "Save invoice",
+      "recordPayment": "Amount",
+      "addPayment": "Record payment",
+      "paymentsTitle": "Payments"
+    },
+    "invoiceStatus": {
+      "draft": "Draft",
+      "to_prepare": "To prepare",
+      "sent": "Sent",
+      "partially_paid": "Partially paid",
+      "paid": "Paid",
+      "overdue": "Overdue",
       "cancelled": "Cancelled"
     },
     "vehicles": {
