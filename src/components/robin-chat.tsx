@@ -8,6 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
+/** Event other components (e.g. the app header) dispatch on window to open Robin. */
+export const ROBIN_OPEN_EVENT = 'robin:open';
+
 interface ChatMessage {
   role: 'user' | 'robin';
   text: string;
@@ -47,6 +50,14 @@ export function RobinChat({ orgId }: { orgId: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, hasOpened]);
 
+  useEffect(() => {
+    function handleOpen() {
+      setOpen(true);
+    }
+    window.addEventListener(ROBIN_OPEN_EVENT, handleOpen);
+    return () => window.removeEventListener(ROBIN_OPEN_EVENT, handleOpen);
+  }, []);
+
   function ask(question: string) {
     const text = question.trim();
     if (!text) return;
@@ -66,11 +77,15 @@ export function RobinChat({ orgId }: { orgId: string }) {
     <>
       <Button
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-5 right-5 z-50 rounded-full shadow-soft transition-transform duration-200 hover:scale-105 active:scale-95"
+        className="fixed bottom-5 right-5 z-50 gap-2 rounded-full bg-gradient-to-br from-primary to-gold shadow-soft transition-transform duration-200 hover:scale-105 active:scale-95"
         size="lg"
       >
+        <span className="relative flex size-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-foreground/60 opacity-75" />
+          <span className="relative inline-flex size-2 rounded-full bg-primary-foreground" />
+        </span>
         <MessageCircle className="size-4" aria-hidden />
-        <span>💬 {t('launcher')}</span>
+        <span>{t('launcher')}</span>
       </Button>
 
       {hasOpened ? (

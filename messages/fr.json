@@ -293,7 +293,12 @@
       "back": "Retour aux véhicules",
       "saved": "Enregistré.",
       "year": "Année",
-      "historyTitle": "Historique"
+      "historyTitle": "Historique",
+      "photo": "Photo",
+      "photoUpload": "Ajouter une photo",
+      "photoChange": "Changer la photo",
+      "photoSave": "Enregistrer la photo",
+      "photoError": "Échec de l'envoi. Utilisez une image de 8 Mo maximum."
     },
     "notifications": {
       "title": "Notifications",

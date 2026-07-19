@@ -29,15 +29,38 @@ export async function addVehicleAction(formData: FormData) {
     .maybeSingle();
   if (!cust) redirect(`/${locale}/customers`);
 
-  await supabase.from('vehicles').insert({
-    organization_id: cust.organization_id,
-    customer_id: customerId,
-    license_plate: clean('licensePlate'),
-    make: clean('make'),
-    model: clean('model'),
-    year: yearRaw ? Number(yearRaw) : null,
-    mileage: mileageRaw ? Number(mileageRaw) : null,
-  });
+  const { data: vehicle } = await supabase
+    .from('vehicles')
+    .insert({
+      organization_id: cust.organization_id,
+      customer_id: customerId,
+      license_plate: clean('licensePlate'),
+      make: clean('make'),
+      model: clean('model'),
+      year: yearRaw ? Number(yearRaw) : null,
+      mileage: mileageRaw ? Number(mileageRaw) : null,
+    })
+    .select('id')
+    .maybeSingle();
+
+  const photo = formData.get('photo');
+  if (
+    vehicle &&
+    photo instanceof File &&
+    photo.size > 0 &&
+    photo.type.startsWith('image/') &&
+    photo.size <= 8 * 1024 * 1024
+  ) {
+    const ext = (photo.name.split('.').pop() ?? 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+    const path = `${cust.organization_id}/${vehicle.id}/${Date.now()}.${ext}`;
+    const { error: uploadError } = await supabase.storage
+      .from('vehicle-photos')
+      .upload(path, photo, { contentType: photo.type });
+    if (!uploadError) {
+      await supabase.from('vehicles').update({ photo_url: path }).eq('id', vehicle.id);
+    }
+  }
+
   redirect(`/${locale}/customers/${customerId}`);
 }
 
