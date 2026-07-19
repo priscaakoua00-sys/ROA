@@ -21,6 +21,8 @@ const config: Config = {
           'Arial',
           'sans-serif',
         ],
+        serif: ['Fraunces', 'Georgia', 'serif'],
+        mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
       colors: {
         border: 'hsl(var(--border))',
