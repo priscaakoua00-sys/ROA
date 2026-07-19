@@ -4,24 +4,26 @@ import { notFound, redirect } from 'next/navigation';
 import { History } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
-import { updateVehicleAction } from '@/data/vehicles/actions';
+import { updateVehicleAction, uploadVehiclePhotoAction } from '@/data/vehicles/actions';
 import { formatDateTimeUTC } from '@/lib/datetime';
 import { ModuleBanner } from '@/components/module-banner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
+import { CarIllustration } from '@/components/vehicles/car-illustration';
+import { VAN_MODEL_PATTERN } from '@/components/vehicles/vehicle-card';
 
 export default async function VehicleDetailPage({
   params,
   searchParams,
 }: {
   params: Promise<{ locale: string; id: string }>;
-  searchParams: Promise<{ saved?: string }>;
+  searchParams: Promise<{ saved?: string; photoError?: string }>;
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  const { saved } = await searchParams;
+  const { saved, photoError } = await searchParams;
   const t = await getTranslations('app');
 
   const supabase = await createSupabaseServerClient();
@@ -32,10 +34,19 @@ export default async function VehicleDetailPage({
 
   const { data: v } = await supabase
     .from('vehicles')
-    .select('id, license_plate, make, model, year, mileage, notes, customer_id, customers(first_name,last_name)')
+    .select('id, license_plate, make, model, year, mileage, notes, customer_id, photo_url, customers(first_name,last_name)')
     .eq('id', id)
     .maybeSingle();
   if (!v) notFound();
+
+  let photoUrl: string | null = null;
+  if (v.photo_url) {
+    const { data: signed } = await supabase.storage
+      .from('vehicle-photos')
+      .createSignedUrl(v.photo_url, 3600);
+    photoUrl = signed?.signedUrl ?? null;
+  }
+  const kind = VAN_MODEL_PATTERN.test(`${v.make ?? ''} ${v.model ?? ''}`) ? 'van' : 'hatch';
 
   const [{ data: leads }, { data: appts }, { data: wos }] = await Promise.all([
     supabase.from('leads').select('id, ai_summary, description, status, created_at').eq('vehicle_id', id).order('created_at', { ascending: false }).limit(15),
@@ -63,6 +74,41 @@ export default async function VehicleDetailPage({
       </p>
 
       {saved ? <p className="mt-3 text-sm text-success">{t('vehicles.saved')}</p> : null}
+      {photoError ? <p className="mt-3 text-sm text-destructive">{t('vehicles.photoError')}</p> : null}
+
+      {/* Photo */}
+      <div className="mt-5 overflow-hidden rounded-xl border border-border bg-card shadow-soft">
+        <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-b from-muted to-accent">
+          <CarIllustration kind={kind} className="absolute inset-0 m-auto h-[70%] w-[80%]" />
+          {photoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={photoUrl} alt={title} className="absolute inset-0 h-full w-full object-cover" />
+          ) : null}
+        </div>
+        <form
+          action={uploadVehiclePhotoAction}
+          encType="multipart/form-data"
+          className="flex flex-wrap items-center gap-3 p-4"
+        >
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="vehicleId" value={v.id} />
+          <label className="flex-1 text-sm">
+            <span className="mb-1.5 block font-medium">
+              {photoUrl ? t('vehicles.photoChange') : t('vehicles.photoUpload')}
+            </span>
+            <input
+              type="file"
+              name="photo"
+              accept="image/*"
+              required
+              className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-primary/90"
+            />
+          </label>
+          <Button type="submit" variant="outline" size="sm">
+            {t('vehicles.photoSave')}
+          </Button>
+        </form>
+      </div>
 
       {/* Edit */}
       <form action={updateVehicleAction} className="mt-5 rounded-xl border border-border bg-card p-5 shadow-soft">

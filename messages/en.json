@@ -293,7 +293,12 @@
       "back": "Back to vehicles",
       "saved": "Saved.",
       "year": "Year",
-      "historyTitle": "History"
+      "historyTitle": "History",
+      "photo": "Photo",
+      "photoUpload": "Add a photo",
+      "photoChange": "Upload another photo",
+      "photoSave": "Save photo",
+      "photoError": "Upload failed. Use an image of 8 MB or smaller."
     },
     "notifications": {
       "title": "Notifications",

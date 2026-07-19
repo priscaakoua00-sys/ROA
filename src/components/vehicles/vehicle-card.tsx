@@ -1,7 +1,7 @@
 import { Link } from '@/i18n/navigation';
 import { CarIllustration } from '@/components/vehicles/car-illustration';
 
-const VAN =
+export const VAN_MODEL_PATTERN =
   /sprinter|transit|transporter|traffic|kangoo|berlingo|partner|combo|ducato|jumper|boxer|crafter|vito|bestel|caddy|expert|vivaro|master|movano|daily/i;
 
 function initialsOf(name: string) {
@@ -35,7 +35,7 @@ export function VehicleCard({
   labels,
 }: Props) {
   const title = [make, model].filter(Boolean).join(' ') || labels.vehicle;
-  const kind = VAN.test(`${make ?? ''} ${model ?? ''}`) ? 'van' : 'hatch';
+  const kind = VAN_MODEL_PATTERN.test(`${make ?? ''} ${model ?? ''}`) ? 'van' : 'hatch';
 
   return (
     <Link

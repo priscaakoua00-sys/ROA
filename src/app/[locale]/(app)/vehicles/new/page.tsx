@@ -59,7 +59,11 @@ export default async function NewVehiclePage({
             {t('newVehicle.forCustomer', { name: name(customer) })}
           </h1>
 
-          <form action={addVehicleAction} className="mt-5 space-y-3 rounded-xl border border-border bg-card p-5 shadow-soft">
+          <form
+            action={addVehicleAction}
+            encType="multipart/form-data"
+            className="mt-5 space-y-3 rounded-xl border border-border bg-card p-5 shadow-soft"
+          >
             <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="customerId" value={customer.id} />
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -69,6 +73,15 @@ export default async function NewVehiclePage({
               <Field label={t('vehicles.year')} name="year" type="number" />
               <Field label={t('customers.mileage')} name="mileage" type="number" />
             </div>
+            <label className="block text-sm">
+              <span className="mb-1.5 block font-medium">{t('vehicles.photoUpload')}</span>
+              <input
+                type="file"
+                name="photo"
+                accept="image/*"
+                className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-primary/90"
+              />
+            </label>
             <Button type="submit" className="w-full">{t('newVehicle.save')}</Button>
           </form>
         </div>

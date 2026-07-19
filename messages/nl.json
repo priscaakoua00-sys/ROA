@@ -293,7 +293,12 @@
       "back": "Terug naar voertuigen",
       "saved": "Opgeslagen.",
       "year": "Bouwjaar",
-      "historyTitle": "Geschiedenis"
+      "historyTitle": "Geschiedenis",
+      "photo": "Foto",
+      "photoUpload": "Foto toevoegen",
+      "photoChange": "Andere foto uploaden",
+      "photoSave": "Foto opslaan",
+      "photoError": "Upload mislukt. Gebruik een afbeelding van maximaal 8 MB."
     },
     "notifications": {
       "title": "Meldingen",

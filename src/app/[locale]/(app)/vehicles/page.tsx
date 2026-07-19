@@ -15,6 +15,7 @@ interface V {
   model: string | null;
   year: number | null;
   mileage: number | null;
+  photo_url: string | null;
   customers: { first_name: string | null; last_name: string | null } | null;
 }
 
@@ -42,7 +43,7 @@ export default async function VehiclesPage({
 
   let query = supabase
     .from('vehicles')
-    .select('id, license_plate, make, model, year, mileage, customers(first_name,last_name)')
+    .select('id, license_plate, make, model, year, mileage, photo_url, customers(first_name,last_name)')
     .eq('organization_id', org.id)
     .order('created_at', { ascending: false })
     .limit(50);
@@ -54,6 +55,17 @@ export default async function VehiclesPage({
   }
   const { data } = await query;
   const vehicles = (data ?? []) as unknown as V[];
+
+  const photoPaths = vehicles.map((v) => v.photo_url).filter((p): p is string => Boolean(p));
+  const photoUrls = new Map<string, string>();
+  if (photoPaths.length > 0) {
+    const { data: signed } = await supabase.storage
+      .from('vehicle-photos')
+      .createSignedUrls(photoPaths, 3600);
+    signed?.forEach((s) => {
+      if (s.signedUrl && s.path) photoUrls.set(s.path, s.signedUrl);
+    });
+  }
 
   const owner = (v: V) =>
     [v.customers?.first_name, v.customers?.last_name].filter(Boolean).join(' ') ||
@@ -101,6 +113,7 @@ export default async function VehiclesPage({
               year={v.year}
               mileage={v.mileage}
               owner={owner(v)}
+              photoUrl={v.photo_url ? photoUrls.get(v.photo_url) : null}
               labels={labels}
             />
           ))}
