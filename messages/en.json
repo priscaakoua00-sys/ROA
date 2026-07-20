@@ -11,7 +11,14 @@
       "automations": "Follow-ups",
       "knowledge": "Knowledge",
       "team": "Team",
-      "settings": "Settings"
+      "settings": "Settings",
+      "openRobin": "Open Robin",
+      "notifications": "Notifications",
+      "signedInAs": "Signed in as",
+      "signOut": "Sign out",
+      "more": "More",
+      "closeMenu": "Close menu",
+      "menu": "Menu"
     },
     "onboarding": {
       "title": "Set up your garage",

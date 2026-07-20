@@ -36,7 +36,7 @@
     --accent: 214 20% 92%;
     --accent-foreground: 220 20% 20%;
 
-    --gold: 215 25% 45%;
+    --gold: 38 68% 42%;
     --urgent: 4 70% 48%;
 
     --success: 152 45% 32%;
@@ -56,49 +56,56 @@
     --radius: 0.9rem;
   }
 
+  /*
+   * ROAVAA Premium — the brand's signature look: deep anthracite surfaces,
+   * a warm gold accent (matches the marketing site's amber), a precise
+   * technical blue for primary actions, and a vivid green reserved for
+   * money/success states. This is the default experience (see ThemeProvider
+   * defaultTheme="dark"); light stays available from the theme toggle.
+   */
   .dark {
-    --background: 220 20% 9%;
-    --foreground: 210 20% 92%;
+    --background: 224 24% 6%;
+    --foreground: 210 20% 93%;
 
-    --surface: 220 17% 11%;
+    --surface: 224 20% 8%;
 
-    --card: 220 16% 13%;
-    --card-foreground: 210 20% 92%;
+    --card: 222 18% 10%;
+    --card-foreground: 210 20% 93%;
     --card-highlight: 255 255 255;
-    --card-highlight-a: 0.05;
+    --card-highlight-a: 0.04;
 
-    --popover: 220 16% 13%;
-    --popover-foreground: 210 20% 92%;
+    --popover: 222 20% 9%;
+    --popover-foreground: 210 20% 93%;
 
-    --primary: 212 58% 60%;
-    --primary-foreground: 220 40% 10%;
+    --primary: 213 74% 58%;
+    --primary-foreground: 220 45% 8%;
 
-    --secondary: 220 14% 17%;
+    --secondary: 222 16% 15%;
     --secondary-foreground: 210 18% 90%;
 
-    --muted: 220 13% 16%;
-    --muted-foreground: 216 10% 65%;
+    --muted: 222 15% 14%;
+    --muted-foreground: 216 10% 63%;
 
-    --accent: 220 13% 18%;
+    --accent: 222 15% 16%;
     --accent-foreground: 210 18% 92%;
 
-    --gold: 215 22% 68%;
-    --urgent: 4 70% 62%;
+    --gold: 40 78% 58%;
+    --urgent: 4 78% 63%;
 
-    --success: 152 45% 50%;
-    --success-foreground: 152 40% 8%;
+    --success: 152 55% 45%;
+    --success-foreground: 152 40% 6%;
 
     --destructive: 0 60% 55%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 13% 21%;
-    --input: 220 13% 23%;
-    --ring: 212 55% 55%;
+    --border: 222 15% 19%;
+    --input: 222 15% 20%;
+    --ring: 213 70% 55%;
 
     --brand: var(--primary);
     --brand-foreground: var(--primary-foreground);
 
-    --sh: 220 40% 2%;
+    --sh: 224 50% 1%;
   }
 
   [data-tenant='demo'] {
@@ -185,6 +192,18 @@
     margin-right: 0.5rem;
     vertical-align: middle;
     background: hsl(var(--gold));
+  }
+
+  /* Frosted glass surface for elevated chrome: topbar, sidebar, dialogs, command palette. */
+  .glass {
+    background: hsl(var(--surface) / 0.72);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+  }
+
+  /* Thin gold-to-transparent glow ring for the active/primary interactive state. */
+  .glow-gold {
+    box-shadow: 0 0 0 1px hsl(var(--gold) / 0.35), 0 8px 24px -12px hsl(var(--gold) / 0.35);
   }
 }
 

@@ -381,13 +381,19 @@ export default async function DashboardPage({
                 <a
                   key={c.label}
                   href={`${c.href.startsWith('#') ? '' : `/${locale}`}${c.href}`}
-                  className={`flex items-center gap-2 rounded-xl border p-3 shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-gold/40 ${
+                  className={`group flex items-center gap-3 rounded-2xl border p-4 shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:shadow-float hover:border-gold/40 ${
                     highlighted ? 'border-urgent/30 bg-urgent/5' : 'border-border bg-card'
                   }`}
                 >
-                  <Icon className={`size-4 shrink-0 ${highlighted ? 'text-urgent' : 'text-gold'}`} aria-hidden />
+                  <span
+                    className={`flex size-9 shrink-0 items-center justify-center rounded-full transition-transform duration-200 group-hover:scale-110 ${
+                      highlighted ? 'bg-urgent/12 text-urgent' : 'bg-gold/12 text-gold'
+                    }`}
+                  >
+                    <Icon className="size-4" aria-hidden />
+                  </span>
                   <div className="min-w-0">
-                    <div className="text-sm font-semibold tracking-tight">{c.value}</div>
+                    <div className="text-lg font-semibold tracking-tight">{c.value}</div>
                     <div className="truncate text-[11px] text-muted-foreground">{c.label}</div>
                   </div>
                 </a>
@@ -399,7 +405,7 @@ export default async function DashboardPage({
           ) : null}
         </section>
 
-        <section className="mt-5 rounded-2xl border border-gold/25 bg-gradient-to-br from-gold/10 to-transparent p-6 shadow-soft animate-in fade-in slide-in-from-top-2 duration-500">
+        <section className="mt-5 rounded-2xl border border-gold/25 bg-gradient-to-br from-gold/10 to-transparent p-7 shadow-float animate-in fade-in slide-in-from-top-2 duration-500">
           <div className="flex items-center gap-2">
             {robinAvatar ? (
               <span className="relative size-7 shrink-0 overflow-hidden rounded-full border border-gold/30">
@@ -649,7 +655,7 @@ export default async function DashboardPage({
           ) : (
             <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
               {metrics.map((s) => (
-                <div key={s.label} className="rounded-xl border border-border bg-card p-4 shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+                <div key={s.label} className="lift rounded-2xl border border-border bg-card p-5 shadow-soft">
                   <div className="text-2xl font-semibold tracking-tight">{s.value}</div>
                   <div className="mt-0.5 text-xs text-muted-foreground">{s.label}</div>
                 </div>
@@ -673,7 +679,7 @@ export default async function DashboardPage({
               { label: t('invoices.statRevenueToday'), value: formatCurrency(revenueToday, locale) },
               { label: t('invoices.statRevenueMonth'), value: formatCurrency(revenueMonth, locale) },
             ].map((s) => (
-              <div key={s.label} className="rounded-xl border border-border bg-card p-4 shadow-soft">
+              <div key={s.label} className="lift rounded-2xl border border-border bg-card p-5 shadow-soft">
                 <div className="text-2xl font-semibold tracking-tight">{s.value}</div>
                 <div className="mt-0.5 text-xs text-muted-foreground">{s.label}</div>
               </div>

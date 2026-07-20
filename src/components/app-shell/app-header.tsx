@@ -34,7 +34,7 @@ export function AppHeader({
   const t = useTranslations('app.nav');
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-background/85 px-4 backdrop-blur md:px-6">
+    <header className="glass sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border px-4 md:px-6">
       <span className="min-w-0 flex-1 truncate text-sm font-semibold tracking-tight md:text-base">
         {orgName}
       </span>
@@ -42,7 +42,7 @@ export function AppHeader({
       <Button
         variant="outline"
         size="sm"
-        className="hidden sm:inline-flex"
+        className="hidden border-gold/30 text-gold hover:bg-gold/10 hover:text-gold sm:inline-flex"
         onClick={() => window.dispatchEvent(new CustomEvent(ROBIN_OPEN_EVENT))}
       >
         <MessageCircle className="size-4" aria-hidden />
@@ -51,7 +51,7 @@ export function AppHeader({
       <Button
         variant="outline"
         size="icon"
-        className="sm:hidden"
+        className="border-gold/30 text-gold hover:bg-gold/10 hover:text-gold sm:hidden"
         aria-label={t('openRobin')}
         onClick={() => window.dispatchEvent(new CustomEvent(ROBIN_OPEN_EVENT))}
       >

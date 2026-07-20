@@ -93,9 +93,14 @@ const config: Config = {
           from: { height: 'var(--radix-accordion-content-height)' },
           to: { height: '0' },
         },
+        shimmer: {
+          from: { backgroundPosition: '150% 0' },
+          to: { backgroundPosition: '-50% 0' },
+        },
       },
       animation: {
         'fade-in-up': 'fade-in-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both',
+        shimmer: 'shimmer 2.2s ease-in-out infinite',
       },
     },
   },
