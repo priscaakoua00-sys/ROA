@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { isAppLocale, routing } from '@/i18n/routing';
 import { ThemeProvider } from '@/components/theme-provider';
+import { Toaster } from '@/components/ui/toaster';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { RobinChat } from '@/components/robin-chat';
 import { SITE_URL } from '@/lib/site';
@@ -106,6 +107,7 @@ export default async function LocaleLayout({
           >
             {children}
             {orgId ? <RobinChat orgId={orgId} /> : null}
+            <Toaster />
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

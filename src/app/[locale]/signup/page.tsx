@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { AuthShell, Field } from '@/components/auth/auth-shell';
-import { Button } from '@/components/ui/button';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { Link } from '@/i18n/navigation';
 import { signUpAction } from '@/data/auth/actions';
 
@@ -24,7 +24,7 @@ export default async function SignupPage({
         <Field label={t('fields.fullName')} name="fullName" autoComplete="name" required />
         <Field label={t('fields.email')} name="email" type="email" autoComplete="email" required />
         <Field label={t('fields.password')} name="password" type="password" autoComplete="new-password" required />
-        <Button type="submit" className="w-full">{t('signup.cta')}</Button>
+        <SubmitButton className="w-full">{t('signup.cta')}</SubmitButton>
       </form>
       <div className="mt-4 text-center text-sm text-muted-foreground">
         {t('signup.hasAccount')}{' '}

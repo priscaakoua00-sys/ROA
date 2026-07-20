@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { createInvoiceAction } from '@/data/invoices/actions';
 import { Button } from '@/components/ui/button';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
 
@@ -90,7 +91,12 @@ export default async function NewInvoicePage({
           </div>
           <Field label={t('invoices.dueDate')} name="dueDate" type="date" />
           <Field label={t('invoices.notes')} name="notes" />
-          <Button type="submit" className="w-full">{t('invoices.save')}</Button>
+          <div className="flex items-center gap-3">
+            <SubmitButton className="flex-1">{t('invoices.save')}</SubmitButton>
+            <Link href="/work-orders">
+              <Button type="button" variant="outline">{t('common.cancel')}</Button>
+            </Link>
+          </div>
         </form>
       </div>
     );
@@ -114,9 +120,15 @@ export default async function NewInvoicePage({
 
       return (
         <div className="container max-w-lg py-10">
-          <Link href="/invoices/new" className="text-sm text-muted-foreground hover:underline">
-            {t('newVehicle.changeCustomer')}
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/invoices/new" className="text-sm text-muted-foreground hover:underline">
+              {t('newVehicle.changeCustomer')}
+            </Link>
+            <span className="text-border">·</span>
+            <Link href="/invoices" className="text-sm text-muted-foreground hover:underline">
+              {t('common.cancel')}
+            </Link>
+          </div>
           <h1 className="mt-3 text-2xl font-semibold tracking-tight">
             {t('invoices.forCustomer', { name: name(customer) })}
           </h1>
@@ -145,7 +157,12 @@ export default async function NewInvoicePage({
             </div>
             <Field label={t('invoices.dueDate')} name="dueDate" type="date" />
             <Field label={t('invoices.notes')} name="notes" />
-            <Button type="submit" className="w-full">{t('invoices.save')}</Button>
+            <div className="flex items-center gap-3">
+              <SubmitButton className="flex-1">{t('invoices.save')}</SubmitButton>
+              <Link href="/invoices">
+                <Button type="button" variant="outline">{t('common.cancel')}</Button>
+              </Link>
+            </div>
           </form>
         </div>
       );

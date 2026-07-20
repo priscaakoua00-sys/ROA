@@ -104,6 +104,12 @@ export default async function InvoicesPage({
     <div className="container max-w-3xl py-10">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">{t('invoices.title')}</h1>
+        <Link href="/dashboard" className="text-sm text-muted-foreground hover:underline">
+          {t('lead.back')}
+        </Link>
+      </div>
+
+      <div className="mt-4">
         <Link href="/invoices/new">
           <Button size="sm">{t('invoices.new')}</Button>
         </Link>

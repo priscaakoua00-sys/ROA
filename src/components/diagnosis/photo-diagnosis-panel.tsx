@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { Camera, ShieldAlert } from 'lucide-react';
 import { createPhotoDiagnosisAction } from '@/data/diagnosis/actions';
-import { Button } from '@/components/ui/button';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { Badge, type BadgeProps } from '@/components/ui/badge';
 import { formatDateTimeUTC } from '@/lib/datetime';
 import { TAGGED_VEHICLE_ANGLES } from '@/lib/vehicle-angles';
@@ -124,7 +124,7 @@ export async function PhotoDiagnosisPanel({
           />
         </label>
 
-        <Button type="submit" variant="outline" size="sm">{t('submit')}</Button>
+        <SubmitButton variant="outline" size="sm" pendingLabel={t('analyzing')}>{t('submit')}</SubmitButton>
 
         <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
           <ShieldAlert className="mt-0.5 size-3.5 shrink-0" aria-hidden />

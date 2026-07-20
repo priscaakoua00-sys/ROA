@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
+import { FlashToast } from '@/components/flash-toast';
 
 const ROLES = ['owner', 'admin', 'receptionist', 'mechanic', 'viewer'] as const;
 
@@ -57,6 +58,7 @@ export default async function TeamPage({
 
   return (
     <div className="container max-w-2xl py-10">
+      <FlashToast success={invited ? t('team.invited') : null} error={error ? t('team.error') : null} />
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">{t('team.title')}</h1>
         <Link href="/dashboard" className="text-sm text-muted-foreground hover:underline">

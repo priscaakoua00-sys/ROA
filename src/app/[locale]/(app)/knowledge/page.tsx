@@ -13,6 +13,8 @@ import { ModuleBanner } from '@/components/module-banner';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
+import { FlashToast } from '@/components/flash-toast';
+import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button';
 
 const CATEGORIES = ['failure', 'intervention_time', 'part', 'faq', 'safety'] as const;
 
@@ -58,6 +60,7 @@ export default async function KnowledgePage({
 
   return (
     <div className="container max-w-2xl py-10">
+      <FlashToast success={saved ? t('settings.saved') : null} error={error ? t('team.error') : null} />
       <ModuleBanner moduleKey="diagnostics" label={t('moduleBanner.diagnostics')} icon={Stethoscope} />
 
       <div className="flex items-center justify-between">
@@ -132,13 +135,18 @@ export default async function KnowledgePage({
                         </button>
                       </div>
                     </form>
-                    <form action={deleteArticleAction} className="mt-1">
+                    <form id={`delete-article-${a.id}`} action={deleteArticleAction} className="mt-1">
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="articleId" value={a.id} />
-                      <button type="submit" className="text-xs text-muted-foreground hover:text-urgent hover:underline">
-                        {t('settings.delete')}
-                      </button>
                     </form>
+                    <ConfirmDeleteButton
+                      formId={`delete-article-${a.id}`}
+                      triggerLabel={t('settings.delete')}
+                      title={t('common.confirmDeleteTitle')}
+                      description={t('knowledge.deleteConfirm')}
+                      cancelLabel={t('common.cancel')}
+                      confirmLabel={t('common.confirm')}
+                    />
                   </li>
                 ))}
               </ul>

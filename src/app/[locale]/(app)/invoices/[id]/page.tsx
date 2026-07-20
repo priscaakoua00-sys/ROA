@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
+import { FlashToast } from '@/components/flash-toast';
 
 type InvoiceStatus = 'draft' | 'to_prepare' | 'sent' | 'partially_paid' | 'paid' | 'overdue' | 'cancelled';
 const STATUSES: InvoiceStatus[] = ['draft', 'to_prepare', 'sent', 'partially_paid', 'paid', 'overdue', 'cancelled'];
@@ -68,6 +69,7 @@ export default async function InvoiceDetailPage({
 
   return (
     <div className="container max-w-2xl py-10">
+      <FlashToast success={saved ? t('invoices.saved') : null} error={error ? t('invoices.error') : null} />
       <Link href="/invoices" className="text-sm text-muted-foreground hover:underline">
         {t('invoices.back')}
       </Link>

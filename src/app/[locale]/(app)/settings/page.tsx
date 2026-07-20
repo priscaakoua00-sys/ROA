@@ -14,7 +14,12 @@ import { Button } from '@/components/ui/button';
 import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
 import { CheckCircle2 } from 'lucide-react';
-import { LAUNCH_FREE, PLAN_FEATURE_KEYS, formatMonthlyPrice } from '@/lib/pricing';
+import { LAUNCH_FREE } from '@/lib/pricing';
+import { PLANS, formatMonthlyPrice } from '@/lib/plans';
+import { getOrgSubscription } from '@/data/subscriptions/get-subscription';
+import { Badge } from '@/components/ui/badge';
+import { FlashToast } from '@/components/flash-toast';
+import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button';
 
 const WEEKDAYS = [1, 2, 3, 4, 5, 6, 0];
 const LANGS = ['nl', 'en', 'fr'] as const;
@@ -52,7 +57,7 @@ export default async function SettingsPage({
   const org = orgs?.[0];
   if (!org) redirect(`/${locale}/onboarding`);
 
-  const [{ data: rules }, { data: svc }] = await Promise.all([
+  const [{ data: rules }, { data: svc }, subscription] = await Promise.all([
     supabase
       .from('availability_rules')
       .select('weekday, start_time, end_time')
@@ -62,7 +67,12 @@ export default async function SettingsPage({
       .select('id, name, duration_minutes, buffer_minutes, active')
       .eq('organization_id', org.id)
       .order('created_at', { ascending: true }),
+    getOrgSubscription(supabase, org.id),
   ]);
+  const currentPlan = PLANS.find((p) => p.key === subscription.planKey) ?? PLANS[0]!;
+  const trialDaysLeft = subscription.trialEndsAt
+    ? Math.max(0, Math.ceil((new Date(subscription.trialEndsAt).getTime() - Date.now()) / 86_400_000))
+    : null;
 
   const hours = new Map<number, { start: string; end: string }>();
   for (const r of rules ?? []) {
@@ -75,6 +85,7 @@ export default async function SettingsPage({
 
   return (
     <div className="container max-w-2xl py-10">
+      <FlashToast success={saved ? t('settings.saved') : null} error={error ? t('team.error') : null} />
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">{t('settings.title')}</h1>
         <Link href="/dashboard" className="text-sm text-muted-foreground hover:underline">
@@ -100,22 +111,39 @@ export default async function SettingsPage({
         </div>
 
         <div className="mt-4 rounded-lg border border-border bg-background p-4">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <span className="text-sm font-semibold">{t('settings.billingPlanName')}</span>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold">{t(`pricing.plans.${currentPlan.key}`)}</span>
+              <Badge variant={subscription.status === 'active' ? 'success' : subscription.status === 'trialing' ? 'gold' : 'urgent'}>
+                {t(`settings.billingStatus.${subscription.status}`)}
+              </Badge>
+            </div>
             <span className="text-lg font-semibold tracking-tight">
-              {formatMonthlyPrice(locale)}
-              <span className="text-sm font-normal text-muted-foreground">
-                {' '}
-                {t('settings.billingPerMonth')}
-              </span>
+              {currentPlan.monthlyPrice === null ? (
+                t('pricing.contactPrice')
+              ) : (
+                <>
+                  {formatMonthlyPrice(currentPlan.monthlyPrice, locale)}
+                  <span className="text-sm font-normal text-muted-foreground">
+                    {' '}
+                    {t('pricing.perMonth')}
+                  </span>
+                </>
+              )}
             </span>
           </div>
 
+          {subscription.status === 'trialing' && trialDaysLeft !== null ? (
+            <p className="mt-2 text-xs text-muted-foreground">
+              {t('settings.billingTrialDays', { count: trialDaysLeft })}
+            </p>
+          ) : null}
+
           <ul className="mt-3 space-y-1.5">
-            {PLAN_FEATURE_KEYS.map((key) => (
+            {currentPlan.featureKeys.map((key) => (
               <li key={key} className="flex items-center gap-2 text-sm text-muted-foreground">
                 <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
-                {t(`settings.billingFeature.${key}`)}
+                {t(`pricing.features.${key}`)}
               </li>
             ))}
           </ul>
@@ -205,13 +233,20 @@ export default async function SettingsPage({
                 </label>
                 <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>
               </form>
-              <form action={deleteServiceAction} className="mt-1 flex justify-end">
+              <form id={`delete-service-${s.id}`} action={deleteServiceAction} className="mt-1 flex justify-end">
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="serviceId" value={s.id} />
-                <button type="submit" className="text-xs text-muted-foreground hover:text-urgent hover:underline">
-                  {t('settings.delete')}
-                </button>
               </form>
+              <div className="flex justify-end">
+                <ConfirmDeleteButton
+                  formId={`delete-service-${s.id}`}
+                  triggerLabel={t('settings.delete')}
+                  title={t('common.confirmDeleteTitle')}
+                  description={t('settings.deleteConfirm')}
+                  cancelLabel={t('common.cancel')}
+                  confirmLabel={t('common.confirm')}
+                />
+              </div>
             </li>
           ))}
         </ul>

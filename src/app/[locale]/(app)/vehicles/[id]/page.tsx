@@ -16,6 +16,7 @@ import { VAN_MODEL_PATTERN } from '@/components/vehicles/vehicle-card';
 import { PhotoDiagnosisPanel, type DiagnosisRow } from '@/components/diagnosis/photo-diagnosis-panel';
 import type { DiagnosisSeverity, VehicleAngle } from '@/integrations/ai';
 import { isExternalPhotoUrl } from '@/lib/utils';
+import { FlashToast } from '@/components/flash-toast';
 
 export default async function VehicleDetailPage({
   params,
@@ -110,6 +111,10 @@ export default async function VehicleDetailPage({
 
   return (
     <div className="container max-w-2xl py-10">
+      <FlashToast
+        success={saved ? t('vehicles.saved') : diagSaved === '1' ? t('diagnosis.saved') : null}
+        error={photoError ? t('vehicles.photoError') : diagError === '1' ? t('diagnosis.error') : null}
+      />
       <ModuleBanner moduleKey="history" label={t('moduleBanner.history')} icon={History} />
 
       <Link href="/vehicles" className="text-sm text-muted-foreground hover:underline">

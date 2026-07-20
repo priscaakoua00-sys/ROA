@@ -1,9 +1,16 @@
 {
   "app": {
     "name": "Roavaa",
+    "common": {
+      "cancel": "Annuler",
+      "close": "Fermer",
+      "confirmDeleteTitle": "Êtes-vous sûr ?",
+      "confirm": "Confirmer"
+    },
     "nav": {
       "dashboard": "Tableau de bord",
       "agenda": "Agenda",
+      "leads": "Demandes",
       "customers": "Clients",
       "vehicles": "Véhicules",
       "workOrders": "Ordres",
@@ -223,6 +230,9 @@
       "viewer": "Observateur"
     },
     "leads": {
+      "title": "Demandes",
+      "search": "Rechercher dans les demandes...",
+      "empty": "Aucune demande pour le moment.",
       "anonymous": "Client inconnu",
       "review": "Contrôle humain",
       "urgency": {
@@ -414,17 +424,15 @@
       "billingTitle": "Abonnement",
       "billingIntro": "Ce que Roavaa coûtera, une fois la facturation activée.",
       "billingFreeBadge": "Gratuit pour l'instant",
-      "billingPlanName": "Roavaa",
-      "billingPerMonth": "/ mois",
       "billingFreeNote": "Vous utilisez actuellement Roavaa gratuitement pendant le lancement. Ce prix sera annoncé bien à l'avance, avant toute facturation.",
       "billingComingSoon": "La facturation n'est pas encore active.",
-      "billingFeature": {
-        "robin": "Robin, votre employé IA",
-        "vehicles": "Véhicules et clients illimités",
-        "workOrders": "Ordres de réparation illimités",
-        "agenda": "Agenda et rendez-vous",
-        "team": "Membres d'équipe et rôles",
-        "knowledge": "Base de connaissances"
+      "billingTrialDays": "{count, plural, =1 {# jour restant} other {# jours restants}} dans votre période d'essai.",
+      "billingStatus": {
+        "trialing": "Période d'essai",
+        "active": "Actif",
+        "past_due": "Paiement en retard",
+        "cancelled": "Résilié",
+        "expired": "Expiré"
       },
       "companyTitle": "Entreprise",
       "name": "Nom",
@@ -438,6 +446,7 @@
       "buffer": "Tampon (min)",
       "active": "Actif",
       "delete": "Supprimer",
+      "deleteConfirm": "Cette prestation sera définitivement supprimée. Cette action est irréversible.",
       "newService": "Nouveau service",
       "addService": "Ajouter",
       "weekday": {
@@ -466,6 +475,7 @@
       "contentPlaceholder": "Décrivez brièvement...",
       "add": "Ajouter",
       "empty": "Rien pour l'instant. Ajoutez votre première connaissance.",
+      "deleteConfirm": "Cet article sera définitivement supprimé. Cette action est irréversible.",
       "category": {
         "failure": "Pannes fréquentes",
         "intervention_time": "Temps d'intervention",
@@ -523,6 +533,7 @@
       "noteLabel": "Courte description (facultatif)",
       "notePlaceholder": "Ex. bruit de grincement au freinage",
       "submit": "Analyser avec Robin IA",
+      "analyzing": "Robin analyse...",
       "disclaimer": "Cette analyse est une aide au diagnostic et ne remplace pas l'expertise d'un professionnel. Confirmez toujours vous-même avant de démarrer une réparation.",
       "visibleProblems": "Problèmes visibles",
       "affectedParts": "Pièces potentiellement endommagées",
@@ -696,26 +707,43 @@
   "pricing": {
     "title": "Tarifs",
     "subtitle": "Clair, sans surprise. Voici ce que coûte Roavaa.",
-    "freeBadge": "Gratuit pour l'instant",
-    "freePlanName": "Pendant le lancement",
-    "freePlanPrice": "0 €",
-    "freePlanPeriod": "/ mois",
-    "freePlanNote": "Tout est gratuit pendant notre lancement. Pas de carte requise, aucun engagement.",
-    "paidPlanName": "Roavaa",
-    "paidPlanPeriod": "/ mois",
-    "paidBadge": "Après le lancement",
-    "paidPlanNote": "Ce sera le prix une fois la facturation activée. On vous préviendra largement à l'avance, rien n'est jamais prélevé sans prévenir.",
+    "launchBanner": "Gratuit pendant le lancement. Choisissez dès maintenant l'abonnement qui vous convient — la facturation ne sera activée que plus tard, et nous vous préviendrons largement à l'avance.",
+    "perMonth": "/ mois",
+    "mostPopular": "Le plus choisi",
+    "contactPrice": "Sur mesure",
+    "cta": "Bientôt disponible",
     "featuresTitle": "Inclus",
-    "ctaFree": "Commencer gratuitement",
-    "ctaPaid": "Pas encore actif",
     "backHome": "Retour à Roavaa",
+    "plans": {
+      "starter": "Starter",
+      "professional": "Professional",
+      "premium": "Premium",
+      "enterprise": "Enterprise"
+    },
     "features": {
       "robin": "Robin, votre collègue IA",
-      "vehicles": "Véhicules et clients illimités",
-      "workOrders": "Ordres de réparation illimités",
+      "vehicles": "Véhicules illimités",
+      "customers": "Clients illimités",
       "agenda": "Agenda et rendez-vous",
-      "team": "Membres d'équipe et rôles",
-      "knowledge": "Base de connaissances"
+      "oneSeat": "1 membre d'équipe",
+      "emailSupport": "Assistance par e-mail",
+      "everythingInStarter": "Tout ce qui est dans Starter",
+      "workOrders": "Ordres de réparation",
+      "invoices": "Facturation",
+      "photoDiagnosis": "Diagnostic photo avec Robin IA",
+      "automations": "Relances automatiques",
+      "fiveSeats": "Jusqu'à 5 membres d'équipe",
+      "prioritySupport": "Assistance prioritaire",
+      "everythingInProfessional": "Tout ce qui est dans Professional",
+      "knowledge": "Base de connaissances",
+      "unlimitedSeats": "Membres d'équipe illimités",
+      "customBranding": "Image de marque personnalisée",
+      "phoneSupport": "Assistance téléphonique",
+      "everythingInPremium": "Tout ce qui est dans Premium",
+      "dedicatedManager": "Chargé de compte dédié",
+      "customIntegrations": "Intégrations sur mesure",
+      "sla": "Contrat de service (SLA)",
+      "multiLocation": "Plusieurs sites"
     }
   }
 }

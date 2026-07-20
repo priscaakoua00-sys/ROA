@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { createManualWorkOrderAction } from '@/data/work-orders/actions';
 import { Button } from '@/components/ui/button';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
 
@@ -66,9 +67,15 @@ export default async function NewWorkOrderPage({
 
       return (
         <div className="container max-w-lg py-10">
-          <Link href="/work-orders/new" className="text-sm text-muted-foreground hover:underline">
-            {t('newWorkOrder.changeCustomer')}
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/work-orders/new" className="text-sm text-muted-foreground hover:underline">
+              {t('newWorkOrder.changeCustomer')}
+            </Link>
+            <span className="text-border">·</span>
+            <Link href="/work-orders" className="text-sm text-muted-foreground hover:underline">
+              {t('common.cancel')}
+            </Link>
+          </div>
           <h1 className="mt-3 text-2xl font-semibold tracking-tight">
             {t('newWorkOrder.forCustomer', { name: name(customer) })}
           </h1>
@@ -103,7 +110,12 @@ export default async function NewWorkOrderPage({
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
               />
             </label>
-            <Button type="submit" className="w-full">{t('newWorkOrder.save')}</Button>
+            <div className="flex items-center gap-3">
+              <SubmitButton className="flex-1">{t('newWorkOrder.save')}</SubmitButton>
+              <Link href="/work-orders">
+                <Button type="button" variant="outline">{t('common.cancel')}</Button>
+              </Link>
+            </div>
           </form>
         </div>
       );

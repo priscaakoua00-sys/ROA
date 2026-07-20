@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Link } from '@/i18n/navigation';
 import { PhotoDiagnosisPanel, type DiagnosisRow } from '@/components/diagnosis/photo-diagnosis-panel';
 import type { DiagnosisSeverity, VehicleAngle } from '@/integrations/ai';
+import { FlashToast } from '@/components/flash-toast';
 
 type Urgency = 'low' | 'normal' | 'high' | 'critical';
 const URGENCY_VARIANT: Record<Urgency, 'muted' | 'default' | 'gold' | 'urgent'> = {
@@ -196,6 +197,10 @@ export default async function LeadDetailPage({
 
   return (
     <div className="container max-w-2xl py-10">
+      <FlashToast
+        success={sent ? t('conversation.sent') : diagSaved === '1' ? t('diagnosis.saved') : null}
+        error={error ? t('lead.error') : diagError === '1' ? t('diagnosis.error') : null}
+      />
       <Link href="/dashboard" className="text-sm text-muted-foreground hover:underline">
         {t('lead.back')}
       </Link>
