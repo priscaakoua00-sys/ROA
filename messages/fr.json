@@ -245,7 +245,19 @@
     },
     "agenda": {
       "title": "Agenda",
-      "empty": "Aucun rendez-vous planifié pour le moment."
+      "empty": "Aucun rendez-vous planifié pour le moment.",
+      "prevMonth": "Mois précédent",
+      "nextMonth": "Mois suivant",
+      "today": "Aujourd'hui",
+      "dayEmpty": "Aucun rendez-vous ce jour-là.",
+      "pickDayHint": "Choisissez un jour dans le calendrier pour voir ou ajouter des rendez-vous.",
+      "addTitle": "Ajouter un rendez-vous",
+      "timeLabel": "Heure",
+      "serviceLabel": "Service",
+      "notesLabel": "Notes (facultatif)",
+      "save": "Enregistrer le rendez-vous",
+      "saved": "Enregistré.",
+      "error": "Une erreur est survenue. Réessayez."
     },
     "appointmentStatus": {
       "proposed": "Proposé",

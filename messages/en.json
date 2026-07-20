@@ -245,7 +245,19 @@
     },
     "agenda": {
       "title": "Agenda",
-      "empty": "No appointments scheduled yet."
+      "empty": "No appointments scheduled yet.",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month",
+      "today": "Today",
+      "dayEmpty": "No appointments on this day.",
+      "pickDayHint": "Pick a day in the calendar to view or add appointments.",
+      "addTitle": "Add appointment",
+      "timeLabel": "Time",
+      "serviceLabel": "Service",
+      "notesLabel": "Notes (optional)",
+      "save": "Save appointment",
+      "saved": "Saved.",
+      "error": "Something went wrong. Please try again."
     },
     "appointmentStatus": {
       "proposed": "Proposed",

@@ -245,7 +245,19 @@
     },
     "agenda": {
       "title": "Agenda",
-      "empty": "Nog geen afspraken ingepland."
+      "empty": "Nog geen afspraken ingepland.",
+      "prevMonth": "Vorige maand",
+      "nextMonth": "Volgende maand",
+      "today": "Vandaag",
+      "dayEmpty": "Geen afspraken op deze dag.",
+      "pickDayHint": "Kies een dag in de kalender om afspraken te bekijken of toe te voegen.",
+      "addTitle": "Afspraak toevoegen",
+      "timeLabel": "Tijd",
+      "serviceLabel": "Dienst",
+      "notesLabel": "Notities (optioneel)",
+      "save": "Afspraak opslaan",
+      "saved": "Opgeslagen.",
+      "error": "Er ging iets mis. Probeer opnieuw."
     },
     "appointmentStatus": {
       "proposed": "Voorgesteld",

@@ -46,3 +46,74 @@ export async function bookAppointmentAction(formData: FormData) {
   await supabase.from('leads').update({ status: 'booked' }).eq('id', lead.id);
   redirect(`/${locale}/leads/${leadId}?booked=1`);
 }
+
+const APPOINTMENT_STATUSES = [
+  'proposed',
+  'pending',
+  'confirmed',
+  'completed',
+  'cancelled',
+  'no_show',
+] as const;
+
+export async function createAppointmentAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const day = String(formData.get('day') ?? '');
+  const month = day.slice(0, 7);
+  const backHref = `/${locale}/agenda?month=${month}&day=${day}`;
+
+  const customerId = String(formData.get('customerId') ?? '').trim();
+  const time = String(formData.get('time') ?? '').trim() || '09:00';
+  if (!customerId || !/^\d{4}-\d{2}-\d{2}$/.test(day) || !/^\d{2}:\d{2}$/.test(time)) {
+    redirect(`${backHref}&error=1`);
+  }
+
+  const vehicleId = String(formData.get('vehicleId') ?? '').trim() || null;
+  const serviceId = String(formData.get('serviceId') ?? '').trim() || null;
+  const durationMin = Number(formData.get('duration') ?? 60) || 60;
+  const notes = String(formData.get('notes') ?? '').trim() || null;
+
+  const supabase = await createSupabaseServerClient();
+  const { data: customer } = await supabase
+    .from('customers')
+    .select('organization_id')
+    .eq('id', customerId)
+    .maybeSingle();
+  if (!customer) redirect(`${backHref}&error=1`);
+
+  const start = new Date(`${day}T${time}:00.000Z`);
+  const end = new Date(start.getTime() + durationMin * 60_000);
+
+  const { error } = await supabase.from('appointments').insert({
+    organization_id: customer.organization_id,
+    customer_id: customerId,
+    vehicle_id: vehicleId,
+    service_id: serviceId,
+    starts_at: start.toISOString(),
+    ends_at: end.toISOString(),
+    status: 'confirmed',
+    notes,
+  });
+  if (error) redirect(`${backHref}&error=1`);
+
+  redirect(`${backHref}&saved=1`);
+}
+
+export async function updateAppointmentStatusAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const appointmentId = String(formData.get('appointmentId') ?? '');
+  const month = String(formData.get('month') ?? '');
+  const day = String(formData.get('day') ?? '');
+  const backHref = `/${locale}/agenda?month=${month}&day=${day}`;
+  if (!appointmentId) redirect(backHref);
+
+  const status = String(formData.get('status') ?? '');
+  if (!APPOINTMENT_STATUSES.includes(status as (typeof APPOINTMENT_STATUSES)[number])) {
+    redirect(backHref);
+  }
+
+  const supabase = await createSupabaseServerClient();
+  await supabase.from('appointments').update({ status }).eq('id', appointmentId);
+
+  redirect(`${backHref}&saved=1`);
+}

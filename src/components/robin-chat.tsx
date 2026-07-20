@@ -11,6 +11,19 @@ import { cn } from '@/lib/utils';
 /** Event other components (e.g. the app header) dispatch on window to open Robin. */
 export const ROBIN_OPEN_EVENT = 'robin:open';
 
+const LAUNCHER_POSITION_KEY = 'robin-launcher-pos';
+const DRAG_THRESHOLD_PX = 6;
+const EDGE_MARGIN_PX = 8;
+
+function clampToViewport(x: number, y: number, width: number, height: number) {
+  const maxX = Math.max(EDGE_MARGIN_PX, window.innerWidth - width - EDGE_MARGIN_PX);
+  const maxY = Math.max(EDGE_MARGIN_PX, window.innerHeight - height - EDGE_MARGIN_PX);
+  return {
+    x: Math.min(Math.max(EDGE_MARGIN_PX, x), maxX),
+    y: Math.min(Math.max(EDGE_MARGIN_PX, y), maxY),
+  };
+}
+
 interface ChatMessage {
   role: 'user' | 'robin';
   text: string;
@@ -37,6 +50,89 @@ export function RobinChat({ orgId }: { orgId: string }) {
   const [isPending, startTransition] = useTransition();
   const listRef = useRef<HTMLDivElement>(null);
   const topicRef = useRef<string | undefined>(undefined);
+
+  // Draggable launcher (mobile only — see handlePointerDown). `dragPos` is null
+  // until the user first drags it; the button then stays wherever it's dropped
+  // (persisted per device) instead of the default bottom-right corner.
+  const launcherRef = useRef<HTMLButtonElement>(null);
+  const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
+  const isMobileRef = useRef(false);
+  const draggingRef = useRef(false);
+  const movedRef = useRef(false);
+  const dragStartRef = useRef({ pointerX: 0, pointerY: 0, originX: 0, originY: 0 });
+
+  useEffect(() => {
+    isMobileRef.current = window.matchMedia('(max-width: 767px)').matches;
+    if (!isMobileRef.current) return;
+    const stored = window.localStorage.getItem(LAUNCHER_POSITION_KEY);
+    if (!stored) return;
+    try {
+      const parsed = JSON.parse(stored) as { x: number; y: number };
+      if (typeof parsed.x === 'number' && typeof parsed.y === 'number') {
+        setDragPos(clampToViewport(parsed.x, parsed.y, 56, 56));
+      }
+    } catch {
+      // Ignore corrupt stored position; fall back to the default corner.
+    }
+  }, []);
+
+  useEffect(() => {
+    function handleResize() {
+      const el = launcherRef.current;
+      if (!el) return;
+      setDragPos((pos) => (pos ? clampToViewport(pos.x, pos.y, el.offsetWidth, el.offsetHeight) : pos));
+    }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  function handlePointerDown(e: React.PointerEvent<HTMLButtonElement>) {
+    if (!isMobileRef.current) return;
+    const el = launcherRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    draggingRef.current = true;
+    movedRef.current = false;
+    dragStartRef.current = { pointerX: e.clientX, pointerY: e.clientY, originX: rect.left, originY: rect.top };
+    el.setPointerCapture(e.pointerId);
+  }
+
+  function handlePointerMove(e: React.PointerEvent<HTMLButtonElement>) {
+    if (!draggingRef.current) return;
+    const dx = e.clientX - dragStartRef.current.pointerX;
+    const dy = e.clientY - dragStartRef.current.pointerY;
+    if (!movedRef.current && Math.hypot(dx, dy) < DRAG_THRESHOLD_PX) return;
+    movedRef.current = true;
+    const el = launcherRef.current;
+    setDragPos(
+      clampToViewport(
+        dragStartRef.current.originX + dx,
+        dragStartRef.current.originY + dy,
+        el?.offsetWidth ?? 56,
+        el?.offsetHeight ?? 56,
+      ),
+    );
+  }
+
+  function handlePointerUp() {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    if (movedRef.current) {
+      setDragPos((pos) => {
+        if (pos) window.localStorage.setItem(LAUNCHER_POSITION_KEY, JSON.stringify(pos));
+        return pos;
+      });
+    }
+  }
+
+  function handleLauncherClick() {
+    // A real drag already repositioned the button; don't also toggle the chat.
+    if (movedRef.current) {
+      movedRef.current = false;
+      return;
+    }
+    setOpen((v) => !v);
+  }
 
   const suggestions = [t('suggestion1'), t('suggestion2'), t('suggestion3'), t('suggestion4')];
 
@@ -76,8 +172,17 @@ export function RobinChat({ orgId }: { orgId: string }) {
   return (
     <>
       <Button
-        onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 z-30 gap-2 rounded-full bg-gradient-to-br from-primary to-gold shadow-soft transition-transform duration-200 hover:scale-105 active:scale-95 md:bottom-5 md:right-5 md:z-50"
+        ref={launcherRef}
+        onClick={handleLauncherClick}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        style={dragPos ? { left: dragPos.x, top: dragPos.y, right: 'auto', bottom: 'auto' } : undefined}
+        className={cn(
+          'fixed z-30 touch-none gap-2 rounded-full bg-gradient-to-br from-primary to-gold shadow-soft transition-transform duration-200 hover:scale-105 active:scale-95 md:z-50 md:touch-auto',
+          !dragPos && 'bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 md:bottom-5 md:right-5',
+        )}
         size="lg"
       >
         <span className="relative flex size-2">

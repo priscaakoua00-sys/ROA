@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { isExternalPhotoUrl } from '@/lib/utils';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -77,7 +78,7 @@ export async function uploadVehiclePhotoAction(formData: FormData) {
 
   const previousPath = vehicle.photo_url;
   await supabase.from('vehicles').update({ photo_url: path }).eq('id', vehicleId);
-  if (previousPath) {
+  if (previousPath && !isExternalPhotoUrl(previousPath)) {
     await supabase.storage.from('vehicle-photos').remove([previousPath]);
   }
 

@@ -14,6 +14,7 @@ import { Link } from '@/i18n/navigation';
 import { CarIllustration } from '@/components/vehicles/car-illustration';
 import { VAN_MODEL_PATTERN } from '@/components/vehicles/vehicle-card';
 import { PhotoDiagnosisPanel, type DiagnosisRow } from '@/components/diagnosis/photo-diagnosis-panel';
+import { isExternalPhotoUrl } from '@/lib/utils';
 
 export default async function VehicleDetailPage({
   params,
@@ -41,7 +42,9 @@ export default async function VehicleDetailPage({
   if (!v) notFound();
 
   let photoUrl: string | null = null;
-  if (v.photo_url) {
+  if (v.photo_url && isExternalPhotoUrl(v.photo_url)) {
+    photoUrl = v.photo_url;
+  } else if (v.photo_url) {
     const { data: signed } = await supabase.storage
       .from('vehicle-photos')
       .createSignedUrl(v.photo_url, 3600);
