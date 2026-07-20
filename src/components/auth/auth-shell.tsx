@@ -41,6 +41,8 @@ export function Field({
   required,
   placeholder,
   defaultValue,
+  min,
+  step,
 }: {
   label: string;
   name: string;
@@ -49,6 +51,8 @@ export function Field({
   required?: boolean;
   placeholder?: string;
   defaultValue?: string;
+  min?: string | number;
+  step?: string | number;
 }) {
   return (
     <label className="block space-y-1.5">
@@ -60,6 +64,8 @@ export function Field({
         required={required}
         placeholder={placeholder}
         defaultValue={defaultValue}
+        min={min}
+        step={step}
         className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
       />
     </label>

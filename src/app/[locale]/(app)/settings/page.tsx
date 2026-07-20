@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import {
   updateCompanyAction,
+  uploadOrgLogoAction,
   setHoursAction,
   addServiceAction,
   updateServiceAction,
@@ -63,10 +64,16 @@ export default async function SettingsPage({
 
   const { data: orgs } = await supabase
     .from('organizations')
-    .select('id, name, default_language')
+    .select('id, name, slug, default_language, phone, email, address, postal_code, city, vat_number, website, iban, bic, logo_url, default_margin_percent')
     .limit(1);
   const org = orgs?.[0];
   if (!org) redirect(`/${locale}/onboarding`);
+
+  let logoUrl: string | null = null;
+  if (org.logo_url) {
+    const { data } = supabase.storage.from('org-logos').getPublicUrl(org.logo_url);
+    logoUrl = data.publicUrl;
+  }
 
   const [{ data: rules }, { data: svc }, subscription, vehicleCount, seatCount, aiAnalysesUsed] = await Promise.all([
     supabase
@@ -202,7 +209,32 @@ export default async function SettingsPage({
       {/* Company */}
       <section className="mt-6 rounded-xl border border-border bg-card p-6 shadow-soft">
         <h2 className="text-base font-semibold tracking-tight">{t('settings.companyTitle')}</h2>
-        <form action={updateCompanyAction} className="mt-3 space-y-3">
+        <p className="mt-1 text-sm text-muted-foreground">{t('settings.companyIntro')}</p>
+
+        <form action={uploadOrgLogoAction} encType="multipart/form-data" className="mt-4 flex flex-wrap items-center gap-3">
+          <input type="hidden" name="locale" value={locale} />
+          {logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={logoUrl} alt="" className="size-14 rounded-lg border border-border object-contain bg-background" />
+          ) : (
+            <span className="flex size-14 items-center justify-center rounded-lg border border-dashed border-border text-xs text-muted-foreground">
+              {t('settings.noLogo')}
+            </span>
+          )}
+          <label className="flex-1 text-sm">
+            <span className="mb-1.5 block font-medium">{t('settings.logoUpload')}</span>
+            <input
+              type="file"
+              name="logo"
+              accept="image/*"
+              required
+              className="block w-full text-xs text-muted-foreground file:mr-2 file:rounded-md file:border-0 file:bg-primary file:px-2 file:py-1 file:text-xs file:font-medium file:text-primary-foreground hover:file:bg-primary/90"
+            />
+          </label>
+          <Button type="submit" variant="outline" size="sm">{t('vehicles.photoSave')}</Button>
+        </form>
+
+        <form action={updateCompanyAction} className="mt-4 space-y-3 border-t border-border pt-4">
           <input type="hidden" name="locale" value={locale} />
           <Field label={t('settings.name')} name="name" defaultValue={org.name} required />
           <div>
@@ -213,10 +245,53 @@ export default async function SettingsPage({
               ))}
             </select>
           </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label={t('settings.phone')} name="phone" defaultValue={org.phone ?? ''} />
+            <Field label={t('settings.email')} name="email" type="email" defaultValue={org.email ?? ''} />
+          </div>
+          <Field label={t('settings.address')} name="address" defaultValue={org.address ?? ''} />
+          <div className="grid grid-cols-2 gap-3">
+            <Field label={t('settings.postalCode')} name="postalCode" defaultValue={org.postal_code ?? ''} />
+            <Field label={t('settings.city')} name="city" defaultValue={org.city ?? ''} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label={t('settings.vatNumber')} name="vatNumber" defaultValue={org.vat_number ?? ''} />
+            <Field label={t('settings.website')} name="website" defaultValue={org.website ?? ''} placeholder="https://" />
+          </div>
+          <p className="text-xs text-muted-foreground">{t('settings.ibanIntro')}</p>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label={t('settings.iban')} name="iban" defaultValue={org.iban ?? ''} />
+            <Field label={t('settings.bic')} name="bic" defaultValue={org.bic ?? ''} />
+          </div>
+          <div>
+            <Field
+              label={t('settings.marginPercent')}
+              name="marginPercent"
+              type="number"
+              min="0"
+              step="1"
+              defaultValue={String(org.default_margin_percent)}
+            />
+            <p className="mt-1 text-xs text-muted-foreground">{t('settings.marginPercentIntro')}</p>
+          </div>
           <div className="flex justify-end">
             <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>
           </div>
         </form>
+      </section>
+
+      {/* Digital business card */}
+      <section className="mt-6 rounded-xl border border-border bg-card p-6 shadow-soft">
+        <h2 className="text-base font-semibold tracking-tight">{t('settings.cardTitle')}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t('settings.cardIntro')}</p>
+        <a
+          href={`/${locale}/card/${org.slug}`}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-3 inline-block text-sm text-gold hover:underline"
+        >
+          {t('settings.cardView')}
+        </a>
       </section>
 
       {/* Opening hours */}

@@ -25,7 +25,8 @@
       "signOut": "Uitloggen",
       "more": "Meer",
       "closeMenu": "Menu sluiten",
-      "menu": "Menu"
+      "menu": "Menu",
+      "billing": "Abonnement"
     },
     "onboarding": {
       "title": "Uw garage instellen",
@@ -142,7 +143,15 @@
       "apptsTodayEmpty": "Geen afspraken vandaag.",
       "urgentWorkTitle": "Urgente reparaties",
       "invoicesTitle": "Facturen",
-      "messagesTitle": "Berichten die een antwoord nodig hebben"
+      "messagesTitle": "Berichten die een antwoord nodig hebben",
+      "performanceTitle": "Prestaties",
+      "revenueToday": "Omzet vandaag",
+      "revenueWeek": "Omzet deze week",
+      "revenueMonth": "Omzet deze maand",
+      "estimatedProfit": "Geschatte winst ({percent}% marge)",
+      "vehiclesRepairedMonth": "Voertuigen gerepareerd deze maand",
+      "clientsTotal": "Klanten",
+      "revenueChartTitle": "Omzet - laatste 14 dagen"
     },
     "moduleBanner": {
       "repairs": "Voertuigen & reparaties",
@@ -180,7 +189,10 @@
         "greeting": "Hoi! Waarmee kan ik je helpen?",
         "thanks": "Geen dank. Ik hou het verder in de gaten.",
         "fallback": "Ik kan je helpen met de afspraken van morgen, voertuigen die wachten, klanten zonder antwoord, of iemand bellen. Typ bijvoorbeeld \"Bel [naam]\"."
-      }
+      },
+      "listening": "Ik luister...",
+      "startListening": "Praat met Robin",
+      "stopListening": "Opname stoppen"
     },
     "newVehicle": {
       "title": "Nieuw voertuig",
@@ -410,7 +422,14 @@
       "save": "Factuur opslaan",
       "recordPayment": "Bedrag",
       "addPayment": "Betaling registreren",
-      "paymentsTitle": "Betalingen"
+      "paymentsTitle": "Betalingen",
+      "downloadPdf": "PDF downloaden",
+      "lineItemsTitle": "Diensten",
+      "lineDescription": "Omschrijving",
+      "lineQuantity": "Aantal",
+      "lineUnitPrice": "Stukprijs",
+      "lineDeleteConfirm": "Deze regel wordt van de factuur verwijderd.",
+      "addLine": "Regel toevoegen"
     },
     "invoiceStatus": {
       "draft": "Concept",
@@ -502,7 +521,25 @@
       "checklistIntro": "Pas aan wat uw monteurs controleren als een voertuig binnenkomt.",
       "checklistDeleteConfirm": "Dit controlepunt wordt verwijderd uit de standaardchecklist.",
       "checklistNewItem": "Nieuw controlepunt",
-      "checklistAddItem": "Toevoegen"
+      "checklistAddItem": "Toevoegen",
+      "companyIntro": "Deze gegevens verschijnen op uw facturen en uw visitekaartje.",
+      "noLogo": "Logo",
+      "logoUpload": "Logo van de garage",
+      "phone": "Telefoon",
+      "email": "E-mail",
+      "address": "Adres",
+      "postalCode": "Postcode",
+      "city": "Plaats",
+      "vatNumber": "Btw-nummer",
+      "website": "Website",
+      "ibanIntro": "Met een IBAN krijgt uw factuur een scan-en-betaal QR-code (optioneel).",
+      "iban": "IBAN",
+      "bic": "BIC",
+      "cardTitle": "Digitaal visitekaartje",
+      "cardIntro": "Een openbare pagina met uw gegevens en een QR-code, klaar om te delen met klanten.",
+      "cardView": "Mijn visitekaartje bekijken",
+      "marginPercent": "Geschatte marge (%)",
+      "marginPercentIntro": "Alleen gebruikt om uw winst op het dashboard te schatten — er worden geen echte kostengegevens vastgelegd."
     },
     "knowledge": {
       "title": "Kennisbank",
@@ -596,6 +633,27 @@
       "attention": "Let op",
       "fail": "Niet in orde",
       "na": "N.v.t."
+    },
+    "invoicePdf": {
+      "invoice": "Factuur",
+      "issueDate": "Factuurdatum",
+      "dueDate": "Vervaldatum",
+      "billTo": "Factuuradres",
+      "vehicle": "Voertuig",
+      "description": "Omschrijving",
+      "quantity": "Aantal",
+      "unitPrice": "Stukprijs",
+      "amount": "Bedrag",
+      "subtotal": "Subtotaal",
+      "vat": "BTW",
+      "total": "Totaal",
+      "paid": "Reeds betaald",
+      "balanceDue": "Openstaand saldo",
+      "notes": "Opmerkingen",
+      "scanToPay": "Scan om te betalen",
+      "paymentTerms": "Gelieve deze factuur te voldoen vóór de hierboven vermelde vervaldatum.",
+      "footer": "Factuur gegenereerd door {name} via ROAVAA.",
+      "anonymousCustomer": "Klant"
     }
   },
   "language": {
@@ -800,5 +858,10 @@
       "prioritySupport": "Prioritaire ondersteuning",
       "emailSupport": "E-mailondersteuning"
     }
+  },
+  "card": {
+    "scanHint": "Scan om dit contact op te slaan",
+    "saveContact": "Contact opslaan",
+    "poweredBy": "Mogelijk gemaakt door ROAVAA"
   }
 }

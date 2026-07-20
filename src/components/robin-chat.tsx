@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { MessageCircle, Send, X } from 'lucide-react';
+import { MessageCircle, Send, X, Mic, Square } from 'lucide-react';
 import { askRobinAction, getRobinGreetingAction, type RobinChatLink } from '@/data/assistant/actions';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
@@ -10,6 +10,20 @@ import { cn } from '@/lib/utils';
 
 /** Event other components (e.g. the app header) dispatch on window to open Robin. */
 export const ROBIN_OPEN_EVENT = 'robin:open';
+
+/** Minimal shape of the Web Speech API — not fully typed in the DOM lib. */
+interface MinimalSpeechRecognition extends EventTarget {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  start(): void;
+  stop(): void;
+  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+}
+
+const SPEECH_LANG: Record<string, string> = { nl: 'nl-NL', en: 'en-US', fr: 'fr-FR' };
 
 const LAUNCHER_POSITION_KEY = 'robin-launcher-pos';
 const DRAG_THRESHOLD_PX = 6;
@@ -50,6 +64,47 @@ export function RobinChat({ orgId }: { orgId: string }) {
   const [isPending, startTransition] = useTransition();
   const listRef = useRef<HTMLDivElement>(null);
   const topicRef = useRef<string | undefined>(undefined);
+
+  // Voice input: transcribes speech to text client-side via the browser's
+  // native Web Speech API (no server key required). Unsupported browsers
+  // (Firefox, most non-Chromium engines) simply don't get the mic button.
+  const recognitionRef = useRef<MinimalSpeechRecognition | null>(null);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  const [listening, setListening] = useState(false);
+
+  useEffect(() => {
+    const SpeechRecognitionCtor =
+      (window as unknown as { SpeechRecognition?: new () => MinimalSpeechRecognition; webkitSpeechRecognition?: new () => MinimalSpeechRecognition })
+        .SpeechRecognition ??
+      (window as unknown as { webkitSpeechRecognition?: new () => MinimalSpeechRecognition }).webkitSpeechRecognition;
+    setSpeechSupported(Boolean(SpeechRecognitionCtor));
+  }, []);
+
+  function toggleListening() {
+    if (listening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+    const SpeechRecognitionCtor =
+      (window as unknown as { SpeechRecognition?: new () => MinimalSpeechRecognition; webkitSpeechRecognition?: new () => MinimalSpeechRecognition })
+        .SpeechRecognition ??
+      (window as unknown as { webkitSpeechRecognition?: new () => MinimalSpeechRecognition }).webkitSpeechRecognition;
+    if (!SpeechRecognitionCtor) return;
+
+    const recognition = new SpeechRecognitionCtor();
+    recognition.lang = SPEECH_LANG[locale] ?? 'en-US';
+    recognition.interimResults = false;
+    recognition.continuous = false;
+    recognition.onresult = (event) => {
+      const transcript = event.results[0]?.[0]?.transcript ?? '';
+      if (transcript) setInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
+    };
+    recognition.onerror = () => setListening(false);
+    recognition.onend = () => setListening(false);
+    recognitionRef.current = recognition;
+    setListening(true);
+    recognition.start();
+  }
 
   // Draggable launcher (mobile only — see handlePointerDown). `dragPos` is null
   // until the user first drags it; the button then stays wherever it's dropped
@@ -289,9 +344,20 @@ export function RobinChat({ orgId }: { orgId: string }) {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={t('placeholder')}
+              placeholder={listening ? t('listening') : t('placeholder')}
               className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
             />
+            {speechSupported ? (
+              <Button
+                type="button"
+                variant={listening ? 'destructive' : 'outline'}
+                size="icon"
+                onClick={toggleListening}
+                aria-label={listening ? t('stopListening') : t('startListening')}
+              >
+                {listening ? <Square className="size-4" aria-hidden /> : <Mic className="size-4" aria-hidden />}
+              </Button>
+            ) : null}
             <Button type="submit" size="icon" disabled={isPending || !input.trim()} aria-label={t('send')}>
               <Send className="size-4" aria-hidden />
             </Button>

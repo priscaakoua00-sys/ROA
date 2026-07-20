@@ -32,11 +32,18 @@ export async function sendReplyAction(formData: FormData) {
     .maybeSingle();
   if (!conv) redirect(`/${locale}/leads/${leadId}?error=1`);
 
+  const { data: org } = await supabase
+    .from('organizations')
+    .select('name')
+    .eq('id', conv.organization_id)
+    .maybeSingle();
+  const signedBody = org?.name ? `${body}\n\n${signOff(locale)}\n${org.name}` : body;
+
   const { error } = await supabase.from('messages').insert({
     organization_id: conv.organization_id,
     conversation_id: conv.id,
     direction: 'outbound',
-    body,
+    body: signedBody,
     author_user_id: user?.id ?? null,
     is_ai_generated: isAi,
     read: true,
@@ -61,9 +68,13 @@ export async function sendReplyAction(formData: FormData) {
       .eq('id', conv.customer_id)
       .maybeSingle();
     if (cust?.email) {
-      await sendEmail({ to: cust.email, subject: 'Bericht van uw garage', text: body });
+      await sendEmail({ to: cust.email, subject: 'Bericht van uw garage', text: signedBody });
     }
   }
 
   redirect(`/${locale}/leads/${leadId}?sent=1`);
+}
+
+function signOff(locale: Locale): string {
+  return { nl: 'Met vriendelijke groet,', en: 'Kind regards,', fr: 'Cordialement,' }[locale];
 }

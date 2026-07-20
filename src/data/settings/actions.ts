@@ -20,12 +20,59 @@ export async function updateCompanyAction(formData: FormData) {
   const name = String(formData.get('name') ?? '').trim();
   const langRaw = String(formData.get('defaultLanguage') ?? 'nl');
   const defaultLanguage = (['nl', 'en', 'fr'] as const).includes(langRaw as Locale) ? langRaw : 'nl';
+  const clean = (k: string) => {
+    const v = String(formData.get(k) ?? '').trim();
+    return v.length > 0 ? v : null;
+  };
+  const marginRaw = Number(formData.get('marginPercent') ?? 35);
+  const marginPercent = Number.isFinite(marginRaw) ? Math.min(100, Math.max(0, marginRaw)) : 35;
   if (!name) redirect(`/${locale}/settings?error=1`);
 
   const supabase = await createSupabaseServerClient();
   const id = await orgId(supabase);
   if (!id) redirect(`/${locale}/onboarding`);
-  await supabase.from('organizations').update({ name, default_language: defaultLanguage }).eq('id', id);
+  await supabase
+    .from('organizations')
+    .update({
+      name,
+      default_language: defaultLanguage,
+      phone: clean('phone'),
+      email: clean('email'),
+      address: clean('address'),
+      postal_code: clean('postalCode'),
+      city: clean('city'),
+      vat_number: clean('vatNumber'),
+      website: clean('website'),
+      iban: clean('iban'),
+      bic: clean('bic'),
+      default_margin_percent: marginPercent,
+    })
+    .eq('id', id);
+  redirect(`/${locale}/settings?saved=company`);
+}
+
+export async function uploadOrgLogoAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const supabase = await createSupabaseServerClient();
+  const id = await orgId(supabase);
+  if (!id) redirect(`/${locale}/onboarding`);
+
+  const logo = formData.get('logo');
+  if (
+    !(logo instanceof File) ||
+    logo.size === 0 ||
+    !logo.type.startsWith('image/') ||
+    logo.size > 4 * 1024 * 1024
+  ) {
+    redirect(`/${locale}/settings?error=1`);
+  }
+  const file = logo as File;
+  const ext = (file.name.split('.').pop() ?? 'png').toLowerCase().replace(/[^a-z0-9]/g, '') || 'png';
+  const path = `${id}/logo-${Date.now()}.${ext}`;
+  const { error } = await supabase.storage.from('org-logos').upload(path, file, { contentType: file.type });
+  if (error) redirect(`/${locale}/settings?error=1`);
+
+  await supabase.from('organizations').update({ logo_url: path }).eq('id', id);
   redirect(`/${locale}/settings?saved=company`);
 }
 
