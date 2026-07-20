@@ -1,8 +1,14 @@
 export const dynamic = 'force-dynamic';
 
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { AppShell } from '@/components/app-shell/app-shell';
+
+/** The authenticated app is private per-organization data — never indexable. */
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 /**
  * Shell for every authenticated screen: verifies the session (same check each

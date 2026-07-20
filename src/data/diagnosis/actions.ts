@@ -3,6 +3,8 @@
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { getAIProvider } from '@/integrations/ai';
+import type { DiagnosisMediaItem, VehicleAngle } from '@/integrations/ai';
+import { TAGGED_VEHICLE_ANGLES } from '@/lib/vehicle-angles';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -11,8 +13,14 @@ function localeOf(formData: FormData): Locale {
   return (['nl', 'en', 'fr'] as const).includes(raw as Locale) ? (raw as Locale) : 'nl';
 }
 
-const MAX_PHOTOS = 3;
-const MAX_PHOTO_BYTES = 8 * 1024 * 1024;
+const MAX_MEDIA = 10;
+const MAX_OTHER_PHOTOS = 2;
+const MAX_MEDIA_BYTES = 4 * 1024 * 1024;
+
+interface PendingUpload {
+  file: File;
+  angle: VehicleAngle;
+}
 
 export async function createPhotoDiagnosisAction(formData: FormData) {
   const locale = localeOf(formData);
@@ -26,13 +34,22 @@ export async function createPhotoDiagnosisAction(formData: FormData) {
   if (!leadId && !vehicleId) redirect(backHref);
 
   const note = String(formData.get('note') ?? '').trim() || undefined;
-  const photos = formData
-    .getAll('photos')
+
+  const uploads: PendingUpload[] = [];
+  for (const angle of TAGGED_VEHICLE_ANGLES) {
+    const file = formData.get(`photo_${angle}`);
+    if (file instanceof File && file.size > 0) uploads.push({ file, angle });
+  }
+  const others = formData
+    .getAll('photos_other')
     .filter((p): p is File => p instanceof File && p.size > 0)
-    .slice(0, MAX_PHOTOS);
-  if (photos.length === 0) redirect(`${backHref}?diagError=1`);
-  for (const photo of photos) {
-    if (!photo.type.startsWith('image/') || photo.size > MAX_PHOTO_BYTES) {
+    .slice(0, MAX_OTHER_PHOTOS);
+  for (const file of others) uploads.push({ file, angle: 'other' });
+  uploads.splice(MAX_MEDIA);
+
+  if (uploads.length === 0) redirect(`${backHref}?diagError=1`);
+  for (const { file } of uploads) {
+    if (!file.type.startsWith('image/') || file.size > MAX_MEDIA_BYTES) {
       redirect(`${backHref}?diagError=1`);
     }
   }
@@ -61,39 +78,61 @@ export async function createPhotoDiagnosisAction(formData: FormData) {
   if (!organizationId) redirect(backHref);
 
   const targetId = vehicleId ?? leadId!;
-  const photoPaths: string[] = [];
-  for (const [i, photo] of photos.entries()) {
-    const ext = (photo.name.split('.').pop() ?? 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
-    const path = `${organizationId}/${targetId}/${Date.now()}-${i}.${ext}`;
+  const uploaded: { path: string; angle: VehicleAngle }[] = [];
+  for (const [i, { file, angle }] of uploads.entries()) {
+    const ext = (file.name.split('.').pop() ?? 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+    const path = `${organizationId}/${targetId}/${Date.now()}-${angle}-${i}.${ext}`;
     const { error } = await supabase.storage
       .from('diagnosis-photos')
-      .upload(path, photo, { contentType: photo.type });
-    if (!error) photoPaths.push(path);
+      .upload(path, file, { contentType: file.type });
+    if (!error) uploaded.push({ path, angle });
   }
-  if (photoPaths.length === 0) redirect(`${backHref}?diagError=1`);
+  if (uploaded.length === 0) redirect(`${backHref}?diagError=1`);
 
   const { data: signedUrls } = await supabase.storage
     .from('diagnosis-photos')
-    .createSignedUrls(photoPaths, 3600);
-  const photoUrls = (signedUrls ?? [])
-    .map((s) => s.signedUrl)
-    .filter((u): u is string => Boolean(u));
+    .createSignedUrls(uploaded.map((u) => u.path), 3600);
+  const urlByPath = new Map((signedUrls ?? []).map((s) => [s.path, s.signedUrl]));
 
-  const result = await getAIProvider().diagnoseFromPhotos({ language: locale, photoUrls, note });
+  const media: DiagnosisMediaItem[] = [];
+  for (const u of uploaded) {
+    const url = urlByPath.get(u.path);
+    if (url) media.push({ url, kind: 'photo', angle: u.angle });
+  }
+
+  const result = await getAIProvider().diagnoseFromMedia({ language: locale, media, note });
   if (result.status !== 'ok') redirect(`${backHref}?diagError=1`);
 
-  await supabase.from('photo_diagnoses').insert({
-    organization_id: organizationId,
-    lead_id: leadId,
-    vehicle_id: vehicleId,
-    note: note ?? null,
-    photo_paths: photoPaths,
-    probable_cause: result.data.probableCause,
-    parts_to_check: result.data.partsToCheck,
-    next_steps: result.data.nextSteps,
-    confidence: result.meta.confidence,
-    created_by: user?.id ?? null,
-  });
+  const { data: diagnosis, error: insertError } = await supabase
+    .from('photo_diagnoses')
+    .insert({
+      organization_id: organizationId,
+      lead_id: leadId,
+      vehicle_id: vehicleId,
+      note: note ?? null,
+      visible_problems: result.data.visibleProblems,
+      affected_parts: result.data.affectedParts,
+      severity: result.data.severity,
+      causes: result.data.causes,
+      additional_checks: result.data.additionalChecks,
+      estimated_repair_time: result.data.estimatedRepairTime,
+      recommendations: result.data.recommendations,
+      confidence: result.meta.confidence,
+      created_by: user?.id ?? null,
+    })
+    .select('id')
+    .single();
+  if (insertError || !diagnosis) redirect(`${backHref}?diagError=1`);
+
+  await supabase.from('diagnosis_media').insert(
+    uploaded.map((u) => ({
+      diagnosis_id: diagnosis.id,
+      organization_id: organizationId,
+      storage_path: u.path,
+      kind: 'photo' as const,
+      angle: u.angle,
+    })),
+  );
 
   redirect(`${backHref}?diagSaved=1`);
 }

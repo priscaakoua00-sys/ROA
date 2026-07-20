@@ -6,7 +6,10 @@ import { isAppLocale, routing } from '@/i18n/routing';
 import { ThemeProvider } from '@/components/theme-provider';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { RobinChat } from '@/components/robin-chat';
+import { SITE_URL } from '@/lib/site';
 import '../globals.css';
+
+const OG_LOCALE: Record<string, string> = { nl: 'nl_NL', en: 'en_US', fr: 'fr_FR' };
 
 export const dynamic = 'force-dynamic';
 
@@ -32,10 +35,36 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'app' });
   const home = await getTranslations({ locale, namespace: 'home' });
+  const title = `${t('name')} · ${home('signature')}`;
+  const description = home('subtitle');
+  const path = `/${locale}`;
+
   return {
-    title: `${t('name')} · ${home('signature')}`,
-    description: home('subtitle'),
+    metadataBase: new URL(SITE_URL),
+    title: { default: title, template: `%s · ${t('name')}` },
+    description,
+    applicationName: t('name'),
     verification: { google: 'B3jewEyxlRg7bAwRSN10vFGEkNCd_QRSvdwWT6qmt0w' },
+    alternates: {
+      canonical: path,
+      languages: {
+        ...Object.fromEntries(routing.locales.map((l) => [l, `/${l}`])),
+        'x-default': `/${routing.defaultLocale}`,
+      },
+    },
+    openGraph: {
+      type: 'website',
+      url: path,
+      siteName: t('name'),
+      title,
+      description,
+      locale: OG_LOCALE[locale] ?? 'en_US',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
   };
 }
 

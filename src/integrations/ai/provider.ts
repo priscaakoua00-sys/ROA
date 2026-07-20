@@ -3,14 +3,14 @@ import type {
   DraftReplyInput,
   LanguageDetectionInput,
   LeadSummaryInput,
-  PhotoDiagnosisInput,
+  MediaDiagnosisInput,
   UrgencyInput,
 } from './types';
 import type {
   DraftedReply,
   LanguageDetection,
   LeadSummary,
-  PhotoDiagnosis,
+  MediaDiagnosis,
   UrgencyAssessment,
 } from './schemas';
 
@@ -41,11 +41,17 @@ export interface AIProvider {
   ): Promise<AIResult<LanguageDetection>>;
 
   /**
-   * Propose a probable diagnosis from photos of a problem (plus an optional
-   * short note): likely cause, parts to check, next steps. A starting point
-   * for the mechanic, never a final verdict.
+   * Act as a technical assistant on 1-8 photos of the same vehicle/problem
+   * (optionally tagged by angle: front, engine, dashboard, ...), plus an
+   * optional short note: visible problems, affected parts, a severity
+   * level, possible causes, further checks to do in person, an estimated
+   * repair time, and recommendations. A starting point for the mechanic,
+   * never a final verdict — the UI always shows that alongside the result.
+   * `kind: 'video'` items are accepted by the shape for a future
+   * video-capable provider; today's providers should hand off if any are
+   * present rather than silently ignore them.
    */
-  diagnoseFromPhotos(
-    input: PhotoDiagnosisInput,
-  ): Promise<AIResult<PhotoDiagnosis>>;
+  diagnoseFromMedia(
+    input: MediaDiagnosisInput,
+  ): Promise<AIResult<MediaDiagnosis>>;
 }

@@ -4,7 +4,7 @@ import {
   draftedReplySchema,
   languageDetectionSchema,
   leadSummarySchema,
-  photoDiagnosisSchema,
+  mediaDiagnosisSchema,
   urgencyAssessmentSchema,
 } from './schemas';
 
@@ -90,36 +90,45 @@ describe('MockAIProvider', () => {
     }
   });
 
-  it('hands off a photo diagnosis with no photos', async () => {
-    const result = await provider.diagnoseFromPhotos({
+  it('hands off a media diagnosis with no media', async () => {
+    const result = await provider.diagnoseFromMedia({
       language: 'nl',
-      photoUrls: [],
+      media: [],
+    });
+    expect(result.status).toBe('handoff');
+  });
+
+  it('hands off a media diagnosis when a video is attached (not supported yet)', async () => {
+    const result = await provider.diagnoseFromMedia({
+      language: 'nl',
+      media: [{ url: 'https://example.com/clip.mp4', kind: 'video' }],
     });
     expect(result.status).toBe('handoff');
   });
 
   it('matches a known symptom from the note and returns schema-valid data', async () => {
-    const result = await provider.diagnoseFromPhotos({
+    const result = await provider.diagnoseFromMedia({
       language: 'nl',
-      photoUrls: ['https://example.com/photo1.jpg'],
+      media: [{ url: 'https://example.com/photo1.jpg', kind: 'photo', angle: 'front' }],
       note: 'Piepend geluid bij het remmen.',
     });
     expect(result.status).toBe('ok');
     if (result.status === 'ok') {
-      expect(() => photoDiagnosisSchema.parse(result.data)).not.toThrow();
-      expect(result.data.partsToCheck.length).toBeGreaterThan(0);
+      expect(() => mediaDiagnosisSchema.parse(result.data)).not.toThrow();
+      expect(result.data.affectedParts.length).toBeGreaterThan(0);
+      expect(result.data.severity).toBe('high');
     }
   });
 
-  it('falls back to a generic diagnosis when the note matches nothing', async () => {
-    const result = await provider.diagnoseFromPhotos({
+  it('falls back to an honest generic diagnosis when the note matches nothing', async () => {
+    const result = await provider.diagnoseFromMedia({
       language: 'en',
-      photoUrls: ['https://example.com/photo1.jpg'],
+      media: [{ url: 'https://example.com/photo1.jpg', kind: 'photo' }],
     });
     expect(result.status).toBe('ok');
     if (result.status === 'ok') {
-      expect(() => photoDiagnosisSchema.parse(result.data)).not.toThrow();
-      expect(result.data.partsToCheck).toEqual([]);
+      expect(() => mediaDiagnosisSchema.parse(result.data)).not.toThrow();
+      expect(result.data.affectedParts).toEqual([]);
     }
   });
 });

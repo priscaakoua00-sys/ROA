@@ -7,6 +7,7 @@ import { createSupabaseServerClient } from '@/data/supabase/server';
 import { ModuleBanner } from '@/components/module-banner';
 import { Link } from '@/i18n/navigation';
 import { VehicleCard } from '@/components/vehicles/vehicle-card';
+import { isExternalPhotoUrl } from '@/lib/utils';
 
 interface V {
   id: string;
@@ -56,16 +57,21 @@ export default async function VehiclesPage({
   const { data } = await query;
   const vehicles = (data ?? []) as unknown as V[];
 
-  const photoPaths = vehicles.map((v) => v.photo_url).filter((p): p is string => Boolean(p));
+  const storagePaths = vehicles
+    .map((v) => v.photo_url)
+    .filter((p): p is string => Boolean(p))
+    .filter((p) => !isExternalPhotoUrl(p));
   const photoUrls = new Map<string, string>();
-  if (photoPaths.length > 0) {
+  if (storagePaths.length > 0) {
     const { data: signed } = await supabase.storage
       .from('vehicle-photos')
-      .createSignedUrls(photoPaths, 3600);
+      .createSignedUrls(storagePaths, 3600);
     signed?.forEach((s) => {
       if (s.signedUrl && s.path) photoUrls.set(s.path, s.signedUrl);
     });
   }
+  const resolvePhoto = (photoUrl: string | null) =>
+    !photoUrl ? null : isExternalPhotoUrl(photoUrl) ? photoUrl : (photoUrls.get(photoUrl) ?? null);
 
   const owner = (v: V) =>
     [v.customers?.first_name, v.customers?.last_name].filter(Boolean).join(' ') ||
@@ -122,7 +128,7 @@ export default async function VehiclesPage({
               year={v.year}
               mileage={v.mileage}
               owner={owner(v)}
-              photoUrl={v.photo_url ? photoUrls.get(v.photo_url) : null}
+              photoUrl={resolvePhoto(v.photo_url)}
               labels={labels}
             />
           ))}

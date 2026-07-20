@@ -67,5 +67,8 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
+  // Also skip the generated, extension-less icon routes (icon, apple-icon,
+  // pwa-icon/*) — without this they get treated as page paths and 307
+  // redirected into a nonexistent /<locale>/icon.
+  matcher: ['/((?!api|_next|_vercel|icon|apple-icon|pwa-icon|.*\\..*).*)'],
 };

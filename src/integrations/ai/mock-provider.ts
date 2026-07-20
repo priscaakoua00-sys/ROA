@@ -5,7 +5,7 @@ import type {
   DraftReplyInput,
   LanguageDetectionInput,
   LeadSummaryInput,
-  PhotoDiagnosisInput,
+  MediaDiagnosisInput,
   SupportedLanguage,
   UrgencyInput,
 } from './types';
@@ -13,12 +13,12 @@ import {
   draftedReplySchema,
   languageDetectionSchema,
   leadSummarySchema,
-  photoDiagnosisSchema,
+  mediaDiagnosisSchema,
   urgencyAssessmentSchema,
   type DraftedReply,
   type LanguageDetection,
   type LeadSummary,
-  type PhotoDiagnosis,
+  type MediaDiagnosis,
   type UrgencyAssessment,
 } from './schemas';
 import { findEmergencyKeywords } from './emergency-keywords';
@@ -152,54 +152,88 @@ export class MockAIProvider implements AIProvider {
     };
   }
 
-  async diagnoseFromPhotos(
-    input: PhotoDiagnosisInput,
-  ): Promise<AIResult<PhotoDiagnosis>> {
-    if (input.photoUrls.length === 0) {
+  async diagnoseFromMedia(
+    input: MediaDiagnosisInput,
+  ): Promise<AIResult<MediaDiagnosis>> {
+    if (input.media.length === 0) {
       return {
         status: 'handoff',
         reason: 'No photos attached.',
         meta: this.meta(0.1),
       };
     }
+    if (input.media.some((m) => m.kind === 'video')) {
+      // The mock (and every provider until a vision+video model is wired)
+      // can only read photos today — hand off honestly rather than pretend.
+      return {
+        status: 'handoff',
+        reason: 'Video analysis is not supported yet.',
+        meta: this.meta(0.1),
+      };
+    }
 
     const match = input.note ? matchSymptom(input.note, input.language) : null;
 
-    const fallback: Record<SupportedLanguage, PhotoDiagnosis> = {
+    const honestVisibleProblems: Record<SupportedLanguage, string[]> = {
+      nl: ['De foto’s zijn opgeslagen, maar automatische beeldherkenning is nog niet actief — deze inschatting komt van uw omschrijving.'],
+      en: ['The photos are saved, but automatic image recognition isn’t active yet — this read comes from your note.'],
+      fr: ["Les photos sont enregistrées, mais la reconnaissance d'image automatique n'est pas encore active — cette estimation vient de votre note."],
+    };
+
+    const fallback: Record<SupportedLanguage, MediaDiagnosis> = {
       nl: {
-        probableCause:
-          'Op basis van de foto’s alleen is nog geen precieze inschatting te geven. Bekijk de foto’s en voeg eventueel een korte omschrijving toe.',
-        partsToCheck: [],
-        nextSteps: [
+        visibleProblems: honestVisibleProblems.nl,
+        affectedParts: [],
+        severity: 'medium',
+        causes: ['Op basis van de foto’s alleen is nog geen precieze oorzaak te geven. Bekijk de foto’s zelf, of voeg een korte omschrijving toe.'],
+        additionalChecks: [
           'Voertuig visueel inspecteren aan de hand van de foto’s.',
           'Klant om meer details vragen indien nodig.',
         ],
+        estimatedRepairTime: 'Nog te bepalen',
+        recommendations: ['Vraag de klant om een korte omschrijving of extra foto’s als het probleem niet duidelijk is.'],
       },
       en: {
-        probableCause:
-          "The photos alone aren't enough for a precise read yet. Take a look yourself, or add a short note.",
-        partsToCheck: [],
-        nextSteps: [
+        visibleProblems: honestVisibleProblems.en,
+        affectedParts: [],
+        severity: 'medium',
+        causes: ["The photos alone aren't enough for a precise cause yet. Take a look yourself, or add a short note."],
+        additionalChecks: [
           'Inspect the vehicle visually using the photos.',
           'Ask the customer for more detail if needed.',
         ],
+        estimatedRepairTime: 'To be determined',
+        recommendations: ["Ask the customer for a short note or extra photos if the problem isn't clear."],
       },
       fr: {
-        probableCause:
-          "Les photos seules ne suffisent pas encore pour une estimation précise. Jetez-y un œil, ou ajoutez une courte note.",
-        partsToCheck: [],
-        nextSteps: [
+        visibleProblems: honestVisibleProblems.fr,
+        affectedParts: [],
+        severity: 'medium',
+        causes: ["Les photos seules ne suffisent pas encore pour une cause précise. Jetez-y un œil, ou ajoutez une courte note."],
+        additionalChecks: [
           'Inspecter le véhicule visuellement à partir des photos.',
           'Demander plus de détails au client si nécessaire.',
         ],
+        estimatedRepairTime: 'À déterminer',
+        recommendations: ["Demandez au client une courte note ou des photos supplémentaires si le problème n'est pas clair."],
       },
     };
 
-    const diagnosis: PhotoDiagnosis = match ?? fallback[input.language];
+    const diagnosis: MediaDiagnosis = match
+      ? {
+          visibleProblems: honestVisibleProblems[input.language],
+          affectedParts: match.affectedParts,
+          severity: match.severity,
+          causes: match.causes,
+          additionalChecks: match.additionalChecks,
+          estimatedRepairTime: match.estimatedRepairTime,
+          recommendations: match.recommendations,
+        }
+      : fallback[input.language];
 
     return {
       status: 'ok',
-      data: photoDiagnosisSchema.parse(diagnosis),
+      data: mediaDiagnosisSchema.parse(diagnosis),
       meta: this.meta(match ? 0.55 : 0.25),
     };
   }
