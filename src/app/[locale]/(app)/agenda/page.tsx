@@ -129,7 +129,10 @@ export default async function AgendaPage({
   const weekdayLabels = weekdayShortLabelsUTC(locale);
   const monthLabel = formatMonthYearUTC(year, month, locale);
 
-  const dayHref = (d: string) => `/${locale}/agenda?month=${monthKey}&day=${d}`;
+  // Link (from '@/i18n/navigation') already prefixes the locale itself —
+  // these hrefs must stay locale-agnostic or they double-prefix into a 404
+  // (e.g. /nl/nl/agenda).
+  const dayHref = (d: string) => `/agenda?month=${monthKey}&day=${d}`;
   const selectedAppts = selectedDay ? (byDay.get(selectedDay) ?? []) : [];
 
   // "Add appointment" data: only fetched once a day is picked.
@@ -200,7 +203,7 @@ export default async function AgendaPage({
       {/* Month navigation */}
       <div className="mt-5 flex items-center justify-between">
         <Link
-          href={`/${locale}/agenda?month=${prevMonthKey}`}
+          href={`/agenda?month=${prevMonthKey}`}
           aria-label={t('agenda.prevMonth')}
           className="flex size-8 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:border-gold/40 hover:text-foreground"
         >
@@ -210,7 +213,7 @@ export default async function AgendaPage({
           <h2 className="text-base font-semibold capitalize tracking-tight">{monthLabel}</h2>
           {!isCurrentMonth ? (
             <Link
-              href={`/${locale}/agenda?month=${todayISO.slice(0, 7)}&day=${todayISO}`}
+              href={`/agenda?month=${todayISO.slice(0, 7)}&day=${todayISO}`}
               className="text-xs text-gold hover:underline"
             >
               {t('agenda.today')}
@@ -218,7 +221,7 @@ export default async function AgendaPage({
           ) : null}
         </div>
         <Link
-          href={`/${locale}/agenda?month=${nextMonthKey}`}
+          href={`/agenda?month=${nextMonthKey}`}
           aria-label={t('agenda.nextMonth')}
           className="flex size-8 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:border-gold/40 hover:text-foreground"
         >

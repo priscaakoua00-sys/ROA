@@ -182,7 +182,24 @@
       "noCustomers": "No customers found.",
       "changeCustomer": "Choose a different customer",
       "forCustomer": "Vehicle for {name}",
-      "save": "Save vehicle"
+      "save": "Save vehicle",
+      "orCreateCustomer": "Or create a new customer",
+      "newCustomerTitle": "New customer",
+      "vinLabel": "VIN (optional)",
+      "fuelLabel": "Fuel",
+      "fuelUnknown": "Not specified",
+      "fuelPetrol": "Petrol",
+      "fuelDiesel": "Diesel",
+      "fuelHybrid": "Hybrid",
+      "fuelElectric": "Electric",
+      "fuelOther": "Other",
+      "transmissionLabel": "Transmission",
+      "transmissionUnknown": "Not specified",
+      "transmissionManual": "Manual",
+      "transmissionAutomatic": "Automatic",
+      "colorLabel": "Colour",
+      "notesLabel": "Notes",
+      "error": "Something went wrong. Pick or create a customer, then try again."
     },
     "newWorkOrder": {
       "title": "New work order",
@@ -380,7 +397,8 @@
       "photoSave": "Save photo",
       "photoError": "Upload failed. Use an image of 8 MB or smaller.",
       "noResults": "No vehicle found for “{query}”.",
-      "clearSearch": "Clear search"
+      "clearSearch": "Clear search",
+      "addNew": "New vehicle"
     },
     "notifications": {
       "title": "Notifications",

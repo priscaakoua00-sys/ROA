@@ -182,7 +182,24 @@
       "noCustomers": "Aucun client trouvé.",
       "changeCustomer": "Choisir un autre client",
       "forCustomer": "Véhicule pour {name}",
-      "save": "Enregistrer le véhicule"
+      "save": "Enregistrer le véhicule",
+      "orCreateCustomer": "Ou créer un nouveau client",
+      "newCustomerTitle": "Nouveau client",
+      "vinLabel": "VIN (facultatif)",
+      "fuelLabel": "Carburant",
+      "fuelUnknown": "Non précisé",
+      "fuelPetrol": "Essence",
+      "fuelDiesel": "Diesel",
+      "fuelHybrid": "Hybride",
+      "fuelElectric": "Électrique",
+      "fuelOther": "Autre",
+      "transmissionLabel": "Transmission",
+      "transmissionUnknown": "Non précisé",
+      "transmissionManual": "Manuelle",
+      "transmissionAutomatic": "Automatique",
+      "colorLabel": "Couleur",
+      "notesLabel": "Observations",
+      "error": "Une erreur est survenue. Choisissez ou créez un client, puis réessayez."
     },
     "newWorkOrder": {
       "title": "Nouvelle commande d'atelier",
@@ -380,7 +397,8 @@
       "photoSave": "Enregistrer la photo",
       "photoError": "Échec de l'envoi. Utilisez une image de 8 Mo maximum.",
       "noResults": "Aucun véhicule trouvé pour « {query} ».",
-      "clearSearch": "Effacer la recherche"
+      "clearSearch": "Effacer la recherche",
+      "addNew": "Nouveau véhicule"
     },
     "notifications": {
       "title": "Notifications",

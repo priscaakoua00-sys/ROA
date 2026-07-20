@@ -10,49 +10,89 @@ export async function addVehicleAction(formData: FormData) {
   const locale: Locale = (['nl', 'en', 'fr'] as const).includes(rawLocale as Locale)
     ? (rawLocale as Locale)
     : 'nl';
-  const customerId = String(formData.get('customerId') ?? '');
-  if (!customerId) redirect(`/${locale}/customers`);
 
   const clean = (k: string) => {
     const v = formData.get(k);
     const s = typeof v === 'string' ? v.trim() : '';
     return s.length > 0 ? s : null;
   };
-  const mileageRaw = clean('mileage');
-  const yearRaw = clean('year');
 
   const supabase = await createSupabaseServerClient();
-  const { data: cust } = await supabase
-    .from('customers')
-    .select('organization_id')
-    .eq('id', customerId)
-    .maybeSingle();
-  if (!cust) redirect(`/${locale}/customers`);
+
+  let customerId = String(formData.get('customerId') ?? '');
+  let organizationId: string | null = null;
+
+  if (customerId) {
+    const { data: cust } = await supabase
+      .from('customers')
+      .select('organization_id')
+      .eq('id', customerId)
+      .maybeSingle();
+    if (!cust) redirect(`/${locale}/vehicles/new?error=1`);
+    organizationId = cust.organization_id;
+  } else {
+    // No existing customer picked: create one inline from the same form.
+    const firstName = clean('firstName');
+    const lastName = clean('lastName');
+    const phone = clean('phone');
+    if (!firstName && !lastName && !phone) {
+      redirect(`/${locale}/vehicles/new?error=1`);
+    }
+
+    const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
+    const orgId = orgs?.[0]?.id;
+    if (!orgId) redirect(`/${locale}/onboarding`);
+
+    const { data: newCustomer } = await supabase
+      .from('customers')
+      .insert({
+        organization_id: orgId,
+        first_name: firstName,
+        last_name: lastName,
+        phone,
+        preferred_language: locale,
+        consent: true,
+      })
+      .select('id')
+      .maybeSingle();
+    if (!newCustomer) redirect(`/${locale}/vehicles/new?error=1`);
+    customerId = newCustomer.id;
+    organizationId = orgId;
+  }
+  if (!organizationId) redirect(`/${locale}/vehicles/new?error=1`);
+
+  const mileageRaw = clean('mileage');
+  const yearRaw = clean('year');
 
   const { data: vehicle } = await supabase
     .from('vehicles')
     .insert({
-      organization_id: cust.organization_id,
+      organization_id: organizationId,
       customer_id: customerId,
       license_plate: clean('licensePlate'),
       make: clean('make'),
       model: clean('model'),
       year: yearRaw ? Number(yearRaw) : null,
       mileage: mileageRaw ? Number(mileageRaw) : null,
+      vin: clean('vin'),
+      fuel: clean('fuel'),
+      transmission: clean('transmission'),
+      color: clean('color'),
+      notes: clean('notes'),
     })
     .select('id')
     .maybeSingle();
+  if (!vehicle) redirect(`/${locale}/vehicles/new?error=1`);
 
   const photo = formData.get('photo');
   if (
-    vehicle &&
     photo instanceof File &&
     photo.size > 0 &&
     photo.type.startsWith('image/') &&
     photo.size <= 8 * 1024 * 1024
   ) {
     const ext = (photo.name.split('.').pop() ?? 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
-    const path = `${cust.organization_id}/${vehicle.id}/${Date.now()}.${ext}`;
+    const path = `${organizationId}/${vehicle.id}/${Date.now()}.${ext}`;
     const { error: uploadError } = await supabase.storage
       .from('vehicle-photos')
       .upload(path, photo, { contentType: photo.type });
@@ -61,7 +101,7 @@ export async function addVehicleAction(formData: FormData) {
     }
   }
 
-  redirect(`/${locale}/customers/${customerId}`);
+  redirect(`/${locale}/vehicles/${vehicle.id}?saved=1`);
 }
 
 

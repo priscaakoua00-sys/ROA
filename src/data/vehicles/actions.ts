@@ -33,6 +33,10 @@ export async function updateVehicleAction(formData: FormData) {
       model: clean('model'),
       year: intOf('year'),
       mileage: intOf('mileage'),
+      vin: clean('vin'),
+      fuel: clean('fuel'),
+      transmission: clean('transmission'),
+      color: clean('color'),
       notes: clean('notes'),
     })
     .eq('id', vehicleId);

@@ -182,7 +182,24 @@
       "noCustomers": "Geen klanten gevonden.",
       "changeCustomer": "Andere klant kiezen",
       "forCustomer": "Voertuig voor {name}",
-      "save": "Voertuig opslaan"
+      "save": "Voertuig opslaan",
+      "orCreateCustomer": "Of nieuwe klant aanmaken",
+      "newCustomerTitle": "Nieuwe klant",
+      "vinLabel": "VIN (optioneel)",
+      "fuelLabel": "Brandstof",
+      "fuelUnknown": "Niet opgegeven",
+      "fuelPetrol": "Benzine",
+      "fuelDiesel": "Diesel",
+      "fuelHybrid": "Hybride",
+      "fuelElectric": "Elektrisch",
+      "fuelOther": "Anders",
+      "transmissionLabel": "Transmissie",
+      "transmissionUnknown": "Niet opgegeven",
+      "transmissionManual": "Handgeschakeld",
+      "transmissionAutomatic": "Automaat",
+      "colorLabel": "Kleur",
+      "notesLabel": "Opmerkingen",
+      "error": "Er ging iets mis. Kies of maak een klant aan, en probeer opnieuw."
     },
     "newWorkOrder": {
       "title": "Nieuwe werkorder",
@@ -380,7 +397,8 @@
       "photoSave": "Foto opslaan",
       "photoError": "Upload mislukt. Gebruik een afbeelding van maximaal 8 MB.",
       "noResults": "Geen voertuig gevonden voor “{query}”.",
-      "clearSearch": "Zoekopdracht wissen"
+      "clearSearch": "Zoekopdracht wissen",
+      "addNew": "Nieuw voertuig"
     },
     "notifications": {
       "title": "Meldingen",

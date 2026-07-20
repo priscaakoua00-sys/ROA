@@ -37,7 +37,7 @@ export default async function VehicleDetailPage({
 
   const { data: v } = await supabase
     .from('vehicles')
-    .select('id, license_plate, make, model, year, mileage, notes, customer_id, photo_url, customers(first_name,last_name)')
+    .select('id, license_plate, make, model, year, mileage, vin, fuel, transmission, color, notes, customer_id, photo_url, customers(first_name,last_name)')
     .eq('id', id)
     .maybeSingle();
   if (!v) notFound();
@@ -170,7 +170,45 @@ export default async function VehicleDetailPage({
           <Field label={t('customers.model')} name="model" defaultValue={v.model ?? ''} />
           <Field label={t('vehicles.year')} name="year" type="number" defaultValue={v.year ? String(v.year) : ''} />
           <Field label={t('customers.mileage')} name="mileage" type="number" defaultValue={v.mileage ? String(v.mileage) : ''} />
+          <Field label={t('newVehicle.vinLabel')} name="vin" defaultValue={v.vin ?? ''} />
+          <Field label={t('newVehicle.colorLabel')} name="color" defaultValue={v.color ?? ''} />
+          <label className="block space-y-1.5 text-sm">
+            <span className="text-sm font-medium">{t('newVehicle.fuelLabel')}</span>
+            <select
+              name="fuel"
+              defaultValue={v.fuel ?? ''}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <option value="">{t('newVehicle.fuelUnknown')}</option>
+              <option value="petrol">{t('newVehicle.fuelPetrol')}</option>
+              <option value="diesel">{t('newVehicle.fuelDiesel')}</option>
+              <option value="hybrid">{t('newVehicle.fuelHybrid')}</option>
+              <option value="electric">{t('newVehicle.fuelElectric')}</option>
+              <option value="other">{t('newVehicle.fuelOther')}</option>
+            </select>
+          </label>
+          <label className="block space-y-1.5 text-sm">
+            <span className="text-sm font-medium">{t('newVehicle.transmissionLabel')}</span>
+            <select
+              name="transmission"
+              defaultValue={v.transmission ?? ''}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <option value="">{t('newVehicle.transmissionUnknown')}</option>
+              <option value="manual">{t('newVehicle.transmissionManual')}</option>
+              <option value="automatic">{t('newVehicle.transmissionAutomatic')}</option>
+            </select>
+          </label>
         </div>
+        <label className="mt-3 block text-sm">
+          <span className="mb-1.5 block font-medium">{t('newVehicle.notesLabel')}</span>
+          <textarea
+            name="notes"
+            rows={2}
+            defaultValue={v.notes ?? ''}
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
+          />
+        </label>
         <div className="mt-3 flex justify-end">
           <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>
         </div>
