@@ -37,6 +37,7 @@ export async function PhotoDiagnosisPanel({
   locale,
   leadId,
   vehicleId,
+  workOrderId,
   diagnoses,
   saved,
   error,
@@ -44,6 +45,7 @@ export async function PhotoDiagnosisPanel({
   locale: string;
   leadId?: string;
   vehicleId?: string;
+  workOrderId?: string;
   diagnoses: DiagnosisRow[];
   saved?: boolean;
   error?: boolean;
@@ -86,6 +88,7 @@ export async function PhotoDiagnosisPanel({
         <input type="hidden" name="locale" value={locale} />
         {leadId ? <input type="hidden" name="leadId" value={leadId} /> : null}
         {vehicleId ? <input type="hidden" name="vehicleId" value={vehicleId} /> : null}
+        {workOrderId ? <input type="hidden" name="workOrderId" value={workOrderId} /> : null}
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {TAGGED_VEHICLE_ANGLES.map((angle) => (

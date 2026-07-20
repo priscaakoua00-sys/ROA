@@ -24,6 +24,13 @@ interface Vehicle {
   model: string | null;
 }
 
+interface Member {
+  user_id: string | null;
+  full_name: string | null;
+  email: string | null;
+  status: string;
+}
+
 export default async function NewWorkOrderPage({
   params,
   searchParams,
@@ -58,12 +65,16 @@ export default async function NewWorkOrderPage({
       .maybeSingle();
 
     if (customer) {
-      const { data: vehicleRows } = await supabase
-        .from('vehicles')
-        .select('id, license_plate, make, model')
-        .eq('customer_id', customer.id)
-        .order('created_at', { ascending: false });
+      const [{ data: vehicleRows }, { data: memData }] = await Promise.all([
+        supabase
+          .from('vehicles')
+          .select('id, license_plate, make, model')
+          .eq('customer_id', customer.id)
+          .order('created_at', { ascending: false }),
+        supabase.rpc('org_members', { p_org: org.id }),
+      ]);
       const vehicles = (vehicleRows ?? []) as Vehicle[];
+      const members = ((memData ?? []) as Member[]).filter((m) => m.status === 'active' && m.user_id);
 
       return (
         <div className="container max-w-lg py-10">
@@ -97,6 +108,20 @@ export default async function NewWorkOrderPage({
                       {[v.make, v.model].filter(Boolean).join(' ') || t('customers.vehicle')}
                       {v.license_plate ? ` · ${v.license_plate}` : ''}
                     </option>
+                  ))}
+                </select>
+              </div>
+            ) : null}
+            {members.length > 0 ? (
+              <div>
+                <label className="mb-1 block text-sm font-medium">{t('newWorkOrder.assignLabel')}</label>
+                <select
+                  name="assignedTo"
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <option value="">{t('lead.unassigned')}</option>
+                  {members.map((m) => (
+                    <option key={m.user_id} value={m.user_id ?? ''}>{m.full_name || m.email}</option>
                   ))}
                 </select>
               </div>

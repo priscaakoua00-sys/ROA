@@ -221,7 +221,8 @@
       "titleLabel": "Titel",
       "titlePlaceholder": "bijv. Grote beurt",
       "descriptionLabel": "Omschrijving",
-      "save": "Werkorder aanmaken"
+      "save": "Werkorder aanmaken",
+      "assignLabel": "Toewijzen aan een monteur (optioneel)"
     },
     "roles": {
       "owner": "Eigenaar",
@@ -347,13 +348,38 @@
       "newTask": "Nieuwe taak",
       "addTask": "Toevoegen",
       "viewInvoice": "Bekijk factuur {number}",
-      "createInvoice": "Factuur maken"
+      "createInvoice": "Factuur maken",
+      "checklistTitle": "Controle-checklist",
+      "checklistIntro": "Controleer elk punt van het voertuig en noteer het resultaat.",
+      "checklistEmpty": "Nog geen checklist voor deze opdracht. Voeg hieronder een punt toe of stel de standaardchecklist in bij Instellingen.",
+      "checklistNotePlaceholder": "Notitie (optioneel)",
+      "checklistAddPhoto": "Foto toevoegen",
+      "checklistNewItem": "Nieuw controlepunt",
+      "timelineTitle": "Volledige geschiedenis",
+      "timelineEmpty": "Nog geen gebeurtenissen.",
+      "timelineDiagnosis": "Robin AI foto-diagnose",
+      "reportTitle": "Robin AI-rapport",
+      "reportIntro": "Robin stelt een professioneel rapport en klantbericht op basis van de checklist en foto-diagnoses.",
+      "reportGenerate": "Rapport genereren",
+      "reportGenerating": "Robin stelt het rapport op...",
+      "reportSaved": "Rapport gegenereerd.",
+      "reportEmpty": "Nog niets te melden: vul eerst de checklist in of voer een foto-diagnose uit.",
+      "reportError": "Het genereren van het rapport is mislukt. Probeer het opnieuw.",
+      "clientMessageTitle": "Bericht voor de klant"
     },
     "workOrderStatus": {
-      "open": "Open",
-      "in_progress": "Bezig",
-      "waiting_parts": "Wacht op onderdelen",
-      "done": "Klaar",
+      "received": "Ontvangen",
+      "inspection_in_progress": "Controle bezig",
+      "diagnostic_done": "Diagnose klaar",
+      "awaiting_customer_approval": "Wacht op akkoord klant",
+      "awaiting_leasing_approval": "Wacht op akkoord leasing",
+      "quote_accepted": "Offerte geaccepteerd",
+      "parts_ordered": "Onderdelen besteld",
+      "parts_received": "Onderdelen ontvangen",
+      "repair_in_progress": "Reparatie bezig",
+      "final_control": "Eindcontrole",
+      "ready_for_delivery": "Klaar voor aflevering",
+      "delivered": "Afgeleverd",
       "cancelled": "Geannuleerd"
     },
     "invoices": {
@@ -471,7 +497,12 @@
         "vehicles": "Voertuigen",
         "users": "Gebruikers",
         "aiAnalyses": "Robin AI-analyses deze maand"
-      }
+      },
+      "checklistTitle": "Controle-checklist",
+      "checklistIntro": "Pas aan wat uw monteurs controleren als een voertuig binnenkomt.",
+      "checklistDeleteConfirm": "Dit controlepunt wordt verwijderd uit de standaardchecklist.",
+      "checklistNewItem": "Nieuw controlepunt",
+      "checklistAddItem": "Toevoegen"
     },
     "knowledge": {
       "title": "Kennisbank",
@@ -558,6 +589,13 @@
       "estimatedRepairTime": "Geschatte reparatietijd",
       "recommendations": "Aanbevelingen",
       "limitReached": "U heeft het aantal Robin AI-analyses van deze maand in uw abonnement bereikt. Upgrade om door te gaan."
+    },
+    "checklistResult": {
+      "pending": "Nog te doen",
+      "ok": "OK",
+      "attention": "Let op",
+      "fail": "Niet in orde",
+      "na": "N.v.t."
     }
   },
   "language": {

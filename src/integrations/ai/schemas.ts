@@ -76,3 +76,24 @@ export const mediaDiagnosisSchema = z.object({
   recommendations: z.array(z.string()),
 });
 export type MediaDiagnosis = z.infer<typeof mediaDiagnosisSchema>;
+
+export const recommendedRepairSchema = z.object({
+  label: z.string().min(1),
+  urgency: diagnosisSeveritySchema,
+  reason: z.string().min(1),
+});
+export type RecommendedRepair = z.infer<typeof recommendedRepairSchema>;
+
+export const repairReportSchema = z.object({
+  /** Short summary for the mechanic/chef d'atelier. */
+  summary: z.string().min(1),
+  recommendedRepairs: z.array(recommendedRepairSchema),
+  /** Full professional report text, for the garage's own record. */
+  reportText: z.string().min(1),
+  /** Ready-to-send message explaining the recommended repairs to the client. */
+  clientMessage: z.object({
+    subject: z.string().min(1),
+    body: z.string().min(1),
+  }),
+});
+export type RepairReport = z.infer<typeof repairReportSchema>;

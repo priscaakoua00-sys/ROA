@@ -9,6 +9,9 @@ import {
   addServiceAction,
   updateServiceAction,
   deleteServiceAction,
+  addChecklistTemplateItemAction,
+  updateChecklistTemplateItemAction,
+  deleteChecklistTemplateItemAction,
 } from '@/data/settings/actions';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/auth/auth-shell';
@@ -31,6 +34,12 @@ interface Service {
   duration_minutes: number;
   buffer_minutes: number;
   active: boolean;
+}
+
+interface ChecklistTemplateItem {
+  id: string;
+  label: string;
+  sort_order: number;
 }
 
 export default async function SettingsPage({
@@ -83,6 +92,21 @@ export default async function SettingsPage({
     { labelKey: 'users', used: seatCount, limit: currentPlan.limits.maxUsers },
     { labelKey: 'aiAnalyses', used: aiAnalysesUsed, limit: currentPlan.limits.aiAnalysesPerMonth },
   ];
+
+  const { data: checklistTemplate } = await supabase
+    .from('checklist_templates')
+    .select('id')
+    .eq('organization_id', org.id)
+    .eq('is_default', true)
+    .maybeSingle();
+  const { data: checklistItemsData } = checklistTemplate
+    ? await supabase
+        .from('checklist_template_items')
+        .select('id, label, sort_order')
+        .eq('template_id', checklistTemplate.id)
+        .order('sort_order', { ascending: true })
+    : { data: [] };
+  const checklistItems = (checklistItemsData ?? []) as ChecklistTemplateItem[];
 
   const hours = new Map<number, { start: string; end: string }>();
   for (const r of rules ?? []) {
@@ -280,6 +304,49 @@ export default async function SettingsPage({
             <Field label={t('settings.buffer')} name="buffer" type="number" defaultValue="0" />
           </div>
           <Button type="submit" variant="outline" size="sm">{t('settings.addService')}</Button>
+        </form>
+      </section>
+
+      {/* Inspection checklist */}
+      <section className="mt-6 rounded-xl border border-border bg-card p-6 shadow-soft">
+        <h2 className="text-base font-semibold tracking-tight">{t('settings.checklistTitle')}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t('settings.checklistIntro')}</p>
+
+        <ul className="mt-3 space-y-2">
+          {checklistItems.map((item) => (
+            <li key={item.id} className="rounded-lg border border-border bg-background p-3">
+              <form action={updateChecklistTemplateItemAction} className="flex flex-wrap items-end gap-2">
+                <input type="hidden" name="locale" value={locale} />
+                <input type="hidden" name="itemId" value={item.id} />
+                <div className="min-w-[150px] flex-1">
+                  <input name="label" defaultValue={item.label} className={`${inputCls} w-full`} />
+                </div>
+                <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>
+              </form>
+              <form id={`delete-checklist-item-${item.id}`} action={deleteChecklistTemplateItemAction} className="mt-1 flex justify-end">
+                <input type="hidden" name="locale" value={locale} />
+                <input type="hidden" name="itemId" value={item.id} />
+              </form>
+              <div className="flex justify-end">
+                <ConfirmDeleteButton
+                  formId={`delete-checklist-item-${item.id}`}
+                  triggerLabel={t('settings.delete')}
+                  title={t('common.confirmDeleteTitle')}
+                  description={t('settings.checklistDeleteConfirm')}
+                  cancelLabel={t('common.cancel')}
+                  confirmLabel={t('common.confirm')}
+                />
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        <form action={addChecklistTemplateItemAction} className="mt-3 flex flex-wrap items-end gap-2 border-t border-border pt-3">
+          <input type="hidden" name="locale" value={locale} />
+          <div className="min-w-[150px] flex-1">
+            <Field label={t('settings.checklistNewItem')} name="label" required />
+          </div>
+          <Button type="submit" variant="outline" size="sm">{t('settings.checklistAddItem')}</Button>
         </form>
       </section>
     </div>

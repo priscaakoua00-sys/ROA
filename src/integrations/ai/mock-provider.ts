@@ -6,6 +6,7 @@ import type {
   LanguageDetectionInput,
   LeadSummaryInput,
   MediaDiagnosisInput,
+  RepairReportInput,
   SupportedLanguage,
   UrgencyInput,
 } from './types';
@@ -14,11 +15,14 @@ import {
   languageDetectionSchema,
   leadSummarySchema,
   mediaDiagnosisSchema,
+  repairReportSchema,
   urgencyAssessmentSchema,
   type DraftedReply,
   type LanguageDetection,
   type LeadSummary,
   type MediaDiagnosis,
+  type RecommendedRepair,
+  type RepairReport,
   type UrgencyAssessment,
 } from './schemas';
 import { findEmergencyKeywords } from './emergency-keywords';
@@ -235,6 +239,90 @@ export class MockAIProvider implements AIProvider {
       status: 'ok',
       data: mediaDiagnosisSchema.parse(diagnosis),
       meta: this.meta(match ? 0.55 : 0.25),
+    };
+  }
+
+  async draftRepairReport(input: RepairReportInput): Promise<AIResult<RepairReport>> {
+    if (input.checklistFindings.length === 0 && input.diagnoses.length === 0) {
+      return {
+        status: 'handoff',
+        reason: 'Nothing to report: no checklist findings or diagnoses yet.',
+        meta: this.meta(0.1),
+      };
+    }
+
+    const vehicleLabel =
+      [input.vehicle.make, input.vehicle.model].filter(Boolean).join(' ') ||
+      { nl: 'het voertuig', en: 'the vehicle', fr: 'le véhicule' }[input.language];
+    const plate = input.vehicle.licensePlate ? ` (${input.vehicle.licensePlate})` : '';
+
+    const findingRepairs: RecommendedRepair[] = input.checklistFindings.map((f) => ({
+      label: f.label,
+      urgency: f.result === 'fail' ? 'high' : 'medium',
+      reason:
+        f.note ||
+        {
+          nl: 'Geconstateerd tijdens de controle.',
+          en: 'Found during the inspection.',
+          fr: 'Constaté lors du contrôle.',
+        }[input.language],
+    }));
+    const diagnosisRepairs: RecommendedRepair[] = input.diagnoses.flatMap((d) =>
+      d.affectedParts.length > 0
+        ? d.affectedParts.map((part) => ({
+            label: part,
+            urgency: d.severity,
+            reason: d.causes[0] ?? d.recommendations[0] ?? '',
+          }))
+        : [],
+    );
+    const recommendedRepairs = [...findingRepairs, ...diagnosisRepairs];
+
+    const lines = {
+      nl: {
+        summary: `${input.checklistFindings.length} controlepunt(en) en ${input.diagnoses.length} foto-diagnose(s) vragen aandacht voor ${vehicleLabel}${plate}.`,
+        subject: `Controle van uw voertuig${plate} - aanbevolen werkzaamheden`,
+        greeting: 'Beste klant,',
+        intro: `Bij de controle van uw ${vehicleLabel}${plate} zijn de volgende punten naar voren gekomen:`,
+        outro: 'We bespreken dit graag telefonisch en informeren u over de kosten voordat we starten.',
+        signOff: 'Met vriendelijke groet,',
+      },
+      en: {
+        summary: `${input.checklistFindings.length} checklist item(s) and ${input.diagnoses.length} photo diagnosis(es) need attention for ${vehicleLabel}${plate}.`,
+        subject: `Vehicle inspection${plate} - recommended repairs`,
+        greeting: 'Dear customer,',
+        intro: `While inspecting your ${vehicleLabel}${plate}, we found the following:`,
+        outro: 'We are happy to discuss this by phone and confirm the cost before starting any work.',
+        signOff: 'Kind regards,',
+      },
+      fr: {
+        summary: `${input.checklistFindings.length} point(s) de contrôle et ${input.diagnoses.length} diagnostic(s) photo demandent votre attention pour ${vehicleLabel}${plate}.`,
+        subject: `Contrôle de votre véhicule${plate} - réparations recommandées`,
+        greeting: 'Bonjour,',
+        intro: `Lors du contrôle de votre ${vehicleLabel}${plate}, nous avons constaté les points suivants :`,
+        outro: 'Nous restons à votre disposition par téléphone pour en discuter et vous confirmer le prix avant toute intervention.',
+        signOff: 'Cordialement,',
+      },
+    }[input.language];
+
+    const repairLines = recommendedRepairs.length > 0
+      ? recommendedRepairs.map((r) => `- ${r.label} (${r.reason})`).join('\n')
+      : { nl: 'Geen bijzonderheden.', en: 'Nothing to report.', fr: 'Rien à signaler.' }[input.language];
+
+    const reportText = `${lines.summary}\n\n${repairLines}`;
+    const clientMessageBody = `${lines.greeting}\n\n${lines.intro}\n\n${repairLines}\n\n${lines.outro}\n\n${lines.signOff}`;
+
+    const report: RepairReport = {
+      summary: lines.summary,
+      recommendedRepairs,
+      reportText,
+      clientMessage: { subject: lines.subject, body: clientMessageBody },
+    };
+
+    return {
+      status: 'ok',
+      data: repairReportSchema.parse(report),
+      meta: this.meta(0.6),
     };
   }
 }

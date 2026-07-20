@@ -95,3 +95,64 @@ export async function deleteServiceAction(formData: FormData) {
   await supabase.from('services').delete().eq('id', serviceId);
   redirect(`/${locale}/settings?saved=service`);
 }
+
+/* --------------------------- Checklist template -------------------------- */
+
+async function defaultChecklistTemplateId(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  organizationId: string,
+): Promise<string | null> {
+  const { data } = await supabase
+    .from('checklist_templates')
+    .select('id')
+    .eq('organization_id', organizationId)
+    .eq('is_default', true)
+    .maybeSingle();
+  return data?.id ?? null;
+}
+
+export async function addChecklistTemplateItemAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const label = String(formData.get('label') ?? '').trim();
+  if (!label) redirect(`/${locale}/settings?error=1`);
+
+  const supabase = await createSupabaseServerClient();
+  const id = await orgId(supabase);
+  if (!id) redirect(`/${locale}/onboarding`);
+
+  const templateId = await defaultChecklistTemplateId(supabase, id);
+  if (!templateId) redirect(`/${locale}/settings?error=1`);
+
+  const { count } = await supabase
+    .from('checklist_template_items')
+    .select('id', { count: 'exact', head: true })
+    .eq('template_id', templateId);
+
+  await supabase.from('checklist_template_items').insert({
+    organization_id: id,
+    template_id: templateId,
+    label,
+    sort_order: count ?? 0,
+  });
+  redirect(`/${locale}/settings?saved=checklist`);
+}
+
+export async function updateChecklistTemplateItemAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const itemId = String(formData.get('itemId') ?? '');
+  const label = String(formData.get('label') ?? '').trim();
+  if (!itemId || !label) redirect(`/${locale}/settings?error=1`);
+
+  const supabase = await createSupabaseServerClient();
+  await supabase.from('checklist_template_items').update({ label }).eq('id', itemId);
+  redirect(`/${locale}/settings?saved=checklist`);
+}
+
+export async function deleteChecklistTemplateItemAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const itemId = String(formData.get('itemId') ?? '');
+  if (!itemId) redirect(`/${locale}/settings`);
+  const supabase = await createSupabaseServerClient();
+  await supabase.from('checklist_template_items').delete().eq('id', itemId);
+  redirect(`/${locale}/settings?saved=checklist`);
+}
