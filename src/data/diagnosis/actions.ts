@@ -5,6 +5,8 @@ import { createSupabaseServerClient } from '@/data/supabase/server';
 import { getAIProvider } from '@/integrations/ai';
 import type { DiagnosisMediaItem, VehicleAngle } from '@/integrations/ai';
 import { TAGGED_VEHICLE_ANGLES } from '@/lib/vehicle-angles';
+import { getOrgEntitlements } from '@/data/subscriptions/get-subscription';
+import { countAiAnalysesThisMonth } from '@/data/subscriptions/usage';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -76,6 +78,12 @@ export async function createPhotoDiagnosisAction(formData: FormData) {
     organizationId = data?.organization_id ?? null;
   }
   if (!organizationId) redirect(backHref);
+
+  const { limits } = await getOrgEntitlements(supabase, organizationId);
+  if (limits.aiAnalysesPerMonth !== null) {
+    const used = await countAiAnalysesThisMonth(supabase, organizationId);
+    if (used >= limits.aiAnalysesPerMonth) redirect(`${backHref}?diagError=limit`);
+  }
 
   const targetId = vehicleId ?? leadId!;
   const uploaded: { path: string; angle: VehicleAngle }[] = [];

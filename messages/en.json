@@ -206,7 +206,8 @@
       "transmissionAutomatic": "Automatic",
       "colorLabel": "Colour",
       "notesLabel": "Notes",
-      "error": "Something went wrong. Pick or create a customer, then try again."
+      "error": "Something went wrong. Pick or create a customer, then try again.",
+      "limitReached": "You've reached the maximum number of vehicles included in your plan. Upgrade to continue."
     },
     "newWorkOrder": {
       "title": "New work order",
@@ -317,7 +318,8 @@
       "inviteIntro": "Add a colleague with a role.",
       "email": "Email",
       "invite": "Invite",
-      "inviteNote": "The invitation is ready. Email delivery comes in a later step."
+      "inviteNote": "The invitation is ready. Email delivery comes in a later step.",
+      "limitReached": "You've reached the maximum number of users included in your plan. Upgrade to invite more people."
     },
     "customers": {
       "title": "Customers",
@@ -463,7 +465,13 @@
         "en": "English",
         "fr": "Français"
       },
-      "billingViewAll": "View all pricing"
+      "billingViewAll": "View all pricing",
+      "billingUsageTitle": "Current usage",
+      "billingUsage": {
+        "vehicles": "Vehicles",
+        "users": "Users",
+        "aiAnalyses": "Robin AI analyses this month"
+      }
     },
     "knowledge": {
       "title": "Knowledge base",
@@ -500,7 +508,10 @@
         "unanswered": "Reply to {name}: the request is still waiting.",
         "post_repair": "Ask {name} if all is well and request a Google review.",
         "reactivate": "Reach out to {name} again with an offer."
-      }
+      },
+      "lockedTitle": "Feature not included in your plan",
+      "lockedMessage": "Automations (follow-ups, reminders) are included from the Professional plan onward. Check pricing to upgrade.",
+      "lockedCta": "View pricing"
     },
     "newCustomer": {
       "title": "New customer",
@@ -545,7 +556,8 @@
       "causes": "Possible causes",
       "additionalChecks": "Additional checks",
       "estimatedRepairTime": "Estimated repair time",
-      "recommendations": "Recommendations"
+      "recommendations": "Recommendations",
+      "limitReached": "You've reached this month's Robin AI analyses included in your plan. Upgrade to continue."
     }
   },
   "language": {
@@ -707,43 +719,48 @@
   "pricing": {
     "title": "Pricing",
     "subtitle": "Clear, no surprises. Here's what Roavaa costs.",
-    "launchBanner": "Free during launch. Pick the plan that fits — billing only switches on later, and we'll announce that well in advance.",
+    "betaBanner": "ROAVAA is currently free during the testing phase. The prices below are indicative and may change before the official commercial launch.",
     "perMonth": "/ month",
     "mostPopular": "Most popular",
     "contactPrice": "Custom",
     "cta": "Coming soon",
+    "provisionalPrice": "Indicative price, subject to change",
+    "paymentNotActive": "No payment is active yet. The \"Subscribe\" button will be enabled at official launch.",
     "featuresTitle": "Included",
     "backHome": "Back to Roavaa",
+    "unlimited": "Unlimited",
     "plans": {
       "starter": "Starter",
       "professional": "Professional",
-      "premium": "Premium",
       "enterprise": "Enterprise"
     },
     "features": {
-      "robin": "Robin, your AI employee",
-      "vehicles": "Unlimited vehicles",
-      "customers": "Unlimited customers",
+      "vehicles": "Up to {count} vehicles",
+      "vehiclesUnlimited": "Unlimited vehicles",
+      "users": "Up to {count} users",
+      "usersUnlimited": "Unlimited users",
+      "storage": "{count} GB of photo and video storage",
+      "storageUnlimited": "Unlimited storage",
+      "aiAnalyses": "{count} Robin AI analyses per month",
+      "aiAnalysesUnlimited": "Unlimited Robin AI analyses",
+      "robinLevel": {
+        "basic": "Robin AI - basic assistant",
+        "advanced": "Robin AI - advanced photo diagnosis",
+        "full": "Robin AI - full suite"
+      },
+      "statisticsLevel": {
+        "basic": "Basic statistics",
+        "advanced": "Advanced statistics and reports"
+      },
+      "automations": "Automations (follow-ups, reminders)",
+      "advancedReports": "Advanced reports",
+      "invoicing": "Invoicing",
       "agenda": "Agenda and appointments",
-      "oneSeat": "1 team seat",
-      "emailSupport": "Email support",
-      "everythingInStarter": "Everything in Starter",
-      "workOrders": "Work orders",
-      "invoices": "Invoicing",
-      "photoDiagnosis": "Photo diagnosis with Robin AI",
-      "automations": "Automated follow-ups",
-      "fiveSeats": "Up to 5 team seats",
-      "prioritySupport": "Priority support",
-      "everythingInProfessional": "Everything in Professional",
-      "knowledge": "Knowledge base",
-      "unlimitedSeats": "Unlimited team seats",
       "customBranding": "Custom branding",
-      "phoneSupport": "Phone support",
-      "everythingInPremium": "Everything in Premium",
-      "dedicatedManager": "Dedicated account manager",
-      "customIntegrations": "Custom integrations",
-      "sla": "Service-level agreement (SLA)",
-      "multiLocation": "Multiple locations"
+      "multiLocation": "Multiple locations",
+      "apiAccess": "API access",
+      "prioritySupport": "Priority support",
+      "emailSupport": "Email support"
     }
   }
 }

@@ -1,7 +1,8 @@
-import { CheckCircle2 } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { PLANS, formatMonthlyPrice } from '@/lib/plans';
+import { PlanFeatureList } from '@/components/pricing/plan-feature-list';
 import { cn } from '@/lib/utils';
 
 export default async function PricingPage({
@@ -24,11 +25,12 @@ export default async function PricingPage({
         <p className="mt-2 text-muted-foreground">{t('subtitle')}</p>
       </div>
 
-      <div className="mt-6 rounded-xl border border-gold/30 bg-gold/5 p-4 text-sm text-muted-foreground">
-        {t('launchBanner')}
+      <div className="mt-6 flex items-start gap-3 rounded-xl border border-gold/30 bg-gold/5 p-4 text-sm text-muted-foreground">
+        <Sparkles className="mt-0.5 size-4 shrink-0 text-gold" aria-hidden />
+        <p>{t('betaBanner')}</p>
       </div>
 
-      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {PLANS.map((plan) => (
           <div
             key={plan.key}
@@ -56,16 +58,10 @@ export default async function PricingPage({
                 </>
               )}
             </div>
+            <p className="mt-1 text-xs text-muted-foreground">{t('provisionalPrice')}</p>
 
             <p className="mt-4 text-xs font-medium text-muted-foreground">{t('featuresTitle')}</p>
-            <ul className="mt-2 flex-1 space-y-1.5">
-              {plan.featureKeys.map((key) => (
-                <li key={key} className="flex items-start gap-2 text-sm">
-                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-success" aria-hidden />
-                  <span>{t(`features.${key}`)}</span>
-                </li>
-              ))}
-            </ul>
+            <PlanFeatureList plan={plan} t={t} />
 
             <span className="mt-5 flex w-full cursor-not-allowed items-center justify-center rounded-md border border-border px-4 py-2 text-sm font-medium text-muted-foreground">
               {t('cta')}
@@ -73,6 +69,8 @@ export default async function PricingPage({
           </div>
         ))}
       </div>
+
+      <p className="mx-auto mt-8 max-w-2xl text-center text-xs text-muted-foreground">{t('paymentNotActive')}</p>
     </main>
   );
 }

@@ -2,6 +2,8 @@
 
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getOrgEntitlements } from '@/data/subscriptions/get-subscription';
+import { countVehicles } from '@/data/subscriptions/usage';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -60,6 +62,12 @@ export async function addVehicleAction(formData: FormData) {
     organizationId = orgId;
   }
   if (!organizationId) redirect(`/${locale}/vehicles/new?error=1`);
+
+  const { limits } = await getOrgEntitlements(supabase, organizationId);
+  if (limits.maxVehicles !== null) {
+    const current = await countVehicles(supabase, organizationId);
+    if (current >= limits.maxVehicles) redirect(`/${locale}/vehicles/new?error=limit`);
+  }
 
   const mileageRaw = clean('mileage');
   const yearRaw = clean('year');

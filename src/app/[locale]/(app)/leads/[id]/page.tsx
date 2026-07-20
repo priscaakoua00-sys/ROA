@@ -199,7 +199,15 @@ export default async function LeadDetailPage({
     <div className="container max-w-2xl py-10">
       <FlashToast
         success={sent ? t('conversation.sent') : diagSaved === '1' ? t('diagnosis.saved') : null}
-        error={error ? t('lead.error') : diagError === '1' ? t('diagnosis.error') : null}
+        error={
+          error
+            ? t('lead.error')
+            : diagError === 'limit'
+              ? t('diagnosis.limitReached')
+              : diagError === '1'
+                ? t('diagnosis.error')
+                : null
+        }
       />
       <Link href="/dashboard" className="text-sm text-muted-foreground hover:underline">
         {t('lead.back')}

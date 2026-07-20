@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { sendEmail } from '@/integrations/email';
+import { getOrgEntitlements } from '@/data/subscriptions/get-subscription';
+import { countSeats } from '@/data/subscriptions/usage';
 
 type Locale = 'nl' | 'en' | 'fr';
 const ROLES = ['owner', 'admin', 'receptionist', 'mechanic', 'viewer'] as const;
@@ -28,6 +30,12 @@ export async function inviteMemberAction(formData: FormData) {
   if (!email || !email.includes('@')) redirect(`/${locale}/team?error=1`);
   const { supabase, orgId } = await currentOrgId();
   if (!orgId) redirect(`/${locale}/onboarding`);
+
+  const { limits } = await getOrgEntitlements(supabase, orgId);
+  if (limits.maxUsers !== null) {
+    const current = await countSeats(supabase, orgId);
+    if (current >= limits.maxUsers) redirect(`/${locale}/team?error=limit`);
+  }
 
   const { error } = await supabase.from('memberships').insert({
     organization_id: orgId,
