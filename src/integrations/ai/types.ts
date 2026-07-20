@@ -59,3 +59,11 @@ export interface UrgencyInput {
 export interface LanguageDetectionInput {
   text: string;
 }
+
+export interface PhotoDiagnosisInput {
+  language: SupportedLanguage;
+  /** Signed URLs (or storage paths) of the 1-3 photos attached to the request. */
+  photoUrls: string[];
+  /** Optional short note the mechanic typed alongside the photos. */
+  note?: string;
+}

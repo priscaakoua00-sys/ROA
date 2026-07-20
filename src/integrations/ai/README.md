@@ -12,6 +12,7 @@ This keeps the product independent of any single AI company.
 | `provider.ts` | The `AIProvider` interface every provider must implement. |
 | `mock-provider.ts` | Offline, deterministic provider for dev/tests/CI. No key, no network. |
 | `emergency-keywords.ts` | Safety-critical keyword detection per language. |
+| `symptom-patterns.ts` | Keyword-matched symptom categories for the mock photo diagnosis. |
 | `index.ts` | Public entry point + `getAIProvider()` factory. |
 
 ## Guarantees
@@ -34,3 +35,12 @@ This keeps the product independent of any single AI company.
 5. Set `AI_PROVIDER="anthropic"` (or `"openai"`) in the environment.
 
 No change is required anywhere else in the app.
+
+### `diagnoseFromPhotos` specifically
+
+`PhotoDiagnosisInput.photoUrls` are already short-lived signed URLs pointing at
+the private `diagnosis-photos` bucket, ready to hand to a vision-capable model
+(e.g. Claude with image blocks fetched from those URLs). The mock provider
+never looks at the images — it only pattern-matches the optional `note` — so
+swapping in a real provider is what makes this feature actually "read" the
+photos.

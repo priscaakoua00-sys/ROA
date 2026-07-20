@@ -366,7 +366,9 @@
       "photoUpload": "Add a photo",
       "photoChange": "Upload another photo",
       "photoSave": "Save photo",
-      "photoError": "Upload failed. Use an image of 8 MB or smaller."
+      "photoError": "Upload failed. Use an image of 8 MB or smaller.",
+      "noResults": "No vehicle found for “{query}”.",
+      "clearSearch": "Clear search"
     },
     "notifications": {
       "title": "Notifications",
@@ -472,6 +474,19 @@
       "vehicleHint": "Leave empty to add only the customer.",
       "save": "Save customer",
       "add": "New customer"
+    },
+    "diagnosis": {
+      "title": "Photo diagnosis",
+      "intro": "Two or three photos of the problem, and Robin thinks along with you.",
+      "saved": "Diagnosis added.",
+      "error": "Upload failed. Try again with photos up to 8 MB.",
+      "photosLabel": "Photos (max 3)",
+      "photosHint": "JPG or PNG, up to 8 MB each.",
+      "noteLabel": "Short note (optional)",
+      "notePlaceholder": "E.g. squealing noise when braking",
+      "submit": "Ask Robin for a read",
+      "partsToCheck": "Check these",
+      "nextSteps": "Next steps"
     }
   },
   "language": {

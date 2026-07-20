@@ -5,6 +5,7 @@ import type {
   DraftReplyInput,
   LanguageDetectionInput,
   LeadSummaryInput,
+  PhotoDiagnosisInput,
   SupportedLanguage,
   UrgencyInput,
 } from './types';
@@ -12,13 +13,16 @@ import {
   draftedReplySchema,
   languageDetectionSchema,
   leadSummarySchema,
+  photoDiagnosisSchema,
   urgencyAssessmentSchema,
   type DraftedReply,
   type LanguageDetection,
   type LeadSummary,
+  type PhotoDiagnosis,
   type UrgencyAssessment,
 } from './schemas';
 import { findEmergencyKeywords } from './emergency-keywords';
+import { matchSymptom } from './symptom-patterns';
 
 /**
  * Deterministic, offline provider used for local dev, tests and CI.
@@ -145,6 +149,58 @@ export class MockAIProvider implements AIProvider {
       status: 'ok',
       data: languageDetectionSchema.parse(detection),
       meta: this.meta(detection.confidence),
+    };
+  }
+
+  async diagnoseFromPhotos(
+    input: PhotoDiagnosisInput,
+  ): Promise<AIResult<PhotoDiagnosis>> {
+    if (input.photoUrls.length === 0) {
+      return {
+        status: 'handoff',
+        reason: 'No photos attached.',
+        meta: this.meta(0.1),
+      };
+    }
+
+    const match = input.note ? matchSymptom(input.note, input.language) : null;
+
+    const fallback: Record<SupportedLanguage, PhotoDiagnosis> = {
+      nl: {
+        probableCause:
+          'Op basis van de foto’s alleen is nog geen precieze inschatting te geven. Bekijk de foto’s en voeg eventueel een korte omschrijving toe.',
+        partsToCheck: [],
+        nextSteps: [
+          'Voertuig visueel inspecteren aan de hand van de foto’s.',
+          'Klant om meer details vragen indien nodig.',
+        ],
+      },
+      en: {
+        probableCause:
+          "The photos alone aren't enough for a precise read yet. Take a look yourself, or add a short note.",
+        partsToCheck: [],
+        nextSteps: [
+          'Inspect the vehicle visually using the photos.',
+          'Ask the customer for more detail if needed.',
+        ],
+      },
+      fr: {
+        probableCause:
+          "Les photos seules ne suffisent pas encore pour une estimation précise. Jetez-y un œil, ou ajoutez une courte note.",
+        partsToCheck: [],
+        nextSteps: [
+          'Inspecter le véhicule visuellement à partir des photos.',
+          'Demander plus de détails au client si nécessaire.',
+        ],
+      },
+    };
+
+    const diagnosis: PhotoDiagnosis = match ?? fallback[input.language];
+
+    return {
+      status: 'ok',
+      data: photoDiagnosisSchema.parse(diagnosis),
+      meta: this.meta(match ? 0.55 : 0.25),
     };
   }
 }

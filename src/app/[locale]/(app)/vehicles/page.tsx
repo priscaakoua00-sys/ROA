@@ -99,7 +99,16 @@ export default async function VehiclesPage({
 
       {vehicles.length === 0 ? (
         <div className="mt-6 rounded-xl border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
-          {t('vehicles.empty')}
+          {q && q.trim() ? (
+            <>
+              {t('vehicles.noResults', { query: q.trim() })}{' '}
+              <Link href="/vehicles" className="text-gold hover:underline">
+                {t('vehicles.clearSearch')}
+              </Link>
+            </>
+          ) : (
+            t('vehicles.empty')
+          )}
         </div>
       ) : (
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">

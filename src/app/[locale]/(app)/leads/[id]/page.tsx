@@ -13,6 +13,7 @@ import { createWorkOrderAction } from '@/data/work-orders/actions';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Link } from '@/i18n/navigation';
+import { PhotoDiagnosisPanel, type DiagnosisRow } from '@/components/diagnosis/photo-diagnosis-panel';
 
 type Urgency = 'low' | 'normal' | 'high' | 'critical';
 const URGENCY_VARIANT: Record<Urgency, 'muted' | 'default' | 'gold' | 'urgent'> = {
@@ -27,11 +28,11 @@ export default async function LeadDetailPage({
   searchParams,
 }: {
   params: Promise<{ locale: string; id: string }>;
-  searchParams: Promise<{ booked?: string; error?: string; sent?: string }>;
+  searchParams: Promise<{ booked?: string; error?: string; sent?: string; diagSaved?: string; diagError?: string }>;
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  const { booked, error, sent } = await searchParams;
+  const { booked, error, sent, diagSaved, diagError } = await searchParams;
   const t = await getTranslations('app');
 
   const supabase = await createSupabaseServerClient();
@@ -145,6 +146,40 @@ export default async function LeadDetailPage({
     .eq('lead_id', lead.id)
     .limit(1);
   const workOrder = wos?.[0];
+
+  const { data: diagData } = await supabase
+    .from('photo_diagnoses')
+    .select('id, note, photo_paths, probable_cause, parts_to_check, next_steps, created_at')
+    .eq('lead_id', lead.id)
+    .order('created_at', { ascending: false });
+  const diagRows = (diagData ?? []) as unknown as {
+    id: string;
+    note: string | null;
+    photo_paths: string[];
+    probable_cause: string;
+    parts_to_check: string[];
+    next_steps: string[];
+    created_at: string;
+  }[];
+  const allDiagPaths = diagRows.flatMap((d) => d.photo_paths);
+  const diagPhotoUrls = new Map<string, string>();
+  if (allDiagPaths.length > 0) {
+    const { data: signed } = await supabase.storage
+      .from('diagnosis-photos')
+      .createSignedUrls(allDiagPaths, 3600);
+    signed?.forEach((s) => {
+      if (s.signedUrl && s.path) diagPhotoUrls.set(s.path, s.signedUrl);
+    });
+  }
+  const diagnoses: DiagnosisRow[] = diagRows.map((d) => ({
+    id: d.id,
+    note: d.note,
+    probableCause: d.probable_cause,
+    partsToCheck: d.parts_to_check,
+    nextSteps: d.next_steps,
+    createdAt: d.created_at,
+    photoUrls: d.photo_paths.map((p) => diagPhotoUrls.get(p)).filter((u): u is string => Boolean(u)),
+  }));
 
   return (
     <div className="container max-w-2xl py-10">
@@ -313,6 +348,14 @@ export default async function LeadDetailPage({
           </form>
         </section>
       ) : null}
+
+      <PhotoDiagnosisPanel
+        locale={locale}
+        leadId={lead.id}
+        diagnoses={diagnoses}
+        saved={diagSaved === '1'}
+        error={diagError === '1'}
+      />
     </div>
   );
 }
