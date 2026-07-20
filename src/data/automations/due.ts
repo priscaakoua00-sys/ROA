@@ -28,7 +28,7 @@ export async function loadFollowUpsDueCount(
         .from('work_orders')
         .select('id, status, title, customers(first_name,last_name)')
         .eq('organization_id', orgId)
-        .eq('status', 'done')
+        .eq('status', 'delivered')
         .order('updated_at', { ascending: false })
         .limit(50),
       supabase
