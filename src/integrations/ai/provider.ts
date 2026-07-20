@@ -3,12 +3,14 @@ import type {
   DraftReplyInput,
   LanguageDetectionInput,
   LeadSummaryInput,
+  PhotoDiagnosisInput,
   UrgencyInput,
 } from './types';
 import type {
   DraftedReply,
   LanguageDetection,
   LeadSummary,
+  PhotoDiagnosis,
   UrgencyAssessment,
 } from './schemas';
 
@@ -37,4 +39,13 @@ export interface AIProvider {
   detectLanguage(
     input: LanguageDetectionInput,
   ): Promise<AIResult<LanguageDetection>>;
+
+  /**
+   * Propose a probable diagnosis from photos of a problem (plus an optional
+   * short note): likely cause, parts to check, next steps. A starting point
+   * for the mechanic, never a final verdict.
+   */
+  diagnoseFromPhotos(
+    input: PhotoDiagnosisInput,
+  ): Promise<AIResult<PhotoDiagnosis>>;
 }

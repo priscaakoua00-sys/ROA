@@ -366,7 +366,9 @@
       "photoUpload": "Foto toevoegen",
       "photoChange": "Andere foto uploaden",
       "photoSave": "Foto opslaan",
-      "photoError": "Upload mislukt. Gebruik een afbeelding van maximaal 8 MB."
+      "photoError": "Upload mislukt. Gebruik een afbeelding van maximaal 8 MB.",
+      "noResults": "Geen voertuig gevonden voor “{query}”.",
+      "clearSearch": "Zoekopdracht wissen"
     },
     "notifications": {
       "title": "Meldingen",
@@ -472,6 +474,19 @@
       "vehicleHint": "Laat leeg als u alleen de klant toevoegt.",
       "save": "Klant opslaan",
       "add": "Nieuwe klant"
+    },
+    "diagnosis": {
+      "title": "Foto-diagnose",
+      "intro": "Twee of drie foto's van het probleem, en Robin denkt met je mee.",
+      "saved": "Diagnose toegevoegd.",
+      "error": "Uploaden lukte niet. Probeer het opnieuw met foto's tot 8 MB.",
+      "photosLabel": "Foto's (max 3)",
+      "photosHint": "JPG of PNG, max 8 MB per foto.",
+      "noteLabel": "Korte omschrijving (optioneel)",
+      "notePlaceholder": "Bijv. piepend geluid bij het remmen",
+      "submit": "Vraag Robin om een inschatting",
+      "partsToCheck": "Te checken",
+      "nextSteps": "Volgende stappen"
     }
   },
   "language": {

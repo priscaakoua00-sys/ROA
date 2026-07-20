@@ -4,6 +4,7 @@ import {
   draftedReplySchema,
   languageDetectionSchema,
   leadSummarySchema,
+  photoDiagnosisSchema,
   urgencyAssessmentSchema,
 } from './schemas';
 
@@ -86,6 +87,39 @@ describe('MockAIProvider', () => {
     if (result.status === 'ok') {
       expect(result.data.language).toBe('unknown');
       expect(result.data.confidence).toBeLessThan(0.5);
+    }
+  });
+
+  it('hands off a photo diagnosis with no photos', async () => {
+    const result = await provider.diagnoseFromPhotos({
+      language: 'nl',
+      photoUrls: [],
+    });
+    expect(result.status).toBe('handoff');
+  });
+
+  it('matches a known symptom from the note and returns schema-valid data', async () => {
+    const result = await provider.diagnoseFromPhotos({
+      language: 'nl',
+      photoUrls: ['https://example.com/photo1.jpg'],
+      note: 'Piepend geluid bij het remmen.',
+    });
+    expect(result.status).toBe('ok');
+    if (result.status === 'ok') {
+      expect(() => photoDiagnosisSchema.parse(result.data)).not.toThrow();
+      expect(result.data.partsToCheck.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('falls back to a generic diagnosis when the note matches nothing', async () => {
+    const result = await provider.diagnoseFromPhotos({
+      language: 'en',
+      photoUrls: ['https://example.com/photo1.jpg'],
+    });
+    expect(result.status).toBe('ok');
+    if (result.status === 'ok') {
+      expect(() => photoDiagnosisSchema.parse(result.data)).not.toThrow();
+      expect(result.data.partsToCheck).toEqual([]);
     }
   });
 });

@@ -77,7 +77,7 @@ export function RobinChat({ orgId }: { orgId: string }) {
     <>
       <Button
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-5 right-5 z-50 gap-2 rounded-full bg-gradient-to-br from-primary to-gold shadow-soft transition-transform duration-200 hover:scale-105 active:scale-95"
+        className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 z-30 gap-2 rounded-full bg-gradient-to-br from-primary to-gold shadow-soft transition-transform duration-200 hover:scale-105 active:scale-95 md:bottom-5 md:right-5 md:z-50"
         size="lg"
       >
         <span className="relative flex size-2">

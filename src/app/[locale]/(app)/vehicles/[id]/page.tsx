@@ -13,17 +13,18 @@ import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
 import { CarIllustration } from '@/components/vehicles/car-illustration';
 import { VAN_MODEL_PATTERN } from '@/components/vehicles/vehicle-card';
+import { PhotoDiagnosisPanel, type DiagnosisRow } from '@/components/diagnosis/photo-diagnosis-panel';
 
 export default async function VehicleDetailPage({
   params,
   searchParams,
 }: {
   params: Promise<{ locale: string; id: string }>;
-  searchParams: Promise<{ saved?: string; photoError?: string }>;
+  searchParams: Promise<{ saved?: string; photoError?: string; diagSaved?: string; diagError?: string }>;
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  const { saved, photoError } = await searchParams;
+  const { saved, photoError, diagSaved, diagError } = await searchParams;
   const t = await getTranslations('app');
 
   const supabase = await createSupabaseServerClient();
@@ -48,11 +49,44 @@ export default async function VehicleDetailPage({
   }
   const kind = VAN_MODEL_PATTERN.test(`${v.make ?? ''} ${v.model ?? ''}`) ? 'van' : 'hatch';
 
-  const [{ data: leads }, { data: appts }, { data: wos }] = await Promise.all([
+  const [{ data: leads }, { data: appts }, { data: wos }, { data: diagData }] = await Promise.all([
     supabase.from('leads').select('id, ai_summary, description, status, created_at').eq('vehicle_id', id).order('created_at', { ascending: false }).limit(15),
     supabase.from('appointments').select('id, starts_at, status, services(name)').eq('vehicle_id', id).order('starts_at', { ascending: false }).limit(15),
     supabase.from('work_orders').select('id, title, status').eq('vehicle_id', id).order('created_at', { ascending: false }).limit(15),
+    supabase
+      .from('photo_diagnoses')
+      .select('id, note, photo_paths, probable_cause, parts_to_check, next_steps, created_at')
+      .eq('vehicle_id', id)
+      .order('created_at', { ascending: false }),
   ]);
+  const diagRows = (diagData ?? []) as unknown as {
+    id: string;
+    note: string | null;
+    photo_paths: string[];
+    probable_cause: string;
+    parts_to_check: string[];
+    next_steps: string[];
+    created_at: string;
+  }[];
+  const allDiagPaths = diagRows.flatMap((d) => d.photo_paths);
+  const diagPhotoUrls = new Map<string, string>();
+  if (allDiagPaths.length > 0) {
+    const { data: signed } = await supabase.storage
+      .from('diagnosis-photos')
+      .createSignedUrls(allDiagPaths, 3600);
+    signed?.forEach((s) => {
+      if (s.signedUrl && s.path) diagPhotoUrls.set(s.path, s.signedUrl);
+    });
+  }
+  const diagnoses: DiagnosisRow[] = diagRows.map((d) => ({
+    id: d.id,
+    note: d.note,
+    probableCause: d.probable_cause,
+    partsToCheck: d.parts_to_check,
+    nextSteps: d.next_steps,
+    createdAt: d.created_at,
+    photoUrls: d.photo_paths.map((p) => diagPhotoUrls.get(p)).filter((u): u is string => Boolean(u)),
+  }));
 
   const customer = v.customers as unknown as { first_name: string | null; last_name: string | null } | null;
   const owner = [customer?.first_name, customer?.last_name].filter(Boolean).join(' ') || t('leads.anonymous');
@@ -154,6 +188,14 @@ export default async function VehicleDetailPage({
           </div>
         )}
       </section>
+
+      <PhotoDiagnosisPanel
+        locale={locale}
+        vehicleId={v.id}
+        diagnoses={diagnoses}
+        saved={diagSaved === '1'}
+        error={diagError === '1'}
+      />
     </div>
   );
 }

@@ -366,7 +366,9 @@
       "photoUpload": "Ajouter une photo",
       "photoChange": "Changer la photo",
       "photoSave": "Enregistrer la photo",
-      "photoError": "Échec de l'envoi. Utilisez une image de 8 Mo maximum."
+      "photoError": "Échec de l'envoi. Utilisez une image de 8 Mo maximum.",
+      "noResults": "Aucun véhicule trouvé pour « {query} ».",
+      "clearSearch": "Effacer la recherche"
     },
     "notifications": {
       "title": "Notifications",
@@ -472,6 +474,19 @@
       "vehicleHint": "Laissez vide pour ajouter seulement le client.",
       "save": "Enregistrer le client",
       "add": "Nouveau client"
+    },
+    "diagnosis": {
+      "title": "Diagnostic photo",
+      "intro": "Deux ou trois photos du problème, et Robin réfléchit avec vous.",
+      "saved": "Diagnostic ajouté.",
+      "error": "L'envoi a échoué. Réessayez avec des photos de 8 Mo maximum.",
+      "photosLabel": "Photos (3 max)",
+      "photosHint": "JPG ou PNG, 8 Mo maximum chacune.",
+      "noteLabel": "Courte description (facultatif)",
+      "notePlaceholder": "Ex. bruit de grincement au freinage",
+      "submit": "Demander l'avis de Robin",
+      "partsToCheck": "À vérifier",
+      "nextSteps": "Prochaines étapes"
     }
   },
   "language": {

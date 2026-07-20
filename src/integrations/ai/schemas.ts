@@ -56,3 +56,10 @@ export const languageDetectionSchema = z.object({
   confidence: z.number().min(0).max(1),
 });
 export type LanguageDetection = z.infer<typeof languageDetectionSchema>;
+
+export const photoDiagnosisSchema = z.object({
+  probableCause: z.string().min(1),
+  partsToCheck: z.array(z.string()),
+  nextSteps: z.array(z.string()),
+});
+export type PhotoDiagnosis = z.infer<typeof photoDiagnosisSchema>;
