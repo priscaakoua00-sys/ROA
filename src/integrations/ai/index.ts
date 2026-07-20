@@ -5,16 +5,18 @@
  * SDK. By default the factory returns the offline MockAIProvider, so no
  * API key is needed to install, test or deploy.
  *
- * Later (Phase 1+), `getAIProvider()` will read process.env.AI_PROVIDER and
- * return the matching server-only implementation.
+ * Set AI_PROVIDER=anthropic and ANTHROPIC_API_KEY to switch to the real,
+ * vision-capable provider.
  */
 import type { AIProvider } from './provider';
 import { MockAIProvider } from './mock-provider';
+import { AnthropicAIProvider } from './anthropic-provider';
 
 export type { AIProvider } from './provider';
 export * from './types';
 export * from './schemas';
 export { MockAIProvider } from './mock-provider';
+export { AnthropicAIProvider } from './anthropic-provider';
 export { findEmergencyKeywords, EMERGENCY_KEYWORDS } from './emergency-keywords';
 
 let cached: AIProvider | null = null;
@@ -29,11 +31,18 @@ export function getAIProvider(): AIProvider {
   const selected = process.env.AI_PROVIDER ?? 'mock';
 
   switch (selected) {
-    // case 'anthropic':
-    //   cached = new AnthropicAIProvider(); // added in Phase 1
-    //   break;
+    case 'anthropic': {
+      const apiKey = process.env.ANTHROPIC_API_KEY;
+      if (!apiKey) {
+        // Misconfiguration, not a user-facing error: fail loudly in logs
+        // rather than silently falling back to the mock in production.
+        throw new Error('AI_PROVIDER is "anthropic" but ANTHROPIC_API_KEY is not set.');
+      }
+      cached = new AnthropicAIProvider(apiKey);
+      break;
+    }
     // case 'openai':
-    //   cached = new OpenAIAIProvider(); // added in Phase 1
+    //   cached = new OpenAIAIProvider(); // added later, if needed
     //   break;
     case 'mock':
     default:
