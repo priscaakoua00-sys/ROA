@@ -11,7 +11,14 @@
       "automations": "Relances",
       "knowledge": "Connaissances",
       "team": "Équipe",
-      "settings": "Paramètres"
+      "settings": "Paramètres",
+      "openRobin": "Ouvrir Robin",
+      "notifications": "Notifications",
+      "signedInAs": "Connecté en tant que",
+      "signOut": "Déconnexion",
+      "more": "Plus",
+      "closeMenu": "Fermer le menu",
+      "menu": "Menu"
     },
     "onboarding": {
       "title": "Configurez votre garage",

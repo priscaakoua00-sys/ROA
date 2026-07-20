@@ -11,7 +11,14 @@
       "automations": "Opvolging",
       "knowledge": "Kennisbank",
       "team": "Team",
-      "settings": "Instellingen"
+      "settings": "Instellingen",
+      "openRobin": "Robin openen",
+      "notifications": "Meldingen",
+      "signedInAs": "Ingelogd als",
+      "signOut": "Uitloggen",
+      "more": "Meer",
+      "closeMenu": "Menu sluiten",
+      "menu": "Menu"
     },
     "onboarding": {
       "title": "Uw garage instellen",

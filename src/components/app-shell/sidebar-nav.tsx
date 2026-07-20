@@ -13,10 +13,18 @@ export function SidebarNav() {
   const t = useTranslations('app.nav');
   const pathname = usePathname();
 
+  const itemClass = (active: boolean) =>
+    cn(
+      'group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
+      active
+        ? 'bg-gold/10 text-gold'
+        : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+    );
+
   return (
-    <aside className="sticky top-0 hidden h-screen w-16 shrink-0 flex-col border-r border-border bg-card/60 py-4 md:flex lg:w-60">
-      <div className="flex items-center gap-2 px-4 pb-4">
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
+    <aside className="glass sticky top-0 hidden h-screen w-16 shrink-0 flex-col border-r border-border py-4 md:flex lg:w-60">
+      <div className="flex items-center gap-2.5 px-4 pb-5">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-gold to-gold/70 text-sm font-bold text-background shadow-[0_4px_16px_-4px_hsl(var(--gold)/0.5)]">
           R
         </span>
         <span className="hidden truncate text-base font-semibold tracking-tight lg:inline">
@@ -34,14 +42,17 @@ export function SidebarNav() {
               href={item.href}
               aria-current={active ? 'page' : undefined}
               title={t(item.labelKey)}
-              className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-                active
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:bg-accent hover:text-foreground',
-              )}
+              className={itemClass(active)}
             >
-              <Icon className="size-[18px] shrink-0" aria-hidden />
+              {active ? (
+                <span className="absolute inset-y-1.5 left-0 w-0.5 rounded-full bg-gold" aria-hidden />
+              ) : null}
+              <Icon
+                className={cn(
+                  'size-[18px] shrink-0 transition-transform duration-200 group-hover:scale-110',
+                )}
+                aria-hidden
+              />
               <span className="hidden truncate lg:inline">{t(item.labelKey)}</span>
             </Link>
           );
@@ -53,14 +64,9 @@ export function SidebarNav() {
           href={SETTINGS_ITEM.href}
           aria-current={isNavItemActive(pathname, SETTINGS_ITEM.href) ? 'page' : undefined}
           title={t(SETTINGS_ITEM.labelKey)}
-          className={cn(
-            'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-            isNavItemActive(pathname, SETTINGS_ITEM.href)
-              ? 'bg-primary/10 text-primary'
-              : 'text-muted-foreground hover:bg-accent hover:text-foreground',
-          )}
+          className={itemClass(isNavItemActive(pathname, SETTINGS_ITEM.href))}
         >
-          <SETTINGS_ITEM.icon className="size-[18px] shrink-0" aria-hidden />
+          <SETTINGS_ITEM.icon className="size-[18px] shrink-0 transition-transform duration-200 group-hover:scale-110" aria-hidden />
           <span className="hidden truncate lg:inline">{t(SETTINGS_ITEM.labelKey)}</span>
         </Link>
       </div>
