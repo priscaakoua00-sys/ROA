@@ -17,7 +17,11 @@ import {
   MessageCircle,
   Receipt,
   UserRoundPlus,
+  TrendingUp,
+  TrendingDown,
+  Users,
 } from 'lucide-react';
+import { RevenueChart } from '@/components/dashboard/revenue-chart';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { signOutAction } from '@/data/auth/actions';
 import { loadFollowUpsDueCount } from '@/data/automations/due';
@@ -127,7 +131,7 @@ export default async function DashboardPage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: orgs } = await supabase.from('organizations').select('id, name, slug').limit(1);
+  const { data: orgs } = await supabase.from('organizations').select('id, name, slug, default_margin_percent').limit(1);
   const org = orgs?.[0];
   if (!org) redirect(`/${locale}/onboarding`);
 
@@ -234,11 +238,20 @@ export default async function DashboardPage({
   ]);
 
   const monthStartISO = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
-  const { data: paymentsMonthData } = await supabase
-    .from('invoice_payments')
-    .select('amount')
-    .eq('organization_id', org.id)
-    .gte('paid_at', monthStartISO);
+  const last14DaysStart = new Date(todayStart.getTime() - 13 * 86_400_000).toISOString();
+  const weekStartISO = new Date(todayStart.getTime() - 6 * 86_400_000).toISOString();
+  const prevWeekStartISO = new Date(todayStart.getTime() - 13 * 86_400_000).toISOString();
+
+  const [{ data: paymentsMonthData }, { data: payments14dData }, { data: deliveredThisMonthData }] = await Promise.all([
+    supabase.from('invoice_payments').select('amount').eq('organization_id', org.id).gte('paid_at', monthStartISO),
+    supabase.from('invoice_payments').select('amount, paid_at').eq('organization_id', org.id).gte('paid_at', last14DaysStart),
+    supabase
+      .from('work_order_status_history')
+      .select('work_order_id')
+      .eq('organization_id', org.id)
+      .eq('status', 'delivered')
+      .gte('created_at', monthStartISO),
+  ]);
 
   const leads = (leadsData ?? []) as unknown as LeadRow[];
   const waiting = (waitingData ?? []) as unknown as WaitingRow[];
@@ -325,6 +338,30 @@ export default async function DashboardPage({
   const sumAmounts = (rows: { amount: number }[] | null) => (rows ?? []).reduce((acc, r) => acc + Number(r.amount), 0);
   const revenueToday = sumAmounts(paymentsTodayData);
   const revenueMonth = sumAmounts(paymentsMonthData);
+  const revenueWeek = sumAmounts(
+    ((payments14dData ?? []) as { amount: number; paid_at: string }[]).filter((p) => p.paid_at >= weekStartISO),
+  );
+  const revenuePrevWeek = sumAmounts(
+    ((payments14dData ?? []) as { amount: number; paid_at: string }[]).filter(
+      (p) => p.paid_at >= prevWeekStartISO && p.paid_at < weekStartISO,
+    ),
+  );
+  const weekProgressionPct =
+    revenuePrevWeek > 0 ? Math.round(((revenueWeek - revenuePrevWeek) / revenuePrevWeek) * 100) : null;
+  const revenueByDay = new Map<string, number>();
+  for (const p of (payments14dData ?? []) as { amount: number; paid_at: string }[]) {
+    const day = p.paid_at.slice(0, 10);
+    revenueByDay.set(day, (revenueByDay.get(day) ?? 0) + Number(p.amount));
+  }
+  const revenueSeries = Array.from({ length: 14 }, (_, i) => {
+    const d = new Date(todayStart.getTime() - (13 - i) * 86_400_000);
+    const key = d.toISOString().slice(0, 10);
+    return { label: String(d.getUTCDate()), amount: revenueByDay.get(key) ?? 0 };
+  });
+  const vehiclesRepairedMonth = new Set(
+    ((deliveredThisMonthData ?? []) as { work_order_id: string }[]).map((r) => r.work_order_id),
+  ).size;
+  const estimatedProfitMonth = Math.round(revenueMonth * (Number(org.default_margin_percent) / 100));
 
   const notifChips: { icon: typeof UserPlus; label: string; value: number; href: string; tone: 'urgent' | 'default' }[] = [
     { icon: UserPlus, label: t('dashboard.notifNewRequests'), value: newToday.count ?? 0, href: '#incoming', tone: 'default' },
@@ -656,6 +693,60 @@ export default async function DashboardPage({
               ))}
             </div>
           )}
+        </section>
+
+        {/* Performance */}
+        <section className="mt-8 animate-in fade-in duration-700">
+          <h2 className="text-base font-semibold tracking-tight">{t('dashboard.performanceTitle')}</h2>
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            <div className="lift rounded-2xl border border-border bg-card p-5 shadow-soft">
+              <div className="text-2xl font-semibold tracking-tight">{formatCurrency(revenueToday, locale)}</div>
+              <div className="mt-0.5 text-xs text-muted-foreground">{t('dashboard.revenueToday')}</div>
+            </div>
+            <div className="lift rounded-2xl border border-border bg-card p-5 shadow-soft">
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-2xl font-semibold tracking-tight">{formatCurrency(revenueWeek, locale)}</span>
+                {weekProgressionPct !== null ? (
+                  <span className={`flex items-center gap-0.5 text-xs font-medium ${weekProgressionPct >= 0 ? 'text-success' : 'text-urgent'}`}>
+                    {weekProgressionPct >= 0 ? <TrendingUp className="size-3" aria-hidden /> : <TrendingDown className="size-3" aria-hidden />}
+                    {weekProgressionPct >= 0 ? '+' : ''}{weekProgressionPct}%
+                  </span>
+                ) : null}
+              </div>
+              <div className="mt-0.5 text-xs text-muted-foreground">{t('dashboard.revenueWeek')}</div>
+            </div>
+            <div className="lift rounded-2xl border border-border bg-card p-5 shadow-soft">
+              <div className="text-2xl font-semibold tracking-tight">{formatCurrency(revenueMonth, locale)}</div>
+              <div className="mt-0.5 text-xs text-muted-foreground">{t('dashboard.revenueMonth')}</div>
+            </div>
+            <div className="lift rounded-2xl border border-border bg-card p-5 shadow-soft">
+              <div className="text-2xl font-semibold tracking-tight">{formatCurrency(estimatedProfitMonth, locale)}</div>
+              <div className="mt-0.5 text-xs text-muted-foreground">
+                {t('dashboard.estimatedProfit', { percent: Number(org.default_margin_percent) })}
+              </div>
+            </div>
+            <div className="lift rounded-2xl border border-border bg-card p-5 shadow-soft">
+              <div className="flex items-center gap-1.5 text-2xl font-semibold tracking-tight">
+                <Wrench className="size-5 text-gold" aria-hidden />
+                {vehiclesRepairedMonth}
+              </div>
+              <div className="mt-0.5 text-xs text-muted-foreground">{t('dashboard.vehiclesRepairedMonth')}</div>
+            </div>
+            <div className="lift rounded-2xl border border-border bg-card p-5 shadow-soft">
+              <div className="flex items-center gap-1.5 text-2xl font-semibold tracking-tight">
+                <Users className="size-5 text-gold" aria-hidden />
+                {customersCount.count ?? 0}
+              </div>
+              <div className="mt-0.5 text-xs text-muted-foreground">{t('dashboard.clientsTotal')}</div>
+            </div>
+          </div>
+
+          <div className="mt-3 rounded-2xl border border-border bg-card p-5 shadow-soft">
+            <h3 className="text-sm font-medium text-muted-foreground">{t('dashboard.revenueChartTitle')}</h3>
+            <div className="mt-3">
+              <RevenueChart data={revenueSeries} formatAmount={(n) => formatCurrency(n, locale)} />
+            </div>
+          </div>
         </section>
 
         {/* Invoices */}

@@ -25,7 +25,8 @@
       "signOut": "Déconnexion",
       "more": "Plus",
       "closeMenu": "Fermer le menu",
-      "menu": "Menu"
+      "menu": "Menu",
+      "billing": "Abonnement"
     },
     "onboarding": {
       "title": "Configurez votre garage",
@@ -142,7 +143,15 @@
       "apptsTodayEmpty": "Aucun rendez-vous aujourd'hui.",
       "urgentWorkTitle": "Réparations urgentes",
       "invoicesTitle": "Factures",
-      "messagesTitle": "Messages en attente de réponse"
+      "messagesTitle": "Messages en attente de réponse",
+      "performanceTitle": "Performance",
+      "revenueToday": "Chiffre d'affaires aujourd'hui",
+      "revenueWeek": "Chiffre d'affaires cette semaine",
+      "revenueMonth": "Chiffre d'affaires ce mois",
+      "estimatedProfit": "Bénéfice estimé ({percent}% de marge)",
+      "vehiclesRepairedMonth": "Véhicules réparés ce mois",
+      "clientsTotal": "Clients",
+      "revenueChartTitle": "Chiffre d'affaires - 14 derniers jours"
     },
     "moduleBanner": {
       "repairs": "Véhicules & réparations",
@@ -180,7 +189,10 @@
         "greeting": "Bonjour ! En quoi puis-je aider ?",
         "thanks": "Avec plaisir. Je garde un œil sur tout ça.",
         "fallback": "Je peux vous aider avec les rendez-vous de demain, les véhicules en attente, les clients sans réponse, ou appeler quelqu'un. Essayez \"Appeler [nom]\"."
-      }
+      },
+      "listening": "Je vous écoute...",
+      "startListening": "Parler à Robin",
+      "stopListening": "Arrêter l'enregistrement"
     },
     "newVehicle": {
       "title": "Nouveau véhicule",
@@ -410,7 +422,14 @@
       "save": "Enregistrer la facture",
       "recordPayment": "Montant",
       "addPayment": "Enregistrer le paiement",
-      "paymentsTitle": "Paiements"
+      "paymentsTitle": "Paiements",
+      "downloadPdf": "Télécharger le PDF",
+      "lineItemsTitle": "Prestations",
+      "lineDescription": "Description",
+      "lineQuantity": "Quantité",
+      "lineUnitPrice": "Prix unitaire",
+      "lineDeleteConfirm": "Cette ligne sera retirée de la facture.",
+      "addLine": "Ajouter une ligne"
     },
     "invoiceStatus": {
       "draft": "Brouillon",
@@ -502,7 +521,25 @@
       "checklistIntro": "Personnalisez les points contrôlés par vos mécaniciens à la réception d'un véhicule.",
       "checklistDeleteConfirm": "Ce point de contrôle sera supprimé du modèle par défaut.",
       "checklistNewItem": "Nouveau point de contrôle",
-      "checklistAddItem": "Ajouter"
+      "checklistAddItem": "Ajouter",
+      "companyIntro": "Ces informations apparaissent sur vos factures et votre carte de visite.",
+      "noLogo": "Logo",
+      "logoUpload": "Logo du garage",
+      "phone": "Téléphone",
+      "email": "E-mail",
+      "address": "Adresse",
+      "postalCode": "Code postal",
+      "city": "Ville",
+      "vatNumber": "Numéro de TVA",
+      "website": "Site web",
+      "ibanIntro": "L'IBAN permet d'afficher un QR code de paiement sur vos factures (optionnel).",
+      "iban": "IBAN",
+      "bic": "BIC",
+      "cardTitle": "Carte de visite numérique",
+      "cardIntro": "Une page publique avec vos coordonnées et un QR code, à partager avec vos clients.",
+      "cardView": "Voir ma carte de visite",
+      "marginPercent": "Marge estimée (%)",
+      "marginPercentIntro": "Utilisée uniquement pour estimer votre bénéfice sur le tableau de bord — aucune donnée de coût réelle n'est enregistrée."
     },
     "knowledge": {
       "title": "Base de connaissances",
@@ -596,6 +633,27 @@
       "attention": "À surveiller",
       "fail": "Échec",
       "na": "N/A"
+    },
+    "invoicePdf": {
+      "invoice": "Facture",
+      "issueDate": "Date d'émission",
+      "dueDate": "Date d'échéance",
+      "billTo": "Facturé à",
+      "vehicle": "Véhicule",
+      "description": "Description",
+      "quantity": "Qté",
+      "unitPrice": "Prix unit.",
+      "amount": "Montant",
+      "subtotal": "Sous-total",
+      "vat": "TVA",
+      "total": "Total",
+      "paid": "Déjà payé",
+      "balanceDue": "Solde dû",
+      "notes": "Notes",
+      "scanToPay": "Scanner pour payer",
+      "paymentTerms": "Merci de régler cette facture avant la date d'échéance indiquée ci-dessus.",
+      "footer": "Facture générée par {name} via ROAVAA.",
+      "anonymousCustomer": "Client"
     }
   },
   "language": {
@@ -800,5 +858,10 @@
       "prioritySupport": "Support prioritaire",
       "emailSupport": "Support par e-mail"
     }
+  },
+  "card": {
+    "scanHint": "Scannez pour enregistrer ce contact",
+    "saveContact": "Enregistrer le contact",
+    "poweredBy": "Propulsé par ROAVAA"
   }
 }

@@ -10,6 +10,7 @@ import {
   Settings,
   Receipt,
   Inbox,
+  CreditCard,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -40,6 +41,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: '/automations', labelKey: 'automations', icon: Zap },
   { href: '/knowledge', labelKey: 'knowledge', icon: BookOpen },
   { href: '/team', labelKey: 'team', icon: Users2 },
+  { href: '/pricing', labelKey: 'billing', icon: CreditCard },
 ];
 
 export const SETTINGS_ITEM: NavItem = {
