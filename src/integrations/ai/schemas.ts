@@ -57,9 +57,22 @@ export const languageDetectionSchema = z.object({
 });
 export type LanguageDetection = z.infer<typeof languageDetectionSchema>;
 
-export const photoDiagnosisSchema = z.object({
-  probableCause: z.string().min(1),
-  partsToCheck: z.array(z.string()),
-  nextSteps: z.array(z.string()),
+export const diagnosisSeveritySchema = z.enum(['low', 'medium', 'high', 'urgent']);
+export type DiagnosisSeverity = z.infer<typeof diagnosisSeveritySchema>;
+
+export const mediaDiagnosisSchema = z.object({
+  /** What's visibly wrong across the attached photos. */
+  visibleProblems: z.array(z.string()).min(1),
+  /** Parts that look potentially damaged or worn. */
+  affectedParts: z.array(z.string()),
+  severity: diagnosisSeveritySchema,
+  /** Possible causes, most likely first. */
+  causes: z.array(z.string()).min(1),
+  /** Further checks the mechanic should do in person to confirm. */
+  additionalChecks: z.array(z.string()),
+  /** Human-readable estimate, e.g. "1-2 hours". */
+  estimatedRepairTime: z.string().min(1),
+  /** Practical advice for the mechanic (e.g. safety, customer communication). */
+  recommendations: z.array(z.string()),
 });
-export type PhotoDiagnosis = z.infer<typeof photoDiagnosisSchema>;
+export type MediaDiagnosis = z.infer<typeof mediaDiagnosisSchema>;

@@ -60,10 +60,35 @@ export interface LanguageDetectionInput {
   text: string;
 }
 
-export interface PhotoDiagnosisInput {
+/** A vehicle angle a diagnosis photo/video can be tagged with. */
+export type VehicleAngle =
+  | 'front'
+  | 'rear'
+  | 'left_side'
+  | 'right_side'
+  | 'engine'
+  | 'dashboard'
+  | 'underside'
+  | 'tire'
+  | 'other';
+
+/**
+ * One piece of media attached to a diagnosis request. `kind` is here so the
+ * shape already accommodates short video clips later (a garage often hears
+ * a problem, e.g. an engine noise, more clearly than a photo shows it) —
+ * providers only need to handle 'photo' until a video-capable model ships.
+ */
+export interface DiagnosisMediaItem {
+  /** Signed URL (or storage path) of the photo/video. */
+  url: string;
+  kind: 'photo' | 'video';
+  angle?: VehicleAngle;
+}
+
+export interface MediaDiagnosisInput {
   language: SupportedLanguage;
-  /** Signed URLs (or storage paths) of the 1-3 photos attached to the request. */
-  photoUrls: string[];
-  /** Optional short note the mechanic typed alongside the photos. */
+  /** 1-8 items describing the same vehicle/problem, optionally from different angles. */
+  media: DiagnosisMediaItem[];
+  /** Optional short note the mechanic typed alongside the media. */
   note?: string;
 }

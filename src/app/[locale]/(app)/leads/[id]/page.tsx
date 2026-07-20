@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Link } from '@/i18n/navigation';
 import { PhotoDiagnosisPanel, type DiagnosisRow } from '@/components/diagnosis/photo-diagnosis-panel';
+import type { DiagnosisSeverity, VehicleAngle } from '@/integrations/ai';
 
 type Urgency = 'low' | 'normal' | 'high' | 'critical';
 const URGENCY_VARIANT: Record<Urgency, 'muted' | 'default' | 'gold' | 'urgent'> = {
@@ -149,19 +150,25 @@ export default async function LeadDetailPage({
 
   const { data: diagData } = await supabase
     .from('photo_diagnoses')
-    .select('id, note, photo_paths, probable_cause, parts_to_check, next_steps, created_at')
+    .select(
+      'id, note, visible_problems, affected_parts, severity, causes, additional_checks, estimated_repair_time, recommendations, created_at, diagnosis_media(storage_path, angle)',
+    )
     .eq('lead_id', lead.id)
     .order('created_at', { ascending: false });
   const diagRows = (diagData ?? []) as unknown as {
     id: string;
     note: string | null;
-    photo_paths: string[];
-    probable_cause: string;
-    parts_to_check: string[];
-    next_steps: string[];
+    visible_problems: string[];
+    affected_parts: string[];
+    severity: DiagnosisSeverity;
+    causes: string[];
+    additional_checks: string[];
+    estimated_repair_time: string | null;
+    recommendations: string[];
     created_at: string;
+    diagnosis_media: { storage_path: string; angle: VehicleAngle | null }[];
   }[];
-  const allDiagPaths = diagRows.flatMap((d) => d.photo_paths);
+  const allDiagPaths = diagRows.flatMap((d) => d.diagnosis_media.map((m) => m.storage_path));
   const diagPhotoUrls = new Map<string, string>();
   if (allDiagPaths.length > 0) {
     const { data: signed } = await supabase.storage
@@ -174,11 +181,17 @@ export default async function LeadDetailPage({
   const diagnoses: DiagnosisRow[] = diagRows.map((d) => ({
     id: d.id,
     note: d.note,
-    probableCause: d.probable_cause,
-    partsToCheck: d.parts_to_check,
-    nextSteps: d.next_steps,
+    visibleProblems: d.visible_problems,
+    affectedParts: d.affected_parts,
+    severity: d.severity,
+    causes: d.causes,
+    additionalChecks: d.additional_checks,
+    estimatedRepairTime: d.estimated_repair_time,
+    recommendations: d.recommendations,
     createdAt: d.created_at,
-    photoUrls: d.photo_paths.map((p) => diagPhotoUrls.get(p)).filter((u): u is string => Boolean(u)),
+    media: d.diagnosis_media
+      .map((m) => ({ url: diagPhotoUrls.get(m.storage_path), angle: m.angle }))
+      .filter((m): m is { url: string; angle: VehicleAngle | null } => Boolean(m.url)),
   }));
 
   return (

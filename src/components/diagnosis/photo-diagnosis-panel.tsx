@@ -1,18 +1,37 @@
 import { getTranslations } from 'next-intl/server';
-import { Camera } from 'lucide-react';
+import { Camera, ShieldAlert } from 'lucide-react';
 import { createPhotoDiagnosisAction } from '@/data/diagnosis/actions';
 import { Button } from '@/components/ui/button';
+import { Badge, type BadgeProps } from '@/components/ui/badge';
 import { formatDateTimeUTC } from '@/lib/datetime';
+import { TAGGED_VEHICLE_ANGLES } from '@/lib/vehicle-angles';
+import type { DiagnosisSeverity, VehicleAngle } from '@/integrations/ai';
+
+export interface DiagnosisMedia {
+  url: string;
+  angle: VehicleAngle | null;
+}
 
 export interface DiagnosisRow {
   id: string;
   note: string | null;
-  probableCause: string;
-  partsToCheck: string[];
-  nextSteps: string[];
+  visibleProblems: string[];
+  affectedParts: string[];
+  severity: DiagnosisSeverity;
+  causes: string[];
+  additionalChecks: string[];
+  estimatedRepairTime: string | null;
+  recommendations: string[];
   createdAt: string;
-  photoUrls: string[];
+  media: DiagnosisMedia[];
 }
+
+const SEVERITY_VARIANT: Record<DiagnosisSeverity, BadgeProps['variant']> = {
+  low: 'success',
+  medium: 'gold',
+  high: 'urgent',
+  urgent: 'urgent',
+};
 
 export async function PhotoDiagnosisPanel({
   locale,
@@ -30,6 +49,23 @@ export async function PhotoDiagnosisPanel({
   error?: boolean;
 }) {
   const t = await getTranslations('app.diagnosis');
+  const angleLabel: Record<VehicleAngle, string> = {
+    front: t('angleFront'),
+    rear: t('angleRear'),
+    left_side: t('angleLeftSide'),
+    right_side: t('angleRightSide'),
+    engine: t('angleEngine'),
+    dashboard: t('angleDashboard'),
+    underside: t('angleUnderside'),
+    tire: t('angleTire'),
+    other: t('angleOther'),
+  };
+  const severityLabel: Record<DiagnosisSeverity, string> = {
+    low: t('severityLow'),
+    medium: t('severityMedium'),
+    high: t('severityHigh'),
+    urgent: t('severityUrgent'),
+  };
 
   return (
     <section className="mt-6 rounded-xl border border-border bg-card p-5 shadow-soft">
@@ -50,18 +86,34 @@ export async function PhotoDiagnosisPanel({
         <input type="hidden" name="locale" value={locale} />
         {leadId ? <input type="hidden" name="leadId" value={leadId} /> : null}
         {vehicleId ? <input type="hidden" name="vehicleId" value={vehicleId} /> : null}
+
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {TAGGED_VEHICLE_ANGLES.map((angle) => (
+            <label key={angle} className="block text-xs">
+              <span className="mb-1 block truncate font-medium">{angleLabel[angle]}</span>
+              <input
+                type="file"
+                name={`photo_${angle}`}
+                accept="image/*"
+                capture="environment"
+                className="block w-full text-xs text-muted-foreground file:mr-1 file:rounded-md file:border-0 file:bg-primary file:px-2 file:py-1 file:text-xs file:font-medium file:text-primary-foreground hover:file:bg-primary/90"
+              />
+            </label>
+          ))}
+        </div>
+
         <label className="block text-sm">
-          <span className="mb-1.5 block font-medium">{t('photosLabel')}</span>
+          <span className="mb-1.5 block font-medium">{angleLabel.other}</span>
           <input
             type="file"
-            name="photos"
+            name="photos_other"
             accept="image/*"
             multiple
-            required
             className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-primary/90"
           />
-          <span className="mt-1 block text-xs text-muted-foreground">{t('photosHint')}</span>
+          <span className="mt-1 block text-xs text-muted-foreground">{t('otherPhotosHint')}</span>
         </label>
+
         <label className="block text-sm">
           <span className="mb-1.5 block font-medium">{t('noteLabel')}</span>
           <textarea
@@ -71,7 +123,13 @@ export async function PhotoDiagnosisPanel({
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
           />
         </label>
+
         <Button type="submit" variant="outline" size="sm">{t('submit')}</Button>
+
+        <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
+          <ShieldAlert className="mt-0.5 size-3.5 shrink-0" aria-hidden />
+          {t('disclaimer')}
+        </p>
       </form>
 
       {diagnoses.length > 0 ? (
@@ -81,8 +139,9 @@ export async function PhotoDiagnosisPanel({
               key={d.id}
               diagnosis={d}
               locale={locale}
-              partsToCheckLabel={t('partsToCheck')}
-              nextStepsLabel={t('nextSteps')}
+              angleLabel={angleLabel}
+              severityLabel={severityLabel}
+              t={t}
             />
           ))}
         </ul>
@@ -94,61 +153,84 @@ export async function PhotoDiagnosisPanel({
 function DiagnosisCard({
   diagnosis,
   locale,
-  partsToCheckLabel,
-  nextStepsLabel,
+  angleLabel,
+  severityLabel,
+  t,
 }: {
   diagnosis: DiagnosisRow;
   locale: string;
-  partsToCheckLabel: string;
-  nextStepsLabel: string;
+  angleLabel: Record<VehicleAngle, string>;
+  severityLabel: Record<DiagnosisSeverity, string>;
+  t: Awaited<ReturnType<typeof getTranslations>>;
 }) {
   return (
     <li className="rounded-lg border border-gold/25 bg-gold/5 p-4">
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-xs text-muted-foreground">{formatDateTimeUTC(diagnosis.createdAt, locale)}</span>
+        <Badge variant={SEVERITY_VARIANT[diagnosis.severity]}>
+          {t('severityLabel')}: {severityLabel[diagnosis.severity]}
+        </Badge>
       </div>
 
-      {diagnosis.photoUrls.length > 0 ? (
+      {diagnosis.media.length > 0 ? (
         <div className="mt-2 flex flex-wrap gap-2">
-          {diagnosis.photoUrls.map((url) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={url}
-              src={url}
-              alt=""
-              className="size-16 rounded-md border border-border object-cover"
-            />
+          {diagnosis.media.map((m) => (
+            <div key={m.url} className="flex flex-col items-center gap-1">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={m.url} alt="" className="size-16 rounded-md border border-border object-cover" />
+              {m.angle ? (
+                <span className="max-w-16 truncate text-[10px] text-muted-foreground">{angleLabel[m.angle]}</span>
+              ) : null}
+            </div>
           ))}
         </div>
       ) : null}
 
       {diagnosis.note ? <p className="mt-2 text-sm text-muted-foreground">“{diagnosis.note}”</p> : null}
 
-      <p className="mt-2 text-sm font-medium">{diagnosis.probableCause}</p>
+      <ReportSection label={t('visibleProblems')} items={diagnosis.visibleProblems} />
+      <ReportSection label={t('affectedParts')} items={diagnosis.affectedParts} chips />
+      <ReportSection label={t('causes')} items={diagnosis.causes} />
+      <ReportSection label={t('additionalChecks')} items={diagnosis.additionalChecks} />
 
-      {diagnosis.partsToCheck.length > 0 ? (
-        <div className="mt-2">
-          <p className="text-xs font-medium text-muted-foreground">{partsToCheckLabel}</p>
-          <div className="mt-1 flex flex-wrap gap-1.5">
-            {diagnosis.partsToCheck.map((part) => (
-              <span key={part} className="rounded-full border border-border bg-background px-2 py-0.5 text-xs">
-                {part}
-              </span>
-            ))}
-          </div>
-        </div>
+      {diagnosis.estimatedRepairTime ? (
+        <p className="mt-2 text-sm">
+          <span className="font-medium">{t('estimatedRepairTime')}:</span>{' '}
+          <span className="text-muted-foreground">{diagnosis.estimatedRepairTime}</span>
+        </p>
       ) : null}
 
-      {diagnosis.nextSteps.length > 0 ? (
-        <div className="mt-2">
-          <p className="text-xs font-medium text-muted-foreground">{nextStepsLabel}</p>
-          <ul className="mt-1 list-disc space-y-0.5 pl-4 text-sm text-muted-foreground">
-            {diagnosis.nextSteps.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
+      <ReportSection label={t('recommendations')} items={diagnosis.recommendations} />
+
+      <p className="mt-3 flex items-start gap-1.5 border-t border-border/70 pt-2 text-xs text-muted-foreground">
+        <ShieldAlert className="mt-0.5 size-3.5 shrink-0" aria-hidden />
+        {t('disclaimer')}
+      </p>
     </li>
   );
 }
+
+function ReportSection({ label, items, chips }: { label: string; items: string[]; chips?: boolean }) {
+  if (items.length === 0) return null;
+  return (
+    <div className="mt-2">
+      <p className="text-xs font-medium text-muted-foreground">{label}</p>
+      {chips ? (
+        <div className="mt-1 flex flex-wrap gap-1.5">
+          {items.map((item) => (
+            <span key={item} className="rounded-full border border-border bg-background px-2 py-0.5 text-xs">
+              {item}
+            </span>
+          ))}
+        </div>
+      ) : (
+        <ul className="mt-1 list-disc space-y-0.5 pl-4 text-sm text-muted-foreground">
+          {items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
