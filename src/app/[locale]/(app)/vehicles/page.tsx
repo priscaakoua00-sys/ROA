@@ -1,11 +1,12 @@
 export const dynamic = 'force-dynamic';
 
 import { redirect } from 'next/navigation';
-import { Car } from 'lucide-react';
+import { Car, Plus } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { ModuleBanner } from '@/components/module-banner';
 import { Link } from '@/i18n/navigation';
+import { Button } from '@/components/ui/button';
 import { VehicleCard } from '@/components/vehicles/vehicle-card';
 import { isExternalPhotoUrl } from '@/lib/utils';
 
@@ -91,6 +92,15 @@ export default async function VehiclesPage({
         <h1 className="text-2xl font-semibold tracking-tight">{t('vehicles.title')}</h1>
         <Link href="/dashboard" className="text-sm text-muted-foreground hover:underline">
           {t('lead.back')}
+        </Link>
+      </div>
+
+      <div className="mt-4">
+        <Link href="/vehicles/new">
+          <Button size="sm">
+            <Plus className="size-4" aria-hidden />
+            {t('vehicles.addNew')}
+          </Button>
         </Link>
       </div>
 

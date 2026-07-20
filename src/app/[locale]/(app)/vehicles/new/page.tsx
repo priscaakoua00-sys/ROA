@@ -21,11 +21,11 @@ export default async function NewVehiclePage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ q?: string; customerId?: string }>;
+  searchParams: Promise<{ q?: string; customerId?: string; new?: string; error?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { q, customerId } = await searchParams;
+  const { q, customerId, new: isNewCustomer, error } = await searchParams;
   const t = await getTranslations('app');
 
   const supabase = await createSupabaseServerClient();
@@ -41,6 +41,102 @@ export default async function NewVehiclePage({
   const name = (c: Customer) =>
     [c.first_name, c.last_name].filter(Boolean).join(' ') || t('leads.anonymous');
 
+  const vehicleFields = (
+    <>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <Field label={t('customers.plate')} name="licensePlate" />
+        <Field label={t('customers.make')} name="make" />
+        <Field label={t('customers.model')} name="model" />
+        <Field label={t('vehicles.year')} name="year" type="number" />
+        <Field label={t('customers.mileage')} name="mileage" type="number" />
+        <Field label={t('newVehicle.vinLabel')} name="vin" />
+        <Field label={t('newVehicle.colorLabel')} name="color" />
+        <label className="block space-y-1.5 text-sm">
+          <span className="text-sm font-medium">{t('newVehicle.fuelLabel')}</span>
+          <select
+            name="fuel"
+            defaultValue=""
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <option value="">{t('newVehicle.fuelUnknown')}</option>
+            <option value="petrol">{t('newVehicle.fuelPetrol')}</option>
+            <option value="diesel">{t('newVehicle.fuelDiesel')}</option>
+            <option value="hybrid">{t('newVehicle.fuelHybrid')}</option>
+            <option value="electric">{t('newVehicle.fuelElectric')}</option>
+            <option value="other">{t('newVehicle.fuelOther')}</option>
+          </select>
+        </label>
+        <label className="block space-y-1.5 text-sm">
+          <span className="text-sm font-medium">{t('newVehicle.transmissionLabel')}</span>
+          <select
+            name="transmission"
+            defaultValue=""
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <option value="">{t('newVehicle.transmissionUnknown')}</option>
+            <option value="manual">{t('newVehicle.transmissionManual')}</option>
+            <option value="automatic">{t('newVehicle.transmissionAutomatic')}</option>
+          </select>
+        </label>
+      </div>
+      <label className="block text-sm">
+        <span className="mb-1.5 block font-medium">{t('newVehicle.notesLabel')}</span>
+        <textarea
+          name="notes"
+          rows={2}
+          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
+        />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1.5 block font-medium">{t('vehicles.photoUpload')}</span>
+        <input
+          type="file"
+          name="photo"
+          accept="image/*"
+          capture="environment"
+          className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-primary/90"
+        />
+      </label>
+    </>
+  );
+
+  // Step 2a: brand-new customer, entered inline on this same form.
+  if (isNewCustomer) {
+    return (
+      <div className="container max-w-lg py-10">
+        <Link href="/vehicles/new" className="text-sm text-muted-foreground hover:underline">
+          {t('newVehicle.changeCustomer')}
+        </Link>
+        <h1 className="mt-3 text-2xl font-semibold tracking-tight">{t('newVehicle.title')}</h1>
+        {error ? <p className="mt-3 text-sm text-destructive">{t('newVehicle.error')}</p> : null}
+
+        <form
+          action={addVehicleAction}
+          encType="multipart/form-data"
+          className="mt-5 space-y-5"
+        >
+          <input type="hidden" name="locale" value={locale} />
+
+          <div className="rounded-xl border border-border bg-card p-5 shadow-soft">
+            <h2 className="text-base font-semibold tracking-tight">{t('newVehicle.newCustomerTitle')}</h2>
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              <Field label={t('newCustomer.firstName')} name="firstName" />
+              <Field label={t('newCustomer.lastName')} name="lastName" />
+              <Field label={t('newCustomer.phone')} name="phone" />
+            </div>
+          </div>
+
+          <div className="space-y-3 rounded-xl border border-border bg-card p-5 shadow-soft">
+            {vehicleFields}
+          </div>
+
+          <Button type="submit" className="w-full">{t('newVehicle.save')}</Button>
+        </form>
+      </div>
+    );
+  }
+
+  // Step 2b: an existing customer was picked.
   if (customerId) {
     const { data: customer } = await supabase
       .from('customers')
@@ -66,22 +162,7 @@ export default async function NewVehiclePage({
           >
             <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="customerId" value={customer.id} />
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              <Field label={t('customers.plate')} name="licensePlate" />
-              <Field label={t('customers.make')} name="make" />
-              <Field label={t('customers.model')} name="model" />
-              <Field label={t('vehicles.year')} name="year" type="number" />
-              <Field label={t('customers.mileage')} name="mileage" type="number" />
-            </div>
-            <label className="block text-sm">
-              <span className="mb-1.5 block font-medium">{t('vehicles.photoUpload')}</span>
-              <input
-                type="file"
-                name="photo"
-                accept="image/*"
-                className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-primary/90"
-              />
-            </label>
+            {vehicleFields}
             <Button type="submit" className="w-full">{t('newVehicle.save')}</Button>
           </form>
         </div>
@@ -89,6 +170,7 @@ export default async function NewVehiclePage({
     }
   }
 
+  // Step 1: pick an existing customer, or create a new one.
   const { data } = await supabase
     .from('customers')
     .select('id, first_name, last_name, phone, email')
@@ -119,6 +201,14 @@ export default async function NewVehiclePage({
       </Link>
       <h1 className="mt-3 text-2xl font-semibold tracking-tight">{t('newVehicle.title')}</h1>
       <p className="mt-1 text-sm text-muted-foreground">{t('newVehicle.pickCustomer')}</p>
+      {error ? <p className="mt-3 text-sm text-destructive">{t('newVehicle.error')}</p> : null}
+
+      <Link
+        href="/vehicles/new?new=1"
+        className="mt-4 block rounded-xl border border-dashed border-gold/40 bg-gold/5 p-4 text-center text-sm font-medium text-gold transition hover:border-gold/60"
+      >
+        {t('newVehicle.orCreateCustomer')}
+      </Link>
 
       <form className="mt-4" action={`/${locale}/vehicles/new`} method="get">
         <input
