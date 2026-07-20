@@ -21,6 +21,7 @@ export function Landing({ locale }: { locale: Locale }) {
           <nav className="lp-nav">
             <a className="lp-link" href="#werk">{c.nav.work}</a>
             <a className="lp-link" href="#robin">{c.nav.robin}</a>
+            <a className="lp-link" href={`/${safeLocale}/pricing`}>{c.nav.pricing}</a>
             <span className="lp-langs">
               {LOCALES.map((l) => (
                 <a key={l} href={`/${l}`} className={l === locale ? 'on' : undefined}>

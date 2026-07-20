@@ -39,7 +39,7 @@ export const STREAM: Record<Locale, StreamMsg[]> = {
 };
 
 interface Copy {
-  nav: { work: string; robin: string; demo: string };
+  nav: { work: string; robin: string; pricing: string; demo: string };
   hero: {
     kicker: string;
     pre: string; em: string; post: string;
@@ -68,7 +68,7 @@ interface Copy {
 
 export const COPY: Record<Locale, Copy> = {
   nl: {
-    nav: { work: 'Hoe het werkt', robin: 'Robin', demo: 'Vraag een demo aan' },
+    nav: { work: 'Hoe het werkt', robin: 'Robin', pricing: 'Prijzen', demo: 'Vraag een demo aan' },
     founder: { eyebrow: 'Wie zit erachter', name: 'Prisca Akoua', role: 'Oprichter & CEO van Roavaa', story: ['Ik geloof dat ondernemers hun tijd moeten besteden aan het laten groeien van hun bedrijf, niet aan het najagen van gemiste oproepen, vergeten berichten of administratie.', 'Die overtuiging bracht mij ertoe Roavaa te maken: een AI-medewerker die kleine bedrijven helpt sneller te antwoorden, beter georganiseerd te zijn en geen kansen meer te verliezen.', 'Ik bouw niet alleen software. Ik bouw een digitale collega die naast ondernemers werkt, zodat zij zich kunnen richten op wat echt telt: hun klanten, hun vak en hun groei.'], signature: 'Innovatie heeft alleen waarde wanneer ze een echt probleem oplost.' },
     hero: {
       kicker: 'AI-medewerker voor de werkplaats',
@@ -118,7 +118,7 @@ export const COPY: Record<Locale, Copy> = {
     footer: 'Roavaa · AI-medewerker voor onafhankelijke garages.',
   },
   en: {
-    nav: { work: 'How it works', robin: 'Robin', demo: 'Request a demo' },
+    nav: { work: 'How it works', robin: 'Robin', pricing: 'Pricing', demo: 'Request a demo' },
     founder: { eyebrow: 'Who is behind this', name: 'Prisca Akoua', role: 'Founder & CEO of Roavaa', story: ['I believe entrepreneurs should spend their time growing their business, not chasing missed calls, forgotten messages or admin tasks.', 'That conviction is why I created Roavaa: an AI employee built to help small businesses reply faster, stay organized and stop losing opportunities.', 'I am not just building software. I am building a digital colleague that works alongside entrepreneurs, so they can focus on what truly matters: their customers, their craft and their growth.'], signature: 'Innovation only has value when it solves a real problem.' },
     hero: {
       kicker: 'AI employee for the workshop',
@@ -168,7 +168,7 @@ export const COPY: Record<Locale, Copy> = {
     footer: 'Roavaa · AI employee for independent garages.',
   },
   fr: {
-    nav: { work: 'Comment ça marche', robin: 'Robin', demo: 'Demander une démo' },
+    nav: { work: 'Comment ça marche', robin: 'Robin', pricing: 'Tarifs', demo: 'Demander une démo' },
     founder: { eyebrow: 'Qui est derrière', name: 'Prisca Akoua', role: 'Fondatrice & CEO de Roavaa', story: ["Je crois que les entrepreneurs devraient consacrer leur temps à développer leur entreprise, pas à courir après les appels manqués, les messages oubliés ou les tâches administratives.", "C'est cette conviction qui m'a poussée à créer Roavaa : un employé IA conçu pour aider les petites entreprises à répondre plus vite, mieux s'organiser et ne plus perdre d'opportunités.", "Je ne construis pas seulement un logiciel. Je construis un collègue numérique qui travaille aux côtés des entrepreneurs, afin qu'ils puissent se concentrer sur ce qui compte vraiment : leurs clients, leur métier et leur croissance."], signature: "L'innovation n'a de valeur que lorsqu'elle résout un vrai problème." },
     hero: {
       kicker: 'Employé IA pour l\u2019atelier',

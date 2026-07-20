@@ -124,6 +124,10 @@ export default async function SettingsPage({
             {LAUNCH_FREE ? t('settings.billingFreeNote') : t('settings.billingComingSoon')}
           </p>
         </div>
+
+        <Link href="/pricing" className="mt-3 inline-block text-sm text-gold hover:underline">
+          {t('settings.billingViewAll')}
+        </Link>
       </section>
 
       {/* Company */}
