@@ -1,9 +1,16 @@
 {
   "app": {
     "name": "Roavaa",
+    "common": {
+      "cancel": "Cancel",
+      "close": "Close",
+      "confirmDeleteTitle": "Are you sure?",
+      "confirm": "Confirm"
+    },
     "nav": {
       "dashboard": "Dashboard",
       "agenda": "Agenda",
+      "leads": "Requests",
       "customers": "Customers",
       "vehicles": "Vehicles",
       "workOrders": "Work orders",
@@ -223,6 +230,9 @@
       "viewer": "Viewer"
     },
     "leads": {
+      "title": "Requests",
+      "search": "Search requests...",
+      "empty": "No requests yet.",
       "anonymous": "Unknown customer",
       "review": "Human review",
       "urgency": {
@@ -414,17 +424,15 @@
       "billingTitle": "Plan",
       "billingIntro": "What Roavaa costs, once billing is switched on.",
       "billingFreeBadge": "Free for now",
-      "billingPlanName": "Roavaa",
-      "billingPerMonth": "/ month",
       "billingFreeNote": "You're using Roavaa fully free during launch. This price will be announced well in advance of any billing ever starting.",
       "billingComingSoon": "Billing is not active yet.",
-      "billingFeature": {
-        "robin": "Robin, your AI employee",
-        "vehicles": "Unlimited vehicles and customers",
-        "workOrders": "Unlimited work orders",
-        "agenda": "Agenda and appointments",
-        "team": "Team members and roles",
-        "knowledge": "Knowledge base"
+      "billingTrialDays": "{count, plural, =1 {# day} other {# days}} left in your trial.",
+      "billingStatus": {
+        "trialing": "Trial",
+        "active": "Active",
+        "past_due": "Payment overdue",
+        "cancelled": "Cancelled",
+        "expired": "Expired"
       },
       "companyTitle": "Company",
       "name": "Name",
@@ -438,6 +446,7 @@
       "buffer": "Buffer (min)",
       "active": "Active",
       "delete": "Delete",
+      "deleteConfirm": "This service will be permanently deleted. This cannot be undone.",
       "newService": "New service",
       "addService": "Add",
       "weekday": {
@@ -466,6 +475,7 @@
       "contentPlaceholder": "Describe briefly...",
       "add": "Add",
       "empty": "Nothing yet. Add your first knowledge.",
+      "deleteConfirm": "This article will be permanently deleted. This cannot be undone.",
       "category": {
         "failure": "Common failures",
         "intervention_time": "Intervention times",
@@ -523,6 +533,7 @@
       "noteLabel": "Short note (optional)",
       "notePlaceholder": "E.g. squealing noise when braking",
       "submit": "Analyze with Robin AI",
+      "analyzing": "Robin is analyzing...",
       "disclaimer": "This analysis is a diagnostic aid and does not replace a professional's assessment. Always confirm yourself before starting any repair.",
       "visibleProblems": "Visible problems",
       "affectedParts": "Potentially damaged parts",
@@ -696,26 +707,43 @@
   "pricing": {
     "title": "Pricing",
     "subtitle": "Clear, no surprises. Here's what Roavaa costs.",
-    "freeBadge": "Free right now",
-    "freePlanName": "During launch",
-    "freePlanPrice": "€0",
-    "freePlanPeriod": "/ month",
-    "freePlanNote": "Everything's free to use while we're launching. No card required, no commitment.",
-    "paidPlanName": "Roavaa",
-    "paidPlanPeriod": "/ month",
-    "paidBadge": "After launch",
-    "paidPlanNote": "This is the price once billing is switched on. We'll announce it well in advance, nothing gets charged without notice.",
+    "launchBanner": "Free during launch. Pick the plan that fits — billing only switches on later, and we'll announce that well in advance.",
+    "perMonth": "/ month",
+    "mostPopular": "Most popular",
+    "contactPrice": "Custom",
+    "cta": "Coming soon",
     "featuresTitle": "Included",
-    "ctaFree": "Start for free",
-    "ctaPaid": "Not active yet",
     "backHome": "Back to Roavaa",
+    "plans": {
+      "starter": "Starter",
+      "professional": "Professional",
+      "premium": "Premium",
+      "enterprise": "Enterprise"
+    },
     "features": {
       "robin": "Robin, your AI employee",
-      "vehicles": "Unlimited vehicles and customers",
-      "workOrders": "Unlimited work orders",
+      "vehicles": "Unlimited vehicles",
+      "customers": "Unlimited customers",
       "agenda": "Agenda and appointments",
-      "team": "Team members and roles",
-      "knowledge": "Knowledge base"
+      "oneSeat": "1 team seat",
+      "emailSupport": "Email support",
+      "everythingInStarter": "Everything in Starter",
+      "workOrders": "Work orders",
+      "invoices": "Invoicing",
+      "photoDiagnosis": "Photo diagnosis with Robin AI",
+      "automations": "Automated follow-ups",
+      "fiveSeats": "Up to 5 team seats",
+      "prioritySupport": "Priority support",
+      "everythingInProfessional": "Everything in Professional",
+      "knowledge": "Knowledge base",
+      "unlimitedSeats": "Unlimited team seats",
+      "customBranding": "Custom branding",
+      "phoneSupport": "Phone support",
+      "everythingInPremium": "Everything in Premium",
+      "dedicatedManager": "Dedicated account manager",
+      "customIntegrations": "Custom integrations",
+      "sla": "Service-level agreement (SLA)",
+      "multiLocation": "Multiple locations"
     }
   }
 }

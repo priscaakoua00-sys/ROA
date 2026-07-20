@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { addVehicleAction } from '@/data/customers/actions';
 import { Button } from '@/components/ui/button';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
 
@@ -104,9 +105,15 @@ export default async function NewVehiclePage({
   if (isNewCustomer) {
     return (
       <div className="container max-w-lg py-10">
-        <Link href="/vehicles/new" className="text-sm text-muted-foreground hover:underline">
-          {t('newVehicle.changeCustomer')}
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/vehicles/new" className="text-sm text-muted-foreground hover:underline">
+            {t('newVehicle.changeCustomer')}
+          </Link>
+          <span className="text-border">·</span>
+          <Link href="/vehicles" className="text-sm text-muted-foreground hover:underline">
+            {t('common.cancel')}
+          </Link>
+        </div>
         <h1 className="mt-3 text-2xl font-semibold tracking-tight">{t('newVehicle.title')}</h1>
         {error ? <p className="mt-3 text-sm text-destructive">{t('newVehicle.error')}</p> : null}
 
@@ -130,7 +137,12 @@ export default async function NewVehiclePage({
             {vehicleFields}
           </div>
 
-          <Button type="submit" className="w-full">{t('newVehicle.save')}</Button>
+          <div className="flex items-center gap-3">
+            <SubmitButton className="flex-1">{t('newVehicle.save')}</SubmitButton>
+            <Link href="/vehicles">
+              <Button type="button" variant="outline">{t('common.cancel')}</Button>
+            </Link>
+          </div>
         </form>
       </div>
     );
@@ -148,9 +160,15 @@ export default async function NewVehiclePage({
     if (customer) {
       return (
         <div className="container max-w-lg py-10">
-          <Link href="/vehicles/new" className="text-sm text-muted-foreground hover:underline">
-            {t('newVehicle.changeCustomer')}
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/vehicles/new" className="text-sm text-muted-foreground hover:underline">
+              {t('newVehicle.changeCustomer')}
+            </Link>
+            <span className="text-border">·</span>
+            <Link href="/vehicles" className="text-sm text-muted-foreground hover:underline">
+              {t('common.cancel')}
+            </Link>
+          </div>
           <h1 className="mt-3 text-2xl font-semibold tracking-tight">
             {t('newVehicle.forCustomer', { name: name(customer) })}
           </h1>
@@ -163,7 +181,12 @@ export default async function NewVehiclePage({
             <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="customerId" value={customer.id} />
             {vehicleFields}
-            <Button type="submit" className="w-full">{t('newVehicle.save')}</Button>
+            <div className="flex items-center gap-3">
+              <SubmitButton className="flex-1">{t('newVehicle.save')}</SubmitButton>
+              <Link href="/vehicles">
+                <Button type="button" variant="outline">{t('common.cancel')}</Button>
+              </Link>
+            </div>
           </form>
         </div>
       );

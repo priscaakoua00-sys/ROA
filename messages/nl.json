@@ -1,9 +1,16 @@
 {
   "app": {
     "name": "Roavaa",
+    "common": {
+      "cancel": "Annuleren",
+      "close": "Sluiten",
+      "confirmDeleteTitle": "Weet je het zeker?",
+      "confirm": "Bevestigen"
+    },
     "nav": {
       "dashboard": "Dashboard",
       "agenda": "Agenda",
+      "leads": "Aanvragen",
       "customers": "Klanten",
       "vehicles": "Voertuigen",
       "workOrders": "Werkorders",
@@ -223,6 +230,9 @@
       "viewer": "Kijker"
     },
     "leads": {
+      "title": "Aanvragen",
+      "search": "Zoek in aanvragen...",
+      "empty": "Nog geen aanvragen.",
       "anonymous": "Onbekende klant",
       "review": "Menselijke controle",
       "urgency": {
@@ -414,17 +424,15 @@
       "billingTitle": "Abonnement",
       "billingIntro": "Wat Roavaa kost, zodra facturatie wordt geactiveerd.",
       "billingFreeBadge": "Nu gratis",
-      "billingPlanName": "Roavaa",
-      "billingPerMonth": "/ maand",
       "billingFreeNote": "U gebruikt Roavaa momenteel volledig gratis tijdens de lancering. Deze prijs wordt vooraf aangekondigd voordat er ooit wordt gefactureerd.",
       "billingComingSoon": "Facturatie is nog niet actief.",
-      "billingFeature": {
-        "robin": "Robin, uw AI-medewerker",
-        "vehicles": "Onbeperkt voertuigen en klanten",
-        "workOrders": "Onbeperkt werkorders",
-        "agenda": "Agenda en afspraken",
-        "team": "Teamleden en rollen",
-        "knowledge": "Kennisbank"
+      "billingTrialDays": "Nog {count, plural, =1 {# dag} other {# dagen}} proefperiode.",
+      "billingStatus": {
+        "trialing": "Proefperiode",
+        "active": "Actief",
+        "past_due": "Betaling verlopen",
+        "cancelled": "Opgezegd",
+        "expired": "Verlopen"
       },
       "companyTitle": "Bedrijf",
       "name": "Naam",
@@ -438,6 +446,7 @@
       "buffer": "Buffer (min)",
       "active": "Actief",
       "delete": "Verwijderen",
+      "deleteConfirm": "Deze dienst wordt definitief verwijderd. Dit kan niet ongedaan worden gemaakt.",
       "newService": "Nieuwe dienst",
       "addService": "Toevoegen",
       "weekday": {
@@ -466,6 +475,7 @@
       "contentPlaceholder": "Beschrijf kort...",
       "add": "Toevoegen",
       "empty": "Nog niets. Voeg uw eerste kennis toe.",
+      "deleteConfirm": "Dit artikel wordt definitief verwijderd. Dit kan niet ongedaan worden gemaakt.",
       "category": {
         "failure": "Veelvoorkomende storingen",
         "intervention_time": "Interventietijden",
@@ -523,6 +533,7 @@
       "noteLabel": "Korte omschrijving (optioneel)",
       "notePlaceholder": "Bijv. piepend geluid bij het remmen",
       "submit": "Analyseren met Robin IA",
+      "analyzing": "Robin analyseert...",
       "disclaimer": "Deze analyse is een hulpmiddel bij de diagnose en vervangt niet de beoordeling van een vakman. Bevestig altijd zelf voordat je een reparatie start.",
       "visibleProblems": "Zichtbare problemen",
       "affectedParts": "Mogelijk beschadigde onderdelen",
@@ -696,26 +707,43 @@
   "pricing": {
     "title": "Prijzen",
     "subtitle": "Duidelijk en zonder verrassingen. Dit is wat Roavaa kost.",
-    "freeBadge": "Nu gratis",
-    "freePlanName": "Tijdens de lancering",
-    "freePlanPrice": "€ 0",
-    "freePlanPeriod": "/ maand",
-    "freePlanNote": "Alles gratis te gebruiken zolang we aan het lanceren zijn. Geen kaartgegevens nodig, geen verplichtingen.",
-    "paidPlanName": "Roavaa",
-    "paidPlanPeriod": "/ maand",
-    "paidBadge": "Na de lancering",
-    "paidPlanNote": "Dit wordt de prijs zodra facturatie wordt geactiveerd. We laten dit ruim van tevoren weten, er wordt nooit zomaar iets afgeschreven.",
+    "launchBanner": "Gratis tijdens de lancering. Kies alvast het abonnement dat bij u past — facturatie wordt pas later geactiveerd, en dat kondigen we ruim op voorhand aan.",
+    "perMonth": "/ maand",
+    "mostPopular": "Meest gekozen",
+    "contactPrice": "Op maat",
+    "cta": "Binnenkort beschikbaar",
     "featuresTitle": "Inbegrepen",
-    "ctaFree": "Start gratis",
-    "ctaPaid": "Nog niet actief",
     "backHome": "Terug naar Roavaa",
+    "plans": {
+      "starter": "Starter",
+      "professional": "Professional",
+      "premium": "Premium",
+      "enterprise": "Enterprise"
+    },
     "features": {
       "robin": "Robin, je AI-medewerker",
-      "vehicles": "Onbeperkt voertuigen en klanten",
-      "workOrders": "Onbeperkt werkorders",
+      "vehicles": "Onbeperkt voertuigen",
+      "customers": "Onbeperkt klanten",
       "agenda": "Agenda en afspraken",
-      "team": "Teamleden en rollen",
-      "knowledge": "Kennisbank"
+      "oneSeat": "1 teamlid",
+      "emailSupport": "E-mailondersteuning",
+      "everythingInStarter": "Alles uit Starter",
+      "workOrders": "Werkorders",
+      "invoices": "Facturatie",
+      "photoDiagnosis": "Foto-diagnose met Robin IA",
+      "automations": "Automatische opvolging",
+      "fiveSeats": "Tot 5 teamleden",
+      "prioritySupport": "Prioritaire ondersteuning",
+      "everythingInProfessional": "Alles uit Professional",
+      "knowledge": "Kennisbank",
+      "unlimitedSeats": "Onbeperkt teamleden",
+      "customBranding": "Eigen huisstijl",
+      "phoneSupport": "Telefonische ondersteuning",
+      "everythingInPremium": "Alles uit Premium",
+      "dedicatedManager": "Vaste accountmanager",
+      "customIntegrations": "Maatwerkintegraties",
+      "sla": "Serviceovereenkomst (SLA)",
+      "multiLocation": "Meerdere vestigingen"
     }
   }
 }

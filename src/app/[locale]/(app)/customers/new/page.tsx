@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { addCustomerAction } from '@/data/customers/actions';
-import { Button } from '@/components/ui/button';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
 
@@ -60,7 +60,7 @@ export default async function NewCustomerPage({
           </div>
         </div>
 
-        <Button type="submit" className="w-full">{t('newCustomer.save')}</Button>
+        <SubmitButton className="w-full">{t('newCustomer.save')}</SubmitButton>
       </form>
     </div>
   );

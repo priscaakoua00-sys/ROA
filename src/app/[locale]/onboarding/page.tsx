@@ -3,9 +3,10 @@ export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { AuthShell, Field } from '@/components/auth/auth-shell';
-import { Button } from '@/components/ui/button';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { createOrgAction } from '@/data/orgs/actions';
+import { signOutAction } from '@/data/auth/actions';
 
 export default async function OnboardingPage({
   params,
@@ -46,7 +47,13 @@ export default async function OnboardingPage({
             <option value="garage">{t('businessType.garage')}</option>
           </select>
         </label>
-        <Button type="submit" className="w-full">{t('onboarding.cta')}</Button>
+        <SubmitButton className="w-full">{t('onboarding.cta')}</SubmitButton>
+      </form>
+      <form action={signOutAction} className="mt-4 text-center">
+        <input type="hidden" name="locale" value={locale} />
+        <button type="submit" className="text-sm text-muted-foreground hover:underline">
+          {t('nav.signOut')}
+        </button>
       </form>
     </AuthShell>
   );

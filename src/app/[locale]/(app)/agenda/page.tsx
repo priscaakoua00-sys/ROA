@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
+import { FlashToast } from '@/components/flash-toast';
 
 const STATUS_VARIANT: Record<string, 'muted' | 'default' | 'gold' | 'urgent' | 'success'> = {
   proposed: 'gold',
@@ -191,6 +192,7 @@ export default async function AgendaPage({
 
   return (
     <div className="container max-w-3xl py-10">
+      <FlashToast success={saved ? t('agenda.saved') : null} error={error ? t('agenda.error') : null} />
       <ModuleBanner moduleKey="appointments" label={t('moduleBanner.appointments')} icon={CalendarClock} />
 
       <div className="flex items-center justify-between">

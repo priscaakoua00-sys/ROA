@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { AuthShell, Field } from '@/components/auth/auth-shell';
-import { Button } from '@/components/ui/button';
+import { SubmitButton } from '@/components/ui/submit-button';
 import { Link } from '@/i18n/navigation';
 import { signInAction } from '@/data/auth/actions';
 
@@ -28,7 +28,7 @@ export default async function LoginPage({
         <input type="hidden" name="locale" value={locale} />
         <Field label={t('fields.email')} name="email" type="email" autoComplete="email" required />
         <Field label={t('fields.password')} name="password" type="password" autoComplete="current-password" required />
-        <Button type="submit" className="w-full">{t('login.cta')}</Button>
+        <SubmitButton className="w-full">{t('login.cta')}</SubmitButton>
       </form>
       <div className="mt-4 flex items-center justify-between text-sm">
         <Link href="/forgot-password" className="text-muted-foreground hover:underline">{t('login.forgot')}</Link>
