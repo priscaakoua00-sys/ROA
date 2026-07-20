@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { PlanKey } from '@/lib/plans';
+import type { PlanKey, PlanLimits } from '@/lib/plans';
+import { getEntitlements } from '@/lib/entitlements';
 
 export type SubscriptionStatus = 'trialing' | 'active' | 'past_due' | 'cancelled' | 'expired';
 
@@ -38,4 +39,13 @@ export async function getOrgSubscription(
     currentPeriodEnd: data.current_period_end,
     cancelAtPeriodEnd: data.cancel_at_period_end,
   };
+}
+
+/** Convenience: subscription state plus the limits actually in effect (beta override included). */
+export async function getOrgEntitlements(
+  supabase: SupabaseClient,
+  organizationId: string,
+): Promise<{ subscription: OrgSubscription; limits: PlanLimits }> {
+  const subscription = await getOrgSubscription(supabase, organizationId);
+  return { subscription, limits: getEntitlements(subscription.planKey) };
 }

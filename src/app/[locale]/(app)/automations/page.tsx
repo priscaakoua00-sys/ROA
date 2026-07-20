@@ -7,6 +7,8 @@ import { computeFollowUps, type FollowUp, type FollowUpKind } from '@/data/autom
 import { markFollowUpAction } from '@/data/automations/actions';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
+import { getOrgEntitlements } from '@/data/subscriptions/get-subscription';
+import { PlanLockedNotice } from '@/components/plan-locked-notice';
 
 const KINDS: FollowUpKind[] = ['reminder', 'unanswered', 'post_repair', 'reactivate'];
 
@@ -39,6 +41,17 @@ export default async function AutomationsPage({
   const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
   const org = orgs?.[0];
   if (!org) redirect(`/${locale}/onboarding`);
+
+  const { limits } = await getOrgEntitlements(supabase, org.id);
+  if (!limits.automations) {
+    return (
+      <PlanLockedNotice
+        title={t('automations.lockedTitle')}
+        message={t('automations.lockedMessage')}
+        ctaLabel={t('automations.lockedCta')}
+      />
+    );
+  }
 
   const now = new Date();
   const in48h = new Date(now.getTime() + 48 * 3_600_000).toISOString();

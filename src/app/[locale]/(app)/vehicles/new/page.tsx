@@ -115,7 +115,11 @@ export default async function NewVehiclePage({
           </Link>
         </div>
         <h1 className="mt-3 text-2xl font-semibold tracking-tight">{t('newVehicle.title')}</h1>
-        {error ? <p className="mt-3 text-sm text-destructive">{t('newVehicle.error')}</p> : null}
+        {error === 'limit' ? (
+          <p className="mt-3 text-sm text-destructive">{t('newVehicle.limitReached')}</p>
+        ) : error ? (
+          <p className="mt-3 text-sm text-destructive">{t('newVehicle.error')}</p>
+        ) : null}
 
         <form
           action={addVehicleAction}
@@ -224,7 +228,11 @@ export default async function NewVehiclePage({
       </Link>
       <h1 className="mt-3 text-2xl font-semibold tracking-tight">{t('newVehicle.title')}</h1>
       <p className="mt-1 text-sm text-muted-foreground">{t('newVehicle.pickCustomer')}</p>
-      {error ? <p className="mt-3 text-sm text-destructive">{t('newVehicle.error')}</p> : null}
+      {error === 'limit' ? (
+        <p className="mt-3 text-sm text-destructive">{t('newVehicle.limitReached')}</p>
+      ) : error ? (
+        <p className="mt-3 text-sm text-destructive">{t('newVehicle.error')}</p>
+      ) : null}
 
       <Link
         href="/vehicles/new?new=1"

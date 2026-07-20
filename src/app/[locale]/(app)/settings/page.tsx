@@ -13,13 +13,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
-import { CheckCircle2 } from 'lucide-react';
 import { LAUNCH_FREE } from '@/lib/pricing';
 import { PLANS, formatMonthlyPrice } from '@/lib/plans';
 import { getOrgSubscription } from '@/data/subscriptions/get-subscription';
+import { countVehicles, countSeats, countAiAnalysesThisMonth } from '@/data/subscriptions/usage';
 import { Badge } from '@/components/ui/badge';
 import { FlashToast } from '@/components/flash-toast';
 import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button';
+import { PlanFeatureList } from '@/components/pricing/plan-feature-list';
 
 const WEEKDAYS = [1, 2, 3, 4, 5, 6, 0];
 const LANGS = ['nl', 'en', 'fr'] as const;
@@ -43,6 +44,7 @@ export default async function SettingsPage({
   setRequestLocale(locale);
   const { saved, error } = await searchParams;
   const t = await getTranslations('app');
+  const tPricing = await getTranslations('pricing');
 
   const supabase = await createSupabaseServerClient();
   const {
@@ -57,7 +59,7 @@ export default async function SettingsPage({
   const org = orgs?.[0];
   if (!org) redirect(`/${locale}/onboarding`);
 
-  const [{ data: rules }, { data: svc }, subscription] = await Promise.all([
+  const [{ data: rules }, { data: svc }, subscription, vehicleCount, seatCount, aiAnalysesUsed] = await Promise.all([
     supabase
       .from('availability_rules')
       .select('weekday, start_time, end_time')
@@ -68,11 +70,19 @@ export default async function SettingsPage({
       .eq('organization_id', org.id)
       .order('created_at', { ascending: true }),
     getOrgSubscription(supabase, org.id),
+    countVehicles(supabase, org.id),
+    countSeats(supabase, org.id),
+    countAiAnalysesThisMonth(supabase, org.id),
   ]);
   const currentPlan = PLANS.find((p) => p.key === subscription.planKey) ?? PLANS[0]!;
   const trialDaysLeft = subscription.trialEndsAt
     ? Math.max(0, Math.ceil((new Date(subscription.trialEndsAt).getTime() - Date.now()) / 86_400_000))
     : null;
+  const usageRows: { labelKey: string; used: number; limit: number | null }[] = [
+    { labelKey: 'vehicles', used: vehicleCount, limit: currentPlan.limits.maxVehicles },
+    { labelKey: 'users', used: seatCount, limit: currentPlan.limits.maxUsers },
+    { labelKey: 'aiAnalyses', used: aiAnalysesUsed, limit: currentPlan.limits.aiAnalysesPerMonth },
+  ];
 
   const hours = new Map<number, { start: string; end: string }>();
   for (const r of rules ?? []) {
@@ -113,20 +123,20 @@ export default async function SettingsPage({
         <div className="mt-4 rounded-lg border border-border bg-background p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold">{t(`pricing.plans.${currentPlan.key}`)}</span>
+              <span className="text-sm font-semibold">{tPricing(`plans.${currentPlan.key}`)}</span>
               <Badge variant={subscription.status === 'active' ? 'success' : subscription.status === 'trialing' ? 'gold' : 'urgent'}>
                 {t(`settings.billingStatus.${subscription.status}`)}
               </Badge>
             </div>
             <span className="text-lg font-semibold tracking-tight">
               {currentPlan.monthlyPrice === null ? (
-                t('pricing.contactPrice')
+                tPricing('contactPrice')
               ) : (
                 <>
                   {formatMonthlyPrice(currentPlan.monthlyPrice, locale)}
                   <span className="text-sm font-normal text-muted-foreground">
                     {' '}
-                    {t('pricing.perMonth')}
+                    {tPricing('perMonth')}
                   </span>
                 </>
               )}
@@ -139,18 +149,25 @@ export default async function SettingsPage({
             </p>
           ) : null}
 
-          <ul className="mt-3 space-y-1.5">
-            {currentPlan.featureKeys.map((key) => (
-              <li key={key} className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
-                {t(`pricing.features.${key}`)}
-              </li>
-            ))}
-          </ul>
+          <PlanFeatureList plan={currentPlan} t={tPricing} className="mt-3 space-y-1.5" />
 
           <p className="mt-4 text-xs text-muted-foreground">
             {LAUNCH_FREE ? t('settings.billingFreeNote') : t('settings.billingComingSoon')}
           </p>
+
+          <div className="mt-4 border-t border-border pt-4">
+            <p className="text-xs font-medium text-muted-foreground">{t('settings.billingUsageTitle')}</p>
+            <ul className="mt-2 space-y-1">
+              {usageRows.map((row) => (
+                <li key={row.labelKey} className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>{t(`settings.billingUsage.${row.labelKey}`)}</span>
+                  <span className="font-medium text-foreground">
+                    {row.used} / {row.limit === null ? tPricing('unlimited') : row.limit}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         <Link href="/pricing" className="mt-3 inline-block text-sm text-gold hover:underline">

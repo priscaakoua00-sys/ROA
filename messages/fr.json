@@ -206,7 +206,8 @@
       "transmissionAutomatic": "Automatique",
       "colorLabel": "Couleur",
       "notesLabel": "Observations",
-      "error": "Une erreur est survenue. Choisissez ou créez un client, puis réessayez."
+      "error": "Une erreur est survenue. Choisissez ou créez un client, puis réessayez.",
+      "limitReached": "Vous avez atteint le nombre maximal de véhicules inclus dans votre formule. Passez à une formule supérieure pour continuer."
     },
     "newWorkOrder": {
       "title": "Nouvelle commande d'atelier",
@@ -317,7 +318,8 @@
       "inviteIntro": "Ajoutez un collègue avec un rôle.",
       "email": "E-mail",
       "invite": "Inviter",
-      "inviteNote": "L'invitation est prête. L'envoi par e-mail viendra plus tard."
+      "inviteNote": "L'invitation est prête. L'envoi par e-mail viendra plus tard.",
+      "limitReached": "Vous avez atteint le nombre maximal d'utilisateurs inclus dans votre formule. Passez à une formule supérieure pour inviter plus de monde."
     },
     "customers": {
       "title": "Clients",
@@ -463,7 +465,13 @@
         "en": "English",
         "fr": "Français"
       },
-      "billingViewAll": "Voir tous les tarifs"
+      "billingViewAll": "Voir tous les tarifs",
+      "billingUsageTitle": "Utilisation actuelle",
+      "billingUsage": {
+        "vehicles": "Véhicules",
+        "users": "Utilisateurs",
+        "aiAnalyses": "Analyses IA Robin ce mois-ci"
+      }
     },
     "knowledge": {
       "title": "Base de connaissances",
@@ -500,7 +508,10 @@
         "unanswered": "Répondez à {name} : la demande attend encore.",
         "post_repair": "Demandez à {name} si tout va bien et sollicitez un avis Google.",
         "reactivate": "Recontactez {name} avec une offre."
-      }
+      },
+      "lockedTitle": "Fonctionnalité non incluse dans votre formule",
+      "lockedMessage": "Les automatisations (relances, rappels) sont incluses à partir de la formule Professional. Consultez les tarifs pour changer de formule.",
+      "lockedCta": "Voir les tarifs"
     },
     "newCustomer": {
       "title": "Nouveau client",
@@ -545,7 +556,8 @@
       "causes": "Causes possibles",
       "additionalChecks": "Vérifications complémentaires",
       "estimatedRepairTime": "Temps de réparation estimé",
-      "recommendations": "Recommandations"
+      "recommendations": "Recommandations",
+      "limitReached": "Vous avez atteint le nombre d'analyses IA Robin incluses ce mois-ci dans votre formule. Passez à une formule supérieure pour continuer."
     }
   },
   "language": {
@@ -707,43 +719,48 @@
   "pricing": {
     "title": "Tarifs",
     "subtitle": "Clair, sans surprise. Voici ce que coûte Roavaa.",
-    "launchBanner": "Gratuit pendant le lancement. Choisissez dès maintenant l'abonnement qui vous convient — la facturation ne sera activée que plus tard, et nous vous préviendrons largement à l'avance.",
+    "betaBanner": "ROAVAA est actuellement en accès gratuit pendant la phase de test. Les prix ci-dessous sont indicatifs et pourront évoluer avant le lancement commercial officiel.",
     "perMonth": "/ mois",
     "mostPopular": "Le plus choisi",
-    "contactPrice": "Sur mesure",
+    "contactPrice": "Sur devis",
     "cta": "Bientôt disponible",
+    "provisionalPrice": "Prix indicatif, sujet à ajustement",
+    "paymentNotActive": "Aucun paiement n'est activé pour le moment. Le bouton \"S'abonner\" sera activé lors du lancement officiel.",
     "featuresTitle": "Inclus",
     "backHome": "Retour à Roavaa",
+    "unlimited": "Illimité",
     "plans": {
       "starter": "Starter",
       "professional": "Professional",
-      "premium": "Premium",
       "enterprise": "Enterprise"
     },
     "features": {
-      "robin": "Robin, votre collègue IA",
-      "vehicles": "Véhicules illimités",
-      "customers": "Clients illimités",
+      "vehicles": "Jusqu'à {count} véhicules",
+      "vehiclesUnlimited": "Véhicules illimités",
+      "users": "Jusqu'à {count} utilisateurs",
+      "usersUnlimited": "Utilisateurs illimités",
+      "storage": "{count} Go de stockage photos et vidéos",
+      "storageUnlimited": "Stockage illimité",
+      "aiAnalyses": "{count} analyses IA Robin par mois",
+      "aiAnalysesUnlimited": "Analyses IA Robin illimitées",
+      "robinLevel": {
+        "basic": "Robin IA - assistant de base",
+        "advanced": "Robin IA - diagnostic photo avancé",
+        "full": "Robin IA - suite complète"
+      },
+      "statisticsLevel": {
+        "basic": "Statistiques de base",
+        "advanced": "Statistiques et rapports avancés"
+      },
+      "automations": "Automatisations (relances, rappels)",
+      "advancedReports": "Rapports avancés",
+      "invoicing": "Facturation",
       "agenda": "Agenda et rendez-vous",
-      "oneSeat": "1 membre d'équipe",
-      "emailSupport": "Assistance par e-mail",
-      "everythingInStarter": "Tout ce qui est dans Starter",
-      "workOrders": "Ordres de réparation",
-      "invoices": "Facturation",
-      "photoDiagnosis": "Diagnostic photo avec Robin IA",
-      "automations": "Relances automatiques",
-      "fiveSeats": "Jusqu'à 5 membres d'équipe",
-      "prioritySupport": "Assistance prioritaire",
-      "everythingInProfessional": "Tout ce qui est dans Professional",
-      "knowledge": "Base de connaissances",
-      "unlimitedSeats": "Membres d'équipe illimités",
       "customBranding": "Image de marque personnalisée",
-      "phoneSupport": "Assistance téléphonique",
-      "everythingInPremium": "Tout ce qui est dans Premium",
-      "dedicatedManager": "Chargé de compte dédié",
-      "customIntegrations": "Intégrations sur mesure",
-      "sla": "Contrat de service (SLA)",
-      "multiLocation": "Plusieurs sites"
+      "multiLocation": "Multi-établissements",
+      "apiAccess": "Accès API",
+      "prioritySupport": "Support prioritaire",
+      "emailSupport": "Support par e-mail"
     }
   }
 }

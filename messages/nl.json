@@ -206,7 +206,8 @@
       "transmissionAutomatic": "Automaat",
       "colorLabel": "Kleur",
       "notesLabel": "Opmerkingen",
-      "error": "Er ging iets mis. Kies of maak een klant aan, en probeer opnieuw."
+      "error": "Er ging iets mis. Kies of maak een klant aan, en probeer opnieuw.",
+      "limitReached": "U heeft het maximum aantal voertuigen van uw abonnement bereikt. Upgrade om door te gaan."
     },
     "newWorkOrder": {
       "title": "Nieuwe werkorder",
@@ -317,7 +318,8 @@
       "inviteIntro": "Voeg een collega toe met een rol.",
       "email": "E-mailadres",
       "invite": "Uitnodigen",
-      "inviteNote": "De uitnodiging staat klaar. E-mailverzending volgt in een latere stap."
+      "inviteNote": "De uitnodiging staat klaar. E-mailverzending volgt in een latere stap.",
+      "limitReached": "U heeft het maximum aantal gebruikers van uw abonnement bereikt. Upgrade om meer mensen uit te nodigen."
     },
     "customers": {
       "title": "Klanten",
@@ -463,7 +465,13 @@
         "en": "English",
         "fr": "Français"
       },
-      "billingViewAll": "Bekijk alle prijzen"
+      "billingViewAll": "Bekijk alle prijzen",
+      "billingUsageTitle": "Huidig gebruik",
+      "billingUsage": {
+        "vehicles": "Voertuigen",
+        "users": "Gebruikers",
+        "aiAnalyses": "Robin AI-analyses deze maand"
+      }
     },
     "knowledge": {
       "title": "Kennisbank",
@@ -500,7 +508,10 @@
         "unanswered": "Reageer op {name}: de aanvraag wacht nog op antwoord.",
         "post_repair": "Vraag {name} of alles goed is en vraag om een Google-review.",
         "reactivate": "Neem opnieuw contact op met {name} met een aanbod."
-      }
+      },
+      "lockedTitle": "Functie niet inbegrepen in uw abonnement",
+      "lockedMessage": "Automatiseringen (opvolging, herinneringen) zijn inbegrepen vanaf het Professional-abonnement. Bekijk de tarieven om te upgraden.",
+      "lockedCta": "Bekijk tarieven"
     },
     "newCustomer": {
       "title": "Nieuwe klant",
@@ -545,7 +556,8 @@
       "causes": "Mogelijke oorzaken",
       "additionalChecks": "Extra controles",
       "estimatedRepairTime": "Geschatte reparatietijd",
-      "recommendations": "Aanbevelingen"
+      "recommendations": "Aanbevelingen",
+      "limitReached": "U heeft het aantal Robin AI-analyses van deze maand in uw abonnement bereikt. Upgrade om door te gaan."
     }
   },
   "language": {
@@ -707,43 +719,48 @@
   "pricing": {
     "title": "Prijzen",
     "subtitle": "Duidelijk en zonder verrassingen. Dit is wat Roavaa kost.",
-    "launchBanner": "Gratis tijdens de lancering. Kies alvast het abonnement dat bij u past — facturatie wordt pas later geactiveerd, en dat kondigen we ruim op voorhand aan.",
+    "betaBanner": "ROAVAA is tijdens de testfase gratis te gebruiken. Onderstaande prijzen zijn indicatief en kunnen wijzigen vóór de officiële commerciële lancering.",
     "perMonth": "/ maand",
     "mostPopular": "Meest gekozen",
     "contactPrice": "Op maat",
     "cta": "Binnenkort beschikbaar",
+    "provisionalPrice": "Indicatieve prijs, kan nog wijzigen",
+    "paymentNotActive": "Er is nog geen betaling actief. De knop \"Abonneren\" wordt geactiveerd bij de officiële lancering.",
     "featuresTitle": "Inbegrepen",
     "backHome": "Terug naar Roavaa",
+    "unlimited": "Onbeperkt",
     "plans": {
       "starter": "Starter",
       "professional": "Professional",
-      "premium": "Premium",
       "enterprise": "Enterprise"
     },
     "features": {
-      "robin": "Robin, je AI-medewerker",
-      "vehicles": "Onbeperkt voertuigen",
-      "customers": "Onbeperkt klanten",
+      "vehicles": "Tot {count} voertuigen",
+      "vehiclesUnlimited": "Onbeperkt voertuigen",
+      "users": "Tot {count} gebruikers",
+      "usersUnlimited": "Onbeperkt gebruikers",
+      "storage": "{count} GB opslag voor foto's en video's",
+      "storageUnlimited": "Onbeperkte opslag",
+      "aiAnalyses": "{count} Robin AI-analyses per maand",
+      "aiAnalysesUnlimited": "Onbeperkt Robin AI-analyses",
+      "robinLevel": {
+        "basic": "Robin IA - basisassistent",
+        "advanced": "Robin IA - geavanceerde foto-diagnose",
+        "full": "Robin IA - volledige suite"
+      },
+      "statisticsLevel": {
+        "basic": "Basisstatistieken",
+        "advanced": "Geavanceerde statistieken en rapporten"
+      },
+      "automations": "Automatiseringen (opvolging, herinneringen)",
+      "advancedReports": "Geavanceerde rapporten",
+      "invoicing": "Facturatie",
       "agenda": "Agenda en afspraken",
-      "oneSeat": "1 teamlid",
-      "emailSupport": "E-mailondersteuning",
-      "everythingInStarter": "Alles uit Starter",
-      "workOrders": "Werkorders",
-      "invoices": "Facturatie",
-      "photoDiagnosis": "Foto-diagnose met Robin IA",
-      "automations": "Automatische opvolging",
-      "fiveSeats": "Tot 5 teamleden",
-      "prioritySupport": "Prioritaire ondersteuning",
-      "everythingInProfessional": "Alles uit Professional",
-      "knowledge": "Kennisbank",
-      "unlimitedSeats": "Onbeperkt teamleden",
       "customBranding": "Eigen huisstijl",
-      "phoneSupport": "Telefonische ondersteuning",
-      "everythingInPremium": "Alles uit Premium",
-      "dedicatedManager": "Vaste accountmanager",
-      "customIntegrations": "Maatwerkintegraties",
-      "sla": "Serviceovereenkomst (SLA)",
-      "multiLocation": "Meerdere vestigingen"
+      "multiLocation": "Meerdere vestigingen",
+      "apiAccess": "API-toegang",
+      "prioritySupport": "Prioritaire ondersteuning",
+      "emailSupport": "E-mailondersteuning"
     }
   }
 }

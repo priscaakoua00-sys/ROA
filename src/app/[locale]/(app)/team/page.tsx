@@ -58,7 +58,10 @@ export default async function TeamPage({
 
   return (
     <div className="container max-w-2xl py-10">
-      <FlashToast success={invited ? t('team.invited') : null} error={error ? t('team.error') : null} />
+      <FlashToast
+        success={invited ? t('team.invited') : null}
+        error={error === 'limit' ? t('team.limitReached') : error ? t('team.error') : null}
+      />
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">{t('team.title')}</h1>
         <Link href="/dashboard" className="text-sm text-muted-foreground hover:underline">
@@ -67,7 +70,11 @@ export default async function TeamPage({
       </div>
 
       {invited ? <p className="mt-3 text-sm text-success">{t('team.invited')}</p> : null}
-      {error ? <p className="mt-3 text-sm text-urgent">{t('team.error')}</p> : null}
+      {error === 'limit' ? (
+        <p className="mt-3 text-sm text-urgent">{t('team.limitReached')}</p>
+      ) : error ? (
+        <p className="mt-3 text-sm text-urgent">{t('team.error')}</p>
+      ) : null}
 
       <ul className="mt-6 space-y-2">
         {members.map((m) => (
