@@ -74,14 +74,14 @@
       "greetAfternoon": "Bon après-midi {name}.",
       "greetEvening": "Bonsoir {name}.",
       "robinName": "Robin",
-      "robinIntro": "Je surveille vos appels, e-mails, messages WhatsApp et rendez-vous. Rien ne sera oublié aujourd'hui.",
+      "robinIntro": "Je garde un œil sur vos appels, e-mails, WhatsApp et rendez-vous. Rien ne passe à travers aujourd'hui.",
       "robinSummary": "Il y a {count} nouvelles demandes, {waiting} en attente de réponse et {upcoming} rendez-vous prévus.",
-      "robinAsk": "Que souhaitez-vous que je fasse ?",
+      "robinAsk": "Qu'est-ce que vous voulez que je prenne en charge ?",
       "actReply": "Répondre au client en attente",
       "actNewCustomer": "Nouveau client",
       "actFollowups": "Voir les relances",
       "actAgenda": "Ouvrir l'agenda",
-      "nudge": "Je vois {count} client(s) qui attendent depuis plus de 30 minutes. Voulez-vous que je m en occupe ?",
+      "nudge": "{count} client(s) attendent depuis plus de 30 minutes. Je m'en occupe ?",
       "nudgeCta": "Prendre le premier",
       "doneTitle": "Ce que j'ai fait aujourd'hui",
       "doneReplies": "{count} réponses envoyées",
@@ -116,16 +116,16 @@
       "metricTimeSaved": "Temps gagné (estimation)",
       "metricResponseRate": "Taux de réponse",
       "minutesShort": "{count} min",
-      "metricsEmptyNew": "Pas encore d'activité. Dès que votre première demande arrive, je garde tout en mémoire ici.",
-      "metricsEmptyQuiet": "Journée calme. Tout est sous contrôle — Robin surveille votre activité.",
+      "metricsEmptyNew": "Pas encore d'activité. Dès votre première demande, je garde tout ici pour vous.",
+      "metricsEmptyQuiet": "Journée calme. Tout est sous contrôle, Robin garde un œil sur le reste.",
       "vehicleCall": "Appeler le client",
       "insight": {
-        "emptyGarage": "Vous n'avez pas encore de clients. Partagez votre formulaire de demande — je capte automatiquement chaque nouvelle demande et j'organise le reste.",
-        "urgentLead": "{name} vient d'envoyer une demande urgente. Je vous recommande de la consulter maintenant.",
-        "waitingCustomers": "{count} client(s) attendent une réponse depuis un moment. Voulez-vous que je prépare le premier ?",
-        "followupsDue": "J'ai {count} relance(s) prête(s) pour aujourd'hui.",
+        "emptyGarage": "Vous n'avez pas encore de clients. Partagez votre formulaire, je capte chaque demande et je m'occupe du reste.",
+        "urgentLead": "{name} vient d'envoyer quelque chose d'urgent. Un coup d'œil s'impose.",
+        "waitingCustomers": "{count} client(s) attendent une réponse depuis un moment. Je prépare le premier ?",
+        "followupsDue": "{count} relance(s) prête(s) pour aujourd'hui.",
         "appointmentSoon": "Il vous reste {count} rendez-vous aujourd'hui.",
-        "allClear": "Tout est sous contrôle. Rien d'urgent pour le moment — je surveille le reste.",
+        "allClear": "Tout est sous contrôle, rien d'urgent pour le moment. Je surveille le reste.",
         "viewRequest": "Voir la demande"
       },
       "notifNewCustomers": "Nouveaux clients",
@@ -151,7 +151,7 @@
       "placeholder": "Tapez votre question...",
       "send": "Envoyer",
       "close": "Fermer",
-      "thinking": "Robin réfléchit...",
+      "thinking": "Un instant...",
       "greetingPrefix": "Salut !",
       "emptyTitle": "En quoi puis-je aider ?",
       "emptyHint": "Essayez une de ces questions, ou tapez la vôtre.",
@@ -160,19 +160,19 @@
       "suggestion3": "Qui n'a pas encore reçu de réponse ?",
       "suggestion4": "Appeler Jean Dupont",
       "answers": {
-        "apptsTomorrowNone": "Vous n'avez aucun rendez-vous prévu demain.",
+        "apptsTomorrowNone": "Rien de prévu demain.",
         "apptsTomorrowCount": "Vous avez {count} rendez-vous demain : {list}",
-        "vehiclesWaitingNone": "Aucun véhicule n'est en attente actuellement.",
-        "vehiclesWaitingCount": "{count} véhicule(s) sont en cours de traitement : {list}",
-        "unansweredNone": "Tout le monde a déjà reçu une réponse. Bon travail.",
+        "vehiclesWaitingNone": "Rien n'attend pour le moment.",
+        "vehiclesWaitingCount": "{count} véhicule(s) en cours : {list}",
+        "unansweredNone": "Tout le monde a eu une réponse. Bien joué.",
         "unansweredCount": "{count} client(s) attendent encore une réponse : {list}",
-        "callWho": "Quel client voulez-vous que j'appelle ? Essayez \"Appeler Jean Dupont\".",
-        "callNotFound": "Je n'ai trouvé aucun client avec ce nom. Essayez le nom complet.",
-        "callNoPhone": "Je n'ai pas de numéro de téléphone pour {name}.",
-        "callFound": "{name} : {phone}. Je ne peux pas encore appeler moi-même, mais le numéro est prêt pour vous.",
-        "greeting": "Bonjour ! Ravi de vous voir. En quoi puis-je aider ?",
-        "thanks": "Avec plaisir ! Je continue à surveiller les choses en arrière-plan.",
-        "fallback": "Je peux vous aider avec les rendez-vous de demain, les véhicules en attente, les clients sans réponse, ou appeler un client. Essayez \"Appeler [nom]\"."
+        "callWho": "Qui voulez-vous que j'appelle ? Essayez \"Appeler Jean Dupont\".",
+        "callNotFound": "Je ne trouve personne à ce nom. Essayez le nom complet.",
+        "callNoPhone": "Je n'ai pas de numéro pour {name}.",
+        "callFound": "{name} : {phone}. Je ne peux pas encore appeler moi-même, mais voici le numéro.",
+        "greeting": "Bonjour ! En quoi puis-je aider ?",
+        "thanks": "Avec plaisir. Je garde un œil sur tout ça.",
+        "fallback": "Je peux vous aider avec les rendez-vous de demain, les véhicules en attente, les clients sans réponse, ou appeler quelqu'un. Essayez \"Appeler [nom]\"."
       }
     },
     "newVehicle": {
@@ -421,7 +421,8 @@
         "nl": "Nederlands",
         "en": "English",
         "fr": "Français"
-      }
+      },
+      "billingViewAll": "Voir tous les tarifs"
     },
     "knowledge": {
       "title": "Base de connaissances",
@@ -627,6 +628,31 @@
       "model": "Modèle",
       "mileage": "Kilométrage",
       "description": "Quel est le problème avec votre voiture ?"
+    }
+  },
+  "pricing": {
+    "title": "Tarifs",
+    "subtitle": "Clair, sans surprise. Voici ce que coûte Roavaa.",
+    "freeBadge": "Gratuit pour l'instant",
+    "freePlanName": "Pendant le lancement",
+    "freePlanPrice": "0 €",
+    "freePlanPeriod": "/ mois",
+    "freePlanNote": "Tout est gratuit pendant notre lancement. Pas de carte requise, aucun engagement.",
+    "paidPlanName": "Roavaa",
+    "paidPlanPeriod": "/ mois",
+    "paidBadge": "Après le lancement",
+    "paidPlanNote": "Ce sera le prix une fois la facturation activée. On vous préviendra largement à l'avance, rien n'est jamais prélevé sans prévenir.",
+    "featuresTitle": "Inclus",
+    "ctaFree": "Commencer gratuitement",
+    "ctaPaid": "Pas encore actif",
+    "backHome": "Retour à Roavaa",
+    "features": {
+      "robin": "Robin, votre collègue IA",
+      "vehicles": "Véhicules et clients illimités",
+      "workOrders": "Ordres de réparation illimités",
+      "agenda": "Agenda et rendez-vous",
+      "team": "Membres d'équipe et rôles",
+      "knowledge": "Base de connaissances"
     }
   }
 }
