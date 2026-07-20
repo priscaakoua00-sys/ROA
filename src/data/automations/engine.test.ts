@@ -31,11 +31,11 @@ describe('computeFollowUps', () => {
     expect(r[0]?.kind).toBe('unanswered');
   });
 
-  it('suggests post-repair follow-up for done work orders', () => {
+  it('suggests post-repair follow-up for delivered work orders', () => {
     const r = computeFollowUps({
       ...base,
       now,
-      workOrders: [{ id: 'w1', status: 'done', name: 'C', title: 'Remmen' }],
+      workOrders: [{ id: 'w1', status: 'delivered', name: 'C', title: 'Remmen' }],
     });
     expect(r[0]?.kind).toBe('post_repair');
   });
@@ -44,7 +44,7 @@ describe('computeFollowUps', () => {
     const r = computeFollowUps({
       ...base,
       now,
-      workOrders: [{ id: 'w1', status: 'done', name: 'C', title: 'Remmen' }],
+      workOrders: [{ id: 'w1', status: 'delivered', name: 'C', title: 'Remmen' }],
       handled: new Set(['post_repair:w1']),
     });
     expect(r).toHaveLength(0);

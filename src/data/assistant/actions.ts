@@ -4,6 +4,7 @@ import { getTranslations } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { formatTimeUTC } from '@/lib/datetime';
 import { loadRobinInsight } from '@/data/robin/load';
+import { ACTIVE_WORK_ORDER_STATUSES } from '@/lib/work-order-status';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -199,7 +200,7 @@ export async function askRobinAction(
       .from('work_orders')
       .select('id, vehicles(make, model, license_plate), customers(first_name, last_name)')
       .eq('organization_id', orgId)
-      .in('status', ['open', 'in_progress', 'waiting_parts'])
+      .in('status', ACTIVE_WORK_ORDER_STATUSES)
       .order('updated_at', { ascending: false })
       .limit(10);
     const rows = (data ?? []) as unknown as {

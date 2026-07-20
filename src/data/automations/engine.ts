@@ -46,7 +46,7 @@ export function computeFollowUps(params: {
     }
   }
   for (const w of workOrders) {
-    if (w.status === 'done') push('post_repair', 'work_order', w.id, w.name, w.title);
+    if (w.status === 'delivered') push('post_repair', 'work_order', w.id, w.name, w.title);
   }
   for (const l of leads) {
     const age = now.getTime() - l.createdAt.getTime();
