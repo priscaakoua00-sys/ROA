@@ -221,7 +221,8 @@
       "titleLabel": "Titre",
       "titlePlaceholder": "ex. Grand entretien",
       "descriptionLabel": "Description",
-      "save": "Créer la commande d'atelier"
+      "save": "Créer la commande d'atelier",
+      "assignLabel": "Attribuer à un mécanicien (optionnel)"
     },
     "roles": {
       "owner": "Proprietaire",
@@ -347,13 +348,38 @@
       "newTask": "Nouvelle tâche",
       "addTask": "Ajouter",
       "viewInvoice": "Voir la facture {number}",
-      "createInvoice": "Créer une facture"
+      "createInvoice": "Créer une facture",
+      "checklistTitle": "Checklist de contrôle",
+      "checklistIntro": "Contrôlez chaque point du véhicule et notez le résultat.",
+      "checklistEmpty": "Aucune checklist pour cet ordre. Ajoutez un point ci-dessous ou configurez la checklist par défaut dans les paramètres.",
+      "checklistNotePlaceholder": "Note (optionnel)",
+      "checklistAddPhoto": "Ajouter une photo",
+      "checklistNewItem": "Nouveau point de contrôle",
+      "timelineTitle": "Historique complet",
+      "timelineEmpty": "Aucun événement pour le moment.",
+      "timelineDiagnosis": "Diagnostic photo Robin IA",
+      "reportTitle": "Rapport Robin IA",
+      "reportIntro": "Robin prépare un rapport professionnel et un message client à partir de la checklist et des diagnostics photo.",
+      "reportGenerate": "Générer le rapport",
+      "reportGenerating": "Robin prépare le rapport...",
+      "reportSaved": "Rapport généré.",
+      "reportEmpty": "Rien à signaler pour l'instant : complétez la checklist ou lancez un diagnostic photo d'abord.",
+      "reportError": "La génération du rapport a échoué. Réessayez.",
+      "clientMessageTitle": "Message pour le client"
     },
     "workOrderStatus": {
-      "open": "Ouvert",
-      "in_progress": "En cours",
-      "waiting_parts": "Attente pièces",
-      "done": "Terminé",
+      "received": "Reçu",
+      "inspection_in_progress": "Contrôle en cours",
+      "diagnostic_done": "Diagnostic terminé",
+      "awaiting_customer_approval": "Attente accord client",
+      "awaiting_leasing_approval": "Attente accord leasing",
+      "quote_accepted": "Devis accepté",
+      "parts_ordered": "Pièces commandées",
+      "parts_received": "Pièces reçues",
+      "repair_in_progress": "Réparation en cours",
+      "final_control": "Contrôle final",
+      "ready_for_delivery": "Prêt à livrer",
+      "delivered": "Livré",
       "cancelled": "Annulé"
     },
     "invoices": {
@@ -471,7 +497,12 @@
         "vehicles": "Véhicules",
         "users": "Utilisateurs",
         "aiAnalyses": "Analyses IA Robin ce mois-ci"
-      }
+      },
+      "checklistTitle": "Checklist de contrôle",
+      "checklistIntro": "Personnalisez les points contrôlés par vos mécaniciens à la réception d'un véhicule.",
+      "checklistDeleteConfirm": "Ce point de contrôle sera supprimé du modèle par défaut.",
+      "checklistNewItem": "Nouveau point de contrôle",
+      "checklistAddItem": "Ajouter"
     },
     "knowledge": {
       "title": "Base de connaissances",
@@ -558,6 +589,13 @@
       "estimatedRepairTime": "Temps de réparation estimé",
       "recommendations": "Recommandations",
       "limitReached": "Vous avez atteint le nombre d'analyses IA Robin incluses ce mois-ci dans votre formule. Passez à une formule supérieure pour continuer."
+    },
+    "checklistResult": {
+      "pending": "À faire",
+      "ok": "OK",
+      "attention": "À surveiller",
+      "fail": "Échec",
+      "na": "N/A"
     }
   },
   "language": {

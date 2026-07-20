@@ -7,14 +7,7 @@ import { createSupabaseServerClient } from '@/data/supabase/server';
 import { ModuleBanner } from '@/components/module-banner';
 import { Badge } from '@/components/ui/badge';
 import { Link } from '@/i18n/navigation';
-
-const STATUS_VARIANT: Record<string, 'gold' | 'default' | 'muted' | 'success'> = {
-  open: 'gold',
-  in_progress: 'default',
-  waiting_parts: 'muted',
-  done: 'success',
-  cancelled: 'muted',
-};
+import { WORK_ORDER_STATUS_VARIANT, type WorkOrderStatus } from '@/lib/work-order-status';
 
 interface WO {
   id: string;
@@ -81,7 +74,7 @@ export default async function WorkOrdersPage({
                   <div className="truncate text-sm font-medium">{w.title}</div>
                   <div className="text-xs text-muted-foreground">{name(w)}</div>
                 </div>
-                <Badge variant={STATUS_VARIANT[w.status] ?? 'muted'}>
+                <Badge variant={WORK_ORDER_STATUS_VARIANT[w.status as WorkOrderStatus] ?? 'muted'}>
                   {t(`workOrderStatus.${w.status}`)}
                 </Badge>
               </Link>

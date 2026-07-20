@@ -7,6 +7,7 @@
  *  - The provider can always say "I don't know" -> status: 'handoff'.
  *  - Humans own the decisions; the AI only proposes.
  */
+import type { MediaDiagnosis } from './schemas';
 
 export type SupportedLanguage = 'nl' | 'en' | 'fr';
 
@@ -91,4 +92,26 @@ export interface MediaDiagnosisInput {
   media: DiagnosisMediaItem[];
   /** Optional short note the mechanic typed alongside the media. */
   note?: string;
+}
+
+/** One inspection checklist item that needed attention, as filled in by the mechanic. */
+export interface ChecklistFindingInput {
+  label: string;
+  category?: string;
+  result: 'attention' | 'fail';
+  note?: string;
+}
+
+export interface RepairReportInput {
+  language: SupportedLanguage;
+  vehicle: {
+    make: string | null;
+    model: string | null;
+    year: number | null;
+    licensePlate: string | null;
+  };
+  /** Checklist items that were NOT ok (pending/ok/na items are not sent — nothing to report). */
+  checklistFindings: ChecklistFindingInput[];
+  /** Any AI photo diagnoses run during this visit. */
+  diagnoses: MediaDiagnosis[];
 }

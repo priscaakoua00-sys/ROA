@@ -28,12 +28,15 @@ export async function createPhotoDiagnosisAction(formData: FormData) {
   const locale = localeOf(formData);
   const leadId = String(formData.get('leadId') ?? '').trim() || null;
   const vehicleId = String(formData.get('vehicleId') ?? '').trim() || null;
-  const backHref = vehicleId
-    ? `/${locale}/vehicles/${vehicleId}`
-    : leadId
-      ? `/${locale}/leads/${leadId}`
-      : `/${locale}/dashboard`;
-  if (!leadId && !vehicleId) redirect(backHref);
+  const workOrderId = String(formData.get('workOrderId') ?? '').trim() || null;
+  const backHref = workOrderId
+    ? `/${locale}/work-orders/${workOrderId}`
+    : vehicleId
+      ? `/${locale}/vehicles/${vehicleId}`
+      : leadId
+        ? `/${locale}/leads/${leadId}`
+        : `/${locale}/dashboard`;
+  if (!leadId && !vehicleId && !workOrderId) redirect(backHref);
 
   const note = String(formData.get('note') ?? '').trim() || undefined;
 
@@ -62,6 +65,7 @@ export async function createPhotoDiagnosisAction(formData: FormData) {
   } = await supabase.auth.getUser();
 
   let organizationId: string | null = null;
+  let resolvedVehicleId = vehicleId;
   if (vehicleId) {
     const { data } = await supabase
       .from('vehicles')
@@ -69,6 +73,14 @@ export async function createPhotoDiagnosisAction(formData: FormData) {
       .eq('id', vehicleId)
       .maybeSingle();
     organizationId = data?.organization_id ?? null;
+  } else if (workOrderId) {
+    const { data } = await supabase
+      .from('work_orders')
+      .select('organization_id, vehicle_id')
+      .eq('id', workOrderId)
+      .maybeSingle();
+    organizationId = data?.organization_id ?? null;
+    resolvedVehicleId = data?.vehicle_id ?? null;
   } else if (leadId) {
     const { data } = await supabase
       .from('leads')
@@ -85,7 +97,7 @@ export async function createPhotoDiagnosisAction(formData: FormData) {
     if (used >= limits.aiAnalysesPerMonth) redirect(`${backHref}?diagError=limit`);
   }
 
-  const targetId = vehicleId ?? leadId!;
+  const targetId = resolvedVehicleId ?? leadId ?? workOrderId!;
   const uploaded: { path: string; angle: VehicleAngle }[] = [];
   for (const [i, { file, angle }] of uploads.entries()) {
     const ext = (file.name.split('.').pop() ?? 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
@@ -116,7 +128,8 @@ export async function createPhotoDiagnosisAction(formData: FormData) {
     .insert({
       organization_id: organizationId,
       lead_id: leadId,
-      vehicle_id: vehicleId,
+      vehicle_id: resolvedVehicleId,
+      work_order_id: workOrderId,
       note: note ?? null,
       visible_problems: result.data.visibleProblems,
       affected_parts: result.data.affectedParts,

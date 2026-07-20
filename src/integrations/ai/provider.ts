@@ -4,6 +4,7 @@ import type {
   LanguageDetectionInput,
   LeadSummaryInput,
   MediaDiagnosisInput,
+  RepairReportInput,
   UrgencyInput,
 } from './types';
 import type {
@@ -11,6 +12,7 @@ import type {
   LanguageDetection,
   LeadSummary,
   MediaDiagnosis,
+  RepairReport,
   UrgencyAssessment,
 } from './schemas';
 
@@ -54,4 +56,14 @@ export interface AIProvider {
   diagnoseFromMedia(
     input: MediaDiagnosisInput,
   ): Promise<AIResult<MediaDiagnosis>>;
+
+  /**
+   * Compose a professional repair report and a ready-to-send client message
+   * from a completed inspection checklist (only the items that needed
+   * attention) plus any AI photo diagnoses run during this visit. The
+   * report is for the garage's own record; the client message is meant to
+   * be copied into an email today, or sent directly once a client
+   * communication channel is connected.
+   */
+  draftRepairReport(input: RepairReportInput): Promise<AIResult<RepairReport>>;
 }

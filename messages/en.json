@@ -221,7 +221,8 @@
       "titleLabel": "Title",
       "titlePlaceholder": "e.g. Full service",
       "descriptionLabel": "Description",
-      "save": "Create work order"
+      "save": "Create work order",
+      "assignLabel": "Assign to a mechanic (optional)"
     },
     "roles": {
       "owner": "Owner",
@@ -347,13 +348,38 @@
       "newTask": "New task",
       "addTask": "Add",
       "viewInvoice": "View invoice {number}",
-      "createInvoice": "Create invoice"
+      "createInvoice": "Create invoice",
+      "checklistTitle": "Inspection checklist",
+      "checklistIntro": "Check every point on the vehicle and record the result.",
+      "checklistEmpty": "No checklist for this order yet. Add an item below or set up the default checklist in Settings.",
+      "checklistNotePlaceholder": "Note (optional)",
+      "checklistAddPhoto": "Add a photo",
+      "checklistNewItem": "New checklist item",
+      "timelineTitle": "Full history",
+      "timelineEmpty": "No events yet.",
+      "timelineDiagnosis": "Robin AI photo diagnosis",
+      "reportTitle": "Robin AI report",
+      "reportIntro": "Robin prepares a professional report and a client message from the checklist and photo diagnoses.",
+      "reportGenerate": "Generate report",
+      "reportGenerating": "Robin is preparing the report...",
+      "reportSaved": "Report generated.",
+      "reportEmpty": "Nothing to report yet: complete the checklist or run a photo diagnosis first.",
+      "reportError": "Report generation failed. Please try again.",
+      "clientMessageTitle": "Message for the client"
     },
     "workOrderStatus": {
-      "open": "Open",
-      "in_progress": "In progress",
-      "waiting_parts": "Waiting for parts",
-      "done": "Done",
+      "received": "Received",
+      "inspection_in_progress": "Inspection in progress",
+      "diagnostic_done": "Diagnostic done",
+      "awaiting_customer_approval": "Awaiting customer approval",
+      "awaiting_leasing_approval": "Awaiting leasing approval",
+      "quote_accepted": "Quote accepted",
+      "parts_ordered": "Parts ordered",
+      "parts_received": "Parts received",
+      "repair_in_progress": "Repair in progress",
+      "final_control": "Final check",
+      "ready_for_delivery": "Ready for delivery",
+      "delivered": "Delivered",
       "cancelled": "Cancelled"
     },
     "invoices": {
@@ -471,7 +497,12 @@
         "vehicles": "Vehicles",
         "users": "Users",
         "aiAnalyses": "Robin AI analyses this month"
-      }
+      },
+      "checklistTitle": "Inspection checklist",
+      "checklistIntro": "Customize what your mechanics check when a vehicle comes in.",
+      "checklistDeleteConfirm": "This checklist item will be removed from the default template.",
+      "checklistNewItem": "New checklist item",
+      "checklistAddItem": "Add"
     },
     "knowledge": {
       "title": "Knowledge base",
@@ -558,6 +589,13 @@
       "estimatedRepairTime": "Estimated repair time",
       "recommendations": "Recommendations",
       "limitReached": "You've reached this month's Robin AI analyses included in your plan. Upgrade to continue."
+    },
+    "checklistResult": {
+      "pending": "Pending",
+      "ok": "OK",
+      "attention": "Needs attention",
+      "fail": "Failed",
+      "na": "N/A"
     }
   },
   "language": {

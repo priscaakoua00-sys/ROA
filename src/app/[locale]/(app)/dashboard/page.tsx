@@ -28,6 +28,7 @@ import { formatCurrency } from '@/lib/pricing';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Link } from '@/i18n/navigation';
+import { ACTIVE_WORK_ORDER_STATUSES, WORK_ORDER_STATUS_VARIANT, type WorkOrderStatus } from '@/lib/work-order-status';
 
 type InvoiceStatus = 'draft' | 'to_prepare' | 'sent' | 'partially_paid' | 'paid' | 'overdue' | 'cancelled';
 
@@ -37,13 +38,6 @@ const URGENCY_VARIANT: Record<Urgency, 'muted' | 'default' | 'gold' | 'urgent'> 
   normal: 'default',
   high: 'gold',
   critical: 'urgent',
-};
-const WO_STATUS_VARIANT: Record<string, 'gold' | 'default' | 'muted' | 'success'> = {
-  open: 'gold',
-  in_progress: 'default',
-  waiting_parts: 'muted',
-  done: 'success',
-  cancelled: 'muted',
 };
 const OPEN_STATUSES = ['new', 'qualifying', 'qualified', 'appointment_proposed'];
 const BRAND_TONES = [
@@ -182,7 +176,7 @@ export default async function DashboardPage({
       .from('work_orders')
       .select('id, status, vehicles(id, make, model, license_plate), customers(first_name, last_name, phone)')
       .eq('organization_id', org.id)
-      .in('status', ['open', 'in_progress', 'waiting_parts'])
+      .in('status', ACTIVE_WORK_ORDER_STATUSES)
       .order('updated_at', { ascending: false })
       .limit(6),
     supabase
@@ -219,7 +213,7 @@ export default async function DashboardPage({
       .from('work_orders')
       .select('id, title, status, vehicles(make,model,license_plate), customers(first_name,last_name), leads!inner(urgency)')
       .eq('organization_id', org.id)
-      .in('status', ['open', 'in_progress', 'waiting_parts'])
+      .in('status', ACTIVE_WORK_ORDER_STATUSES)
       .in('leads.urgency', ['high', 'critical'])
       .order('updated_at', { ascending: false })
       .limit(6),
@@ -595,7 +589,7 @@ export default async function DashboardPage({
                     </div>
                     <div className="relative z-10 flex shrink-0 flex-col items-end gap-1.5">
                       {v.status ? (
-                        <Badge variant={WO_STATUS_VARIANT[v.status] ?? 'muted'}>{t(`workOrderStatus.${v.status}`)}</Badge>
+                        <Badge variant={WORK_ORDER_STATUS_VARIANT[v.status as WorkOrderStatus] ?? 'muted'}>{t(`workOrderStatus.${v.status}`)}</Badge>
                       ) : (
                         <Badge variant="muted">{t('dashboard.vehicleNoActiveWork')}</Badge>
                       )}
@@ -634,7 +628,7 @@ export default async function DashboardPage({
                         {w.vehicles ? ` · ${[w.vehicles.make, w.vehicles.model].filter(Boolean).join(' ')}` : ''}
                       </div>
                     </div>
-                    <Badge variant={WO_STATUS_VARIANT[w.status] ?? 'muted'}>{t(`workOrderStatus.${w.status}`)}</Badge>
+                    <Badge variant={WORK_ORDER_STATUS_VARIANT[w.status as WorkOrderStatus] ?? 'muted'}>{t(`workOrderStatus.${w.status}`)}</Badge>
                   </Link>
                 </li>
               ))}

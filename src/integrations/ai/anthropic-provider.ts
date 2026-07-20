@@ -8,6 +8,7 @@ import type {
   LanguageDetectionInput,
   LeadSummaryInput,
   MediaDiagnosisInput,
+  RepairReportInput,
   UrgencyInput,
 } from './types';
 import {
@@ -15,11 +16,13 @@ import {
   languageDetectionSchema,
   leadSummarySchema,
   mediaDiagnosisSchema,
+  repairReportSchema,
   urgencyAssessmentSchema,
   type DraftedReply,
   type LanguageDetection,
   type LeadSummary,
   type MediaDiagnosis,
+  type RepairReport,
   type UrgencyAssessment,
 } from './schemas';
 import { findEmergencyKeywords } from './emergency-keywords';
@@ -300,5 +303,76 @@ export class AnthropicAIProvider implements AIProvider {
       return { status: 'handoff', reason: 'Model output failed validation.', meta: this.meta(0.2, Date.now() - started) };
     }
     return { status: 'ok', data: parsed.data, meta: this.meta(0.75, Date.now() - started) };
+  }
+
+  async draftRepairReport(input: RepairReportInput): Promise<AIResult<RepairReport>> {
+    const started = Date.now();
+    if (input.checklistFindings.length === 0 && input.diagnoses.length === 0) {
+      return { status: 'handoff', reason: 'Nothing to report: no checklist findings or diagnoses yet.', meta: this.meta(0.1, Date.now() - started) };
+    }
+
+    const tool: Tool = {
+      name: 'submit_repair_report',
+      description: 'Submit the repair report and client message.',
+      input_schema: {
+        type: 'object',
+        properties: {
+          summary: { type: 'string' },
+          recommendedRepairs: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                label: { type: 'string' },
+                urgency: { type: 'string', enum: ['low', 'medium', 'high', 'urgent'] },
+                reason: { type: 'string' },
+              },
+              required: ['label', 'urgency', 'reason'],
+            },
+          },
+          reportText: { type: 'string' },
+          clientMessage: {
+            type: 'object',
+            properties: {
+              subject: { type: 'string' },
+              body: { type: 'string' },
+            },
+            required: ['subject', 'body'],
+          },
+        },
+        required: ['summary', 'recommendedRepairs', 'reportText', 'clientMessage'],
+      },
+    };
+
+    const vehicleLabel = [input.vehicle.make, input.vehicle.model, input.vehicle.year]
+      .filter(Boolean)
+      .join(' ');
+    const findingsText = input.checklistFindings
+      .map((f) => `- [checklist] ${f.label}: ${f.result}${f.note ? ` — ${f.note}` : ''}`)
+      .join('\n');
+    const diagnosesText = input.diagnoses
+      .map(
+        (d, i) =>
+          `- [photo diagnosis ${i + 1}] severity ${d.severity}. Visible problems: ${d.visibleProblems.join('; ')}. Affected parts: ${d.affectedParts.join(', ') || 'none'}. Causes: ${d.causes.join('; ')}. Estimated repair time: ${d.estimatedRepairTime}.`,
+      )
+      .join('\n');
+
+    const result = await this.callTool({
+      system: `You are Robin, an AI assistant for a car garage. Compose a professional repair report for the mechanic/shop foreman and a ready-to-send client message, in ${LANGUAGE_NAME[input.language] ?? input.language}, explaining the recommended repairs. Base this ONLY on the checklist findings and photo diagnoses given below for ${vehicleLabel || 'this vehicle'}${input.vehicle.licensePlate ? ` (${input.vehicle.licensePlate})` : ''} — never invent findings that weren't reported. The client message must be polite, professional, explain why each repair is recommended, and ask the client to confirm before work starts (no fixed price promise).`,
+      userContent: [
+        {
+          type: 'text',
+          text: [findingsText, diagnosesText].filter(Boolean).join('\n'),
+        },
+      ],
+      tool,
+    });
+    if ('error' in result) return { status: 'error', error: result.error, meta: this.meta(0, Date.now() - started) };
+
+    const parsed = repairReportSchema.safeParse(result.input);
+    if (!parsed.success) {
+      return { status: 'handoff', reason: 'Model output failed validation.', meta: this.meta(0.2, Date.now() - started) };
+    }
+    return { status: 'ok', data: parsed.data, meta: this.meta(0.7, Date.now() - started) };
   }
 }

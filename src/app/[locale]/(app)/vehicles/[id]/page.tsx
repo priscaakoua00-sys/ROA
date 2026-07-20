@@ -1,22 +1,59 @@
 export const dynamic = 'force-dynamic';
 
 import { notFound, redirect } from 'next/navigation';
-import { History } from 'lucide-react';
+import { History, CalendarDays, Wrench, Receipt, Camera, Inbox } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { updateVehicleAction, uploadVehiclePhotoAction } from '@/data/vehicles/actions';
+import { getVehicleTimeline } from '@/data/timeline/build';
 import { formatDateTimeUTC } from '@/lib/datetime';
 import { ModuleBanner } from '@/components/module-banner';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import type { BadgeProps } from '@/components/ui/badge';
 import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
 import { CarIllustration } from '@/components/vehicles/car-illustration';
 import { VAN_MODEL_PATTERN } from '@/components/vehicles/vehicle-card';
 import { PhotoDiagnosisPanel, type DiagnosisRow } from '@/components/diagnosis/photo-diagnosis-panel';
+import { TimelineList, type TimelineItemView } from '@/components/timeline/timeline-list';
 import type { DiagnosisSeverity, VehicleAngle } from '@/integrations/ai';
 import { isExternalPhotoUrl } from '@/lib/utils';
 import { FlashToast } from '@/components/flash-toast';
+import { WORK_ORDER_STATUS_VARIANT, type WorkOrderStatus } from '@/lib/work-order-status';
+
+const APPT_STATUS_VARIANT: Record<string, BadgeProps['variant']> = {
+  proposed: 'muted',
+  pending: 'muted',
+  confirmed: 'default',
+  completed: 'success',
+  cancelled: 'muted',
+  no_show: 'urgent',
+};
+const INVOICE_STATUS_VARIANT: Record<string, BadgeProps['variant']> = {
+  draft: 'muted',
+  to_prepare: 'gold',
+  sent: 'default',
+  partially_paid: 'gold',
+  paid: 'success',
+  overdue: 'urgent',
+  cancelled: 'muted',
+};
+const DIAGNOSIS_SEVERITY_VARIANT: Record<string, BadgeProps['variant']> = {
+  low: 'success',
+  medium: 'gold',
+  high: 'urgent',
+  urgent: 'urgent',
+};
+const LEAD_STATUS_VARIANT: Record<string, BadgeProps['variant']> = {
+  new: 'gold',
+  qualifying: 'default',
+  qualified: 'default',
+  appointment_proposed: 'default',
+  booked: 'success',
+  won: 'success',
+  lost: 'muted',
+  archived: 'muted',
+};
 
 export default async function VehicleDetailPage({
   params,
@@ -54,10 +91,7 @@ export default async function VehicleDetailPage({
   }
   const kind = VAN_MODEL_PATTERN.test(`${v.make ?? ''} ${v.model ?? ''}`) ? 'van' : 'hatch';
 
-  const [{ data: leads }, { data: appts }, { data: wos }, { data: diagData }] = await Promise.all([
-    supabase.from('leads').select('id, ai_summary, description, status, created_at').eq('vehicle_id', id).order('created_at', { ascending: false }).limit(15),
-    supabase.from('appointments').select('id, starts_at, status, services(name)').eq('vehicle_id', id).order('starts_at', { ascending: false }).limit(15),
-    supabase.from('work_orders').select('id, title, status').eq('vehicle_id', id).order('created_at', { ascending: false }).limit(15),
+  const [{ data: diagData }, timeline] = await Promise.all([
     supabase
       .from('photo_diagnoses')
       .select(
@@ -65,6 +99,7 @@ export default async function VehicleDetailPage({
       )
       .eq('vehicle_id', id)
       .order('created_at', { ascending: false }),
+    getVehicleTimeline(supabase, id),
   ]);
   const diagRows = (diagData ?? []) as unknown as {
     id: string;
@@ -227,32 +262,77 @@ export default async function VehicleDetailPage({
         </div>
       </form>
 
-      {/* History */}
+      {/* Timeline: a single chronological history, from arrival to delivery. */}
       <section className="mt-6">
-        <h2 className="text-base font-semibold tracking-tight">{t('vehicles.historyTitle')}</h2>
-        {(leads ?? []).length === 0 && (appts ?? []).length === 0 && (wos ?? []).length === 0 ? (
+        <div className="flex items-center gap-2">
+          <History className="size-4 text-gold" aria-hidden />
+          <h2 className="text-base font-semibold tracking-tight">{t('vehicles.historyTitle')}</h2>
+        </div>
+        {timeline.length === 0 ? (
           <p className="mt-2 text-sm text-muted-foreground">{t('customers.noHistory')}</p>
         ) : (
-          <div className="mt-2 space-y-2">
-            {(appts ?? []).map((a) => (
-              <div key={a.id} className="flex items-center justify-between rounded-xl border border-border bg-card p-3 text-sm shadow-soft">
-                <span>📅 {formatDateTimeUTC(a.starts_at, locale)}{(a.services as unknown as { name: string | null } | null)?.name ? ` · ${(a.services as unknown as { name: string | null }).name}` : ''}</span>
-                <Badge variant="muted">{t(`appointmentStatus.${a.status}`)}</Badge>
-              </div>
-            ))}
-            {(wos ?? []).map((w) => (
-              <Link key={w.id} href={`/work-orders/${w.id}`} className="flex items-center justify-between rounded-xl border border-border bg-card p-3 text-sm shadow-soft transition hover:border-gold/40">
-                <span className="truncate">🔧 {w.title}</span>
-                <Badge variant="muted">{t(`workOrderStatus.${w.status}`)}</Badge>
-              </Link>
-            ))}
-            {(leads ?? []).map((l) => (
-              <Link key={l.id} href={`/leads/${l.id}`} className="flex items-center justify-between gap-2 rounded-xl border border-border bg-card p-3 text-sm shadow-soft transition hover:border-gold/40">
-                <span className="truncate text-muted-foreground">{l.ai_summary ?? l.description}</span>
-                <Badge variant="muted">{t(`leads.status.${l.status}`)}</Badge>
-              </Link>
-            ))}
-          </div>
+          <TimelineList
+            items={(() => {
+              const severityLabel: Record<string, string> = {
+                low: t('diagnosis.severityLow'),
+                medium: t('diagnosis.severityMedium'),
+                high: t('diagnosis.severityHigh'),
+                urgent: t('diagnosis.severityUrgent'),
+              };
+              return timeline.map((ev): TimelineItemView => {
+              switch (ev.kind) {
+                case 'status':
+                  return {
+                    id: ev.id,
+                    at: ev.at,
+                    icon: Wrench,
+                    label: ev.meta ? `${ev.meta} — ${formatDateTimeUTC(ev.at, locale)}` : formatDateTimeUTC(ev.at, locale),
+                    badgeLabel: t(`workOrderStatus.${ev.status}`),
+                    badgeVariant: WORK_ORDER_STATUS_VARIANT[ev.status as WorkOrderStatus] ?? 'muted',
+                    href: ev.href,
+                  };
+                case 'appointment':
+                  return {
+                    id: ev.id,
+                    at: ev.at,
+                    icon: CalendarDays,
+                    label: ev.meta ? `${formatDateTimeUTC(ev.at, locale)} · ${ev.meta}` : formatDateTimeUTC(ev.at, locale),
+                    badgeLabel: t(`appointmentStatus.${ev.status}`),
+                    badgeVariant: APPT_STATUS_VARIANT[ev.status] ?? 'muted',
+                  };
+                case 'invoice':
+                  return {
+                    id: ev.id,
+                    at: ev.at,
+                    icon: Receipt,
+                    label: t('workOrders.viewInvoice', { number: ev.meta ?? '' }),
+                    badgeLabel: t(`invoiceStatus.${ev.status}`),
+                    badgeVariant: INVOICE_STATUS_VARIANT[ev.status] ?? 'muted',
+                    href: ev.href,
+                  };
+                case 'diagnosis':
+                  return {
+                    id: ev.id,
+                    at: ev.at,
+                    icon: Camera,
+                    label: t('workOrders.timelineDiagnosis'),
+                    badgeLabel: severityLabel[ev.status] ?? ev.status,
+                    badgeVariant: DIAGNOSIS_SEVERITY_VARIANT[ev.status] ?? 'muted',
+                  };
+                default:
+                  return {
+                    id: ev.id,
+                    at: ev.at,
+                    icon: Inbox,
+                    label: formatDateTimeUTC(ev.at, locale),
+                    badgeLabel: t(`leads.status.${ev.status}`),
+                    badgeVariant: LEAD_STATUS_VARIANT[ev.status] ?? 'muted',
+                    href: ev.href,
+                  };
+              }
+              });
+            })()}
+          />
         )}
       </section>
 
