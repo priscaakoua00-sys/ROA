@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { Volume2, VolumeX } from 'lucide-react';
 import { COPY, type Locale } from './content';
-import { speakAsRobin } from './robin-voice';
+import { speakAsRobin, RECORDED_VOICE } from './robin-voice';
 import heroCar from '../../../public/landing/hero-car.png';
 
 const MUTE_KEY = 'roavaa-hero-muted';
@@ -51,6 +51,8 @@ export function HeroCarExperience({ locale }: { locale: Locale }) {
   const [pulse, setPulse] = useState(false);
   const [muted, setMuted] = useState(false);
   const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const recordedSrc = RECORDED_VOICE[locale];
 
   useEffect(() => {
     const stored = window.localStorage.getItem(MUTE_KEY);
@@ -71,7 +73,10 @@ export function HeroCarExperience({ locale }: { locale: Locale }) {
     setMuted((prev) => {
       const next = !prev;
       window.localStorage.setItem(MUTE_KEY, next ? '1' : '0');
-      if (next) window.speechSynthesis?.cancel();
+      if (next) {
+        window.speechSynthesis?.cancel();
+        audioRef.current?.pause();
+      }
       return next;
     });
   }, []);
@@ -82,12 +87,21 @@ export function HeroCarExperience({ locale }: { locale: Locale }) {
     setTimeout(() => setPulse(false), 700);
     if (muted) return;
     playDoorSound();
+    if (recordedSrc) {
+      setTimeout(() => {
+        if (!audioRef.current) audioRef.current = new Audio(recordedSrc);
+        const audio = audioRef.current;
+        audio.currentTime = 0;
+        void audio.play();
+      }, 300);
+      return;
+    }
     window.speechSynthesis?.cancel();
     setTimeout(() => {
       const utter = speakAsRobin(c.doorLine, locale, voicesRef.current);
       window.speechSynthesis?.speak(utter);
     }, 300);
-  }, [muted, c.doorLine, locale]);
+  }, [muted, c.doorLine, locale, recordedSrc]);
 
   return (
     <div className="lp-carhero">
