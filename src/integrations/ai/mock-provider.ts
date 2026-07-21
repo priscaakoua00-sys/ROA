@@ -2,6 +2,7 @@ import type { AIProvider } from './provider';
 import type {
   AIResult,
   AIResultMeta,
+  AssistantQuestionInput,
   DraftReplyInput,
   LanguageDetectionInput,
   LeadSummaryInput,
@@ -11,12 +12,14 @@ import type {
   UrgencyInput,
 } from './types';
 import {
+  assistantAnswerSchema,
   draftedReplySchema,
   languageDetectionSchema,
   leadSummarySchema,
   mediaDiagnosisSchema,
   repairReportSchema,
   urgencyAssessmentSchema,
+  type AssistantAnswer,
   type DraftedReply,
   type LanguageDetection,
   type LeadSummary,
@@ -323,6 +326,20 @@ export class MockAIProvider implements AIProvider {
       status: 'ok',
       data: repairReportSchema.parse(report),
       meta: this.meta(0.6),
+    };
+  }
+
+  async answerAssistantQuestion(input: AssistantQuestionInput): Promise<AIResult<AssistantAnswer>> {
+    const text = {
+      nl: `Ik kon geen kant-en-klaar antwoord vinden voor "${input.question}". Hier is wat ik nu weet:\n\n${input.context}`,
+      en: `I couldn't find a ready answer for "${input.question}". Here's what I know right now:\n\n${input.context}`,
+      fr: `Je n'ai pas trouvé de réponse toute faite pour « ${input.question} ». Voici ce que je sais pour le moment :\n\n${input.context}`,
+    }[input.language];
+
+    return {
+      status: 'ok',
+      data: assistantAnswerSchema.parse({ answer: text }),
+      meta: this.meta(0.3),
     };
   }
 }

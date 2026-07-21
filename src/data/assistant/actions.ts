@@ -5,6 +5,8 @@ import { createSupabaseServerClient } from '@/data/supabase/server';
 import { formatTimeUTC } from '@/lib/datetime';
 import { loadRobinInsight } from '@/data/robin/load';
 import { ACTIVE_WORK_ORDER_STATUSES } from '@/lib/work-order-status';
+import { getAIProvider } from '@/integrations/ai';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -118,6 +120,43 @@ function insightLink(
     return [{ label: t('dashboard.actAgenda'), href: '/agenda' }];
   }
   return [];
+}
+
+const CONTEXT_LABELS: Record<Locale, { activeWorkOrders: string; newLeads: string; apptsToday: string }> = {
+  nl: { activeWorkOrders: 'Actieve werkorders', newLeads: 'Nieuwe aanvragen', apptsToday: 'Afspraken vandaag' },
+  en: { activeWorkOrders: 'Active work orders', newLeads: 'New leads', apptsToday: 'Appointments today' },
+  fr: { activeWorkOrders: 'Ordres de réparation actifs', newLeads: 'Nouvelles demandes', apptsToday: "Rendez-vous aujourd'hui" },
+};
+
+/** A short, real-numbers-only snapshot of the garage's current state, for the AI fallback answer. */
+async function buildAssistantContext(supabase: SupabaseClient, orgId: string, locale: Locale): Promise<string> {
+  const now = new Date();
+  const todayStart = new Date(now);
+  todayStart.setUTCHours(0, 0, 0, 0);
+  const todayEnd = new Date(todayStart.getTime() + 24 * 3_600_000);
+
+  const [{ count: activeWorkOrders }, { count: newLeads }, { count: apptsToday }] = await Promise.all([
+    supabase
+      .from('work_orders')
+      .select('id', { count: 'exact', head: true })
+      .eq('organization_id', orgId)
+      .in('status', ACTIVE_WORK_ORDER_STATUSES),
+    supabase.from('leads').select('id', { count: 'exact', head: true }).eq('organization_id', orgId).eq('status', 'new'),
+    supabase
+      .from('appointments')
+      .select('id', { count: 'exact', head: true })
+      .eq('organization_id', orgId)
+      .neq('status', 'cancelled')
+      .gte('starts_at', todayStart.toISOString())
+      .lt('starts_at', todayEnd.toISOString()),
+  ]);
+
+  const l = CONTEXT_LABELS[locale];
+  return [
+    `${l.activeWorkOrders}: ${activeWorkOrders ?? 0}`,
+    `${l.newLeads}: ${newLeads ?? 0}`,
+    `${l.apptsToday}: ${apptsToday ?? 0}`,
+  ].join('\n');
 }
 
 export async function getRobinGreetingAction(orgId: string, rawLocale: string): Promise<RobinChatAnswer> {
@@ -289,6 +328,22 @@ export async function askRobinAction(
       links: [{ label: name, href: `/customers/${customer.id}` }],
       topic: 'call',
     };
+  }
+
+  // No fast intent matched: hand the raw question to the real AI provider
+  // (when configured) with a small, real-numbers-only snapshot of the
+  // garage's data, instead of a canned "I don't understand" message. Any
+  // failure (no provider configured, network error, bad model output)
+  // falls back to the same canned message as before — never worse than the
+  // deterministic path.
+  try {
+    const context = await buildAssistantContext(supabase, orgId, locale);
+    const result = await getAIProvider().answerAssistantQuestion({ language: locale, question, context });
+    if (result.status === 'ok') {
+      return { text: result.data.answer, links: [], topic: 'fallback' };
+    }
+  } catch {
+    // Provider misconfigured or unreachable — fall through to the canned reply.
   }
 
   return { text: t('robinChat.answers.fallback'), links: [], topic: 'fallback' };

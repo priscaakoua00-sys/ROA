@@ -4,6 +4,7 @@ import type { AIProvider } from './provider';
 import type {
   AIResult,
   AIResultMeta,
+  AssistantQuestionInput,
   DraftReplyInput,
   LanguageDetectionInput,
   LeadSummaryInput,
@@ -12,12 +13,14 @@ import type {
   UrgencyInput,
 } from './types';
 import {
+  assistantAnswerSchema,
   draftedReplySchema,
   languageDetectionSchema,
   leadSummarySchema,
   mediaDiagnosisSchema,
   repairReportSchema,
   urgencyAssessmentSchema,
+  type AssistantAnswer,
   type DraftedReply,
   type LanguageDetection,
   type LeadSummary,
@@ -374,5 +377,32 @@ export class AnthropicAIProvider implements AIProvider {
       return { status: 'handoff', reason: 'Model output failed validation.', meta: this.meta(0.2, Date.now() - started) };
     }
     return { status: 'ok', data: parsed.data, meta: this.meta(0.7, Date.now() - started) };
+  }
+
+  async answerAssistantQuestion(input: AssistantQuestionInput): Promise<AIResult<AssistantAnswer>> {
+    const started = Date.now();
+
+    const tool: Tool = {
+      name: 'submit_answer',
+      description: "Submit the answer to the mechanic's question.",
+      input_schema: {
+        type: 'object',
+        properties: { answer: { type: 'string' } },
+        required: ['answer'],
+      },
+    };
+
+    const result = await this.callTool({
+      system: `You are Robin, the AI assistant inside a car garage's management software, answering the shop owner or a mechanic directly inside the app, in ${LANGUAGE_NAME[input.language] ?? input.language}. Answer ONLY using the "Current garage data" snapshot below — never invent customer names, vehicles, appointments, amounts, or any other fact not present in it. If the answer isn't in the snapshot, say so plainly and suggest which screen of the app to check instead. Keep the answer short (2-4 sentences), direct, and in a warm but professional tone. This is not medical, legal, or safety advice — for any safety-critical vehicle issue, tell the mechanic to inspect it in person rather than guessing.\n\nCurrent garage data:\n${input.context}`,
+      userContent: [{ type: 'text', text: input.question }],
+      tool,
+    });
+    if ('error' in result) return { status: 'error', error: result.error, meta: this.meta(0, Date.now() - started) };
+
+    const parsed = assistantAnswerSchema.safeParse(result.input);
+    if (!parsed.success) {
+      return { status: 'handoff', reason: 'Model output failed validation.', meta: this.meta(0.2, Date.now() - started) };
+    }
+    return { status: 'ok', data: parsed.data, meta: this.meta(0.65, Date.now() - started) };
   }
 }
