@@ -5,5 +5,5 @@
  * current Vercel production URL.
  */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://roa-sigma.vercel.app'
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://roavaa.com'
 ).replace(/\/+$/, '');

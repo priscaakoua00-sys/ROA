@@ -740,7 +740,9 @@
       "approve": "Approve",
       "view": "View",
       "youDecide": "You decide"
-    }
+    },
+    "seoTitle": "ROAVAA – AI garage software for scheduling, customers and invoices",
+    "seoDescription": "ROAVAA is smart garage software with Robin, your AI employee. Manage customers, vehicles, appointments, work orders, communication and professional invoices from one platform."
   },
   "footer": {
     "signature": "Responds. Organizes. Learns.",
@@ -857,7 +859,9 @@
       "apiAccess": "API access",
       "prioritySupport": "Priority support",
       "emailSupport": "Email support"
-    }
+    },
+    "seoTitle": "Pricing – ROAVAA AI garage software with Robin",
+    "seoDescription": "See ROAVAA's plans: Starter, Professional and Enterprise. Smart garage software with Robin AI, invoicing, scheduling and more."
   },
   "card": {
     "scanHint": "Scan to save this contact",
