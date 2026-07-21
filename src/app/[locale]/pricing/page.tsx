@@ -94,9 +94,12 @@ export default async function PricingPage({
             <p className="mt-4 text-xs font-medium text-muted-foreground">{t('featuresTitle')}</p>
             <PlanFeatureList plan={plan} t={t} />
 
-            <span className="mt-5 flex w-full cursor-not-allowed items-center justify-center rounded-md border border-border px-4 py-2 text-sm font-medium text-muted-foreground">
-              {t('cta')}
-            </span>
+            <Link
+              href={{ pathname: '/signup', query: { plan: plan.key } }}
+              className="mt-5 flex w-full items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
+            >
+              {t('cta')} →
+            </Link>
           </div>
         ))}
       </div>

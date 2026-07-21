@@ -9,11 +9,11 @@ export default async function SignupPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; plan?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { error } = await searchParams;
+  const { error, plan } = await searchParams;
   const t = await getTranslations('auth');
 
   return (
@@ -21,6 +21,7 @@ export default async function SignupPage({
       {error ? <p className="mb-4 text-sm text-urgent">{t('errors.generic')}</p> : null}
       <form action={signUpAction} className="space-y-4">
         <input type="hidden" name="locale" value={locale} />
+        {plan ? <input type="hidden" name="plan" value={plan} /> : null}
         <Field label={t('fields.fullName')} name="fullName" autoComplete="name" required />
         <Field label={t('fields.email')} name="email" type="email" autoComplete="email" required />
         <Field label={t('fields.password')} name="password" type="password" autoComplete="new-password" required />

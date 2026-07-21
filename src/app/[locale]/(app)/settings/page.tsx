@@ -21,6 +21,8 @@ import { LAUNCH_FREE } from '@/lib/pricing';
 import { PLANS, formatMonthlyPrice } from '@/lib/plans';
 import { getOrgSubscription } from '@/data/subscriptions/get-subscription';
 import { countVehicles, countSeats, countAiAnalysesThisMonth } from '@/data/subscriptions/usage';
+import { startCheckoutAction, openBillingPortalAction } from '@/data/subscriptions/stripe-actions';
+import { isPlatformOwnerEmail } from '@/lib/platform-admin';
 import { Badge } from '@/components/ui/badge';
 import { FlashToast } from '@/components/flash-toast';
 import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button';
@@ -48,11 +50,11 @@ export default async function SettingsPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ saved?: string; error?: string }>;
+  searchParams: Promise<{ saved?: string; error?: string; stripe?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { saved, error } = await searchParams;
+  const { saved, error, stripe } = await searchParams;
   const t = await getTranslations('app');
   const tPricing = await getTranslations('pricing');
 
@@ -90,6 +92,7 @@ export default async function SettingsPage({
     countSeats(supabase, org.id),
     countAiAnalysesThisMonth(supabase, org.id),
   ]);
+  const isPlatformOwner = isPlatformOwnerEmail(user.email);
   const currentPlan = PLANS.find((p) => p.key === subscription.planKey) ?? PLANS[0]!;
   const trialDaysLeft = subscription.trialEndsAt
     ? Math.max(0, Math.ceil((new Date(subscription.trialEndsAt).getTime() - Date.now()) / 86_400_000))
@@ -126,7 +129,17 @@ export default async function SettingsPage({
 
   return (
     <div className="container max-w-2xl py-10">
-      <FlashToast success={saved ? t('settings.saved') : null} error={error ? t('team.error') : null} />
+      <FlashToast
+        success={saved ? t('settings.saved') : null}
+        error={error ? t('team.error') : null}
+        info={
+          stripe === 'pending'
+            ? t('settings.billingPendingToast')
+            : stripe === 'cancelled'
+              ? t('settings.billingCancelledToast')
+              : null
+        }
+      />
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">{t('settings.title')}</h1>
         <Link href="/dashboard" className="text-sm text-muted-foreground hover:underline">
@@ -155,9 +168,21 @@ export default async function SettingsPage({
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <span className="text-sm font-semibold">{tPricing(`plans.${currentPlan.key}`)}</span>
-              <Badge variant={subscription.status === 'active' ? 'success' : subscription.status === 'trialing' ? 'gold' : 'urgent'}>
-                {t(`settings.billingStatus.${subscription.status}`)}
-              </Badge>
+              {isPlatformOwner ? (
+                <Badge variant="gold">{t('settings.billingSuperAdmin')}</Badge>
+              ) : (
+                <Badge
+                  variant={
+                    subscription.status === 'active'
+                      ? 'success'
+                      : subscription.status === 'trialing'
+                        ? 'gold'
+                        : 'urgent'
+                  }
+                >
+                  {t(`settings.billingStatus.${subscription.status}`)}
+                </Badge>
+              )}
             </div>
             <span className="text-lg font-semibold tracking-tight">
               {currentPlan.monthlyPrice === null ? (
@@ -199,6 +224,40 @@ export default async function SettingsPage({
               ))}
             </ul>
           </div>
+
+          {isPlatformOwner ? (
+            <div className="mt-4 rounded-lg border border-gold/30 bg-gold/5 p-4">
+              <p className="text-sm font-semibold">{t('settings.billingSuperAdmin')}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t('settings.billingSuperAdminNote')}</p>
+            </div>
+          ) : subscription.provider === 'stripe' ? (
+            <div className="mt-4 border-t border-border pt-4">
+              <p className="text-xs font-medium text-muted-foreground">{t('settings.billingManage')}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t('settings.billingManageIntro')}</p>
+              <form action={openBillingPortalAction} className="mt-2">
+                <input type="hidden" name="locale" value={locale} />
+                <Button type="submit" variant="outline" size="sm">
+                  {t('settings.billingManage')}
+                </Button>
+              </form>
+            </div>
+          ) : (
+            <div className="mt-4 rounded-lg border border-gold/30 bg-gold/5 p-4">
+              <p className="text-sm font-semibold">{t('settings.billingActivateTitle')}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t('settings.billingActivateBody')}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {PLANS.map((plan) => (
+                  <form key={plan.key} action={startCheckoutAction}>
+                    <input type="hidden" name="locale" value={locale} />
+                    <input type="hidden" name="planKey" value={plan.key} />
+                    <Button type="submit" variant={plan.key === subscription.planKey ? 'default' : 'outline'} size="sm">
+                      {t('settings.billingChoosePlanCta', { plan: tPricing(`plans.${plan.key}`) })}
+                    </Button>
+                  </form>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <Link href="/pricing" className="mt-3 inline-block text-sm text-gold hover:underline">

@@ -31,6 +31,7 @@ export const createOrgSchema = z.object({
   name: z.string().trim().min(2).max(120),
   businessType: z.enum(BUSINESS_TYPES).default('garage'),
   language: z.enum(['nl', 'en', 'fr']).default('nl'),
+  planKey: z.enum(['starter', 'professional', 'enterprise']).default('starter'),
 });
 
 export type SignInInput = z.infer<typeof signInSchema>;
