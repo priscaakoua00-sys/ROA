@@ -744,7 +744,7 @@ export default async function DashboardPage({
           <div className="mt-3 rounded-2xl border border-border bg-card p-5 shadow-soft">
             <h3 className="text-sm font-medium text-muted-foreground">{t('dashboard.revenueChartTitle')}</h3>
             <div className="mt-3">
-              <RevenueChart data={revenueSeries} formatAmount={(n) => formatCurrency(n, locale)} />
+              <RevenueChart data={revenueSeries} locale={locale} />
             </div>
           </div>
         </section>
