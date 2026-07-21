@@ -542,3 +542,21 @@
   .lp-sim-panel { padding: 1.3rem; }
   .lp-journey-step { flex: 1 0 7rem; }
 }
+
+/* Hero: on-demand spoken welcome from Robin (no autoplay) */
+.lp-voice-hero { margin-top: 1.4rem; }
+.lp-voice-intro {
+  display: inline-flex; align-items: center; gap: 0.75rem;
+  padding: 0.5rem 1.1rem 0.5rem 0.5rem; border-radius: 999px;
+  border: 1px solid var(--lp-line-d); background: rgba(236, 228, 215, 0.04);
+  color: var(--lp-bone); cursor: pointer; transition: border-color 0.2s, background 0.2s;
+}
+.lp-voice-intro:hover { border-color: var(--lp-amber); background: rgba(227, 154, 59, 0.08); }
+.lp-voice-intro .ico {
+  flex: none; width: 2.15rem; height: 2.15rem; border-radius: 999px; display: grid; place-items: center;
+  background: linear-gradient(150deg, #3a2c1e, #241a12); border: 1px solid var(--lp-line-d); color: var(--lp-amber);
+}
+.lp-voice-intro.playing .ico { color: #e39a3b; animation: lp-pulse 1.4s infinite; }
+.lp-voice-intro .txt { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.3; }
+.lp-voice-intro .cta { font-size: 0.88rem; font-weight: 500; }
+.lp-voice-intro .dur { font-family: 'JetBrains Mono', monospace; font-size: 0.64rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lp-bone-dim); }

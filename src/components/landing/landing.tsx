@@ -3,6 +3,7 @@ import { COPY, type Locale } from './content';
 import { LiveStream } from './live-stream';
 import { Reveal } from './reveal';
 import { RobinSimulation } from './robin-simulation';
+import { RobinVoiceIntro } from './robin-voice-intro';
 import { VoiceDemo } from './voice-demo';
 
 const LOCALES: Locale[] = ['nl', 'en', 'fr'];
@@ -52,6 +53,9 @@ export function Landing({ locale }: { locale: Locale }) {
               <div className="lp-cta">
                 <a className="lp-btn" href={`/${safeLocale}/signup`}>{c.hero.ctaPrimary} →</a>
                 <a className="lp-btn ghost" href="#werk">{c.hero.ctaSecondary}</a>
+              </div>
+              <div className="lp-voice-hero">
+                <RobinVoiceIntro locale={safeLocale} />
               </div>
               <div className="lp-sig">
                 <span className="lp-serif">
