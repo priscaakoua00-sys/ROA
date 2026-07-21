@@ -1,9 +1,27 @@
+import type { Metadata } from 'next';
 import { Sparkles } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { PLANS, formatMonthlyPrice } from '@/lib/plans';
 import { PlanFeatureList } from '@/components/pricing/plan-feature-list';
 import { cn } from '@/lib/utils';
+import { SITE_URL } from '@/lib/site';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'pricing' });
+  const path = `/${locale}/pricing`;
+
+  return {
+    title: { absolute: t('seoTitle') },
+    description: t('seoDescription'),
+    alternates: { canonical: path },
+  };
+}
 
 export default async function PricingPage({
   params,
@@ -14,8 +32,21 @@ export default async function PricingPage({
   setRequestLocale(locale);
   const t = await getTranslations('pricing');
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'ROAVAA', item: `${SITE_URL}/${locale}` },
+      { '@type': 'ListItem', position: 2, name: t('title'), item: `${SITE_URL}/${locale}/pricing` },
+    ],
+  };
+
   return (
     <main className="mx-auto max-w-6xl px-4 py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <Link href="/" className="text-sm text-muted-foreground hover:underline">
         {t('backHome')}
       </Link>

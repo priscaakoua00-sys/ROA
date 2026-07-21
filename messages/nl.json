@@ -740,7 +740,9 @@
       "approve": "Goedkeuren",
       "view": "Bekijken",
       "youDecide": "Jij beslist"
-    }
+    },
+    "seoTitle": "ROAVAA – AI-garagistensoftware voor planning, klanten en facturen",
+    "seoDescription": "ROAVAA is slimme garagesoftware met Robin, uw AI-medewerker. Beheer klanten, voertuigen, afspraken, werkorders, communicatie en professionele facturen vanuit één platform."
   },
   "footer": {
     "signature": "Reageert. Organiseert. Leert.",
@@ -857,7 +859,9 @@
       "apiAccess": "API-toegang",
       "prioritySupport": "Prioritaire ondersteuning",
       "emailSupport": "E-mailondersteuning"
-    }
+    },
+    "seoTitle": "Prijzen – ROAVAA garagesoftware met AI-medewerker Robin",
+    "seoDescription": "Bekijk de ROAVAA-abonnementen: Starter, Professional en Enterprise. Slimme garagesoftware met Robin AI, facturatie, agenda en meer."
   },
   "card": {
     "scanHint": "Scan om dit contact op te slaan",

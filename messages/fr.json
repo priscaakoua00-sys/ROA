@@ -740,7 +740,9 @@
       "approve": "Approuver",
       "view": "Voir",
       "youDecide": "Vous décidez"
-    }
+    },
+    "seoTitle": "ROAVAA – Logiciel de garage avec IA pour planning, clients et factures",
+    "seoDescription": "ROAVAA est un logiciel de garage intelligent avec Robin, votre employé IA. Gérez clients, véhicules, rendez-vous, ordres de réparation, communication et factures professionnelles depuis une seule plateforme."
   },
   "footer": {
     "signature": "Répond. Organise. Apprend.",
@@ -857,7 +859,9 @@
       "apiAccess": "Accès API",
       "prioritySupport": "Support prioritaire",
       "emailSupport": "Support par e-mail"
-    }
+    },
+    "seoTitle": "Tarifs – Logiciel de garage ROAVAA avec IA",
+    "seoDescription": "Découvrez les formules ROAVAA : Starter, Professional et Enterprise. Logiciel de garage intelligent avec Robin IA, facturation, agenda et plus."
   },
   "card": {
     "scanHint": "Scannez pour enregistrer ce contact",

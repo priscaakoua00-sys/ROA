@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="g" x1="15%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#10131a"/>
+      <stop offset="60%" stop-color="#0c0e13"/>
+      <stop offset="100%" stop-color="#090b10"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="22" fill="url(#g)"/>
+  <text x="47" y="68" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-weight="700" font-size="58" fill="#f4ede1" letter-spacing="-2">R<tspan fill="#e7b040">.</tspan></text>
+</svg>
