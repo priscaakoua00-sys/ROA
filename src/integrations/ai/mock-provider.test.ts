@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { MockAIProvider } from './mock-provider';
 import {
+  assistantAnswerSchema,
   draftedReplySchema,
   languageDetectionSchema,
   leadSummarySchema,
@@ -129,6 +130,19 @@ describe('MockAIProvider', () => {
     if (result.status === 'ok') {
       expect(() => mediaDiagnosisSchema.parse(result.data)).not.toThrow();
       expect(result.data.affectedParts).toEqual([]);
+    }
+  });
+
+  it('answers a free-form question with schema-valid data grounded in the given context', async () => {
+    const result = await provider.answerAssistantQuestion({
+      language: 'fr',
+      question: 'Combien de véhicules sont en cours ?',
+      context: 'Ordres de réparation actifs: 3\nNouvelles demandes: 1\nRendez-vous aujourd\'hui: 2',
+    });
+    expect(result.status).toBe('ok');
+    if (result.status === 'ok') {
+      expect(() => assistantAnswerSchema.parse(result.data)).not.toThrow();
+      expect(result.data.answer).toContain('3');
     }
   });
 });

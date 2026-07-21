@@ -1,13 +1,15 @@
 import type {
-  AIResult,
+  AssistantQuestionInput,
   DraftReplyInput,
   LanguageDetectionInput,
   LeadSummaryInput,
   MediaDiagnosisInput,
   RepairReportInput,
   UrgencyInput,
+  AIResult,
 } from './types';
 import type {
+  AssistantAnswer,
   DraftedReply,
   LanguageDetection,
   LeadSummary,
@@ -66,4 +68,14 @@ export interface AIProvider {
    * communication channel is connected.
    */
   draftRepairReport(input: RepairReportInput): Promise<AIResult<RepairReport>>;
+
+  /**
+   * Answer a free-form question typed into the Robin chat widget that
+   * didn't match a fast, deterministic intent. Must answer only from the
+   * given context snapshot — never invent data about the garage, its
+   * customers, or its vehicles that isn't in `context`.
+   */
+  answerAssistantQuestion(
+    input: AssistantQuestionInput,
+  ): Promise<AIResult<AssistantAnswer>>;
 }

@@ -97,3 +97,9 @@ export const repairReportSchema = z.object({
   }),
 });
 export type RepairReport = z.infer<typeof repairReportSchema>;
+
+export const assistantAnswerSchema = z.object({
+  /** A short, direct answer to the mechanic's question — no filler. */
+  answer: z.string().min(1),
+});
+export type AssistantAnswer = z.infer<typeof assistantAnswerSchema>;
