@@ -2,6 +2,20 @@ import type { Locale } from './content';
 
 export const LANG_PREFIX: Record<Locale, string> = { nl: 'nl', en: 'en', fr: 'fr' };
 
+/**
+ * The browser's built-in speech voices have no cross-language identity
+ * guarantee — each locale picks from whatever voices happen to be
+ * installed, so "Robin" can sound like a different person per language.
+ * French has no good male system voice available on the affected devices,
+ * unlike Dutch and English which already sound right, so French uses a
+ * real pre-generated recording (same voice actor as the rest of Robin's
+ * identity) everywhere Robin speaks, instead of speechSynthesis. Dutch and
+ * English keep using the browser voice unchanged.
+ */
+export const RECORDED_VOICE: Partial<Record<Locale, string>> = {
+  fr: 'https://cms-toolkit-artifacts.artlist.io/content/-t-e-x-t_-t-o_-s-p-e-e-c-h-v1/media__8/-t-e-x-t_-t-o_-s-p-e-e-c-h-c9afd800-a8e0-453a-869c-14b0a518b115.mp3?Expires=2100024215&Key-Pair-Id=K2ZDLYDZI2R1DF&Signature=bpjVoO6rgMvzw~77ugRSHVM5EomqBuZZnqpN2fuEVHKXT61zZlwTlEJtT~~BRgV6ZRp6iF~Hwvp-Sj-GQuTTnnwo13dRU~l~jCq41~SnR9a1mFd~D9zanZf0Yms3QxiTg933HHtx1gjsOqTsyWUCRhykNJYXBbZR3n~Y4oVCqvVOagDJFrmO2FyyrvAU4OmO9Bv3WJePI8Hc4CGKmqlr2oUFwUEsfWYZXl2KJEzyaIdBFIqPPEG9xeA9J9vkM7VkeOxQ0nihHbxxRHSVyoydI5dJOx387ak6EwjfsFVZhxiZxSDT0antzgxiUW6lNsaL0yl~MPE00SpA2LO5dIqnpg__',
+};
+
 // Common male-voice names across macOS/iOS, Windows and Chrome/Google TTS packs,
 // covering nl/en/fr. Best-effort: the Web Speech API exposes no gender field,
 // so Robin's identity depends on recognizing these names correctly.
