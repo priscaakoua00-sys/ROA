@@ -49,13 +49,10 @@ interface Copy {
   device: { head: string; live: string; decide: string; decideB: string; approve: string; view: string };
   carHero: {
     hint: string;
-    hintOpen: string;
-    colorLabel: string;
-    colors: { obsidian: string; electric: string; silver: string; pearl: string; crimson: string };
+    hintAgain: string;
     doorLine: string;
     muteOn: string;
     muteOff: string;
-    plate: string;
   };
   stakes: { pre: string; em: string; post: string; note: string };
   welcome: { cta: string; playing: string; duration: string; text: string };
@@ -109,13 +106,10 @@ export const COPY: Record<Locale, Copy> = {
     },
     device: { head: 'Binnenkomend · vandaag', live: 'live', decide: 'Robin stelt voor. ', decideB: 'U beslist.', approve: 'Goedkeuren', view: 'Bekijken' },
     carHero: {
-      hint: 'Klik op de wagen om Robin te ontmoeten',
-      hintOpen: 'Klik opnieuw om te herbeleven',
-      colorLabel: 'Kies een kleur',
-      colors: { obsidian: 'Diepzwart', electric: 'Elektrisch blauw', silver: 'Zilver', pearl: 'Parelwit', crimson: 'Dieprood' },
+      hint: 'Klik om Robin te ontmoeten',
+      hintAgain: 'Klik opnieuw om te herbeleven',
       doorLine: 'Hallo, ik ben Robin, uw AI-medewerker.',
       muteOn: 'Geluid uitschakelen', muteOff: 'Geluid inschakelen',
-      plate: 'ROAVAA · AI EMPLOYEE',
     },
     welcome: {
       cta: 'Beluister Robin', playing: 'Wordt afgespeeld…', duration: '8 seconden',
@@ -216,13 +210,10 @@ export const COPY: Record<Locale, Copy> = {
     },
     device: { head: 'Incoming · today', live: 'live', decide: 'Robin proposes. ', decideB: 'You decide.', approve: 'Approve', view: 'View' },
     carHero: {
-      hint: 'Click the car to meet Robin',
-      hintOpen: 'Click again to replay',
-      colorLabel: 'Choose a color',
-      colors: { obsidian: 'Deep black', electric: 'Electric blue', silver: 'Silver', pearl: 'Pearl white', crimson: 'Deep red' },
+      hint: 'Click to meet Robin',
+      hintAgain: 'Click again to replay',
       doorLine: 'Hello, I’m Robin, your AI employee.',
       muteOn: 'Mute sound', muteOff: 'Unmute sound',
-      plate: 'ROAVAA · AI EMPLOYEE',
     },
     welcome: {
       cta: 'Listen to Robin', playing: 'Playing…', duration: '8 seconds',
@@ -323,13 +314,10 @@ export const COPY: Record<Locale, Copy> = {
     },
     device: { head: 'Entrant · aujourd\u2019hui', live: 'en direct', decide: 'Robin propose. ', decideB: 'Vous décidez.', approve: 'Approuver', view: 'Voir' },
     carHero: {
-      hint: 'Cliquez sur la voiture pour rencontrer Robin',
-      hintOpen: 'Cliquez à nouveau pour rejouer',
-      colorLabel: 'Choisissez une couleur',
-      colors: { obsidian: 'Noir profond', electric: 'Bleu électrique', silver: 'Argent', pearl: 'Blanc perlé', crimson: 'Rouge foncé' },
+      hint: 'Cliquez pour rencontrer Robin',
+      hintAgain: 'Cliquez à nouveau pour réécouter',
       doorLine: 'Bonjour, je suis Robin, votre employé IA.',
       muteOn: 'Couper le son', muteOff: 'Activer le son',
-      plate: 'ROAVAA · AI EMPLOYEE',
     },
     welcome: {
       cta: 'Écouter Robin', playing: 'Lecture en cours…', duration: '8 secondes',

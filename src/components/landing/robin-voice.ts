@@ -3,35 +3,58 @@ import type { Locale } from './content';
 export const LANG_PREFIX: Record<Locale, string> = { nl: 'nl', en: 'en', fr: 'fr' };
 
 // Common male-voice names across macOS/iOS, Windows and Chrome/Google TTS packs,
-// covering nl/en/fr. Best-effort: the Web Speech API exposes no gender field.
+// covering nl/en/fr. Best-effort: the Web Speech API exposes no gender field,
+// so Robin's identity depends on recognizing these names correctly.
 const MALE_NAME_HINTS = [
   'david', 'mark', 'daniel', 'thomas', 'xander', 'fred', 'alex', 'ruben', 'henri',
   'guy', 'paul', 'frank', 'liam', 'arthur', 'matteo', 'bart', 'jeroen', 'stefan',
   'oliver', 'george', 'james', 'peter', 'marc', 'luc', 'pierre', 'nicolas', 'antoine',
-  'lee', 'eric', 'sean', 'aaron', 'gordon', 'tom',
+  'lee', 'eric', 'sean', 'aaron', 'gordon', 'tom', 'ryan', 'roger', 'diego', 'jorge',
+  'bruno', 'yannick', 'jacques', 'nathan', 'christopher', 'brian', 'kevin', 'reed',
+  'rishi', 'andrew', 'ravi',
 ];
 const FEMALE_NAME_HINTS = [
   'samantha', 'amelie', 'audrey', 'ellen', 'claire', 'denise', 'karen', 'susan',
   'victoria', 'zira', 'hazel', 'helena', 'salli', 'joanna', 'sophie', 'lotte', 'anna',
+  'hortense', 'julie', 'chantal', 'celine', 'marie', 'catherine', 'moira', 'tessa',
+  'fiona', 'kate', 'serena', 'aria', 'jenny', 'michelle', 'emma', 'ava', 'nicky',
+  'flo', 'sandy', 'shelley', 'veena', 'kyoko',
 ];
 const QUALITY_HINTS = [/natural/i, /neural/i, /online/i, /google/i, /premium/i];
 
-function scoreVoice(voice: SpeechSynthesisVoice): number {
+type Gender = 'male' | 'female' | 'unknown';
+
+function genderOf(voice: SpeechSynthesisVoice): Gender {
   const name = voice.name.toLowerCase();
-  let score = 0;
-  if (MALE_NAME_HINTS.some((hint) => name.includes(hint))) score += 4;
-  if (FEMALE_NAME_HINTS.some((hint) => name.includes(hint))) score -= 4;
-  if (QUALITY_HINTS.some((hint) => hint.test(voice.name))) score += 1;
-  return score;
+  if (/\bmale\b/.test(name)) return 'male';
+  if (/\bfemale\b/.test(name)) return 'female';
+  if (MALE_NAME_HINTS.some((hint) => name.includes(hint))) return 'male';
+  if (FEMALE_NAME_HINTS.some((hint) => name.includes(hint))) return 'female';
+  return 'unknown';
 }
 
-/** Picks the best-sounding available voice for a locale: prefers ones that
- * read as male and higher-quality, falls back to the least-bad match. */
+function qualityScore(voice: SpeechSynthesisVoice): number {
+  return QUALITY_HINTS.some((hint) => hint.test(voice.name)) ? 1 : 0;
+}
+
+/**
+ * Picks Robin's voice for a locale. Gender takes strict priority over voice
+ * "quality" hints: a named male voice always wins over an unnamed/generic
+ * one, which in turn always wins over an explicitly female-named voice — so
+ * a generic "Google français"-style entry never outranks an actual male
+ * voice just because it matched a quality regex. Robin must sound like the
+ * same person in every language.
+ */
 export function pickVoice(voices: SpeechSynthesisVoice[], locale: Locale): SpeechSynthesisVoice | null {
   const prefix = LANG_PREFIX[locale];
   const candidates = voices.filter((v) => v.lang.toLowerCase().startsWith(prefix));
   if (candidates.length === 0) return null;
-  return candidates.slice().sort((a, b) => scoreVoice(b) - scoreVoice(a))[0]!;
+
+  const byGender: Record<Gender, SpeechSynthesisVoice[]> = { male: [], unknown: [], female: [] };
+  for (const v of candidates) byGender[genderOf(v)].push(v);
+
+  const pool = byGender.male.length > 0 ? byGender.male : byGender.unknown.length > 0 ? byGender.unknown : byGender.female;
+  return pool.slice().sort((a, b) => qualityScore(b) - qualityScore(a))[0]!;
 }
 
 /**

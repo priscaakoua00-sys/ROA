@@ -590,26 +590,27 @@
 .lp-voice-intro .dur { font-family: 'JetBrains Mono', monospace; font-size: 0.64rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lp-bone-dim); }
 
 /* ============================================================
-   Hero centerpiece: the original ROAVAA car — Robin's arrival.
-   Pure CSS/SVG (no WebGL/3D library) so it stays fast, accessible
-   and reliable on every device; prefers-reduced-motion already
-   disables all animation/transition inside .lp (see below).
+   Hero centerpiece: the original ROAVAA concept car — Robin's
+   arrival. A real generated image (public/landing/hero-car.png),
+   not an illustration; CSS only adds the float, glow and click
+   feedback. prefers-reduced-motion already disables all
+   animation/transition inside .lp (see below).
    ============================================================ */
 .lp-carhero {
   position: relative; border-radius: 24px; overflow: hidden;
-  padding: 2.4rem 1.6rem 2.2rem;
+  padding: 2rem 1.4rem;
   background:
-    radial-gradient(120% 100% at 50% 0%, rgba(59, 123, 255, 0.14), transparent 60%),
+    radial-gradient(120% 100% at 50% 0%, rgba(205, 162, 80, 0.14), transparent 60%),
     linear-gradient(180deg, var(--lp-espresso-2), var(--lp-espresso-3));
   border: 1px solid var(--lp-line-d);
   box-shadow: 0 50px 110px -50px #000;
 }
 .lp-carhero-aurora {
-  position: absolute; inset: -20%; z-index: 0; pointer-events: none; opacity: 0.7;
+  position: absolute; inset: -20%; z-index: 0; pointer-events: none; opacity: 0.6;
   background:
-    radial-gradient(35% 40% at 20% 20%, rgba(59, 123, 255, 0.35), transparent 70%),
-    radial-gradient(30% 35% at 80% 15%, rgba(139, 180, 255, 0.22), transparent 70%),
-    radial-gradient(40% 45% at 55% 90%, rgba(59, 123, 255, 0.16), transparent 70%);
+    radial-gradient(35% 40% at 20% 15%, rgba(205, 162, 80, 0.3), transparent 70%),
+    radial-gradient(30% 35% at 82% 20%, rgba(205, 162, 80, 0.16), transparent 70%),
+    radial-gradient(40% 45% at 55% 92%, rgba(205, 162, 80, 0.14), transparent 70%);
   filter: blur(40px);
   animation: lp-aurora-drift 18s ease-in-out infinite alternate;
 }
@@ -620,63 +621,29 @@
 .lp-carhero-mute {
   position: absolute; top: 1rem; right: 1rem; z-index: 3;
   width: 2.3rem; height: 2.3rem; border-radius: 999px; display: grid; place-items: center;
-  border: 1px solid var(--lp-line-d); background: rgba(238, 241, 250, 0.06); color: var(--lp-bone-dim);
+  border: 1px solid var(--lp-line-d); background: rgba(242, 233, 216, 0.06); color: var(--lp-bone-dim);
   cursor: pointer; transition: color 0.2s, border-color 0.2s;
 }
 .lp-carhero-mute:hover { color: var(--lp-bone); border-color: var(--lp-amber); }
 
-.lp-carhero-stage { position: relative; z-index: 2; cursor: pointer; border-radius: 16px; outline-offset: 6px; }
-.lp-carhero-stage:focus-visible { outline: 2px solid var(--lp-amber); }
-
-.lp-car-svg { width: 100%; height: auto; display: block; overflow: visible; }
-
-.lp-car-float { animation: lp-car-float 6s ease-in-out infinite; transform-origin: 300px 170px; }
-@keyframes lp-car-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
-.lp-carhero-stage.open .lp-car-float { animation: lp-car-float 6s ease-in-out infinite, lp-car-settle 0.6s ease-out; }
-@keyframes lp-car-settle {
-  0% { transform: translateY(-4px) scale(1); }
-  40% { transform: translateY(2px) scale(1.015); }
-  100% { transform: translateY(0) scale(1); }
+.lp-carhero-stage {
+  position: relative; z-index: 2; cursor: pointer; border-radius: 16px; outline-offset: 6px;
+  animation: lp-car-float 7s ease-in-out infinite;
 }
+.lp-carhero-stage:focus-visible { outline: 2px solid var(--lp-amber); }
+@keyframes lp-car-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.lp-carhero-stage.pulse { filter: drop-shadow(0 0 26px rgba(205, 162, 80, 0.45)); }
 
-.lp-car-body {
-  stroke: rgba(238, 241, 250, 0.35); stroke-width: 1.2;
-  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.45));
+.lp-car-photo {
+  width: 100%; height: auto; display: block; border-radius: 12px;
+  filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.55));
   transition: filter 0.5s;
 }
-.lp-carhero-stage.open .lp-car-body { filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.45)) brightness(1.06); }
-.lp-car-body stop { transition: stop-color 0.6s ease; }
 
-.lp-car-glass { opacity: 0.92; }
-.lp-car-seam { stroke: rgba(238, 241, 250, 0.18); stroke-width: 1.4; transition: stroke 0.4s, opacity 0.4s; }
-.lp-carhero-stage.open .lp-car-seam { stroke: var(--lp-amber); opacity: 0.9; }
-
-.lp-car-wheel { fill: #0a0e1f; stroke: rgba(238, 241, 250, 0.25); stroke-width: 3; }
-.lp-car-wheel-hub { fill: rgba(238, 241, 250, 0.4); }
-
-.lp-car-headlight { fill: rgba(238, 241, 250, 0.35); transition: fill 0.4s, filter 0.4s; }
-.lp-carhero-stage.open .lp-car-headlight { fill: #eef6ff; filter: drop-shadow(0 0 10px rgba(159, 201, 255, 0.9)); }
-.lp-car-taillight { fill: rgba(227, 166, 59, 0.55); transition: fill 0.4s, filter 0.4s; }
-.lp-carhero-stage.open .lp-car-taillight { fill: #ff8a5c; filter: drop-shadow(0 0 8px rgba(255, 138, 92, 0.8)); }
-
-.lp-car-interior { opacity: 0; transition: opacity 0.6s ease 0.2s; }
-.lp-carhero-stage.open .lp-car-interior { opacity: 1; }
-
-.lp-car-plate rect { fill: rgba(10, 14, 31, 0.7); stroke: rgba(238, 241, 250, 0.3); stroke-width: 1; }
-.lp-car-plate text { fill: var(--lp-bone-dim); font-family: 'JetBrains Mono', monospace; font-size: 7px; letter-spacing: 0.04em; }
-
-.lp-carhero-hint { position: relative; z-index: 2; margin-top: 1.4rem; text-align: center; font-size: 0.86rem; color: var(--lp-bone-dim); }
-
-.lp-carhero-swatches { position: relative; z-index: 2; margin-top: 1.1rem; display: flex; justify-content: center; gap: 0.6rem; }
-.lp-swatch {
-  width: 1.6rem; height: 1.6rem; border-radius: 999px; border: 2px solid rgba(238, 241, 250, 0.25);
-  cursor: pointer; transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s; padding: 0;
-}
-.lp-swatch:hover { transform: scale(1.12); }
-.lp-swatch.on { border-color: var(--lp-bone); box-shadow: 0 0 0 3px rgba(59, 123, 255, 0.35); }
+.lp-carhero-hint { position: relative; z-index: 2; margin-top: 1.2rem; text-align: center; font-size: 0.86rem; color: var(--lp-bone-dim); }
 
 @media (max-width: 640px) {
-  .lp-carhero { padding: 1.8rem 1.2rem 1.6rem; }
-  .lp-carhero-aurora { filter: blur(22px); opacity: 0.5; }
-  .lp-car-float, .lp-carhero-aurora { animation-duration: 10s; }
+  .lp-carhero { padding: 1.4rem 1rem; }
+  .lp-carhero-aurora { filter: blur(22px); opacity: 0.45; }
+  .lp-carhero-stage { animation-duration: 10s; }
 }
