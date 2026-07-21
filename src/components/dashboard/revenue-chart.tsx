@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatCurrency } from '@/lib/pricing';
 
 export interface RevenuePoint {
   label: string;
@@ -11,8 +12,13 @@ export interface RevenuePoint {
  * Single-series daily-revenue bar chart. One series -> no legend needed (the
  * chart title names it); thin bars with rounded data-ends, a recessive
  * baseline, and a lightweight hover tooltip.
+ *
+ * Takes `locale` (a plain string) rather than a formatter function: a Server
+ * Component can never pass a function prop to a Client Component (it isn't
+ * serializable across that boundary) — this crashed the dashboard on every
+ * single load in production.
  */
-export function RevenueChart({ data, formatAmount }: { data: RevenuePoint[]; formatAmount: (n: number) => string }) {
+export function RevenueChart({ data, locale }: { data: RevenuePoint[]; locale: string }) {
   const [hover, setHover] = useState<number | null>(null);
   const max = Math.max(1, ...data.map((d) => d.amount));
   const width = 100;
@@ -52,7 +58,7 @@ export function RevenueChart({ data, formatAmount }: { data: RevenuePoint[]; for
       </div>
       {hover !== null && data[hover] ? (
         <div className="pointer-events-none absolute -top-7 left-0 rounded-md border border-border bg-popover px-2 py-1 text-xs shadow-soft">
-          {data[hover]!.label}: <span className="font-medium">{formatAmount(data[hover]!.amount)}</span>
+          {data[hover]!.label}: <span className="font-medium">{formatCurrency(data[hover]!.amount, locale)}</span>
         </div>
       ) : null}
     </div>

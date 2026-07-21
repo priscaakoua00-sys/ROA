@@ -37,9 +37,19 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // A stale or already-rotated refresh token makes getUser() reject (not just
+  // return an error field) — an uncaught rejection here crashes the whole
+  // middleware function on every matched request. Treat it as "not signed
+  // in" instead: the isApp check below then redirects to /login normally.
+  let user = null;
+  try {
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser();
+    user = authUser;
+  } catch {
+    user = null;
+  }
 
   const parts = request.nextUrl.pathname.split('/');
   const locale = (LOCALES as readonly string[]).includes(parts[1] ?? '')
