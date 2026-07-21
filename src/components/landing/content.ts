@@ -48,6 +48,10 @@ interface Copy {
   };
   device: { head: string; live: string; decide: string; decideB: string; approve: string; view: string };
   stakes: { pre: string; em: string; post: string; note: string };
+  pillars: {
+    title: string; tag: string;
+    items: { t: string; p: string }[];
+  };
   acts: {
     title: string; tag: string;
     items: { n: string; t: string; p: string }[];
@@ -57,10 +61,25 @@ interface Copy {
     who: string; inMsg: string; outMsg: string;
     proposeLbl: string; propose: string; approve: string; adjust: string; decide: string;
   };
+  simulation: {
+    tag: string; titlePre: string; titleEm: string; sub: string;
+    tabs: string[];
+    step1: { who: string; msg: string; reply: string };
+    step2: { label: string; lines: { d: string; price: string }[]; total: string };
+    step3: { label: string; slots: string[]; confirmed: string };
+    step4: { label: string; stages: string[]; current: number; note: string };
+  };
+  voice: {
+    tag: string; title: string; sub: string;
+    examples: { cmd: string; result: string }[];
+  };
   memories: {
     title: string; tag: string;
     items: { k: string; t: string; p: string }[];
   };
+  why: { title: string; tag: string; items: string[] };
+  journey: { title: string; tag: string; steps: string[] };
+  pwa: { tag: string; title: string; sub: string; bullets: string[]; ctaInstall: string };
   founder: { eyebrow: string; name: string; role: string; story: string[]; signature: string };
   close: { pre: string; em: string; post: string; ctaPrimary: string; ctaSecondary: string; sig: string };
   footer: string;
@@ -81,6 +100,14 @@ export const COPY: Record<Locale, Copy> = {
     stakes: {
       pre: 'Een gemiste oproep is een klant die ', em: 'de volgende garage', post: ' belt.',
       note: 'Een werkplaats staat nooit stil. Terwijl u onder een auto ligt, blijft de telefoon gaan, komt er een appje binnen, wacht er een offerte. Roavaa vangt alles op, zodat niets meer tussen wal en schip valt.',
+    },
+    pillars: {
+      title: 'Alles wat uw garage nodig heeft, op één plek.', tag: 'De drie pijlers',
+      items: [
+        { t: 'Volledige voertuighistorie', p: 'Elke reparatie, elk gesprek en elke factuur op één tijdlijn per voertuig. Nooit meer zoeken in mappen of oude berichten.' },
+        { t: 'Devissen, reparaties en facturen', p: 'Maak een devis in seconden, zet het om in een reparatie en daarna in een factuur. Zonder ooit iets dubbel in te typen.' },
+        { t: 'Robin, uw AI-medewerker', p: 'Beantwoordt klanten, bereidt devissen voor en houdt de werkplaats georganiseerd — dag en nacht.' },
+      ],
     },
     acts: {
       title: 'Drie dingen, onberispelijk gedaan.', tag: 'Reageert · Organiseert · Leert',
@@ -103,6 +130,22 @@ export const COPY: Record<Locale, Copy> = {
       propose: 'Piepende remmen kunnen op slijtage wijzen. Ik markeer dit met voorrang en stel donderdag 09:00 of vrijdag 14:30 voor.',
       approve: 'Goedkeuren', adjust: 'Aanpassen', decide: 'U beslist',
     },
+    simulation: {
+      tag: 'Live simulatie', titlePre: 'Bekijk ', titleEm: 'Robin', sub: 'Van eerste bericht tot afgeronde reparatie — dezelfde stroom die vandaag in echte garages draait.',
+      tabs: ['Bericht', 'Devis', 'Afspraak', 'Opvolging'],
+      step1: { who: 'Dhr. Peeters · WhatsApp', msg: 'Mijn Golf trekt naar links bij het remmen. Kan dat gevaarlijk zijn?', reply: 'Dat kan wijzen op versleten remblokken. Ik maak alvast een devis klaar en stel een moment voor.' },
+      step2: { label: 'Robin stelt een devis op', lines: [{ d: 'Remblokken vooraan (set)', price: '€ 89,00' }, { d: 'Arbeid — 45 min', price: '€ 67,50' }, { d: 'BTW 21%', price: '€ 32,84' }], total: '€ 189,34' },
+      step3: { label: 'Robin stelt een afspraak voor', slots: ['Donderdag 09:00', 'Vrijdag 14:30'], confirmed: 'Bevestigd voor vrijdag 14:30' },
+      step4: { label: 'Robin volgt de reparatie op', stages: ['Ontvangen', 'Diagnose', 'Reparatie', 'Klaar'], current: 2, note: 'Dhr. Peeters krijgt automatisch bericht zodra zijn Golf klaar is.' },
+    },
+    voice: {
+      tag: 'Spraakbediening', title: 'Praat gewoon met Robin.', sub: 'Typen is niet nodig. Spreek een opdracht in, Robin voert ze meteen uit.',
+      examples: [
+        { cmd: '"Robin, maak een devis voor deze Golf."', result: 'Devis DEV-2026-014 aangemaakt' },
+        { cmd: '"Robin, bel deze klant morgen terug."', result: 'Herinnering gepland voor morgen 09:00' },
+        { cmd: '"Robin, hoeveel hebben we deze week gefactureerd?"', result: '€ 4.280 gefactureerd deze week' },
+      ],
+    },
     memories: {
       title: 'Echte intelligentie, geen trucje.', tag: 'Drie soorten geheugen',
       items: [
@@ -110,6 +153,26 @@ export const COPY: Record<Locale, Copy> = {
         { k: '02 · Het vak', t: 'Kent de branche', p: 'Reparaties, onderdelen, urgenties en de vragen die klanten altijd stellen.' },
         { k: '03 · Samen', t: 'Wordt slimmer', p: 'Leert anoniem welke antwoorden en herinneringen het best werken.' },
       ],
+    },
+    why: {
+      title: 'Waarom garages voor Roavaa kiezen.', tag: 'Concrete voordelen',
+      items: [
+        'Geen enkele klant meer vergeten.',
+        'Alle voertuiginformatie op één plek.',
+        'Devissen razendsnel verstuurd.',
+        'Professionele PDF-facturen.',
+        'Automatische herinneringen.',
+        'Elke dag tijd bespaard.',
+      ],
+    },
+    journey: {
+      title: 'Eén voertuig, één volledig parcours.', tag: 'Van ontvangst tot historiek',
+      steps: ['Ontvangst', 'Inspectie', "Foto's", 'AI-diagnose', 'Devis', 'Akkoord klant', 'Reparatie', 'Factuur', 'Betaling', 'Historiek bewaard'],
+    },
+    pwa: {
+      tag: 'Overal beschikbaar', title: 'Werkt op computer én telefoon.', sub: 'Installeer Roavaa rechtstreeks vanuit uw browser — geen Play Store of App Store nodig.',
+      bullets: ['Direct installeerbaar vanaf uw browser (PWA)', 'Werkt op computer, tablet en smartphone', 'Altijd de laatste versie, zonder updates te installeren', 'Opent net als een echte app, met een eigen icoon op uw scherm'],
+      ctaInstall: 'Zo installeert u Roavaa',
     },
     close: {
       pre: 'Klaar om geen enkele klant ', em: 'meer', post: ' te verliezen?',
@@ -132,6 +195,14 @@ export const COPY: Record<Locale, Copy> = {
       pre: 'A missed call is a customer calling ', em: 'the next garage', post: '.',
       note: 'A workshop never stands still. While you are under a car, the phone keeps ringing, a message comes in, a quote is waiting. Roavaa catches it all, so nothing falls through the cracks.',
     },
+    pillars: {
+      title: 'Everything your garage needs, in one place.', tag: 'The three pillars',
+      items: [
+        { t: 'Complete vehicle history', p: 'Every repair, every conversation and every invoice on one timeline per vehicle. Never dig through folders or old messages again.' },
+        { t: 'Quotes, repairs and invoices', p: 'Create a quote in seconds, turn it into a repair and then an invoice. Without ever typing anything twice.' },
+        { t: 'Robin, your AI employee', p: 'Answers customers, prepares quotes and keeps the workshop organised — day and night.' },
+      ],
+    },
     acts: {
       title: 'Three things, done impeccably.', tag: 'Responds · Organizes · Learns',
       items: [
@@ -153,6 +224,22 @@ export const COPY: Record<Locale, Copy> = {
       propose: 'Squeaking brakes can indicate wear. I am flagging this with priority and propose Thursday 09:00 or Friday 14:30.',
       approve: 'Approve', adjust: 'Adjust', decide: 'You decide',
     },
+    simulation: {
+      tag: 'Live simulation', titlePre: 'Watch ', titleEm: 'Robin', sub: 'From the first message to a finished repair — the same flow running in real garages today.',
+      tabs: ['Message', 'Quote', 'Appointment', 'Follow-up'],
+      step1: { who: 'Mr. Peeters · WhatsApp', msg: 'My Golf pulls left when braking. Could that be dangerous?', reply: 'That can indicate worn brake pads. I am preparing a quote and proposing a time.' },
+      step2: { label: 'Robin drafts a quote', lines: [{ d: 'Front brake pads (set)', price: '€ 89.00' }, { d: 'Labour — 45 min', price: '€ 67.50' }, { d: 'VAT 21%', price: '€ 32.84' }], total: '€ 189.34' },
+      step3: { label: 'Robin proposes an appointment', slots: ['Thursday 09:00', 'Friday 14:30'], confirmed: 'Confirmed for Friday 14:30' },
+      step4: { label: 'Robin tracks the repair', stages: ['Received', 'Diagnosis', 'Repair', 'Done'], current: 2, note: 'Mr. Peeters is automatically notified as soon as his Golf is ready.' },
+    },
+    voice: {
+      tag: 'Voice control', title: 'Just talk to Robin.', sub: 'No typing needed. Speak a command, Robin carries it out instantly.',
+      examples: [
+        { cmd: '"Robin, create a quote for this Golf."', result: 'Quote QUO-2026-014 created' },
+        { cmd: '"Robin, call this customer back tomorrow."', result: 'Reminder scheduled for tomorrow 09:00' },
+        { cmd: '"Robin, how much have we invoiced this week?"', result: '€ 4,280 invoiced this week' },
+      ],
+    },
     memories: {
       title: 'Real intelligence, not a trick.', tag: 'Three kinds of memory',
       items: [
@@ -160,6 +247,26 @@ export const COPY: Record<Locale, Copy> = {
         { k: '02 · The trade', t: 'Knows the industry', p: 'Repairs, parts, emergencies and the questions customers always ask.' },
         { k: '03 · Together', t: 'Gets smarter', p: 'Learns anonymously which replies and reminders work best.' },
       ],
+    },
+    why: {
+      title: 'Why garages choose Roavaa.', tag: 'Real-world benefits',
+      items: [
+        'No customer ever forgotten again.',
+        'All vehicle information in one place.',
+        'Quotes sent in minutes.',
+        'Professional PDF invoices.',
+        'Automatic reminders.',
+        'Time saved every single day.',
+      ],
+    },
+    journey: {
+      title: 'One vehicle, one complete journey.', tag: 'From reception to history',
+      steps: ['Reception', 'Inspection', 'Photos', 'AI diagnosis', 'Quote', 'Customer approval', 'Repair', 'Invoice', 'Payment', 'History saved'],
+    },
+    pwa: {
+      tag: 'Available everywhere', title: 'Works on computer and phone.', sub: 'Install Roavaa directly from your browser — no Play Store or App Store required.',
+      bullets: ['Installable straight from your browser (PWA)', 'Works on desktop, tablet and smartphone', 'Always the latest version, no updates to install', 'Opens just like a real app, with its own icon on your screen'],
+      ctaInstall: 'How to install Roavaa',
     },
     close: {
       pre: 'Ready to never lose ', em: 'another', post: ' customer?',
@@ -182,6 +289,14 @@ export const COPY: Record<Locale, Copy> = {
       pre: 'Un appel manqué, c\u2019est un client qui appelle ', em: 'le garage suivant', post: '.',
       note: 'Un atelier ne s\u2019arrête jamais. Pendant que vous êtes sous une voiture, le téléphone sonne, un message arrive, un devis attend. Roavaa capte tout, pour que plus rien ne passe entre les mailles.',
     },
+    pillars: {
+      title: 'Tout ce dont votre garage a besoin, au même endroit.', tag: 'Les trois piliers',
+      items: [
+        { t: 'Historique complet du véhicule', p: 'Chaque réparation, chaque échange et chaque facture sur une seule chronologie par véhicule. Plus jamais besoin de fouiller dans des dossiers ou d\u2019anciens messages.' },
+        { t: 'Devis, réparations et factures', p: 'Créez un devis en quelques secondes, transformez-le en ordre de réparation puis en facture. Sans jamais ressaisir la moindre information.' },
+        { t: 'Robin, votre employé IA', p: 'Répond aux clients, prépare les devis et garde l\u2019atelier organisé — jour et nuit.' },
+      ],
+    },
     acts: {
       title: 'Trois choses, faites impeccablement.', tag: 'Répond · Organise · Apprend',
       items: [
@@ -203,6 +318,22 @@ export const COPY: Record<Locale, Copy> = {
       propose: 'Des freins qui grincent peuvent indiquer de l\u2019usure. Je marque ceci en priorité et propose jeudi 09:00 ou vendredi 14:30.',
       approve: 'Approuver', adjust: 'Ajuster', decide: 'Vous décidez',
     },
+    simulation: {
+      tag: 'Simulation en direct', titlePre: 'Regardez ', titleEm: 'Robin', sub: 'Du premier message à la réparation terminée — le même parcours qui fonctionne aujourd\u2019hui dans de vrais garages.',
+      tabs: ['Message', 'Devis', 'Rendez-vous', 'Suivi'],
+      step1: { who: 'M. Peeters · WhatsApp', msg: 'Ma Golf tire à gauche au freinage. C\u2019est dangereux ?', reply: 'Cela peut indiquer des plaquettes usées. Je prépare un devis et propose un créneau.' },
+      step2: { label: 'Robin prépare un devis', lines: [{ d: 'Plaquettes de frein avant (jeu)', price: '89,00 €' }, { d: 'Main d\u2019œuvre — 45 min', price: '67,50 €' }, { d: 'TVA 21 %', price: '32,84 €' }], total: '189,34 €' },
+      step3: { label: 'Robin propose un rendez-vous', slots: ['Jeudi 09:00', 'Vendredi 14:30'], confirmed: 'Confirmé pour vendredi 14:30' },
+      step4: { label: 'Robin suit la réparation', stages: ['Reçu', 'Diagnostic', 'Réparation', 'Terminé'], current: 2, note: 'M. Peeters est prévenu automatiquement dès que sa Golf est prête.' },
+    },
+    voice: {
+      tag: 'Commande vocale', title: 'Parlez simplement à Robin.', sub: 'Pas besoin d\u2019écrire. Dites une consigne à voix haute, Robin l\u2019exécute aussitôt.',
+      examples: [
+        { cmd: '« Robin, crée un devis pour cette Golf. »', result: 'Devis DEV-2026-014 créé' },
+        { cmd: '« Robin, rappelle ce client demain. »', result: 'Rappel programmé pour demain 09:00' },
+        { cmd: '« Robin, combien avons-nous facturé cette semaine ? »', result: '4 280 € facturés cette semaine' },
+      ],
+    },
     memories: {
       title: 'De la vraie intelligence, pas un gadget.', tag: 'Trois mémoires',
       items: [
@@ -210,6 +341,26 @@ export const COPY: Record<Locale, Copy> = {
         { k: '02 · Le métier', t: 'Connaît la branche', p: 'Réparations, pièces, urgences et les questions que les clients posent toujours.' },
         { k: '03 · Ensemble', t: 'Devient plus intelligent', p: 'Apprend anonymement quelles réponses et relances fonctionnent le mieux.' },
       ],
+    },
+    why: {
+      title: 'Pourquoi les garages choisissent ROAVAA ?', tag: 'Bénéfices concrets',
+      items: [
+        'Plus aucun client oublié.',
+        'Toutes les informations du véhicule au même endroit.',
+        'Devis envoyés rapidement.',
+        'Factures PDF professionnelles.',
+        'Rappels automatiques.',
+        'Gain de temps chaque jour.',
+      ],
+    },
+    journey: {
+      title: 'Un véhicule, un parcours complet.', tag: 'De la réception à l\u2019historique',
+      steps: ['Réception', 'Inspection', 'Photos', 'Diagnostic IA', 'Devis', 'Accord du client', 'Réparation', 'Facture', 'Paiement', 'Historique conservé'],
+    },
+    pwa: {
+      tag: 'Disponible partout', title: 'Fonctionne sur ordinateur et téléphone.', sub: 'Installez ROAVAA directement depuis votre navigateur — sans passer par le Play Store ou l\u2019App Store.',
+      bullets: ['Installable directement depuis votre navigateur (PWA)', 'Fonctionne sur ordinateur, tablette et smartphone', 'Toujours la dernière version, sans mise à jour à installer', 'S\u2019ouvre comme une vraie application, avec son icône sur votre écran'],
+      ctaInstall: 'Comment installer ROAVAA',
     },
     close: {
       pre: 'Prêt à ne plus ', em: 'jamais', post: ' perdre un client ?',

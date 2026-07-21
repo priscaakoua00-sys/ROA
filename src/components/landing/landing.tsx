@@ -1,6 +1,9 @@
+import { Check } from 'lucide-react';
 import { COPY, type Locale } from './content';
 import { LiveStream } from './live-stream';
 import { Reveal } from './reveal';
+import { RobinSimulation } from './robin-simulation';
+import { VoiceDemo } from './voice-demo';
 
 const LOCALES: Locale[] = ['nl', 'en', 'fr'];
 
@@ -81,6 +84,25 @@ export function Landing({ locale }: { locale: Locale }) {
           </Reveal>
         </section>
 
+        {/* PILLARS */}
+        <section className="lp-light lp-pillars" id="pillars">
+          <div className="lp-wrap">
+            <Reveal className="lp-sechead">
+              <h2>{c.pillars.title}</h2>
+              <span className="lp-mono">{c.pillars.tag}</span>
+            </Reveal>
+            <div className="lp-pillars-grid">
+              {c.pillars.items.map((p, i) => (
+                <Reveal key={p.t} delay={i * 90} className="lp-pillar">
+                  <span className="lp-pillar-n lp-mono">{String(i + 1).padStart(2, '0')}</span>
+                  <h3>{p.t}</h3>
+                  <p>{p.p}</p>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* ACTS */}
         <section className="lp-light lp-acts" id="werk">
           <div className="lp-wrap">
@@ -134,6 +156,38 @@ export function Landing({ locale }: { locale: Locale }) {
           </div>
         </section>
 
+        {/* SIMULATION */}
+        <section className="lp-simsec" id="simulatie">
+          <div className="lp-wrap">
+            <Reveal className="lp-sechead on-dark">
+              <h2>
+                {c.simulation.titlePre}<em>{c.simulation.titleEm}</em>
+              </h2>
+              <span className="lp-mono">{c.simulation.tag}</span>
+            </Reveal>
+            <Reveal>
+              <p className="lp-lead">{c.simulation.sub}</p>
+            </Reveal>
+            <Reveal delay={100}>
+              <RobinSimulation locale={safeLocale} />
+            </Reveal>
+          </div>
+        </section>
+
+        {/* VOICE */}
+        <section className="lp-light lp-voice-section" id="voice">
+          <div className="lp-wrap lp-voice-grid">
+            <Reveal className="lp-copy-head">
+              <span className="lp-mono">{c.voice.tag}</span>
+              <h2>{c.voice.title}</h2>
+              <p className="lp-lead-light">{c.voice.sub}</p>
+            </Reveal>
+            <Reveal delay={100}>
+              <VoiceDemo locale={safeLocale} />
+            </Reveal>
+          </div>
+        </section>
+
         {/* MEMORIES */}
         <section className="lp-light lp-mem">
           <div className="lp-wrap">
@@ -150,6 +204,78 @@ export function Landing({ locale }: { locale: Locale }) {
                 </Reveal>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* WHY */}
+        <section className="lp-light lp-why" id="why">
+          <div className="lp-wrap">
+            <Reveal className="lp-sechead">
+              <h2>{c.why.title}</h2>
+              <span className="lp-mono">{c.why.tag}</span>
+            </Reveal>
+            <div className="lp-why-grid">
+              {c.why.items.map((item, i) => (
+                <Reveal key={item} delay={i * 60} className="lp-why-item">
+                  <Check className="size-4" aria-hidden />
+                  <span>{item}</span>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* JOURNEY */}
+        <section className="lp-journey" id="journey">
+          <div className="lp-wrap">
+            <Reveal className="lp-sechead on-dark">
+              <h2>{c.journey.title}</h2>
+              <span className="lp-mono">{c.journey.tag}</span>
+            </Reveal>
+            <div className="lp-journey-track">
+              {c.journey.steps.map((step, i) => (
+                <Reveal key={step} delay={i * 50} className="lp-journey-step">
+                  <span className="n lp-mono">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="t">{step}</span>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* PWA */}
+        <section className="lp-light lp-pwa" id="pwa">
+          <div className="lp-wrap lp-pwa-grid">
+            <Reveal className="lp-copy-head">
+              <span className="lp-mono">{c.pwa.tag}</span>
+              <h2>{c.pwa.title}</h2>
+              <p className="lp-lead-light">{c.pwa.sub}</p>
+              <ul className="lp-pwa-list">
+                {c.pwa.bullets.map((b) => (
+                  <li key={b}>{b}</li>
+                ))}
+              </ul>
+            </Reveal>
+            <Reveal delay={100} className="lp-pwa-mocks">
+              <div className="lp-pwa-mock desktop">
+                <div className="bar">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+                <div className="body">
+                  <div className="url">roavaa.com</div>
+                  <div className="install">＋ {c.pwa.ctaInstall}</div>
+                </div>
+              </div>
+              <div className="lp-pwa-mock phone">
+                <div className="notch" />
+                <div className="screen">
+                  <span className="app-icon">R</span>
+                  <span className="app-label">Roavaa</span>
+                </div>
+              </div>
+            </Reveal>
           </div>
         </section>
 
