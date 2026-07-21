@@ -26,7 +26,8 @@
       "more": "Plus",
       "closeMenu": "Fermer le menu",
       "menu": "Menu",
-      "billing": "Abonnement"
+      "billing": "Abonnement",
+      "quotes": "Devis"
     },
     "onboarding": {
       "title": "Configurez votre garage",
@@ -455,7 +456,9 @@
       "photoError": "Échec de l'envoi. Utilisez une image de 8 Mo maximum.",
       "noResults": "Aucun véhicule trouvé pour « {query} ».",
       "clearSearch": "Effacer la recherche",
-      "addNew": "Nouveau véhicule"
+      "addNew": "Nouveau véhicule",
+      "messageFromGarage": "Du garage",
+      "messageFromClient": "Du client"
     },
     "notifications": {
       "title": "Notifications",
@@ -654,6 +657,59 @@
       "paymentTerms": "Merci de régler cette facture avant la date d'échéance indiquée ci-dessus.",
       "footer": "Facture générée par {name} via ROAVAA.",
       "anonymousCustomer": "Client"
+    },
+    "quotes": {
+      "title": "Devis",
+      "new": "Nouveau devis",
+      "newTitle": "Nouveau devis",
+      "back": "← Devis",
+      "save": "Enregistrer le devis",
+      "saved": "Devis enregistré.",
+      "error": "Une erreur est survenue. Merci de réessayer.",
+      "empty": "Aucun devis pour le moment.",
+      "forCustomer": "Devis pour {name}",
+      "statDraft": "Brouillon",
+      "statSent": "Envoyé",
+      "statAccepted": "Accepté",
+      "lineKind": "Type",
+      "kindPart": "Pièce",
+      "kindLabor": "Main-d'œuvre",
+      "kindOther": "Autre",
+      "validUntil": "Valable jusqu'au",
+      "convertToWorkOrder": "Convertir en ordre de réparation",
+      "convertToInvoice": "Convertir en facture",
+      "convertToInvoiceHint": "Le devis doit d'abord être accepté avant de pouvoir être converti en facture.",
+      "viewWorkOrder": "Voir l'ordre de réparation",
+      "viewInvoice": "Voir la facture"
+    },
+    "quoteStatus": {
+      "draft": "Brouillon",
+      "sent": "Envoyé",
+      "accepted": "Accepté",
+      "refused": "Refusé",
+      "expired": "Expiré",
+      "converted": "Converti"
+    },
+    "quotePdf": {
+      "quote": "Devis",
+      "issueDate": "Date",
+      "validUntil": "Valable jusqu'au",
+      "billTo": "Devis pour",
+      "vehicle": "Véhicule",
+      "description": "Description",
+      "quantity": "Qté",
+      "unitPrice": "Prix unit.",
+      "amount": "Montant",
+      "subtotal": "Sous-total",
+      "vat": "TVA",
+      "total": "Total",
+      "notes": "Notes",
+      "footer": "Devis établi par {name} via ROAVAA.",
+      "kindPart": "Pièce",
+      "kindLabor": "Main-d'œuvre",
+      "anonymousCustomer": "Client",
+      "acceptanceWithDate": "Ce devis est proposé à titre indicatif et valable jusqu'au {validUntil}.",
+      "acceptanceNoDate": "Ce devis est proposé à titre indicatif."
     }
   },
   "language": {

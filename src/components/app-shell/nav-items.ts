@@ -11,6 +11,7 @@ import {
   Receipt,
   Inbox,
   CreditCard,
+  FileText,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -37,6 +38,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: '/customers', labelKey: 'customers', icon: Users, mobilePrimary: true },
   { href: '/vehicles', labelKey: 'vehicles', icon: Car, mobilePrimary: true },
   { href: '/work-orders', labelKey: 'workOrders', icon: Wrench, mobilePrimary: true },
+  { href: '/quotes', labelKey: 'quotes', icon: FileText },
   { href: '/invoices', labelKey: 'invoices', icon: Receipt },
   { href: '/automations', labelKey: 'automations', icon: Zap },
   { href: '/knowledge', labelKey: 'knowledge', icon: BookOpen },

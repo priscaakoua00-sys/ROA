@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { notFound, redirect } from 'next/navigation';
-import { History, CalendarDays, Wrench, Receipt, Camera, Inbox } from 'lucide-react';
+import { History, CalendarDays, Wrench, Receipt, Camera, Inbox, MessageCircle } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { updateVehicleAction, uploadVehiclePhotoAction } from '@/data/vehicles/actions';
@@ -318,6 +318,15 @@ export default async function VehicleDetailPage({
                     label: t('workOrders.timelineDiagnosis'),
                     badgeLabel: severityLabel[ev.status] ?? ev.status,
                     badgeVariant: DIAGNOSIS_SEVERITY_VARIANT[ev.status] ?? 'muted',
+                  };
+                case 'message':
+                  return {
+                    id: ev.id,
+                    at: ev.at,
+                    icon: MessageCircle,
+                    label: ev.meta ?? formatDateTimeUTC(ev.at, locale),
+                    badgeLabel: t(ev.status === 'outbound' ? 'vehicles.messageFromGarage' : 'vehicles.messageFromClient'),
+                    badgeVariant: ev.status === 'outbound' ? 'default' : 'gold',
                   };
                 default:
                   return {

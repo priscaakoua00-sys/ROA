@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-export type TimelineEventKind = 'status' | 'appointment' | 'invoice' | 'diagnosis' | 'lead';
+export type TimelineEventKind = 'status' | 'appointment' | 'invoice' | 'diagnosis' | 'lead' | 'message';
 
 export interface TimelineEvent {
   id: string;
@@ -49,7 +49,14 @@ export async function getVehicleTimeline(
   const woIds = (wos ?? []).map((w) => w.id as string);
   const woTitleById = new Map((wos ?? []).map((w) => [w.id as string, w.title as string]));
 
-  const [{ data: history }, { data: appts }, { data: invoices }, { data: diagnoses }, { data: leads }] =
+  const { data: vehicleRow } = await supabase.from('vehicles').select('customer_id').eq('id', vehicleId).maybeSingle();
+  const customerId = vehicleRow?.customer_id as string | null | undefined;
+  const { data: conversations } = customerId
+    ? await supabase.from('conversations').select('id').eq('customer_id', customerId)
+    : { data: [] as { id: string }[] };
+  const conversationIds = (conversations ?? []).map((c) => c.id as string);
+
+  const [{ data: history }, { data: appts }, { data: invoices }, { data: diagnoses }, { data: leads }, { data: messages }] =
     await Promise.all([
       woIds.length > 0
         ? supabase
@@ -81,6 +88,14 @@ export async function getVehicleTimeline(
         .eq('vehicle_id', vehicleId)
         .order('created_at', { ascending: false })
         .limit(20),
+      conversationIds.length > 0
+        ? supabase
+            .from('messages')
+            .select('id, direction, body, created_at')
+            .in('conversation_id', conversationIds)
+            .order('created_at', { ascending: false })
+            .limit(20)
+        : Promise.resolve({ data: [] }),
     ]);
 
   const events: TimelineEvent[] = [
@@ -114,6 +129,13 @@ export async function getVehicleTimeline(
       kind: 'lead' as const,
       status: l.status,
       href: `/leads/${l.id}`,
+    })),
+    ...(messages ?? []).map((m) => ({
+      id: m.id,
+      at: m.created_at,
+      kind: 'message' as const,
+      status: m.direction,
+      meta: m.body.length > 80 ? `${m.body.slice(0, 80)}…` : m.body,
     })),
   ];
   return sortDesc(events);

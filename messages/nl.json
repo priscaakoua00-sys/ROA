@@ -26,7 +26,8 @@
       "more": "Meer",
       "closeMenu": "Menu sluiten",
       "menu": "Menu",
-      "billing": "Abonnement"
+      "billing": "Abonnement",
+      "quotes": "Offertes"
     },
     "onboarding": {
       "title": "Uw garage instellen",
@@ -455,7 +456,9 @@
       "photoError": "Upload mislukt. Gebruik een afbeelding van maximaal 8 MB.",
       "noResults": "Geen voertuig gevonden voor “{query}”.",
       "clearSearch": "Zoekopdracht wissen",
-      "addNew": "Nieuw voertuig"
+      "addNew": "Nieuw voertuig",
+      "messageFromGarage": "Van garage",
+      "messageFromClient": "Van klant"
     },
     "notifications": {
       "title": "Meldingen",
@@ -654,6 +657,59 @@
       "paymentTerms": "Gelieve deze factuur te voldoen vóór de hierboven vermelde vervaldatum.",
       "footer": "Factuur gegenereerd door {name} via ROAVAA.",
       "anonymousCustomer": "Klant"
+    },
+    "quotes": {
+      "title": "Offertes",
+      "new": "Nieuwe offerte",
+      "newTitle": "Nieuwe offerte",
+      "back": "← Offertes",
+      "save": "Offerte opslaan",
+      "saved": "Offerte opgeslagen.",
+      "error": "Er ging iets mis. Probeer het opnieuw.",
+      "empty": "Nog geen offertes.",
+      "forCustomer": "Offerte voor {name}",
+      "statDraft": "Concept",
+      "statSent": "Verzonden",
+      "statAccepted": "Geaccepteerd",
+      "lineKind": "Type",
+      "kindPart": "Onderdeel",
+      "kindLabor": "Arbeid",
+      "kindOther": "Overig",
+      "validUntil": "Geldig tot",
+      "convertToWorkOrder": "Omzetten naar werkorder",
+      "convertToInvoice": "Omzetten naar factuur",
+      "convertToInvoiceHint": "De offerte moet eerst geaccepteerd zijn voordat u ze kunt omzetten naar een factuur.",
+      "viewWorkOrder": "Werkorder bekijken",
+      "viewInvoice": "Factuur bekijken"
+    },
+    "quoteStatus": {
+      "draft": "Concept",
+      "sent": "Verzonden",
+      "accepted": "Geaccepteerd",
+      "refused": "Geweigerd",
+      "expired": "Verlopen",
+      "converted": "Omgezet"
+    },
+    "quotePdf": {
+      "quote": "Offerte",
+      "issueDate": "Datum",
+      "validUntil": "Geldig tot",
+      "billTo": "Offerte voor",
+      "vehicle": "Voertuig",
+      "description": "Omschrijving",
+      "quantity": "Aantal",
+      "unitPrice": "Prijs/stuk",
+      "amount": "Bedrag",
+      "subtotal": "Subtotaal",
+      "vat": "BTW",
+      "total": "Totaal",
+      "notes": "Opmerkingen",
+      "footer": "Offerte opgesteld door {name} via ROAVAA.",
+      "kindPart": "Onderdeel",
+      "kindLabor": "Arbeid",
+      "anonymousCustomer": "Klant",
+      "acceptanceWithDate": "Deze offerte is vrijblijvend en geldig tot {validUntil}.",
+      "acceptanceNoDate": "Deze offerte is vrijblijvend."
     }
   },
   "language": {
