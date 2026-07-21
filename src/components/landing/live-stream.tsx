@@ -29,7 +29,7 @@ export function LiveStream({ locale }: { locale: Locale }) {
     <ul className="lp-stream">
       {items.map((m) => (
         <li key={m.key} className={`lp-msg${m.fresh ? ' enter' : ''}`}>
-          <span className="lp-ava">{m.i}</span>
+          <span className="lp-ava">{m.i.slice(0, 2)}</span>
           <div>
             <div className="lp-who">{m.who}</div>
             <div className="lp-txt">{m.txt}</div>
