@@ -55,9 +55,12 @@ async function HomeContent({ params }: { params: Promise<{ locale: string }> }) 
         '@type': 'Organization',
         '@id': `${SITE_URL}/#organization`,
         name: 'ROAVAA',
+        legalName: 'ROAVAA',
         url: SITE_URL,
         logo: `${SITE_URL}/apple-icon`,
         image: `${SITE_URL}/${locale}/opengraph-image`,
+        description: home('seoDescription'),
+        founder: { '@type': 'Person', name: 'Prisca Akoua', jobTitle: 'Founder & CEO' },
       },
       {
         '@type': 'WebSite',
