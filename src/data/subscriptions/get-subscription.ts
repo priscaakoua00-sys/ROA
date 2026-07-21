@@ -1,8 +1,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { PlanKey, PlanLimits } from '@/lib/plans';
-import { getEntitlements } from '@/lib/entitlements';
+import { getEntitlements, type SubscriptionStatus } from '@/lib/entitlements';
 
-export type SubscriptionStatus = 'trialing' | 'active' | 'past_due' | 'cancelled' | 'expired';
+export type { SubscriptionStatus };
 
 export interface OrgSubscription {
   planKey: PlanKey;
@@ -10,6 +10,7 @@ export interface OrgSubscription {
   trialEndsAt: string | null;
   currentPeriodEnd: string | null;
   cancelAtPeriodEnd: boolean;
+  provider: 'stripe' | 'mollie' | null;
 }
 
 /**
@@ -24,12 +25,19 @@ export async function getOrgSubscription(
 ): Promise<OrgSubscription> {
   const { data } = await supabase
     .from('organization_subscriptions')
-    .select('plan_key, status, trial_ends_at, current_period_end, cancel_at_period_end')
+    .select('plan_key, status, trial_ends_at, current_period_end, cancel_at_period_end, provider')
     .eq('organization_id', organizationId)
     .maybeSingle();
 
   if (!data) {
-    return { planKey: 'starter', status: 'trialing', trialEndsAt: null, currentPeriodEnd: null, cancelAtPeriodEnd: false };
+    return {
+      planKey: 'starter',
+      status: 'trialing',
+      trialEndsAt: null,
+      currentPeriodEnd: null,
+      cancelAtPeriodEnd: false,
+      provider: null,
+    };
   }
 
   return {
@@ -38,6 +46,7 @@ export async function getOrgSubscription(
     trialEndsAt: data.trial_ends_at,
     currentPeriodEnd: data.current_period_end,
     cancelAtPeriodEnd: data.cancel_at_period_end,
+    provider: data.provider as 'stripe' | 'mollie' | null,
   };
 }
 

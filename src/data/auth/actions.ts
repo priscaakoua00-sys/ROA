@@ -42,6 +42,10 @@ export async function signInAction(formData: FormData) {
 
 export async function signUpAction(formData: FormData) {
   const locale = localeOf(formData);
+  const planRaw = String(formData.get('plan') ?? '');
+  const planQuery = (['starter', 'professional', 'enterprise'] as const).includes(planRaw as never)
+    ? `?plan=${planRaw}`
+    : '';
   const parsed = signUpSchema.safeParse({
     fullName: formData.get('fullName'),
     email: formData.get('email'),
@@ -62,14 +66,14 @@ export async function signUpAction(formData: FormData) {
   if (error) redirect(`/${locale}/signup?error=signup`);
 
   // New users are auto-confirmed (DB trigger). Go straight in.
-  if (data.session) redirect(`/${locale}/onboarding`);
+  if (data.session) redirect(`/${locale}/onboarding${planQuery}`);
 
   // No session returned: sign in right away (the account is already confirmed).
   const { error: signInError } = await supabase.auth.signInWithPassword({
     email: parsed.data.email,
     password: parsed.data.password,
   });
-  if (!signInError) redirect(`/${locale}/onboarding`);
+  if (!signInError) redirect(`/${locale}/onboarding${planQuery}`);
 
   // Fallback only if sign-in somehow failed.
   redirect(`/${locale}/login?message=check_email`);

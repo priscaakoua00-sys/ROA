@@ -47,6 +47,16 @@ interface Copy {
     sigB: string; sigRest: string;
   };
   device: { head: string; live: string; decide: string; decideB: string; approve: string; view: string };
+  carHero: {
+    hint: string;
+    hintOpen: string;
+    colorLabel: string;
+    colors: { obsidian: string; electric: string; silver: string; pearl: string; crimson: string };
+    doorLine: string;
+    muteOn: string;
+    muteOff: string;
+    plate: string;
+  };
   stakes: { pre: string; em: string; post: string; note: string };
   welcome: { cta: string; playing: string; duration: string; text: string };
   pillars: {
@@ -98,6 +108,15 @@ export const COPY: Record<Locale, Copy> = {
       sigB: 'Reageert.', sigRest: 'Organiseert. Leert.',
     },
     device: { head: 'Binnenkomend · vandaag', live: 'live', decide: 'Robin stelt voor. ', decideB: 'U beslist.', approve: 'Goedkeuren', view: 'Bekijken' },
+    carHero: {
+      hint: 'Klik op de wagen om Robin te ontmoeten',
+      hintOpen: 'Klik opnieuw om te herbeleven',
+      colorLabel: 'Kies een kleur',
+      colors: { obsidian: 'Diepzwart', electric: 'Elektrisch blauw', silver: 'Zilver', pearl: 'Parelwit', crimson: 'Dieprood' },
+      doorLine: 'Hallo, ik ben Robin, uw AI-medewerker.',
+      muteOn: 'Geluid uitschakelen', muteOff: 'Geluid inschakelen',
+      plate: 'ROAVAA · AI EMPLOYEE',
+    },
     welcome: {
       cta: 'Beluister Robin', playing: 'Wordt afgespeeld…', duration: '8 seconden',
       text: 'Welkom bij Roavaa. Ik ben Robin, uw AI-medewerker. Ik help u klanten te beantwoorden, voertuigen te organiseren en elke dag tijd te besparen.',
@@ -196,6 +215,15 @@ export const COPY: Record<Locale, Copy> = {
       sigB: 'Responds.', sigRest: 'Organizes. Learns.',
     },
     device: { head: 'Incoming · today', live: 'live', decide: 'Robin proposes. ', decideB: 'You decide.', approve: 'Approve', view: 'View' },
+    carHero: {
+      hint: 'Click the car to meet Robin',
+      hintOpen: 'Click again to replay',
+      colorLabel: 'Choose a color',
+      colors: { obsidian: 'Deep black', electric: 'Electric blue', silver: 'Silver', pearl: 'Pearl white', crimson: 'Deep red' },
+      doorLine: 'Hello, I’m Robin, your AI employee.',
+      muteOn: 'Mute sound', muteOff: 'Unmute sound',
+      plate: 'ROAVAA · AI EMPLOYEE',
+    },
     welcome: {
       cta: 'Listen to Robin', playing: 'Playing…', duration: '8 seconds',
       text: 'Welcome to Roavaa. I am Robin, your AI employee. I help you answer customers, organize vehicles and save time every day.',
@@ -294,6 +322,15 @@ export const COPY: Record<Locale, Copy> = {
       sigB: 'Répond.', sigRest: 'Organise. Apprend.',
     },
     device: { head: 'Entrant · aujourd\u2019hui', live: 'en direct', decide: 'Robin propose. ', decideB: 'Vous décidez.', approve: 'Approuver', view: 'Voir' },
+    carHero: {
+      hint: 'Cliquez sur la voiture pour rencontrer Robin',
+      hintOpen: 'Cliquez à nouveau pour rejouer',
+      colorLabel: 'Choisissez une couleur',
+      colors: { obsidian: 'Noir profond', electric: 'Bleu électrique', silver: 'Argent', pearl: 'Blanc perlé', crimson: 'Rouge foncé' },
+      doorLine: 'Bonjour, je suis Robin, votre employé IA.',
+      muteOn: 'Couper le son', muteOff: 'Activer le son',
+      plate: 'ROAVAA · AI EMPLOYEE',
+    },
     welcome: {
       cta: 'Écouter Robin', playing: 'Lecture en cours…', duration: '8 secondes',
       text: 'Bienvenue chez Roavaa. Je suis Robin, votre employé IA. Je vous aide à répondre aux clients, organiser les véhicules et gagner du temps chaque jour.',

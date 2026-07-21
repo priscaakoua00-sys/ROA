@@ -1,5 +1,6 @@
 import { Check } from 'lucide-react';
 import { COPY, type Locale } from './content';
+import { HeroCarExperience } from './hero-car-experience';
 import { LiveStream } from './live-stream';
 import { Reveal } from './reveal';
 import { RobinSimulation } from './robin-simulation';
@@ -64,17 +65,7 @@ export function Landing({ locale }: { locale: Locale }) {
               </div>
             </div>
 
-            <div className="lp-device">
-              <div className="lp-device-head">
-                <span className="t">{c.device.head}</span>
-                <span className="lp-live lp-mono"><span className="pulse" />{c.device.live}</span>
-              </div>
-              <LiveStream locale={safeLocale} />
-              <div className="lp-device-foot">
-                <span className="decide">{c.device.decide}<b>{c.device.decideB}</b></span>
-                <span className="mini"><span className="go">{c.device.approve}</span><span>{c.device.view}</span></span>
-              </div>
-            </div>
+            <HeroCarExperience locale={safeLocale} />
           </div>
         </section>
 
@@ -109,18 +100,31 @@ export function Landing({ locale }: { locale: Locale }) {
 
         {/* ACTS */}
         <section className="lp-light lp-acts" id="werk">
-          <div className="lp-wrap">
-            <Reveal className="lp-sechead">
-              <h2>{c.acts.title}</h2>
-              <span className="lp-mono">{c.acts.tag}</span>
-            </Reveal>
-            {c.acts.items.map((a) => (
-              <Reveal key={a.n} className="lp-act">
-                <span className="num">{a.n}</span>
-                <h3>{a.t}</h3>
-                <p>{a.p}</p>
+          <div className="lp-wrap lp-acts-grid">
+            <div>
+              <Reveal className="lp-sechead">
+                <h2>{c.acts.title}</h2>
+                <span className="lp-mono">{c.acts.tag}</span>
               </Reveal>
-            ))}
+              {c.acts.items.map((a) => (
+                <Reveal key={a.n} className="lp-act">
+                  <span className="num">{a.n}</span>
+                  <h3>{a.t}</h3>
+                  <p>{a.p}</p>
+                </Reveal>
+              ))}
+            </div>
+            <Reveal delay={100} className="lp-device">
+              <div className="lp-device-head">
+                <span className="t">{c.device.head}</span>
+                <span className="lp-live lp-mono"><span className="pulse" />{c.device.live}</span>
+              </div>
+              <LiveStream locale={safeLocale} />
+              <div className="lp-device-foot">
+                <span className="decide">{c.device.decide}<b>{c.device.decideB}</b></span>
+                <span className="mini"><span className="go">{c.device.approve}</span><span>{c.device.view}</span></span>
+              </div>
+            </Reveal>
           </div>
         </section>
 

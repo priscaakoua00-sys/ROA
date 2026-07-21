@@ -16,16 +16,24 @@ export async function createOrgAction(formData: FormData) {
     name: formData.get('name'),
     businessType: formData.get('businessType') ?? 'garage',
     language: formData.get('language') ?? locale,
+    planKey: formData.get('planKey') ?? 'starter',
   });
   if (!parsed.success) redirect(`/${locale}/onboarding?error=invalid`);
 
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.rpc('create_organization', {
+  const { data: org, error } = await supabase.rpc('create_organization', {
     p_name: parsed.data.name,
     p_business_type: parsed.data.businessType,
     p_default_language: parsed.data.language,
   });
-  if (error) redirect(`/${locale}/onboarding?error=create`);
+  if (error || !org) redirect(`/${locale}/onboarding?error=create`);
+
+  if (parsed.data.planKey !== 'starter') {
+    await supabase
+      .from('organization_subscriptions')
+      .update({ plan_key: parsed.data.planKey })
+      .eq('organization_id', org.id);
+  }
 
   redirect(`/${locale}/dashboard`);
 }

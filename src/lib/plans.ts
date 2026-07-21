@@ -42,7 +42,7 @@ export interface PlanLimits {
 export interface Plan {
   key: PlanKey;
   nameKey: string;
-  /** Monthly price in EUR, or null for "contact us" (enterprise). Provisional. */
+  /** Monthly price in EUR, or null for "contact us". All three tiers are priced today. */
   monthlyPrice: number | null;
   limits: PlanLimits;
   highlighted?: boolean;
@@ -52,7 +52,7 @@ export const PLANS: Plan[] = [
   {
     key: 'starter',
     nameKey: 'starter',
-    monthlyPrice: 39,
+    monthlyPrice: 49,
     limits: {
       maxVehicles: 150,
       maxUsers: 2,
@@ -73,7 +73,7 @@ export const PLANS: Plan[] = [
   {
     key: 'professional',
     nameKey: 'professional',
-    monthlyPrice: 79,
+    monthlyPrice: 99,
     highlighted: true,
     limits: {
       maxVehicles: 750,
@@ -95,7 +95,7 @@ export const PLANS: Plan[] = [
   {
     key: 'enterprise',
     nameKey: 'enterprise',
-    monthlyPrice: null,
+    monthlyPrice: 199,
     limits: {
       maxVehicles: null,
       maxUsers: null,
