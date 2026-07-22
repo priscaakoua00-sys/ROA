@@ -224,6 +224,20 @@
       "error": "Une erreur est survenue. Choisissez ou créez un client, puis réessayez.",
       "limitReached": "Vous avez atteint le nombre maximal de véhicules inclus dans votre formule. Passez à une formule supérieure pour continuer."
     },
+    "plateFirst": {
+      "plateLabel": "Plaque d'immatriculation",
+      "platePlaceholder": "ex. 6-XKD-69",
+      "lookup": "Récupérer",
+      "searching": "Ruben récupère les données du véhicule auprès de la RDW…",
+      "found": "Ruben a tout rempli. Vérifiez et enregistrez.",
+      "notFound": "Aucune donnée trouvée. Saisissez le véhicule manuellement ci-dessous.",
+      "confirmTitle": "Vérifiez les informations",
+      "mileageHint": "Kilométrage",
+      "manualEntry": "Saisir manuellement sans plaque",
+      "apkExpired": "Contrôle technique expiré depuis le {date}. Ruben peut inviter le client à le faire.",
+      "apkSoon": "Contrôle technique à renouveler dans {weeks} semaines ({date}). Bon moment pour réserver le client.",
+      "apkOk": "Contrôle technique valide jusqu'au {date}."
+    },
     "newWorkOrder": {
       "title": "Nouvelle commande d'atelier",
       "pickCustomer": "Choisissez d'abord un client",

@@ -7,6 +7,7 @@ import { addVehicleAction } from '@/data/customers/actions';
 import { Button } from '@/components/ui/button';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Field } from '@/components/auth/auth-shell';
+import { PlateFirstFields } from '@/components/vehicles/plate-first-fields';
 import { Link } from '@/i18n/navigation';
 
 interface Customer {
@@ -42,64 +43,7 @@ export default async function NewVehiclePage({
   const name = (c: Customer) =>
     [c.first_name, c.last_name].filter(Boolean).join(' ') || t('leads.anonymous');
 
-  const vehicleFields = (
-    <>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <Field label={t('customers.plate')} name="licensePlate" />
-        <Field label={t('customers.make')} name="make" />
-        <Field label={t('customers.model')} name="model" />
-        <Field label={t('vehicles.year')} name="year" type="number" />
-        <Field label={t('customers.mileage')} name="mileage" type="number" />
-        <Field label={t('newVehicle.vinLabel')} name="vin" />
-        <Field label={t('newVehicle.colorLabel')} name="color" />
-        <label className="block space-y-1.5 text-sm">
-          <span className="text-sm font-medium">{t('newVehicle.fuelLabel')}</span>
-          <select
-            name="fuel"
-            defaultValue=""
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <option value="">{t('newVehicle.fuelUnknown')}</option>
-            <option value="petrol">{t('newVehicle.fuelPetrol')}</option>
-            <option value="diesel">{t('newVehicle.fuelDiesel')}</option>
-            <option value="hybrid">{t('newVehicle.fuelHybrid')}</option>
-            <option value="electric">{t('newVehicle.fuelElectric')}</option>
-            <option value="other">{t('newVehicle.fuelOther')}</option>
-          </select>
-        </label>
-        <label className="block space-y-1.5 text-sm">
-          <span className="text-sm font-medium">{t('newVehicle.transmissionLabel')}</span>
-          <select
-            name="transmission"
-            defaultValue=""
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <option value="">{t('newVehicle.transmissionUnknown')}</option>
-            <option value="manual">{t('newVehicle.transmissionManual')}</option>
-            <option value="automatic">{t('newVehicle.transmissionAutomatic')}</option>
-          </select>
-        </label>
-      </div>
-      <label className="block text-sm">
-        <span className="mb-1.5 block font-medium">{t('newVehicle.notesLabel')}</span>
-        <textarea
-          name="notes"
-          rows={2}
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
-        />
-      </label>
-      <label className="block text-sm">
-        <span className="mb-1.5 block font-medium">{t('vehicles.photoUpload')}</span>
-        <input
-          type="file"
-          name="photo"
-          accept="image/*"
-          capture="environment"
-          className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-primary/90"
-        />
-      </label>
-    </>
-  );
+  const vehicleFields = <PlateFirstFields />;
 
   // Step 2a: brand-new customer, entered inline on this same form.
   if (isNewCustomer) {

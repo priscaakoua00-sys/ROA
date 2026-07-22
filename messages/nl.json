@@ -224,6 +224,20 @@
       "error": "Er ging iets mis. Kies of maak een klant aan, en probeer opnieuw.",
       "limitReached": "U heeft het maximum aantal voertuigen van uw abonnement bereikt. Upgrade om door te gaan."
     },
+    "plateFirst": {
+      "plateLabel": "Kenteken",
+      "platePlaceholder": "bijv. 6-XKD-69",
+      "lookup": "Ophalen",
+      "searching": "Ruben haalt de voertuiggegevens op bij de RDW…",
+      "found": "Ruben heeft de gegevens ingevuld. Controleer en sla op.",
+      "notFound": "Geen gegevens gevonden. Vul het voertuig hieronder handmatig in.",
+      "confirmTitle": "Gegevens controleren",
+      "mileageHint": "Kilometerstand",
+      "manualEntry": "Handmatig invullen zonder kenteken",
+      "apkExpired": "APK is verlopen sinds {date}. Ruben kan de klant hiervoor uitnodigen.",
+      "apkSoon": "APK verloopt over {weeks} weken ({date}). Mooie kans om de klant nu in te plannen.",
+      "apkOk": "APK geldig tot {date}."
+    },
     "newWorkOrder": {
       "title": "Nieuwe werkorder",
       "pickCustomer": "Kies eerst een klant",
