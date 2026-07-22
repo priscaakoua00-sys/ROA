@@ -424,6 +424,10 @@
 .lp-faq-item p { padding: 0 0 1.1rem; color: var(--lp-ink-dim); line-height: 1.6; font-size: 0.98rem; overflow-wrap: break-word; }
 
 .lp-footer { border-top: 1px solid var(--lp-line-d); padding: 2.5rem 0; color: var(--lp-bone-dim); font-size: 0.82rem; }
+.lp-footer-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+.lp-footer-legal { display: flex; flex-wrap: wrap; gap: 1.3rem; }
+.lp-footer-legal a { color: var(--lp-bone-dim); transition: color 0.2s ease; }
+.lp-footer-legal a:hover { color: var(--lp-bone); }
 
 .lp-reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
 .lp-reveal.in { opacity: 1; transform: none; }
