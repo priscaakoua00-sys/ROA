@@ -207,8 +207,12 @@
         "callFound": "{name}: {phone}. Can't dial it myself yet, but there's the number.",
         "greeting": "Hey! What can I help with?",
         "thanks": "No problem. I'll keep an eye on things.",
-        "fallback": "I can help with tomorrow's appointments, vehicles waiting, customers without a reply, or calling someone. Try \"Call [name]\"."
+        "fallback": "I can help with tomorrow's appointments, vehicles waiting, customers without a reply, or calling someone. Try \"Call [name]\".",
+        "draftFailed": "I couldn't draft a reply for this one — there wasn't enough in the request. Open it and I'll help from there."
       },
+      "actionDraftReply": "Draft the reply for {name}",
+      "draftPrefix": "Here's a draft reply for {name} — check it and send:",
+      "openConversation": "Open conversation",
       "listening": "Listening...",
       "startListening": "Talk to Ruben",
       "stopListening": "Stop recording"

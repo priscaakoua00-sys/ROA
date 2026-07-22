@@ -16,9 +16,18 @@ export interface RobinChatLink {
   href: string;
 }
 
+/** An action Ruben can actually perform on the boss's behalf, not just a link. */
+export interface RobinChatAction {
+  id: string;
+  label: string;
+  kind: 'draft_reply';
+  refId: string;
+}
+
 export interface RobinChatAnswer {
   text: string;
   links: RobinChatLink[];
+  actions?: RobinChatAction[];
   topic: IntentKind;
 }
 
@@ -370,9 +379,15 @@ export async function askRobinAction(
       return { text: t('robinChat.answers.unansweredNone'), links: [], topic: 'unanswered' };
     }
     const list = rows.map((r) => nameOf(r.customers)).join(', ');
+    const first = rows[0];
     return {
       text: t('robinChat.answers.unansweredCount', { count: rows.length, list }),
       links: rows.slice(0, 5).map((r) => ({ label: nameOf(r.customers), href: `/leads/${r.id}` })),
+      // Ruben doesn't just point at the waiting customer — he offers to write
+      // the reply himself, right here.
+      actions: first
+        ? [{ id: `draft-${first.id}`, kind: 'draft_reply', refId: first.id, label: t('robinChat.actionDraftReply', { name: nameOf(first.customers) }) }]
+        : undefined,
       topic: 'unanswered',
     };
   }
@@ -432,6 +447,75 @@ export async function askRobinAction(
     }
   } catch {
     // Provider misconfigured or unreachable — fall through to the canned reply.
+  }
+
+  return { text: t('robinChat.answers.fallback'), links: [], topic: 'fallback' };
+}
+
+/**
+ * Execute an action Ruben offered — the "acts, doesn't just answer" step.
+ * Today: draft a reply to a waiting customer with the real AI and hand it
+ * back ready to copy. Deliberately does NOT send it: no client channel is
+ * connected yet, so pretending to send would be dishonest. The mechanic
+ * reviews and sends. More action kinds plug in here.
+ */
+export async function runRobinAction(
+  orgId: string,
+  rawLocale: string,
+  action: { kind: string; refId: string },
+): Promise<RobinChatAnswer> {
+  const locale = localeOf(rawLocale);
+  const t = await getTranslations({ locale, namespace: 'app' });
+  const anon = t('leads.anonymous');
+  const supabase = await createSupabaseServerClient();
+
+  const nameOf = (row: { first_name: string | null; last_name: string | null } | null) =>
+    [row?.first_name, row?.last_name].filter(Boolean).join(' ') || anon;
+
+  if (action.kind === 'draft_reply') {
+    const { data: lead } = await supabase
+      .from('leads')
+      .select('id, description, ai_summary, customers(first_name, last_name)')
+      .eq('organization_id', orgId)
+      .eq('id', action.refId)
+      .maybeSingle();
+    const row = lead as unknown as {
+      id: string;
+      description: string | null;
+      ai_summary: string | null;
+      customers: { first_name: string | null; last_name: string | null } | null;
+    } | null;
+
+    if (!row) {
+      return { text: t('robinChat.answers.draftFailed'), links: [], topic: 'fallback' };
+    }
+
+    const conversation = [row.ai_summary, row.description].filter(Boolean).join('\n').trim();
+    if (!conversation) {
+      return {
+        text: t('robinChat.answers.draftFailed'),
+        links: [{ label: nameOf(row.customers), href: `/leads/${row.id}` }],
+        topic: 'fallback',
+      };
+    }
+
+    try {
+      const result = await getAIProvider().draftReply({ language: locale, conversation });
+      if (result.status === 'ok') {
+        return {
+          text: `${t('robinChat.draftPrefix', { name: nameOf(row.customers) })}\n\n${result.data.reply}`,
+          links: [{ label: t('robinChat.openConversation'), href: `/leads/${row.id}` }],
+          topic: 'fallback',
+        };
+      }
+    } catch {
+      // Provider unreachable — fall through to the honest failure message.
+    }
+    return {
+      text: t('robinChat.answers.draftFailed'),
+      links: [{ label: nameOf(row.customers), href: `/leads/${row.id}` }],
+      topic: 'fallback',
+    };
   }
 
   return { text: t('robinChat.answers.fallback'), links: [], topic: 'fallback' };

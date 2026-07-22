@@ -207,8 +207,12 @@
         "callFound": "{name}: {phone}. Zelf bellen kan ik nog niet, maar daar heb je het nummer.",
         "greeting": "Hoi! Waarmee kan ik je helpen?",
         "thanks": "Geen dank. Ik hou het verder in de gaten.",
-        "fallback": "Ik kan je helpen met de afspraken van morgen, voertuigen die wachten, klanten zonder antwoord, of iemand bellen. Typ bijvoorbeeld \"Bel [naam]\"."
+        "fallback": "Ik kan je helpen met de afspraken van morgen, voertuigen die wachten, klanten zonder antwoord, of iemand bellen. Typ bijvoorbeeld \"Bel [naam]\".",
+        "draftFailed": "Ik kon hiervoor geen antwoord opstellen — er stond te weinig in de aanvraag. Open hem, dan help ik verder."
       },
+      "actionDraftReply": "Stel het antwoord op voor {name}",
+      "draftPrefix": "Hier is een concept-antwoord voor {name} — controleer en verstuur:",
+      "openConversation": "Gesprek openen",
       "listening": "Ik luister...",
       "startListening": "Praat met Ruben",
       "stopListening": "Opname stoppen"
