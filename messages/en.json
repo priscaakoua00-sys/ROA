@@ -224,6 +224,20 @@
       "error": "Something went wrong. Pick or create a customer, then try again.",
       "limitReached": "You've reached the maximum number of vehicles included in your plan. Upgrade to continue."
     },
+    "plateFirst": {
+      "plateLabel": "License plate",
+      "platePlaceholder": "e.g. 6-XKD-69",
+      "lookup": "Fetch",
+      "searching": "Ruben is fetching the vehicle data from the RDW…",
+      "found": "Ruben filled everything in. Check it and save.",
+      "notFound": "No data found. Enter the vehicle manually below.",
+      "confirmTitle": "Check the details",
+      "mileageHint": "Mileage",
+      "manualEntry": "Enter manually without a plate",
+      "apkExpired": "MOT expired since {date}. Ruben can invite the customer for it.",
+      "apkSoon": "MOT expires in {weeks} weeks ({date}). A good moment to book the customer now.",
+      "apkOk": "MOT valid until {date}."
+    },
     "newWorkOrder": {
       "title": "New work order",
       "pickCustomer": "Pick a customer first",
