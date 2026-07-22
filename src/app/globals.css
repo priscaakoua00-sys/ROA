@@ -413,6 +413,16 @@
 .lp-close-sig .lp-serif { font-size: 1.15rem; color: var(--lp-bone); }
 .lp-close-sig .lp-mono { color: var(--lp-bone-dim); display: block; margin-top: 0.6rem; }
 
+.lp-faq { padding: 6rem 0; }
+.lp-faq-list { margin-top: 2.5rem; max-width: 780px; display: flex; flex-direction: column; gap: 0.9rem; }
+.lp-faq-item { border: 1px solid var(--lp-line-l); border-radius: 14px; background: var(--lp-card-light); padding: 0.4rem 1.3rem; transition: border-color 0.2s ease; }
+.lp-faq-item[open] { border-color: rgba(205, 162, 80, 0.4); }
+.lp-faq-item summary { cursor: pointer; list-style: none; padding: 1rem 0; font-weight: 600; font-size: 1.05rem; color: var(--lp-ink); display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.lp-faq-item summary::-webkit-details-marker { display: none; }
+.lp-faq-item summary::after { content: '+'; color: var(--lp-amber); font-size: 1.4rem; line-height: 1; transition: transform 0.2s ease; }
+.lp-faq-item[open] summary::after { transform: rotate(45deg); }
+.lp-faq-item p { padding: 0 0 1.1rem; color: var(--lp-ink-dim); line-height: 1.6; font-size: 0.98rem; overflow-wrap: break-word; }
+
 .lp-footer { border-top: 1px solid var(--lp-line-d); padding: 2.5rem 0; color: var(--lp-bone-dim); font-size: 0.82rem; }
 
 .lp-reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1); }

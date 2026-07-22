@@ -304,6 +304,26 @@ export function Landing({ locale }: { locale: Locale }) {
           </div>
         </section>
 
+        {/* FAQ — real, visible questions (also emitted as FAQPage structured data) */}
+        <section className="lp-light lp-faq" id="faq">
+          <div className="lp-wrap">
+            <Reveal className="lp-sechead">
+              <h2>{c.faq.title}</h2>
+              <span className="lp-mono">{c.faq.tag}</span>
+            </Reveal>
+            <div className="lp-faq-list">
+              {c.faq.items.map((item, i) => (
+                <Reveal key={item.q} delay={i * 60}>
+                  <details className="lp-faq-item">
+                    <summary>{item.q}</summary>
+                    <p>{item.a}</p>
+                  </details>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section className="lp-close" id="demo">
           <div className="lp-wrap">
             <Reveal>

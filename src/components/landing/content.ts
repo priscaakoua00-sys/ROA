@@ -90,6 +90,7 @@ interface Copy {
   pwa: { tag: string; title: string; sub: string; bullets: string[]; ctaInstall: string };
   founder: { eyebrow: string; name: string; role: string; story: string[]; signature: string };
   close: { pre: string; em: string; post: string; ctaPrimary: string; ctaSecondary: string; sig: string };
+  faq: { title: string; tag: string; items: { q: string; a: string }[] };
   footer: string;
 }
 
@@ -196,6 +197,15 @@ export const COPY: Record<Locale, Copy> = {
       pre: 'Klaar om geen enkele klant ', em: 'meer', post: ' te verliezen?',
       ctaPrimary: 'Vraag een demo aan', ctaSecondary: 'Praat met ons', sig: 'Reageert. Organiseert. Leert.',
     },
+    faq: {
+      title: 'Veelgestelde vragen', tag: 'Over Roavaa',
+      items: [
+        { q: 'Wat is Roavaa?', a: 'Roavaa is een AI-medewerker voor onafhankelijke autogarages. Ruben, de AI, beantwoordt aanvragen, ordent de dag en houdt het overzicht — zodat geen enkele klant verloren gaat.' },
+        { q: 'Voor wie is Roavaa bedoeld?', a: 'Voor zelfstandige garages en werkplaatsen die snel willen reageren, georganiseerd willen blijven en geen omzet willen mislopen door gemiste berichten of afspraken.' },
+        { q: 'Wat doet Ruben, de AI?', a: 'Ruben verwelkomt je met een ochtendbriefing, beantwoordt vragen met je échte gegevens, stelt antwoorden voor klanten op en pakt terugkerend werk uit handen — als een echte collega naast je.' },
+        { q: 'Kan ik Roavaa gratis proberen?', a: 'Ja. Je start met 30 dagen gratis, €0 vandaag, en je kunt op elk moment opzeggen voordat de proefperiode afloopt.' },
+      ],
+    },
     footer: 'Roavaa · AI-medewerker voor onafhankelijke garages.',
   },
   en: {
@@ -300,6 +310,15 @@ export const COPY: Record<Locale, Copy> = {
       pre: 'Ready to never lose ', em: 'another', post: ' customer?',
       ctaPrimary: 'Request a demo', ctaSecondary: 'Talk to us', sig: 'Responds. Organizes. Learns.',
     },
+    faq: {
+      title: 'Frequently asked questions', tag: 'About Roavaa',
+      items: [
+        { q: 'What is Roavaa?', a: 'Roavaa is an AI employee for independent car garages. Ruben, the AI, answers requests, organizes the day and keeps the overview — so no customer is ever lost.' },
+        { q: 'Who is Roavaa for?', a: 'For independent garages and workshops that want to reply fast, stay organized and stop losing revenue to missed messages or appointments.' },
+        { q: 'What does Ruben, the AI, do?', a: 'Ruben greets you with a morning briefing, answers questions from your real data, drafts replies to customers and takes recurring work off your hands — like a real colleague beside you.' },
+        { q: 'Can I try Roavaa for free?', a: 'Yes. You start with a 30-day free trial, €0 today, and you can cancel any time before the trial ends.' },
+      ],
+    },
     footer: 'Roavaa · AI employee for independent garages.',
   },
   fr: {
@@ -403,6 +422,15 @@ export const COPY: Record<Locale, Copy> = {
     close: {
       pre: 'Prêt à ne plus ', em: 'jamais', post: ' perdre un client ?',
       ctaPrimary: 'Demander une démo', ctaSecondary: 'Parlez-nous', sig: 'Répond. Organise. Apprend.',
+    },
+    faq: {
+      title: 'Questions fréquentes', tag: 'À propos de Roavaa',
+      items: [
+        { q: 'Qu’est-ce que Roavaa ?', a: 'Roavaa est un employé IA pour les garages automobiles indépendants. Ruben, l’IA, répond aux demandes, organise la journée et garde la vue d’ensemble — pour ne plus jamais perdre un client.' },
+        { q: 'À qui s’adresse Roavaa ?', a: 'Aux garages et ateliers indépendants qui veulent répondre vite, rester organisés et ne plus perdre de chiffre d’affaires à cause de messages ou de rendez-vous manqués.' },
+        { q: 'Que fait Ruben, l’IA ?', a: 'Ruben vous accueille avec un briefing du matin, répond à vos questions avec vos vraies données, rédige les réponses aux clients et prend en charge le travail répétitif — comme un vrai collègue à vos côtés.' },
+        { q: 'Puis-je essayer Roavaa gratuitement ?', a: 'Oui. Vous démarrez avec 30 jours gratuits, 0 € aujourd’hui, et vous pouvez annuler à tout moment avant la fin de la période d’essai.' },
+      ],
     },
     footer: 'Roavaa · employé IA pour garages indépendants.',
   },
