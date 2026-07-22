@@ -878,7 +878,8 @@
       "subtitle": "Begin met Roavaa voor uw garage.",
       "cta": "Account aanmaken",
       "hasAccount": "Al een account?",
-      "toLogin": "Inloggen"
+      "toLogin": "Inloggen",
+      "legalPrefix": "Door een account aan te maken ga je akkoord met onze"
     },
     "forgot": {
       "title": "Wachtwoord vergeten",

@@ -12,6 +12,9 @@ const PUBLIC_PATHS: { path: string; priority: number; changeFrequency: MetadataR
   { path: '/pricing', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/login', priority: 0.3, changeFrequency: 'yearly' },
   { path: '/signup', priority: 0.5, changeFrequency: 'yearly' },
+  { path: '/privacy', priority: 0.3, changeFrequency: 'yearly' },
+  { path: '/terms', priority: 0.3, changeFrequency: 'yearly' },
+  { path: '/cookies', priority: 0.2, changeFrequency: 'yearly' },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

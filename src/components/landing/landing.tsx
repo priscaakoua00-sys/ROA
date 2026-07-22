@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react';
+import { LEGAL_NAV } from '@/lib/legal';
 import { COPY, type Locale } from './content';
 import { HeroCarExperience } from './hero-car-experience';
 import { LiveStream } from './live-stream';
@@ -344,7 +345,14 @@ export function Landing({ locale }: { locale: Locale }) {
       </main>
 
       <footer className="lp-footer">
-        <div className="lp-wrap">{c.footer}</div>
+        <div className="lp-wrap lp-footer-row">
+          <span>{c.footer}</span>
+          <nav className="lp-footer-legal">
+            <a href={`/${safeLocale}/privacy`}>{LEGAL_NAV[safeLocale].privacy}</a>
+            <a href={`/${safeLocale}/terms`}>{LEGAL_NAV[safeLocale].terms}</a>
+            <a href={`/${safeLocale}/cookies`}>{LEGAL_NAV[safeLocale].cookies}</a>
+          </nav>
+        </div>
       </footer>
     </div>
   );

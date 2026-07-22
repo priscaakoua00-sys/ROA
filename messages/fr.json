@@ -878,7 +878,8 @@
       "subtitle": "Demarrez avec Roavaa pour votre garage.",
       "cta": "Creer un compte",
       "hasAccount": "Deja un compte ?",
-      "toLogin": "Se connecter"
+      "toLogin": "Se connecter",
+      "legalPrefix": "En créant un compte, vous acceptez nos"
     },
     "forgot": {
       "title": "Mot de passe oublie",
