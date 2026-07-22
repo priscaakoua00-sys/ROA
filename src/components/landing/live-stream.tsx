@@ -33,7 +33,7 @@ export function LiveStream({ locale }: { locale: Locale }) {
           <div>
             <div className="lp-who">{m.who}</div>
             <div className="lp-txt">{m.txt}</div>
-            <div className={`lp-roa${m.urgent ? ' urgent' : ''}`}>Robin {m.roa}</div>
+            <div className={`lp-roa${m.urgent ? ' urgent' : ''}`}>Ruben {m.roa}</div>
           </div>
         </li>
       ))}

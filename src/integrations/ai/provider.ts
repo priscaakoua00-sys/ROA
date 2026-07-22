@@ -70,7 +70,7 @@ export interface AIProvider {
   draftRepairReport(input: RepairReportInput): Promise<AIResult<RepairReport>>;
 
   /**
-   * Answer a free-form question typed into the Robin chat widget that
+   * Answer a free-form question typed into the Ruben chat widget that
    * didn't match a fast, deterministic intent. Must answer only from the
    * given context snapshot — never invent data about the garage, its
    * customers, or its vehicles that isn't in `context`.

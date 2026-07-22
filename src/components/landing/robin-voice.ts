@@ -5,11 +5,11 @@ export const LANG_PREFIX: Record<Locale, string> = { nl: 'nl', en: 'en', fr: 'fr
 /**
  * The browser's built-in speech voices have no cross-language identity
  * guarantee — each locale picks from whatever voices happen to be
- * installed, so "Robin" can sound like a different person per language.
+ * installed, so "Ruben" can sound like a different person per language.
  * French has no good male system voice available on the affected devices,
  * unlike Dutch and English which already sound right, so French uses a
- * real pre-generated recording (same voice actor as the rest of Robin's
- * identity) everywhere Robin speaks, instead of speechSynthesis. Dutch and
+ * real pre-generated recording (same voice actor as the rest of Ruben's
+ * identity) everywhere Ruben speaks, instead of speechSynthesis. Dutch and
  * English keep using the browser voice unchanged.
  */
 export const RECORDED_VOICE: Partial<Record<Locale, string>> = {
@@ -18,7 +18,7 @@ export const RECORDED_VOICE: Partial<Record<Locale, string>> = {
 
 // Common male-voice names across macOS/iOS, Windows and Chrome/Google TTS packs,
 // covering nl/en/fr. Best-effort: the Web Speech API exposes no gender field,
-// so Robin's identity depends on recognizing these names correctly.
+// so Ruben's identity depends on recognizing these names correctly.
 const MALE_NAME_HINTS = [
   'david', 'mark', 'daniel', 'thomas', 'xander', 'fred', 'alex', 'ruben', 'henri',
   'guy', 'paul', 'frank', 'liam', 'arthur', 'matteo', 'bart', 'jeroen', 'stefan',
@@ -52,11 +52,11 @@ function qualityScore(voice: SpeechSynthesisVoice): number {
 }
 
 /**
- * Picks Robin's voice for a locale. Gender takes strict priority over voice
+ * Picks Ruben's voice for a locale. Gender takes strict priority over voice
  * "quality" hints: a named male voice always wins over an unnamed/generic
  * one, which in turn always wins over an explicitly female-named voice — so
  * a generic "Google français"-style entry never outranks an actual male
- * voice just because it matched a quality regex. Robin must sound like the
+ * voice just because it matched a quality regex. Ruben must sound like the
  * same person in every language.
  */
 export function pickVoice(voices: SpeechSynthesisVoice[], locale: Locale): SpeechSynthesisVoice | null {
@@ -72,7 +72,7 @@ export function pickVoice(voices: SpeechSynthesisVoice[], locale: Locale): Speec
 }
 
 /**
- * Speaks a line with Robin's voice settings (calm, mature, slightly grave —
+ * Speaks a line with Ruben's voice settings (calm, mature, slightly grave —
  * never the default robotic cadence). Always user-triggered by the caller;
  * never called on page load.
  */

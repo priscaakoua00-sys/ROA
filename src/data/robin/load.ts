@@ -8,7 +8,7 @@ function fullName(c: { first_name: string | null; last_name: string | null } | n
   return [c?.first_name, c?.last_name].filter(Boolean).join(' ') || anon;
 }
 
-/** Fetches what Robin needs to know to open a conversation with something useful to say. */
+/** Fetches what Ruben needs to know to open a conversation with something useful to say. */
 export async function loadRobinInsight(supabase: SupabaseClient, orgId: string, anon: string): Promise<RobinInsight> {
   const now = new Date();
   const todayStart = new Date(now);

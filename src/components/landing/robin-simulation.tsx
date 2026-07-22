@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { COPY, type Locale } from './content';
 
-/** Tabbed, auto-cycling simulation of Robin handling a request end-to-end. */
+/** Tabbed, auto-cycling simulation of Ruben handling a request end-to-end. */
 export function RobinSimulation({ locale }: { locale: Locale }) {
   const c = COPY[locale].simulation;
   const [active, setActive] = useState(0);
