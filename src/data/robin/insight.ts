@@ -14,7 +14,7 @@ export interface RobinInsight {
 }
 
 /**
- * What Robin should say and suggest right now, in priority order: an urgent
+ * What Ruben should say and suggest right now, in priority order: an urgent
  * lead always wins, then customers waiting too long, then due follow-ups,
  * then a same-day appointment, and only then a calm "all clear". A brand new
  * garage with no data yet gets onboarding guidance instead.

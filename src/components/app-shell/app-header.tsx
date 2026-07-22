@@ -15,6 +15,7 @@ import {
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { ROBIN_OPEN_EVENT } from '@/components/robin-chat';
+import { PlateCommandBar } from '@/components/app-shell/plate-command-bar';
 
 function initialsOf(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -35,9 +36,13 @@ export function AppHeader({
 
   return (
     <header className="glass sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border px-4 md:px-6">
-      <span className="min-w-0 flex-1 truncate text-sm font-semibold tracking-tight md:text-base">
+      <span className="hidden min-w-0 max-w-[10rem] truncate text-sm font-semibold tracking-tight md:block md:text-base">
         {orgName}
       </span>
+
+      <div className="flex min-w-0 flex-1 justify-center">
+        <PlateCommandBar />
+      </div>
 
       <Button
         variant="outline"

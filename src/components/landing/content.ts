@@ -95,7 +95,7 @@ interface Copy {
 
 export const COPY: Record<Locale, Copy> = {
   nl: {
-    nav: { work: 'Hoe het werkt', robin: 'Robin', pricing: 'Prijzen', demo: 'Vraag een demo aan' },
+    nav: { work: 'Hoe het werkt', robin: 'Ruben', pricing: 'Prijzen', demo: 'Vraag een demo aan' },
     founder: { eyebrow: 'Wie zit erachter', name: 'Prisca Akoua', role: 'Oprichter & CEO van Roavaa', story: ['Ik geloof dat ondernemers hun tijd moeten besteden aan het laten groeien van hun bedrijf, niet aan het najagen van gemiste oproepen, vergeten berichten of administratie.', 'Die overtuiging bracht mij ertoe Roavaa te maken: een AI-medewerker die kleine bedrijven helpt sneller te antwoorden, beter georganiseerd te zijn en geen kansen meer te verliezen.', 'Ik bouw niet alleen software. Ik bouw een digitale collega die naast ondernemers werkt, zodat zij zich kunnen richten op wat echt telt: hun klanten, hun vak en hun groei.'], signature: 'Innovatie heeft alleen waarde wanneer ze een echt probleem oplost.' },
     hero: {
       kicker: 'AI-medewerker voor de werkplaats',
@@ -104,16 +104,16 @@ export const COPY: Record<Locale, Copy> = {
       ctaPrimary: 'Vraag een demo aan', ctaSecondary: 'Zie hoe het werkt',
       sigB: 'Reageert.', sigRest: 'Organiseert. Leert.',
     },
-    device: { head: 'Binnenkomend · vandaag', live: 'live', decide: 'Robin stelt voor. ', decideB: 'U beslist.', approve: 'Goedkeuren', view: 'Bekijken' },
+    device: { head: 'Binnenkomend · vandaag', live: 'live', decide: 'Ruben stelt voor. ', decideB: 'U beslist.', approve: 'Goedkeuren', view: 'Bekijken' },
     carHero: {
-      hint: 'Klik om Robin te ontmoeten',
+      hint: 'Klik om Ruben te ontmoeten',
       hintAgain: 'Klik opnieuw om te herbeleven',
-      doorLine: 'Hallo, ik ben Robin, uw AI-medewerker.',
+      doorLine: 'Hallo, ik ben Ruben, uw AI-medewerker.',
       muteOn: 'Geluid uitschakelen', muteOff: 'Geluid inschakelen',
     },
     welcome: {
-      cta: 'Beluister Robin', playing: 'Wordt afgespeeld…', duration: '8 seconden',
-      text: 'Welkom bij Roavaa. Ik ben Robin, uw AI-medewerker. Ik help u klanten te beantwoorden, voertuigen te organiseren en elke dag tijd te besparen.',
+      cta: 'Beluister Ruben', playing: 'Wordt afgespeeld…', duration: '8 seconden',
+      text: 'Welkom bij Roavaa. Ik ben Ruben, uw AI-medewerker. Ik help u klanten te beantwoorden, voertuigen te organiseren en elke dag tijd te besparen.',
     },
     stakes: {
       pre: 'Een gemiste oproep is een klant die ', em: 'de volgende garage', post: ' belt.',
@@ -124,7 +124,7 @@ export const COPY: Record<Locale, Copy> = {
       items: [
         { t: 'Volledige voertuighistorie', p: 'Elke reparatie, elk gesprek en elke factuur op één tijdlijn per voertuig. Nooit meer zoeken in mappen of oude berichten.' },
         { t: 'Devissen, reparaties en facturen', p: 'Maak een devis in seconden, zet het om in een reparatie en daarna in een factuur. Zonder ooit iets dubbel in te typen.' },
-        { t: 'Robin, uw AI-medewerker', p: 'Beantwoordt klanten, bereidt devissen voor en houdt de werkplaats georganiseerd, dag en nacht.' },
+        { t: 'Ruben, uw AI-medewerker', p: 'Beantwoordt klanten, bereidt devissen voor en houdt de werkplaats georganiseerd, dag en nacht.' },
       ],
     },
     acts: {
@@ -136,32 +136,32 @@ export const COPY: Record<Locale, Copy> = {
       ],
     },
     robin: {
-      titlePre: 'Maak kennis met ', titleEm: 'Robin.',
-      lead: 'Uw AI-medewerker. Robin praat met uw klanten, stelt voor wat er moet gebeuren, en legt de beslissing altijd bij u neer.',
+      titlePre: 'Maak kennis met ', titleEm: 'Ruben.',
+      lead: 'Uw AI-medewerker. Ruben praat met uw klanten, stelt voor wat er moet gebeuren, en legt de beslissing altijd bij u neer.',
       bullets: ['Belooft nooit een vaste prijs zonder uw akkoord.', 'Herkent noodgevallen en schakelt meteen een mens in.', 'Zegt eerlijk "dat weet ik niet" in plaats van iets te verzinnen.'],
     },
     chat: {
       who: 'Mevr. De Vries · 08:41',
       inMsg: 'Mijn remmen piepen al een week. Kan ik deze week nog langskomen?',
       outMsg: 'Natuurlijk. Kunt u het kenteken doorgeven? Dan stel ik twee momenten voor.',
-      proposeLbl: 'Voorstel van Robin',
+      proposeLbl: 'Voorstel van Ruben',
       propose: 'Piepende remmen kunnen op slijtage wijzen. Ik markeer dit met voorrang en stel donderdag 09:00 of vrijdag 14:30 voor.',
       approve: 'Goedkeuren', adjust: 'Aanpassen', decide: 'U beslist',
     },
     simulation: {
-      tag: 'Live simulatie', titlePre: 'Bekijk ', titleEm: 'Robin', sub: 'Van het eerste bericht tot de afgeronde reparatie volgt u dezelfde stroom die vandaag al in echte garages draait.',
+      tag: 'Live simulatie', titlePre: 'Bekijk ', titleEm: 'Ruben', sub: 'Van het eerste bericht tot de afgeronde reparatie volgt u dezelfde stroom die vandaag al in echte garages draait.',
       tabs: ['Bericht', 'Devis', 'Afspraak', 'Opvolging'],
       step1: { who: 'Dhr. Peeters · WhatsApp', msg: 'Mijn Golf trekt naar links bij het remmen. Kan dat gevaarlijk zijn?', reply: 'Dat kan wijzen op versleten remblokken. Ik maak alvast een devis klaar en stel een moment voor.' },
-      step2: { label: 'Robin stelt een devis op', lines: [{ d: 'Remblokken vooraan (set)', price: '€ 89,00' }, { d: 'Arbeid (45 min)', price: '€ 67,50' }, { d: 'BTW 21%', price: '€ 32,84' }], total: '€ 189,34' },
-      step3: { label: 'Robin stelt een afspraak voor', slots: ['Donderdag 09:00', 'Vrijdag 14:30'], confirmed: 'Bevestigd voor vrijdag 14:30' },
-      step4: { label: 'Robin volgt de reparatie op', stages: ['Ontvangen', 'Diagnose', 'Reparatie', 'Klaar'], current: 2, note: 'Dhr. Peeters krijgt automatisch bericht zodra zijn Golf klaar is.' },
+      step2: { label: 'Ruben stelt een devis op', lines: [{ d: 'Remblokken vooraan (set)', price: '€ 89,00' }, { d: 'Arbeid (45 min)', price: '€ 67,50' }, { d: 'BTW 21%', price: '€ 32,84' }], total: '€ 189,34' },
+      step3: { label: 'Ruben stelt een afspraak voor', slots: ['Donderdag 09:00', 'Vrijdag 14:30'], confirmed: 'Bevestigd voor vrijdag 14:30' },
+      step4: { label: 'Ruben volgt de reparatie op', stages: ['Ontvangen', 'Diagnose', 'Reparatie', 'Klaar'], current: 2, note: 'Dhr. Peeters krijgt automatisch bericht zodra zijn Golf klaar is.' },
     },
     voice: {
-      tag: 'Spraakbediening', title: 'Praat gewoon met Robin.', sub: 'Typen is niet nodig. Spreek een opdracht in, Robin voert ze meteen uit.',
+      tag: 'Spraakbediening', title: 'Praat gewoon met Ruben.', sub: 'Typen is niet nodig. Spreek een opdracht in, Ruben voert ze meteen uit.',
       examples: [
-        { cmd: '"Robin, maak een devis voor deze Golf."', result: 'Devis DEV-2026-014 aangemaakt' },
-        { cmd: '"Robin, bel deze klant morgen terug."', result: 'Herinnering gepland voor morgen 09:00' },
-        { cmd: '"Robin, hoeveel hebben we deze week gefactureerd?"', result: '€ 4.280 gefactureerd deze week' },
+        { cmd: '"Ruben, maak een devis voor deze Golf."', result: 'Devis DEV-2026-014 aangemaakt' },
+        { cmd: '"Ruben, bel deze klant morgen terug."', result: 'Herinnering gepland voor morgen 09:00' },
+        { cmd: '"Ruben, hoeveel hebben we deze week gefactureerd?"', result: '€ 4.280 gefactureerd deze week' },
       ],
     },
     memories: {
@@ -199,7 +199,7 @@ export const COPY: Record<Locale, Copy> = {
     footer: 'Roavaa · AI-medewerker voor onafhankelijke garages.',
   },
   en: {
-    nav: { work: 'How it works', robin: 'Robin', pricing: 'Pricing', demo: 'Request a demo' },
+    nav: { work: 'How it works', robin: 'Ruben', pricing: 'Pricing', demo: 'Request a demo' },
     founder: { eyebrow: 'Who is behind this', name: 'Prisca Akoua', role: 'Founder & CEO of Roavaa', story: ['I believe entrepreneurs should spend their time growing their business, not chasing missed calls, forgotten messages or admin tasks.', 'That conviction is why I created Roavaa: an AI employee built to help small businesses reply faster, stay organized and stop losing opportunities.', 'I am not just building software. I am building a digital colleague that works alongside entrepreneurs, so they can focus on what truly matters: their customers, their craft and their growth.'], signature: 'Innovation only has value when it solves a real problem.' },
     hero: {
       kicker: 'AI employee for the workshop',
@@ -208,16 +208,16 @@ export const COPY: Record<Locale, Copy> = {
       ctaPrimary: 'Request a demo', ctaSecondary: 'See how it works',
       sigB: 'Responds.', sigRest: 'Organizes. Learns.',
     },
-    device: { head: 'Incoming · today', live: 'live', decide: 'Robin proposes. ', decideB: 'You decide.', approve: 'Approve', view: 'View' },
+    device: { head: 'Incoming · today', live: 'live', decide: 'Ruben proposes. ', decideB: 'You decide.', approve: 'Approve', view: 'View' },
     carHero: {
-      hint: 'Click to meet Robin',
+      hint: 'Click to meet Ruben',
       hintAgain: 'Click again to replay',
-      doorLine: 'Hello, I’m Robin, your AI employee.',
+      doorLine: 'Hello, I’m Ruben, your AI employee.',
       muteOn: 'Mute sound', muteOff: 'Unmute sound',
     },
     welcome: {
-      cta: 'Listen to Robin', playing: 'Playing…', duration: '8 seconds',
-      text: 'Welcome to Roavaa. I am Robin, your AI employee. I help you answer customers, organize vehicles and save time every day.',
+      cta: 'Listen to Ruben', playing: 'Playing…', duration: '8 seconds',
+      text: 'Welcome to Roavaa. I am Ruben, your AI employee. I help you answer customers, organize vehicles and save time every day.',
     },
     stakes: {
       pre: 'A missed call is a customer calling ', em: 'the next garage', post: '.',
@@ -228,7 +228,7 @@ export const COPY: Record<Locale, Copy> = {
       items: [
         { t: 'Complete vehicle history', p: 'Every repair, every conversation and every invoice on one timeline per vehicle. Never dig through folders or old messages again.' },
         { t: 'Quotes, repairs and invoices', p: 'Create a quote in seconds, turn it into a repair and then an invoice. Without ever typing anything twice.' },
-        { t: 'Robin, your AI employee', p: 'Answers customers, prepares quotes and keeps the workshop organised, day and night.' },
+        { t: 'Ruben, your AI employee', p: 'Answers customers, prepares quotes and keeps the workshop organised, day and night.' },
       ],
     },
     acts: {
@@ -240,32 +240,32 @@ export const COPY: Record<Locale, Copy> = {
       ],
     },
     robin: {
-      titlePre: 'Meet ', titleEm: 'Robin.',
-      lead: 'Your AI employee. Robin talks to your customers, proposes what should happen, and always leaves the decision to you.',
+      titlePre: 'Meet ', titleEm: 'Ruben.',
+      lead: 'Your AI employee. Ruben talks to your customers, proposes what should happen, and always leaves the decision to you.',
       bullets: ['Never promises a fixed price without your approval.', 'Recognises emergencies and brings in a human at once.', 'Honestly says "I don\u2019t know" instead of inventing something.'],
     },
     chat: {
       who: 'Ms. De Vries · 08:41',
       inMsg: 'My brakes have been squeaking for a week. Can I still come by this week?',
       outMsg: 'Of course. Could you share the licence plate? Then I will propose two times.',
-      proposeLbl: 'Robin proposes',
+      proposeLbl: 'Ruben proposes',
       propose: 'Squeaking brakes can indicate wear. I am flagging this with priority and propose Thursday 09:00 or Friday 14:30.',
       approve: 'Approve', adjust: 'Adjust', decide: 'You decide',
     },
     simulation: {
-      tag: 'Live simulation', titlePre: 'Watch ', titleEm: 'Robin', sub: 'From the first message to a finished repair, follow the same flow already running in real garages today.',
+      tag: 'Live simulation', titlePre: 'Watch ', titleEm: 'Ruben', sub: 'From the first message to a finished repair, follow the same flow already running in real garages today.',
       tabs: ['Message', 'Quote', 'Appointment', 'Follow-up'],
       step1: { who: 'Mr. Peeters · WhatsApp', msg: 'My Golf pulls left when braking. Could that be dangerous?', reply: 'That can indicate worn brake pads. I am preparing a quote and proposing a time.' },
-      step2: { label: 'Robin drafts a quote', lines: [{ d: 'Front brake pads (set)', price: '€ 89.00' }, { d: 'Labour (45 min)', price: '€ 67.50' }, { d: 'VAT 21%', price: '€ 32.84' }], total: '€ 189.34' },
-      step3: { label: 'Robin proposes an appointment', slots: ['Thursday 09:00', 'Friday 14:30'], confirmed: 'Confirmed for Friday 14:30' },
-      step4: { label: 'Robin tracks the repair', stages: ['Received', 'Diagnosis', 'Repair', 'Done'], current: 2, note: 'Mr. Peeters is automatically notified as soon as his Golf is ready.' },
+      step2: { label: 'Ruben drafts a quote', lines: [{ d: 'Front brake pads (set)', price: '€ 89.00' }, { d: 'Labour (45 min)', price: '€ 67.50' }, { d: 'VAT 21%', price: '€ 32.84' }], total: '€ 189.34' },
+      step3: { label: 'Ruben proposes an appointment', slots: ['Thursday 09:00', 'Friday 14:30'], confirmed: 'Confirmed for Friday 14:30' },
+      step4: { label: 'Ruben tracks the repair', stages: ['Received', 'Diagnosis', 'Repair', 'Done'], current: 2, note: 'Mr. Peeters is automatically notified as soon as his Golf is ready.' },
     },
     voice: {
-      tag: 'Voice control', title: 'Just talk to Robin.', sub: 'No typing needed. Speak a command, Robin carries it out instantly.',
+      tag: 'Voice control', title: 'Just talk to Ruben.', sub: 'No typing needed. Speak a command, Ruben carries it out instantly.',
       examples: [
-        { cmd: '"Robin, create a quote for this Golf."', result: 'Quote QUO-2026-014 created' },
-        { cmd: '"Robin, call this customer back tomorrow."', result: 'Reminder scheduled for tomorrow 09:00' },
-        { cmd: '"Robin, how much have we invoiced this week?"', result: '€ 4,280 invoiced this week' },
+        { cmd: '"Ruben, create a quote for this Golf."', result: 'Quote QUO-2026-014 created' },
+        { cmd: '"Ruben, call this customer back tomorrow."', result: 'Reminder scheduled for tomorrow 09:00' },
+        { cmd: '"Ruben, how much have we invoiced this week?"', result: '€ 4,280 invoiced this week' },
       ],
     },
     memories: {
@@ -303,7 +303,7 @@ export const COPY: Record<Locale, Copy> = {
     footer: 'Roavaa · AI employee for independent garages.',
   },
   fr: {
-    nav: { work: 'Comment ça marche', robin: 'Robin', pricing: 'Tarifs', demo: 'Demander une démo' },
+    nav: { work: 'Comment ça marche', robin: 'Ruben', pricing: 'Tarifs', demo: 'Demander une démo' },
     founder: { eyebrow: 'Qui est derrière', name: 'Prisca Akoua', role: 'Fondatrice & CEO de Roavaa', story: ["Je crois que les entrepreneurs devraient consacrer leur temps à développer leur entreprise, pas à courir après les appels manqués, les messages oubliés ou les tâches administratives.", "C'est cette conviction qui m'a poussée à créer Roavaa : un employé IA conçu pour aider les petites entreprises à répondre plus vite, mieux s'organiser et ne plus perdre d'opportunités.", "Je ne construis pas seulement un logiciel. Je construis un collègue numérique qui travaille aux côtés des entrepreneurs, afin qu'ils puissent se concentrer sur ce qui compte vraiment : leurs clients, leur métier et leur croissance."], signature: "L'innovation n'a de valeur que lorsqu'elle résout un vrai problème." },
     hero: {
       kicker: 'Employé IA pour l\u2019atelier',
@@ -312,16 +312,16 @@ export const COPY: Record<Locale, Copy> = {
       ctaPrimary: 'Demander une démo', ctaSecondary: 'Voir comment ça marche',
       sigB: 'Répond.', sigRest: 'Organise. Apprend.',
     },
-    device: { head: 'Entrant · aujourd\u2019hui', live: 'en direct', decide: 'Robin propose. ', decideB: 'Vous décidez.', approve: 'Approuver', view: 'Voir' },
+    device: { head: 'Entrant · aujourd\u2019hui', live: 'en direct', decide: 'Ruben propose. ', decideB: 'Vous décidez.', approve: 'Approuver', view: 'Voir' },
     carHero: {
-      hint: 'Cliquez pour rencontrer Robin',
+      hint: 'Cliquez pour rencontrer Ruben',
       hintAgain: 'Cliquez à nouveau pour réécouter',
-      doorLine: 'Bonjour, je suis Robin, votre employé IA.',
+      doorLine: 'Bonjour, je suis Ruben, votre employé IA.',
       muteOn: 'Couper le son', muteOff: 'Activer le son',
     },
     welcome: {
-      cta: 'Écouter Robin', playing: 'Lecture en cours…', duration: '8 secondes',
-      text: 'Bienvenue chez Roavaa. Je suis Robin, votre employé IA. Je vous aide à répondre aux clients, organiser les véhicules et gagner du temps chaque jour.',
+      cta: 'Écouter Ruben', playing: 'Lecture en cours…', duration: '8 secondes',
+      text: 'Bienvenue chez Roavaa. Je suis Ruben, votre employé IA. Je vous aide à répondre aux clients, organiser les véhicules et gagner du temps chaque jour.',
     },
     stakes: {
       pre: 'Un appel manqué, c\u2019est un client qui appelle ', em: 'le garage suivant', post: '.',
@@ -332,7 +332,7 @@ export const COPY: Record<Locale, Copy> = {
       items: [
         { t: 'Historique complet du véhicule', p: 'Chaque réparation, chaque échange et chaque facture sur une seule chronologie par véhicule. Plus jamais besoin de fouiller dans des dossiers ou d\u2019anciens messages.' },
         { t: 'Devis, réparations et factures', p: 'Créez un devis en quelques secondes, transformez-le en ordre de réparation puis en facture. Sans jamais ressaisir la moindre information.' },
-        { t: 'Robin, votre employé IA', p: 'Répond aux clients, prépare les devis et garde l\u2019atelier organisé, jour et nuit.' },
+        { t: 'Ruben, votre employé IA', p: 'Répond aux clients, prépare les devis et garde l\u2019atelier organisé, jour et nuit.' },
       ],
     },
     acts: {
@@ -344,32 +344,32 @@ export const COPY: Record<Locale, Copy> = {
       ],
     },
     robin: {
-      titlePre: 'Faites connaissance avec ', titleEm: 'Robin.',
-      lead: 'Votre employé IA. Robin parle à vos clients, propose ce qu\u2019il faut faire, et vous laisse toujours la décision.',
+      titlePre: 'Faites connaissance avec ', titleEm: 'Ruben.',
+      lead: 'Votre employé IA. Ruben parle à vos clients, propose ce qu\u2019il faut faire, et vous laisse toujours la décision.',
       bullets: ['Ne promet jamais un prix fixe sans votre accord.', 'Reconnaît les urgences et fait appel à un humain aussitôt.', 'Dit honnêtement « je ne sais pas » au lieu d\u2019inventer.'],
     },
     chat: {
       who: 'Mme De Vries · 08:41',
       inMsg: 'Mes freins grincent depuis une semaine. Je peux passer cette semaine ?',
       outMsg: 'Bien sûr. Pouvez-vous indiquer la plaque ? Je proposerai deux créneaux.',
-      proposeLbl: 'Proposition de Robin',
+      proposeLbl: 'Proposition de Ruben',
       propose: 'Des freins qui grincent peuvent indiquer de l\u2019usure. Je marque ceci en priorité et propose jeudi 09:00 ou vendredi 14:30.',
       approve: 'Approuver', adjust: 'Ajuster', decide: 'Vous décidez',
     },
     simulation: {
-      tag: 'Simulation en direct', titlePre: 'Regardez ', titleEm: 'Robin', sub: 'Du premier message jusqu’à la réparation terminée, découvrez le parcours qui fonctionne déjà aujourd’hui dans de vrais garages.',
+      tag: 'Simulation en direct', titlePre: 'Regardez ', titleEm: 'Ruben', sub: 'Du premier message jusqu’à la réparation terminée, découvrez le parcours qui fonctionne déjà aujourd’hui dans de vrais garages.',
       tabs: ['Message', 'Devis', 'Rendez-vous', 'Suivi'],
       step1: { who: 'M. Peeters · WhatsApp', msg: 'Ma Golf tire à gauche au freinage. C\u2019est dangereux ?', reply: 'Cela peut indiquer des plaquettes usées. Je prépare un devis et propose un créneau.' },
-      step2: { label: 'Robin prépare un devis', lines: [{ d: 'Plaquettes de frein avant (jeu)', price: '89,00 €' }, { d: 'Main d’œuvre (45 min)', price: '67,50 €' }, { d: 'TVA 21 %', price: '32,84 €' }], total: '189,34 €' },
-      step3: { label: 'Robin propose un rendez-vous', slots: ['Jeudi 09:00', 'Vendredi 14:30'], confirmed: 'Confirmé pour vendredi 14:30' },
-      step4: { label: 'Robin suit la réparation', stages: ['Reçu', 'Diagnostic', 'Réparation', 'Terminé'], current: 2, note: 'M. Peeters est prévenu automatiquement dès que sa Golf est prête.' },
+      step2: { label: 'Ruben prépare un devis', lines: [{ d: 'Plaquettes de frein avant (jeu)', price: '89,00 €' }, { d: 'Main d’œuvre (45 min)', price: '67,50 €' }, { d: 'TVA 21 %', price: '32,84 €' }], total: '189,34 €' },
+      step3: { label: 'Ruben propose un rendez-vous', slots: ['Jeudi 09:00', 'Vendredi 14:30'], confirmed: 'Confirmé pour vendredi 14:30' },
+      step4: { label: 'Ruben suit la réparation', stages: ['Reçu', 'Diagnostic', 'Réparation', 'Terminé'], current: 2, note: 'M. Peeters est prévenu automatiquement dès que sa Golf est prête.' },
     },
     voice: {
-      tag: 'Commande vocale', title: 'Parlez simplement à Robin.', sub: 'Pas besoin d\u2019écrire. Dites une consigne à voix haute, Robin l\u2019exécute aussitôt.',
+      tag: 'Commande vocale', title: 'Parlez simplement à Ruben.', sub: 'Pas besoin d\u2019écrire. Dites une consigne à voix haute, Ruben l\u2019exécute aussitôt.',
       examples: [
-        { cmd: '« Robin, crée un devis pour cette Golf. »', result: 'Devis DEV-2026-014 créé' },
-        { cmd: '« Robin, rappelle ce client demain. »', result: 'Rappel programmé pour demain 09:00' },
-        { cmd: '« Robin, combien avons-nous facturé cette semaine ? »', result: '4 280 € facturés cette semaine' },
+        { cmd: '« Ruben, crée un devis pour cette Golf. »', result: 'Devis DEV-2026-014 créé' },
+        { cmd: '« Ruben, rappelle ce client demain. »', result: 'Rappel programmé pour demain 09:00' },
+        { cmd: '« Ruben, combien avons-nous facturé cette semaine ? »', result: '4 280 € facturés cette semaine' },
       ],
     },
     memories: {

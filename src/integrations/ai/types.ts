@@ -117,7 +117,7 @@ export interface RepairReportInput {
 }
 
 /**
- * A free-form question typed into the Robin chat widget that didn't match
+ * A free-form question typed into the Ruben chat widget that didn't match
  * any of the fast, deterministic intents (greeting, "vehicles waiting",
  * etc.). `context` is a short plain-text snapshot of the garage's current
  * data (counts only, built server-side) so the model can answer from real

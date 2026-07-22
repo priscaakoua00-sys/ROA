@@ -5,7 +5,7 @@ import { Volume2 } from 'lucide-react';
 import { COPY, type Locale } from './content';
 import { speakAsRobin, RECORDED_VOICE } from './robin-voice';
 
-/** On-demand, no-autoplay spoken welcome from Robin. Silently disappears if unsupported. */
+/** On-demand, no-autoplay spoken welcome from Ruben. Silently disappears if unsupported. */
 export function RobinVoiceIntro({ locale }: { locale: Locale }) {
   const c = COPY[locale].welcome;
   const recordedSrc = RECORDED_VOICE[locale];

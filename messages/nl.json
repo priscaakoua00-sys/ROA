@@ -19,7 +19,7 @@
       "knowledge": "Kennisbank",
       "team": "Team",
       "settings": "Instellingen",
-      "openRobin": "Robin openen",
+      "openRobin": "Ruben openen",
       "notifications": "Meldingen",
       "signedInAs": "Ingelogd als",
       "signOut": "Uitloggen",
@@ -84,7 +84,7 @@
       "greetMorning": "Goedemorgen {name}.",
       "greetAfternoon": "Goedemiddag {name}.",
       "greetEvening": "Goedenavond {name}.",
-      "robinName": "Robin",
+      "robinName": "Ruben",
       "robinIntro": "Ik hou je telefoon, mail, WhatsApp en afspraken in de gaten. Er glipt vandaag niks doorheen.",
       "robinSummary": "Er zijn {count} nieuwe aanvragen, {waiting} wachten op antwoord en {upcoming} afspraken gepland.",
       "robinAsk": "Wat wil je dat ik oppak?",
@@ -99,7 +99,7 @@
       "doneAppts": "{count} afspraken gemaakt",
       "doneFollowups": "{count} opvolgingen afgerond",
       "doneWaiting": "{count} klanten in afwachting",
-      "startTitle": "Robin staat klaar",
+      "startTitle": "Ruben staat klaar",
       "startIntro": "Zo begin je:",
       "step1": "Deel je aanvraagformulier met klanten.",
       "step2": "Voeg je eerste klant toe.",
@@ -112,7 +112,7 @@
       "notifUrgent": "Urgente berichten",
       "notifFollowups": "Opvolgingen nodig",
       "notifApptsToday": "Afspraken vandaag",
-      "notifRobinDone": "Robin voltooide taken",
+      "notifRobinDone": "Ruben voltooide taken",
       "notifAllCaughtUp": "Alles is bij. Geen meldingen.",
       "vehiclesTitle": "Voertuigen in de garage",
       "vehiclesSubtitle": "Wat er nu op de werkvloer staat.",
@@ -128,7 +128,7 @@
       "metricResponseRate": "Reactiesnelheid",
       "minutesShort": "{count} min",
       "metricsEmptyNew": "Nog geen activiteit. Zodra je eerste aanvraag binnenkomt, hou ik alles hier voor je bij.",
-      "metricsEmptyQuiet": "Rustige dag. Alles onder controle, Robin blijft intussen meekijken.",
+      "metricsEmptyQuiet": "Rustige dag. Alles onder controle, Ruben blijft intussen meekijken.",
       "vehicleCall": "Klant bellen",
       "insight": {
         "emptyGarage": "Je hebt nog geen klanten. Deel je aanvraagformulier, dan vang ik elke aanvraag automatisch op en regel ik de rest.",
@@ -156,6 +156,9 @@
       "clientsTotal": "Klanten",
       "revenueChartTitle": "Omzet - laatste 14 dagen"
     },
+    "commandBar": {
+      "placeholder": "Kenteken…"
+    },
     "moduleBanner": {
       "repairs": "Voertuigen & reparaties",
       "appointments": "Klantafspraken",
@@ -164,8 +167,8 @@
       "history": "Voertuiggeschiedenis"
     },
     "robinChat": {
-      "launcher": "Praat met Robin",
-      "title": "Robin",
+      "launcher": "Praat met Ruben",
+      "title": "Ruben",
       "subtitle": "Vraag maar wat er speelt in je garage.",
       "placeholder": "Typ je vraag...",
       "send": "Verstuur",
@@ -194,7 +197,7 @@
         "fallback": "Ik kan je helpen met de afspraken van morgen, voertuigen die wachten, klanten zonder antwoord, of iemand bellen. Typ bijvoorbeeld \"Bel [naam]\"."
       },
       "listening": "Ik luister...",
-      "startListening": "Praat met Robin",
+      "startListening": "Praat met Ruben",
       "stopListening": "Opname stoppen"
     },
     "newVehicle": {
@@ -236,7 +239,17 @@
       "manualEntry": "Handmatig invullen zonder kenteken",
       "apkExpired": "APK is verlopen sinds {date}. Ruben kan de klant hiervoor uitnodigen.",
       "apkSoon": "APK verloopt over {weeks} weken ({date}). Mooie kans om de klant nu in te plannen.",
-      "apkOk": "APK geldig tot {date}."
+      "apkOk": "APK geldig tot {date}.",
+      "intro": "Begin met het kenteken. Ruben vult de rest in.",
+      "stepVehicle": "Voertuig",
+      "stepCustomer": "Klant"
+    },
+    "attachCustomer": {
+      "searchPlaceholder": "Zoek een klant op naam, telefoon of e-mail…",
+      "newCustomer": "Nieuwe klant toevoegen",
+      "backToSearch": "Bestaande klant zoeken",
+      "noResults": "Geen klant gevonden. Voeg een nieuwe toe.",
+      "change": "Wijzigen"
     },
     "newWorkOrder": {
       "title": "Nieuwe werkorder",
@@ -386,11 +399,11 @@
       "checklistNewItem": "Nieuw controlepunt",
       "timelineTitle": "Volledige geschiedenis",
       "timelineEmpty": "Nog geen gebeurtenissen.",
-      "timelineDiagnosis": "Robin AI foto-diagnose",
-      "reportTitle": "Robin AI-rapport",
-      "reportIntro": "Robin stelt een professioneel rapport en klantbericht op basis van de checklist en foto-diagnoses.",
+      "timelineDiagnosis": "Ruben AI foto-diagnose",
+      "reportTitle": "Ruben AI-rapport",
+      "reportIntro": "Ruben stelt een professioneel rapport en klantbericht op basis van de checklist en foto-diagnoses.",
       "reportGenerate": "Rapport genereren",
-      "reportGenerating": "Robin stelt het rapport op...",
+      "reportGenerating": "Ruben stelt het rapport op...",
       "reportSaved": "Rapport gegenereerd.",
       "reportEmpty": "Nog niets te melden: vul eerst de checklist in of voer een foto-diagnose uit.",
       "reportError": "Het genereren van het rapport is mislukt. Probeer het opnieuw.",
@@ -544,7 +557,7 @@
       "billingUsage": {
         "vehicles": "Voertuigen",
         "users": "Gebruikers",
-        "aiAnalyses": "Robin AI-analyses deze maand"
+        "aiAnalyses": "Ruben AI-analyses deze maand"
       },
       "checklistTitle": "Controle-checklist",
       "checklistIntro": "Pas aan wat uw monteurs controleren als een voertuig binnenkomt.",
@@ -625,7 +638,7 @@
     },
     "diagnosis": {
       "title": "Foto-diagnose",
-      "intro": "Voeg foto's toe vanuit verschillende hoeken — voorkant, motor, dashboard, onderkant — en Robin IA stelt één volledig rapport op.",
+      "intro": "Voeg foto's toe vanuit verschillende hoeken — voorkant, motor, dashboard, onderkant — en Ruben IA stelt één volledig rapport op.",
       "saved": "Diagnose toegevoegd.",
       "error": "Uploaden lukte niet. Probeer het opnieuw met foto's tot 4 MB, max 10 in totaal.",
       "angleFront": "Voorkant",
@@ -640,8 +653,8 @@
       "otherPhotosHint": "Optioneel, max 2 extra foto's.",
       "noteLabel": "Korte omschrijving (optioneel)",
       "notePlaceholder": "Bijv. piepend geluid bij het remmen",
-      "submit": "Analyseren met Robin IA",
-      "analyzing": "Robin analyseert...",
+      "submit": "Analyseren met Ruben IA",
+      "analyzing": "Ruben analyseert...",
       "disclaimer": "Deze analyse is een hulpmiddel bij de diagnose en vervangt niet de beoordeling van een vakman. Bevestig altijd zelf voordat je een reparatie start.",
       "visibleProblems": "Zichtbare problemen",
       "affectedParts": "Mogelijk beschadigde onderdelen",
@@ -654,7 +667,7 @@
       "additionalChecks": "Extra controles",
       "estimatedRepairTime": "Geschatte reparatietijd",
       "recommendations": "Aanbevelingen",
-      "limitReached": "U heeft het aantal Robin AI-analyses van deze maand in uw abonnement bereikt. Upgrade om door te gaan."
+      "limitReached": "U heeft het aantal Ruben AI-analyses van deze maand in uw abonnement bereikt. Upgrade om door te gaan."
     },
     "checklistResult": {
       "pending": "Nog te doen",
@@ -824,7 +837,7 @@
       "youDecide": "Jij beslist"
     },
     "seoTitle": "ROAVAA – AI-garagistensoftware voor planning, klanten en facturen",
-    "seoDescription": "ROAVAA is slimme garagesoftware met Robin, uw AI-medewerker. Beheer klanten, voertuigen, afspraken, werkorders, communicatie en professionele facturen vanuit één platform."
+    "seoDescription": "ROAVAA is slimme garagesoftware met Ruben, uw AI-medewerker. Beheer klanten, voertuigen, afspraken, werkorders, communicatie en professionele facturen vanuit één platform."
   },
   "footer": {
     "signature": "Reageert. Organiseert. Leert.",
@@ -921,12 +934,12 @@
       "usersUnlimited": "Onbeperkt gebruikers",
       "storage": "{count} GB opslag voor foto's en video's",
       "storageUnlimited": "Onbeperkte opslag",
-      "aiAnalyses": "{count} Robin AI-analyses per maand",
-      "aiAnalysesUnlimited": "Onbeperkt Robin AI-analyses",
+      "aiAnalyses": "{count} Ruben AI-analyses per maand",
+      "aiAnalysesUnlimited": "Onbeperkt Ruben AI-analyses",
       "robinLevel": {
-        "basic": "Robin IA - basisassistent",
-        "advanced": "Robin IA - geavanceerde foto-diagnose",
-        "full": "Robin IA - volledige suite"
+        "basic": "Ruben IA - basisassistent",
+        "advanced": "Ruben IA - geavanceerde foto-diagnose",
+        "full": "Ruben IA - volledige suite"
       },
       "statisticsLevel": {
         "basic": "Basisstatistieken",
@@ -942,8 +955,8 @@
       "prioritySupport": "Prioritaire ondersteuning",
       "emailSupport": "E-mailondersteuning"
     },
-    "seoTitle": "Prijzen – ROAVAA garagesoftware met AI-medewerker Robin",
-    "seoDescription": "Bekijk de ROAVAA-abonnementen: Starter, Professional en Enterprise. Slimme garagesoftware met Robin AI, facturatie, agenda en meer."
+    "seoTitle": "Prijzen – ROAVAA garagesoftware met AI-medewerker Ruben",
+    "seoDescription": "Bekijk de ROAVAA-abonnementen: Starter, Professional en Enterprise. Slimme garagesoftware met Ruben AI, facturatie, agenda en meer."
   },
   "card": {
     "scanHint": "Scan om dit contact op te slaan",

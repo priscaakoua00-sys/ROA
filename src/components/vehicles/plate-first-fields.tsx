@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Search, Sparkles, Check, AlertTriangle, Loader2 } from 'lucide-react';
 import type { FuelKey, RdwVehicle } from '@/integrations/rdw/client';
@@ -18,10 +18,10 @@ function weeksUntil(iso: string): number {
  * RDW technical data, and every field arrives pre-filled and editable. Manual
  * entry stays possible at all times — the fields work with or without a lookup.
  */
-export function PlateFirstFields() {
+export function PlateFirstFields({ initialPlate = '' }: { initialPlate?: string }) {
   const t = useTranslations('app');
   const [status, setStatus] = useState<Status>('idle');
-  const [plate, setPlate] = useState('');
+  const [plate, setPlate] = useState(initialPlate.toUpperCase());
   const [make, setMake] = useState('');
   const [model, setModel] = useState('');
   const [year, setYear] = useState('');
@@ -57,6 +57,13 @@ export function PlateFirstFields() {
       setRevealed(true);
     }
   }, [plate]);
+
+  // Deep-linked from the command bar with a plate already in hand — look it up
+  // immediately so the dossier is pre-filled on arrival.
+  useEffect(() => {
+    if (initialPlate.replace(/[^A-Za-z0-9]/g, '').length >= 4) runLookup();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onPlateChange = (value: string) => {
     setPlate(value.toUpperCase());

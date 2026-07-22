@@ -25,7 +25,7 @@ export interface PlanLimits {
   maxUsers: number | null;
   /** null = unlimited. Photo/video storage for diagnoses + vehicle photos. */
   storageGb: number | null;
-  /** null = unlimited. Robin AI photo-diagnosis calls per calendar month. */
+  /** null = unlimited. Ruben AI photo-diagnosis calls per calendar month. */
   aiAnalysesPerMonth: number | null;
   robinAiLevel: RobinAiLevel;
   automations: boolean;

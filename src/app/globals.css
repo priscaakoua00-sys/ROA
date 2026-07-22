@@ -474,7 +474,7 @@
 .lp-pillar h3 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 1.35rem; margin: 1rem 0 0.6rem; letter-spacing: -0.01em; }
 .lp-pillar p { color: var(--lp-ink-dim); font-size: 0.96rem; overflow-wrap: break-word; }
 
-/* Live simulation: tabbed multi-step Robin demo */
+/* Live simulation: tabbed multi-step Ruben demo */
 .lp-simsec { padding: 6.5rem 0; }
 .lp-sim { margin-top: 2.4rem; border: 1px solid var(--lp-line-d); border-radius: 18px; background: linear-gradient(180deg, var(--lp-espresso-2), var(--lp-espresso-3)); box-shadow: 0 40px 90px -44px #000; overflow: hidden; }
 .lp-sim-tabs { display: flex; overflow-x: auto; border-bottom: 1px solid var(--lp-line-d); }
@@ -516,7 +516,7 @@
 .lp-sim-track .stage.done::before { background: var(--lp-amber); }
 .lp-sim-track .note { margin-top: 1rem; color: var(--lp-bone-dim); font-size: 0.9rem; }
 
-/* Voice: speak-to-Robin demo */
+/* Voice: speak-to-Ruben demo */
 .lp-voice-section { padding: 6.5rem 0; }
 .lp-voice-grid { display: grid; gap: 2.5rem; align-items: center; }
 @media (min-width: 900px) { .lp-voice-grid { grid-template-columns: 0.95fr 1.05fr; } }
@@ -571,7 +571,7 @@
   .lp-journey-step { flex: 1 0 7rem; }
 }
 
-/* Hero: on-demand spoken welcome from Robin (no autoplay) */
+/* Hero: on-demand spoken welcome from Ruben (no autoplay) */
 .lp-voice-hero { margin-top: 1.4rem; }
 .lp-voice-intro {
   display: inline-flex; align-items: center; gap: 0.75rem;
@@ -590,7 +590,7 @@
 .lp-voice-intro .dur { font-family: 'JetBrains Mono', monospace; font-size: 0.64rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lp-bone-dim); }
 
 /* ============================================================
-   Hero centerpiece: the original ROAVAA concept car — Robin's
+   Hero centerpiece: the original ROAVAA concept car — Ruben's
    arrival. A real generated image (public/landing/hero-car.png),
    not an illustration; CSS only adds the float, glow and click
    feedback. prefers-reduced-motion already disables all

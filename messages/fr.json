@@ -19,7 +19,7 @@
       "knowledge": "Connaissances",
       "team": "Équipe",
       "settings": "Paramètres",
-      "openRobin": "Ouvrir Robin",
+      "openRobin": "Ouvrir Ruben",
       "notifications": "Notifications",
       "signedInAs": "Connecté en tant que",
       "signOut": "Déconnexion",
@@ -84,7 +84,7 @@
       "greetMorning": "Bonjour {name}.",
       "greetAfternoon": "Bon après-midi {name}.",
       "greetEvening": "Bonsoir {name}.",
-      "robinName": "Robin",
+      "robinName": "Ruben",
       "robinIntro": "Je garde un œil sur vos appels, e-mails, WhatsApp et rendez-vous. Rien ne passe à travers aujourd'hui.",
       "robinSummary": "Il y a {count} nouvelles demandes, {waiting} en attente de réponse et {upcoming} rendez-vous prévus.",
       "robinAsk": "Qu'est-ce que vous voulez que je prenne en charge ?",
@@ -99,7 +99,7 @@
       "doneAppts": "{count} rendez-vous créés",
       "doneFollowups": "{count} relances effectuées",
       "doneWaiting": "{count} clients en attente",
-      "startTitle": "Robin est prêt",
+      "startTitle": "Ruben est prêt",
       "startIntro": "Voici comment commencer :",
       "step1": "Partagez votre formulaire de demande avec vos clients.",
       "step2": "Ajoutez votre premier client.",
@@ -112,7 +112,7 @@
       "notifUrgent": "Messages urgents",
       "notifFollowups": "Relances à faire",
       "notifApptsToday": "Rendez-vous du jour",
-      "notifRobinDone": "Tâches terminées par Robin",
+      "notifRobinDone": "Tâches terminées par Ruben",
       "notifAllCaughtUp": "Tout est à jour. Aucune notification.",
       "vehiclesTitle": "Véhicules au garage",
       "vehiclesSubtitle": "Ce qui se trouve actuellement à l'atelier.",
@@ -128,7 +128,7 @@
       "metricResponseRate": "Taux de réponse",
       "minutesShort": "{count} min",
       "metricsEmptyNew": "Pas encore d'activité. Dès votre première demande, je garde tout ici pour vous.",
-      "metricsEmptyQuiet": "Journée calme. Tout est sous contrôle, Robin garde un œil sur le reste.",
+      "metricsEmptyQuiet": "Journée calme. Tout est sous contrôle, Ruben garde un œil sur le reste.",
       "vehicleCall": "Appeler le client",
       "insight": {
         "emptyGarage": "Vous n'avez pas encore de clients. Partagez votre formulaire, je capte chaque demande et je m'occupe du reste.",
@@ -156,6 +156,9 @@
       "clientsTotal": "Clients",
       "revenueChartTitle": "Chiffre d'affaires - 14 derniers jours"
     },
+    "commandBar": {
+      "placeholder": "Plaque…"
+    },
     "moduleBanner": {
       "repairs": "Véhicules & réparations",
       "appointments": "Rendez-vous clients",
@@ -164,8 +167,8 @@
       "history": "Historique du véhicule"
     },
     "robinChat": {
-      "launcher": "Parler à Robin",
-      "title": "Robin",
+      "launcher": "Parler à Ruben",
+      "title": "Ruben",
       "subtitle": "Demandez ce qui se passe dans votre garage.",
       "placeholder": "Tapez votre question...",
       "send": "Envoyer",
@@ -194,7 +197,7 @@
         "fallback": "Je peux vous aider avec les rendez-vous de demain, les véhicules en attente, les clients sans réponse, ou appeler quelqu'un. Essayez \"Appeler [nom]\"."
       },
       "listening": "Je vous écoute...",
-      "startListening": "Parler à Robin",
+      "startListening": "Parler à Ruben",
       "stopListening": "Arrêter l'enregistrement"
     },
     "newVehicle": {
@@ -236,7 +239,17 @@
       "manualEntry": "Saisir manuellement sans plaque",
       "apkExpired": "Contrôle technique expiré depuis le {date}. Ruben peut inviter le client à le faire.",
       "apkSoon": "Contrôle technique à renouveler dans {weeks} semaines ({date}). Bon moment pour réserver le client.",
-      "apkOk": "Contrôle technique valide jusqu'au {date}."
+      "apkOk": "Contrôle technique valide jusqu'au {date}.",
+      "intro": "Commencez par la plaque. Ruben remplit le reste.",
+      "stepVehicle": "Véhicule",
+      "stepCustomer": "Client"
+    },
+    "attachCustomer": {
+      "searchPlaceholder": "Rechercher un client par nom, téléphone ou e-mail…",
+      "newCustomer": "Ajouter un nouveau client",
+      "backToSearch": "Rechercher un client existant",
+      "noResults": "Aucun client trouvé. Ajoutez-en un nouveau.",
+      "change": "Modifier"
     },
     "newWorkOrder": {
       "title": "Nouvelle commande d'atelier",
@@ -386,11 +399,11 @@
       "checklistNewItem": "Nouveau point de contrôle",
       "timelineTitle": "Historique complet",
       "timelineEmpty": "Aucun événement pour le moment.",
-      "timelineDiagnosis": "Diagnostic photo Robin IA",
-      "reportTitle": "Rapport Robin IA",
-      "reportIntro": "Robin prépare un rapport professionnel et un message client à partir de la checklist et des diagnostics photo.",
+      "timelineDiagnosis": "Diagnostic photo Ruben IA",
+      "reportTitle": "Rapport Ruben IA",
+      "reportIntro": "Ruben prépare un rapport professionnel et un message client à partir de la checklist et des diagnostics photo.",
       "reportGenerate": "Générer le rapport",
-      "reportGenerating": "Robin prépare le rapport...",
+      "reportGenerating": "Ruben prépare le rapport...",
       "reportSaved": "Rapport généré.",
       "reportEmpty": "Rien à signaler pour l'instant : complétez la checklist ou lancez un diagnostic photo d'abord.",
       "reportError": "La génération du rapport a échoué. Réessayez.",
@@ -544,7 +557,7 @@
       "billingUsage": {
         "vehicles": "Véhicules",
         "users": "Utilisateurs",
-        "aiAnalyses": "Analyses IA Robin ce mois-ci"
+        "aiAnalyses": "Analyses IA Ruben ce mois-ci"
       },
       "checklistTitle": "Checklist de contrôle",
       "checklistIntro": "Personnalisez les points contrôlés par vos mécaniciens à la réception d'un véhicule.",
@@ -625,7 +638,7 @@
     },
     "diagnosis": {
       "title": "Diagnostic photo",
-      "intro": "Ajoutez des photos sous plusieurs angles — avant, moteur, tableau de bord, dessous — et Robin IA rédige un seul rapport complet.",
+      "intro": "Ajoutez des photos sous plusieurs angles — avant, moteur, tableau de bord, dessous — et Ruben IA rédige un seul rapport complet.",
       "saved": "Diagnostic ajouté.",
       "error": "L'envoi a échoué. Réessayez avec des photos de 4 Mo max, 10 au total.",
       "angleFront": "Avant",
@@ -640,8 +653,8 @@
       "otherPhotosHint": "Facultatif, jusqu'à 2 photos supplémentaires.",
       "noteLabel": "Courte description (facultatif)",
       "notePlaceholder": "Ex. bruit de grincement au freinage",
-      "submit": "Analyser avec Robin IA",
-      "analyzing": "Robin analyse...",
+      "submit": "Analyser avec Ruben IA",
+      "analyzing": "Ruben analyse...",
       "disclaimer": "Cette analyse est une aide au diagnostic et ne remplace pas l'expertise d'un professionnel. Confirmez toujours vous-même avant de démarrer une réparation.",
       "visibleProblems": "Problèmes visibles",
       "affectedParts": "Pièces potentiellement endommagées",
@@ -654,7 +667,7 @@
       "additionalChecks": "Vérifications complémentaires",
       "estimatedRepairTime": "Temps de réparation estimé",
       "recommendations": "Recommandations",
-      "limitReached": "Vous avez atteint le nombre d'analyses IA Robin incluses ce mois-ci dans votre formule. Passez à une formule supérieure pour continuer."
+      "limitReached": "Vous avez atteint le nombre d'analyses IA Ruben incluses ce mois-ci dans votre formule. Passez à une formule supérieure pour continuer."
     },
     "checklistResult": {
       "pending": "À faire",
@@ -824,7 +837,7 @@
       "youDecide": "Vous décidez"
     },
     "seoTitle": "ROAVAA – Logiciel de garage avec IA pour planning, clients et factures",
-    "seoDescription": "ROAVAA est un logiciel de garage intelligent avec Robin, votre employé IA. Gérez clients, véhicules, rendez-vous, ordres de réparation, communication et factures professionnelles depuis une seule plateforme."
+    "seoDescription": "ROAVAA est un logiciel de garage intelligent avec Ruben, votre employé IA. Gérez clients, véhicules, rendez-vous, ordres de réparation, communication et factures professionnelles depuis une seule plateforme."
   },
   "footer": {
     "signature": "Répond. Organise. Apprend.",
@@ -921,12 +934,12 @@
       "usersUnlimited": "Utilisateurs illimités",
       "storage": "{count} Go de stockage photos et vidéos",
       "storageUnlimited": "Stockage illimité",
-      "aiAnalyses": "{count} analyses IA Robin par mois",
-      "aiAnalysesUnlimited": "Analyses IA Robin illimitées",
+      "aiAnalyses": "{count} analyses IA Ruben par mois",
+      "aiAnalysesUnlimited": "Analyses IA Ruben illimitées",
       "robinLevel": {
-        "basic": "Robin IA - assistant de base",
-        "advanced": "Robin IA - diagnostic photo avancé",
-        "full": "Robin IA - suite complète"
+        "basic": "Ruben IA - assistant de base",
+        "advanced": "Ruben IA - diagnostic photo avancé",
+        "full": "Ruben IA - suite complète"
       },
       "statisticsLevel": {
         "basic": "Statistiques de base",
@@ -943,7 +956,7 @@
       "emailSupport": "Support par e-mail"
     },
     "seoTitle": "Tarifs – Logiciel de garage ROAVAA avec IA",
-    "seoDescription": "Découvrez les formules ROAVAA : Starter, Professional et Enterprise. Logiciel de garage intelligent avec Robin IA, facturation, agenda et plus."
+    "seoDescription": "Découvrez les formules ROAVAA : Starter, Professional et Enterprise. Logiciel de garage intelligent avec Ruben IA, facturation, agenda et plus."
   },
   "card": {
     "scanHint": "Scannez pour enregistrer ce contact",

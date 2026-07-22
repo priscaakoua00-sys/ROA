@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
-/** Event other components (e.g. the app header) dispatch on window to open Robin. */
+/** Event other components (e.g. the app header) dispatch on window to open Ruben. */
 export const ROBIN_OPEN_EVENT = 'robin:open';
 
 /** Minimal shape of the Web Speech API — not fully typed in the DOM lib. */
