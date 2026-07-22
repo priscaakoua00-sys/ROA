@@ -3,6 +3,7 @@
 import { getTranslations } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { formatTimeUTC } from '@/lib/datetime';
+import { formatCurrency } from '@/lib/pricing';
 import { loadRobinInsight } from '@/data/robin/load';
 import { ACTIVE_WORK_ORDER_STATUSES } from '@/lib/work-order-status';
 import { getAIProvider } from '@/integrations/ai';
@@ -122,20 +123,78 @@ function insightLink(
   return [];
 }
 
-const CONTEXT_LABELS: Record<Locale, { activeWorkOrders: string; newLeads: string; apptsToday: string }> = {
-  nl: { activeWorkOrders: 'Actieve werkorders', newLeads: 'Nieuwe aanvragen', apptsToday: 'Afspraken vandaag' },
-  en: { activeWorkOrders: 'Active work orders', newLeads: 'New leads', apptsToday: 'Appointments today' },
-  fr: { activeWorkOrders: 'Ordres de réparation actifs', newLeads: 'Nouvelles demandes', apptsToday: "Rendez-vous aujourd'hui" },
+const OPEN_LEAD_STATUSES = ['new', 'qualifying', 'qualified', 'appointment_proposed'];
+
+const CONTEXT_LABELS: Record<
+  Locale,
+  {
+    activeWorkOrders: string;
+    newLeads: string;
+    apptsToday: string;
+    waiting: string;
+    urgent: string;
+    revenueToday: string;
+    none: string;
+  }
+> = {
+  nl: {
+    activeWorkOrders: 'Actieve werkorders',
+    newLeads: 'Nieuwe aanvragen',
+    apptsToday: 'Afspraken vandaag',
+    waiting: 'Klanten die op antwoord wachten',
+    urgent: 'Dringende aanvragen',
+    revenueToday: 'Omzet vandaag',
+    none: 'geen',
+  },
+  en: {
+    activeWorkOrders: 'Active work orders',
+    newLeads: 'New leads',
+    apptsToday: 'Appointments today',
+    waiting: 'Customers waiting for a reply',
+    urgent: 'Urgent requests',
+    revenueToday: 'Revenue today',
+    none: 'none',
+  },
+  fr: {
+    activeWorkOrders: 'Ordres de réparation actifs',
+    newLeads: 'Nouvelles demandes',
+    apptsToday: "Rendez-vous aujourd'hui",
+    waiting: 'Clients en attente de réponse',
+    urgent: 'Demandes urgentes',
+    revenueToday: "Chiffre d'affaires aujourd'hui",
+    none: 'aucun',
+  },
 };
 
-/** A short, real-numbers-only snapshot of the garage's current state, for the AI fallback answer. */
-async function buildAssistantContext(supabase: SupabaseClient, orgId: string, locale: Locale): Promise<string> {
+/**
+ * A real-data-only snapshot of the garage's current state, handed to the AI so
+ * a free-form question ("who is waiting?", "how much did I make today?",
+ * "what's urgent?") is answered from the actual live database — never invented.
+ * Names and numbers only; capped so it stays short.
+ */
+async function buildAssistantContext(
+  supabase: SupabaseClient,
+  orgId: string,
+  locale: Locale,
+  anon: string,
+): Promise<string> {
   const now = new Date();
   const todayStart = new Date(now);
   todayStart.setUTCHours(0, 0, 0, 0);
   const todayEnd = new Date(todayStart.getTime() + 24 * 3_600_000);
+  const thirtyMinAgo = new Date(now.getTime() - 30 * 60_000).toISOString();
 
-  const [{ count: activeWorkOrders }, { count: newLeads }, { count: apptsToday }] = await Promise.all([
+  const nameOf = (row: { first_name: string | null; last_name: string | null } | null) =>
+    [row?.first_name, row?.last_name].filter(Boolean).join(' ') || anon;
+
+  const [
+    { count: activeWorkOrders },
+    { count: newLeads },
+    { data: apptsData },
+    { data: waitingData },
+    { data: urgentData },
+    { data: paymentsData },
+  ] = await Promise.all([
     supabase
       .from('work_orders')
       .select('id', { count: 'exact', head: true })
@@ -144,18 +203,47 @@ async function buildAssistantContext(supabase: SupabaseClient, orgId: string, lo
     supabase.from('leads').select('id', { count: 'exact', head: true }).eq('organization_id', orgId).eq('status', 'new'),
     supabase
       .from('appointments')
-      .select('id', { count: 'exact', head: true })
+      .select('starts_at, customers(first_name, last_name)')
       .eq('organization_id', orgId)
       .neq('status', 'cancelled')
       .gte('starts_at', todayStart.toISOString())
-      .lt('starts_at', todayEnd.toISOString()),
+      .lt('starts_at', todayEnd.toISOString())
+      .order('starts_at', { ascending: true })
+      .limit(12),
+    supabase
+      .from('leads')
+      .select('customers(first_name, last_name)')
+      .eq('organization_id', orgId)
+      .eq('status', 'new')
+      .lte('created_at', thirtyMinAgo)
+      .limit(12),
+    supabase
+      .from('leads')
+      .select('customers(first_name, last_name)')
+      .eq('organization_id', orgId)
+      .in('urgency', ['high', 'critical'])
+      .in('status', OPEN_LEAD_STATUSES)
+      .limit(12),
+    supabase.from('invoice_payments').select('amount').eq('organization_id', orgId).gte('paid_at', todayStart.toISOString()),
   ]);
 
+  const appts = (apptsData ?? []) as unknown as { starts_at: string; customers: { first_name: string | null; last_name: string | null } | null }[];
+  const waiting = (waitingData ?? []) as unknown as { customers: { first_name: string | null; last_name: string | null } | null }[];
+  const urgent = (urgentData ?? []) as unknown as { customers: { first_name: string | null; last_name: string | null } | null }[];
+  const revenueToday = ((paymentsData ?? []) as { amount: number }[]).reduce((acc, r) => acc + Number(r.amount), 0);
+
   const l = CONTEXT_LABELS[locale];
+  const apptsList = appts.length > 0 ? appts.map((a) => `${formatTimeUTC(a.starts_at, locale)} ${nameOf(a.customers)}`).join(', ') : l.none;
+  const waitingList = waiting.length > 0 ? waiting.map((w) => nameOf(w.customers)).join(', ') : l.none;
+  const urgentList = urgent.length > 0 ? urgent.map((u) => nameOf(u.customers)).join(', ') : l.none;
+
   return [
     `${l.activeWorkOrders}: ${activeWorkOrders ?? 0}`,
     `${l.newLeads}: ${newLeads ?? 0}`,
-    `${l.apptsToday}: ${apptsToday ?? 0}`,
+    `${l.apptsToday} (${appts.length}): ${apptsList}`,
+    `${l.waiting} (${waiting.length}): ${waitingList}`,
+    `${l.urgent} (${urgent.length}): ${urgentList}`,
+    `${l.revenueToday}: ${formatCurrency(revenueToday, locale)}`,
   ].join('\n');
 }
 
@@ -337,7 +425,7 @@ export async function askRobinAction(
   // falls back to the same canned message as before — never worse than the
   // deterministic path.
   try {
-    const context = await buildAssistantContext(supabase, orgId, locale);
+    const context = await buildAssistantContext(supabase, orgId, locale, anon);
     const result = await getAIProvider().answerAssistantQuestion({ language: locale, question, context });
     if (result.status === 'ok') {
       return { text: result.data.answer, links: [], topic: 'fallback' };
