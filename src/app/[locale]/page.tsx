@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Landing } from '@/components/landing/landing';
-import type { Locale } from '@/components/landing/content';
+import { COPY, type Locale } from '@/components/landing/content';
 import { SITE_URL } from '@/lib/site';
 import { PLANS } from '@/lib/plans';
 
@@ -56,10 +56,14 @@ async function HomeContent({ params }: { params: Promise<{ locale: string }> }) 
         '@id': `${SITE_URL}/#organization`,
         name: 'ROAVAA',
         legalName: 'ROAVAA',
+        alternateName: ['Roavaa', 'ROAVAA — AI employee for garages'],
         url: SITE_URL,
         logo: `${SITE_URL}/apple-icon`,
         image: `${SITE_URL}/${locale}/opengraph-image`,
         description: home('seoDescription'),
+        slogan: 'Responds. Organizes. Learns.',
+        knowsAbout: ['Garage management software', 'AI assistant for car workshops', 'Automotive repair shop software'],
+        areaServed: 'Europe',
         founder: { '@type': 'Person', name: 'Prisca Akoua', jobTitle: 'Founder & CEO' },
       },
       {
@@ -82,6 +86,15 @@ async function HomeContent({ params }: { params: Promise<{ locale: string }> }) 
         image: `${SITE_URL}/${locale}/opengraph-image`,
         publisher: { '@id': `${SITE_URL}/#organization` },
         offers,
+      },
+      {
+        '@type': 'FAQPage',
+        '@id': `${SITE_URL}/${locale}#faq`,
+        mainEntity: COPY[locale as Locale].faq.items.map((item) => ({
+          '@type': 'Question',
+          name: item.q,
+          acceptedAnswer: { '@type': 'Answer', text: item.a },
+        })),
       },
       {
         '@type': 'BreadcrumbList',
