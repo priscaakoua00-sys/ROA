@@ -66,6 +66,7 @@ export async function POST(req: Request) {
         provider_subscription_id: subscription.id,
         provider_customer_id:
           typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id,
+        provider_price_id: priceId ?? null,
         status: mapStatus(subscription.status),
         ...(planKey ? { plan_key: planKey } : {}),
         current_period_start: item?.current_period_start
@@ -87,6 +88,21 @@ export async function POST(req: Request) {
       .eq('provider_customer_id', customerId)
       .maybeSingle();
     return data?.organization_id ?? null;
+  }
+
+  // For invoice events we key off the stable customer id (this SDK's Invoice
+  // no longer carries `subscription` directly), then re-sync from the stored
+  // subscription so status reflects the failed/succeeded payment.
+  async function subContextForCustomer(
+    customerId: string,
+  ): Promise<{ organizationId: string; subscriptionId: string | null } | null> {
+    const { data } = await admin
+      .from('organization_subscriptions')
+      .select('organization_id, provider_subscription_id')
+      .eq('provider_customer_id', customerId)
+      .maybeSingle();
+    if (!data) return null;
+    return { organizationId: data.organization_id, subscriptionId: data.provider_subscription_id ?? null };
   }
 
   switch (event.type) {
@@ -123,6 +139,23 @@ export async function POST(req: Request) {
           .from('organization_subscriptions')
           .update({ status: 'cancelled', cancel_at_period_end: false })
           .eq('organization_id', organizationId);
+      }
+      break;
+    }
+    // Monthly renewals and failed payments: Stripe also flips the subscription
+    // status (active / past_due / unpaid) and fires subscription.updated, but
+    // we handle the invoice events explicitly too so state is never missed.
+    case 'invoice.paid':
+    case 'invoice.payment_succeeded':
+    case 'invoice.payment_failed': {
+      const invoice = event.data.object as Stripe.Invoice;
+      const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id;
+      if (customerId) {
+        const ctx = await subContextForCustomer(customerId);
+        if (ctx?.subscriptionId) {
+          const subscription = await stripe.subscriptions.retrieve(ctx.subscriptionId);
+          await upsertFromSubscription(subscription, ctx.organizationId);
+        }
       }
       break;
     }
