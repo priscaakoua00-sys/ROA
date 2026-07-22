@@ -28,7 +28,11 @@ let cached: AIProvider | null = null;
 export function getAIProvider(): AIProvider {
   if (cached) return cached;
 
-  const selected = process.env.AI_PROVIDER ?? 'mock';
+  // If a key is present, use the real provider automatically — a garage that
+  // paid for and configured an API key should get the real AI without also
+  // having to know about a second AI_PROVIDER flag. An explicit AI_PROVIDER
+  // still wins (e.g. AI_PROVIDER=mock to force the offline provider).
+  const selected = process.env.AI_PROVIDER ?? (process.env.ANTHROPIC_API_KEY ? 'anthropic' : 'mock');
 
   switch (selected) {
     case 'anthropic': {
