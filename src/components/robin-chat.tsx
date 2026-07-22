@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState, useTransition } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { MessageCircle, Send, X, Mic, Square } from 'lucide-react';
-import { askRobinAction, getRobinGreetingAction, type RobinChatLink } from '@/data/assistant/actions';
+import { MessageCircle, Send, X, Mic, Square, Sparkles } from 'lucide-react';
+import { askRobinAction, getRobinGreetingAction, runRobinAction, type RobinChatLink, type RobinChatAction } from '@/data/assistant/actions';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
@@ -42,6 +42,7 @@ interface ChatMessage {
   role: 'user' | 'robin';
   text: string;
   links?: RobinChatLink[];
+  actions?: RobinChatAction[];
 }
 
 function ThinkingDots() {
@@ -217,7 +218,20 @@ export function RobinChat({ orgId }: { orgId: string }) {
     startTransition(async () => {
       const answer = await askRobinAction(orgId, locale, text, topicRef.current);
       topicRef.current = answer.topic;
-      setMessages((prev) => [...prev, { role: 'robin', text: answer.text, links: answer.links }]);
+      setMessages((prev) => [...prev, { role: 'robin', text: answer.text, links: answer.links, actions: answer.actions }]);
+      requestAnimationFrame(() => {
+        listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' });
+      });
+    });
+  }
+
+  // Ruben performs an action he offered (e.g. draft a reply), then posts the
+  // result back into the conversation.
+  function runAction(action: RobinChatAction) {
+    startTransition(async () => {
+      const answer = await runRobinAction(orgId, locale, { kind: action.kind, refId: action.refId });
+      topicRef.current = answer.topic;
+      setMessages((prev) => [...prev, { role: 'robin', text: answer.text, links: answer.links, actions: answer.actions }]);
       requestAnimationFrame(() => {
         listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' });
       });
@@ -292,7 +306,23 @@ export function RobinChat({ orgId }: { orgId: string }) {
                     m.role === 'user' ? 'ml-auto bg-primary text-primary-foreground' : 'border border-gold/25 bg-gold/5',
                   )}
                 >
-                  <p>{m.text}</p>
+                  <p className="whitespace-pre-wrap">{m.text}</p>
+                  {m.actions && m.actions.length > 0 ? (
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {m.actions.map((a) => (
+                        <button
+                          key={a.id}
+                          type="button"
+                          disabled={isPending}
+                          onClick={() => runAction(a)}
+                          className="inline-flex items-center gap-1 rounded-full bg-gold px-2.5 py-1 text-xs font-medium text-primary-foreground transition hover:bg-gold/90 disabled:opacity-50"
+                        >
+                          <Sparkles className="size-3" aria-hidden />
+                          {a.label}
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
                   {m.links && m.links.length > 0 ? (
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {m.links.map((l) => (

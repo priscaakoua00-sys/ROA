@@ -207,8 +207,12 @@
         "callFound": "{name} : {phone}. Je ne peux pas encore appeler moi-même, mais voici le numéro.",
         "greeting": "Bonjour ! En quoi puis-je aider ?",
         "thanks": "Avec plaisir. Je garde un œil sur tout ça.",
-        "fallback": "Je peux vous aider avec les rendez-vous de demain, les véhicules en attente, les clients sans réponse, ou appeler quelqu'un. Essayez \"Appeler [nom]\"."
+        "fallback": "Je peux vous aider avec les rendez-vous de demain, les véhicules en attente, les clients sans réponse, ou appeler quelqu'un. Essayez \"Appeler [nom]\".",
+        "draftFailed": "Je n'ai pas pu rédiger de réponse pour celui-ci — la demande manquait d'informations. Ouvrez-la et je vous aide à partir de là."
       },
+      "actionDraftReply": "Rédige la réponse pour {name}",
+      "draftPrefix": "Voici un brouillon de réponse pour {name} — vérifiez et envoyez :",
+      "openConversation": "Ouvrir la conversation",
       "listening": "Je vous écoute...",
       "startListening": "Parler à Ruben",
       "stopListening": "Arrêter l'enregistrement"
