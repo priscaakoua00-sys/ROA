@@ -21,6 +21,7 @@ import {
   TrendingDown,
   Users,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { RevenueChart } from '@/components/dashboard/revenue-chart';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { signOutAction } from '@/data/auth/actions';
@@ -388,6 +389,35 @@ export default async function DashboardPage({
     { href: '/work-orders/new', label: t('dashboard.actNewWorkOrder'), icon: Wrench },
   ];
 
+  // Ruben's hand-over list: the few things that actually need the human right
+  // now, ranked most-urgent first, each phrased as Ruben handing over work.
+  const briefingItems: { key: string; icon: LucideIcon; text: string; href: string; cta: string; tone: 'urgent' | 'default' }[] = [];
+  if (priority[0]) {
+    briefingItems.push({ key: 'urgent', icon: AlertTriangle, text: t('dashboard.briefing.urgentLead', { name: fullName(priority[0].customers) }), href: `/leads/${priority[0].id}`, cta: t('dashboard.insight.viewRequest'), tone: 'urgent' });
+  }
+  if (waiting.length > 0) {
+    briefingItems.push({ key: 'waiting', icon: MessageCircle, text: t('dashboard.briefing.waiting', { count: waiting.length }), href: firstWaitingId ? `/leads/${firstWaitingId}` : '/leads', cta: t('dashboard.actReply'), tone: 'default' });
+  }
+  if (unreadMessages.length > 0) {
+    briefingItems.push({ key: 'messages', icon: MessageCircle, text: t('dashboard.briefing.messages', { count: unreadMessages.length }), href: '#messages', cta: t('dashboard.briefing.open'), tone: 'default' });
+  }
+  if (followUpsDue > 0) {
+    briefingItems.push({ key: 'followups', icon: Clock, text: t('dashboard.briefing.followups', { count: followUpsDue }), href: '/automations', cta: t('dashboard.actFollowups'), tone: 'default' });
+  }
+  if (invoicesToPrepare > 0) {
+    briefingItems.push({ key: 'invoices', icon: Receipt, text: t('dashboard.briefing.invoices', { count: invoicesToPrepare }), href: '/invoices', cta: t('dashboard.briefing.prepare'), tone: 'default' });
+  }
+  if ((apptsStartingToday.count ?? 0) > 0) {
+    briefingItems.push({ key: 'appts', icon: CalendarClock, text: t('dashboard.briefing.appts', { count: apptsStartingToday.count ?? 0 }), href: '#appointments', cta: t('dashboard.actAgenda'), tone: 'default' });
+  }
+
+  // What Ruben already handled today — the "he'd already started" feeling.
+  const handledChips = [
+    { label: t('dashboard.doneReplies', { count: repliesToday.count ?? 0 }), value: repliesToday.count ?? 0 },
+    { label: t('dashboard.doneAppts', { count: apptsToday.count ?? 0 }), value: apptsToday.count ?? 0 },
+    { label: t('dashboard.doneFollowups', { count: handledToday.count ?? 0 }), value: handledToday.count ?? 0 },
+  ].filter((c) => c.value > 0);
+
   return (
     <div className="min-h-[calc(100vh-4rem)]">
       <div className="container py-8">
@@ -399,8 +429,82 @@ export default async function DashboardPage({
           </form>
         </div>
 
-        {/* Notification center */}
-        <section className="mt-4 animate-in fade-in slide-in-from-top-1 duration-500">
+        {/* Ruben's morning briefing */}
+        <section className="mt-4 rounded-2xl border border-gold/25 bg-gradient-to-br from-gold/10 to-transparent p-6 shadow-float sm:p-7 animate-in fade-in slide-in-from-top-2 duration-500">
+          <div className="flex items-center gap-2">
+            {robinAvatar ? (
+              <span className="relative size-7 shrink-0 overflow-hidden rounded-full border border-gold/30">
+                <Image src={robinAvatar} alt="" fill sizes="28px" className="object-cover" />
+              </span>
+            ) : null}
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.15em] text-gold">
+              <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-gold" />
+              {t('dashboard.robinName')}
+            </div>
+          </div>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight">{greeting}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t('dashboard.briefing.startedWorking')}</p>
+
+          {handledChips.length > 0 ? (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {handledChips.map((c) => (
+                <span
+                  key={c.label}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-gold/20 bg-card/60 px-3 py-1 text-xs font-medium"
+                >
+                  <Sparkles className="size-3 text-gold" aria-hidden />
+                  {c.label}
+                </span>
+              ))}
+            </div>
+          ) : null}
+
+          {briefingItems.length > 0 ? (
+            <div className="mt-5">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+                {t('dashboard.briefing.handoverTitle')}
+              </h2>
+              <ul className="mt-2 space-y-2">
+                {briefingItems.map((item) => {
+                  const Icon = item.icon;
+                  const href = item.href.startsWith('#') ? item.href : `/${locale}${item.href}`;
+                  return (
+                    <li
+                      key={item.key}
+                      className={`flex items-center justify-between gap-3 rounded-xl border p-3 transition ${
+                        item.tone === 'urgent' ? 'border-urgent/30 bg-urgent/5' : 'border-border bg-card/70'
+                      }`}
+                    >
+                      <div className="flex min-w-0 items-center gap-3">
+                        <span
+                          className={`flex size-8 shrink-0 items-center justify-center rounded-full ${
+                            item.tone === 'urgent' ? 'bg-urgent/12 text-urgent' : 'bg-gold/12 text-gold'
+                          }`}
+                        >
+                          <Icon className="size-4" aria-hidden />
+                        </span>
+                        <span className="min-w-0 text-sm">{item.text}</span>
+                      </div>
+                      <a href={href} className="shrink-0">
+                        <Button size="sm" variant={item.tone === 'urgent' ? 'default' : 'outline'}>
+                          {item.cta}
+                        </Button>
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : (
+            <p className="mt-4 flex items-center gap-2 text-sm">
+              <Sparkles className="size-4 text-gold" aria-hidden />
+              {t(`dashboard.insight.${insight.kind}`, { name: insight.name ?? '', count: insight.count ?? 0 })}
+            </p>
+          )}
+        </section>
+
+        {/* At a glance — Ruben keeps watch */}
+        <section className="mt-6 animate-in fade-in slide-in-from-top-1 duration-500">
           <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
             {t('dashboard.notifCenterTitle')}
           </h2>
@@ -434,67 +538,6 @@ export default async function DashboardPage({
           {allCaughtUp ? (
             <p className="mt-2 text-xs text-muted-foreground">{t('dashboard.notifAllCaughtUp')}</p>
           ) : null}
-        </section>
-
-        <section className="mt-5 rounded-2xl border border-gold/25 bg-gradient-to-br from-gold/10 to-transparent p-7 shadow-float animate-in fade-in slide-in-from-top-2 duration-500">
-          <div className="flex items-center gap-2">
-            {robinAvatar ? (
-              <span className="relative size-7 shrink-0 overflow-hidden rounded-full border border-gold/30">
-                <Image src={robinAvatar} alt="" fill sizes="28px" className="object-cover" />
-              </span>
-            ) : null}
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.15em] text-gold">
-              <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-gold" />
-              {t('dashboard.robinName')}
-            </div>
-          </div>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight">{greeting}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t('dashboard.robinIntro')}</p>
-          <p className="mt-3 text-sm">
-            {t(`dashboard.insight.${insight.kind}`, { name: insight.name ?? '', count: insight.count ?? 0 })}
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {insight.kind === 'emptyGarage' ? (
-              <a href={`/${locale}/request/${org.slug}`} target="_blank" rel="noreferrer">
-                <Button size="sm">{t('dashboard.openForm')}</Button>
-              </a>
-            ) : null}
-            {insight.kind === 'urgentLead' && insight.refId ? (
-              <Link href={`/leads/${insight.refId}`}>
-                <Button size="sm">{t('dashboard.insight.viewRequest')}</Button>
-              </Link>
-            ) : null}
-            {insight.kind === 'waitingCustomers' && insight.refId ? (
-              <Link href={`/leads/${insight.refId}`}>
-                <Button size="sm">{t('dashboard.actReply')}</Button>
-              </Link>
-            ) : null}
-            {insight.kind === 'followupsDue' ? (
-              <Link href="/automations">
-                <Button size="sm">{t('dashboard.actFollowups')}</Button>
-              </Link>
-            ) : null}
-            {insight.kind === 'appointmentSoon' ? (
-              <Link href="/agenda">
-                <Button size="sm">{t('dashboard.actAgenda')}</Button>
-              </Link>
-            ) : null}
-            {insight.kind === 'emptyGarage' ? (
-              <Link href="/customers/new">
-                <Button size="sm" variant="outline">{t('dashboard.actNewCustomer')}</Button>
-              </Link>
-            ) : null}
-            {insight.kind !== 'followupsDue' ? (
-              <Link href="/automations">
-                <Button size="sm" variant="outline">{t('dashboard.actFollowups')}</Button>
-              </Link>
-            ) : null}
-            {insight.kind !== 'appointmentSoon' ? (
-              <Link href="/agenda">
-                <Button size="sm" variant="outline">{t('dashboard.actAgenda')}</Button>
-              </Link>
-            ) : null}
-          </div>
         </section>
 
         {/* Quick actions */}
