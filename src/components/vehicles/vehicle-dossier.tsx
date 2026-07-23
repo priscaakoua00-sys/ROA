@@ -58,10 +58,12 @@ export async function VehicleDossierSection({
   plate,
   locale,
   customerId,
+  withSummary = false,
 }: {
   plate: string;
   locale: Locale;
   customerId?: string | null;
+  withSummary?: boolean;
 }) {
   const dossier: VehicleDossier | null = await getVehicleDossier(plate);
   const c = SHEET[locale];
@@ -90,6 +92,19 @@ export async function VehicleDossierSection({
   const apkTone: PillTone = apkWeeks === null ? 'muted' : apkWeeks < 0 ? 'bad' : apkWeeks <= 6 ? 'warn' : 'good';
 
   const power = dossier.powerKw !== null ? `${fmtInt(dossier.powerKw)} kW · ${Math.round(dossier.powerKw * 1.35962)} ${HP_SUFFIX[locale]}` : null;
+
+  // A one-line natural summary — "Ruben already knows this car".
+  const summary = withSummary
+    ? [
+        [dossier.make, dossier.model].filter(Boolean).join(' ') || null,
+        dossier.firstAdmission ? dossier.firstAdmission.slice(0, 4) : null,
+        dossier.fuel ? c.fuel[dossier.fuel] : null,
+        dossier.powerKw !== null ? `${fmtInt(dossier.powerKw)} kW` : null,
+        dossier.color,
+      ]
+        .filter(Boolean)
+        .join(' · ')
+    : null;
 
   const actionHref = (action: string | null): string | null => {
     if (action === 'bookApk') return '/agenda';
@@ -131,6 +146,7 @@ export async function VehicleDossierSection({
           <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-gold" />
           Ruben
         </div>
+        {summary ? <p className="mt-2 text-base font-semibold tracking-tight">{summary}</p> : null}
         <p className="mt-2 flex items-start gap-2 text-sm font-medium">
           {headline.level === 'urgent' ? (
             <ShieldAlert className="mt-0.5 size-4 shrink-0 text-destructive" aria-hidden />

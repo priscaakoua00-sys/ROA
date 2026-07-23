@@ -25,6 +25,17 @@ export interface SheetCopy {
   fuel: Record<FuelKey, string>;
   insight: (i: VehicleInsight, fmtDate: (iso: string) => string) => string;
   actions: { bookApk: string; notifyCustomer: string };
+  create: {
+    prompt: string;
+    promptSub: string;
+    placeholder: string;
+    open: string;
+    alreadyTitle: string;
+    alreadyCta: string;
+    completeTitle: string;
+    completeSub: string;
+    save: string;
+  };
 }
 
 const LABELS_EN: Record<string, string> = {
@@ -69,6 +80,17 @@ export const SHEET: Record<Locale, SheetCopy> = {
     labels: LABELS_EN,
     fuel: { petrol: 'Petrol', diesel: 'Diesel', hybrid: 'Hybrid', electric: 'Electric', other: 'Other' },
     actions: { bookApk: 'Book MOT', notifyCustomer: 'Notify customer' },
+    create: {
+      prompt: 'Type a plate — I’ll open the file.',
+      promptSub: 'Ruben fetches everything known about the vehicle. No blank form to fill in.',
+      placeholder: 'e.g. 6-XKD-69',
+      open: 'Open',
+      alreadyTitle: 'This vehicle is already in ROAVAA.',
+      alreadyCta: 'Open its file',
+      completeTitle: 'Complete or correct',
+      completeSub: 'Attach the customer and add the mileage — the rest is already filled in.',
+      save: 'Save this vehicle',
+    },
     insight: (i, f) => {
       switch (i.code) {
         case 'apkExpired': return `MOT expired since ${f(i.date!)}. The vehicle may not be driven — offer an inspection.`;
@@ -92,6 +114,17 @@ export const SHEET: Record<Locale, SheetCopy> = {
     labels: LABELS_NL,
     fuel: { petrol: 'Benzine', diesel: 'Diesel', hybrid: 'Hybride', electric: 'Elektrisch', other: 'Anders' },
     actions: { bookApk: 'APK inplannen', notifyCustomer: 'Klant informeren' },
+    create: {
+      prompt: 'Typ een kenteken — ik open het dossier.',
+      promptSub: 'Ruben haalt alles op wat over het voertuig bekend is. Geen leeg formulier om in te vullen.',
+      placeholder: 'bijv. 6-XKD-69',
+      open: 'Openen',
+      alreadyTitle: 'Dit voertuig staat al in ROAVAA.',
+      alreadyCta: 'Open het dossier',
+      completeTitle: 'Aanvullen of corrigeren',
+      completeSub: 'Koppel de klant en vul de kilometerstand aan — de rest is al ingevuld.',
+      save: 'Voertuig opslaan',
+    },
     insight: (i, f) => {
       switch (i.code) {
         case 'apkExpired': return `APK verlopen sinds ${f(i.date!)}. Het voertuig mag niet rijden — bied een keuring aan.`;
@@ -115,6 +148,17 @@ export const SHEET: Record<Locale, SheetCopy> = {
     labels: LABELS_FR,
     fuel: { petrol: 'Essence', diesel: 'Diesel', hybrid: 'Hybride', electric: 'Électrique', other: 'Autre' },
     actions: { bookApk: 'Planifier le CT', notifyCustomer: 'Prévenir le client' },
+    create: {
+      prompt: 'Tapez une plaque — j’ouvre le dossier.',
+      promptSub: 'Ruben récupère tout ce qui est connu sur le véhicule. Aucun formulaire vide à remplir.',
+      placeholder: 'ex. 6-XKD-69',
+      open: 'Ouvrir',
+      alreadyTitle: 'Ce véhicule est déjà dans ROAVAA.',
+      alreadyCta: 'Ouvrir son dossier',
+      completeTitle: 'Compléter ou corriger',
+      completeSub: 'Rattachez le client et ajoutez le kilométrage — le reste est déjà rempli.',
+      save: 'Enregistrer ce véhicule',
+    },
     insight: (i, f) => {
       switch (i.code) {
         case 'apkExpired': return `Contrôle technique expiré depuis le ${f(i.date!)}. Le véhicule ne peut pas rouler — proposez une visite.`;
