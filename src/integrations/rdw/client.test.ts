@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { normalizePlate, mapFuel, lookupPlate } from './client';
+import { normalizePlate, mapFuel, lookupPlate, getVehicleDossier } from './client';
 
 describe('normalizePlate', () => {
   it('strips separators and uppercases', () => {
@@ -81,5 +81,60 @@ describe('lookupPlate', () => {
       throw new Error('network down');
     }));
     expect(await lookupPlate('6XKD69')).toBeNull();
+  });
+});
+
+describe('getVehicleDossier', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('builds a rich dossier and flags import + open recall', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) =>
+        url.includes('m9d7-ebf2')
+          ? {
+              ok: true,
+              json: async () => [
+                {
+                  kenteken: '6XKD69',
+                  merk: 'VOLKSWAGEN',
+                  handelsbenaming: 'GOLF',
+                  voertuigsoort: 'Personenauto',
+                  eerste_kleur: 'GRIJS',
+                  cilinderinhoud: '1498',
+                  aantal_cilinders: '4',
+                  massa_ledig_voertuig: '1320',
+                  toegestane_maximum_massa: '1900',
+                  datum_eerste_toelating: '20180131',
+                  datum_eerste_tenaamstelling_in_nederland: '20200601',
+                  datum_tenaamstelling: '20210301',
+                  vervaldatum_apk: '20260215',
+                  wam_verzekerd: 'Ja',
+                  openstaande_terugroepactie_indicator: 'Ja',
+                  tellerstandoordeel: 'Logisch',
+                  catalogusprijs: '28900',
+                },
+              ],
+            }
+          : { ok: true, json: async () => [{ brandstof_omschrijving: 'Benzine', nettomaximumvermogen: '110', co2_uitstoot_gecombineerd: '120' }] },
+      ),
+    );
+
+    const d = await getVehicleDossier('6-XKD-69');
+    expect(d).not.toBeNull();
+    expect(d!.make).toBe('Volkswagen');
+    expect(d!.fuel).toBe('petrol');
+    expect(d!.powerKw).toBe(110);
+    expect(d!.co2).toBe(120);
+    expect(d!.insuredWam).toBe(true);
+    expect(d!.openRecall).toBe(true);
+    expect(d!.isImport).toBe(true);
+    expect(d!.catalogPrice).toBe(28900);
+    expect(d!.apkExpiry).toBe('2026-02-15');
+  });
+
+  it('returns null for an unknown plate', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => [] })));
+    expect(await getVehicleDossier('0AAAAA0')).toBeNull();
   });
 });

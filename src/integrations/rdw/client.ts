@@ -85,6 +85,132 @@ async function fetchJson(url: string): Promise<unknown[]> {
   return Array.isArray(json) ? json : [];
 }
 
+function num(raw: unknown): number | null {
+  if (typeof raw === 'string' && raw.trim() !== '' && Number.isFinite(Number(raw))) return Number(raw);
+  if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+  return null;
+}
+
+/** RDW indicator fields: "Ja"/"Nee" -> boolean, anything else -> null. */
+function yesNo(raw: unknown): boolean | null {
+  if (typeof raw !== 'string') return null;
+  const v = raw.trim().toLowerCase();
+  if (v === 'ja') return true;
+  if (v === 'nee') return false;
+  return null;
+}
+
+/** The full public dossier ROAVAA shows the instant a plate is entered. */
+export interface VehicleDossier {
+  plate: string;
+  // Identity
+  make: string | null;
+  model: string | null;
+  vehicleType: string | null;
+  bodywork: string | null;
+  color: string | null;
+  secondColor: string | null;
+  category: string | null;
+  // Engine & energy
+  fuel: FuelKey | null;
+  powerKw: number | null;
+  displacementCc: number | null;
+  cylinders: number | null;
+  co2: number | null;
+  emissionClass: string | null;
+  energyLabel: string | null;
+  consumption: number | null;
+  // Dimensions & weight
+  lengthCm: number | null;
+  widthCm: number | null;
+  wheelbaseCm: number | null;
+  massEmpty: number | null;
+  massReady: number | null;
+  massMaxAllowed: number | null;
+  towingBraked: number | null;
+  seats: number | null;
+  doors: number | null;
+  // Registry
+  firstAdmission: string | null;
+  firstNlRegistration: string | null;
+  registeredSince: string | null;
+  isImport: boolean;
+  catalogPrice: number | null;
+  // Inspection & safety
+  apkExpiry: string | null;
+  insuredWam: boolean | null;
+  openRecall: boolean | null;
+  odometerJudgement: string | null;
+}
+
+/**
+ * Full public dossier for a plate: identity, engine, dimensions, registry and
+ * inspection/safety, from the RDW registration + fuel datasets. Best-effort and
+ * never throws; returns null on unknown plate or failure so the sheet falls
+ * back to whatever the garage already stored.
+ */
+export async function getVehicleDossier(rawPlate: string): Promise<VehicleDossier | null> {
+  const plate = normalizePlate(rawPlate);
+  if (plate.length < 4 || plate.length > 8) return null;
+
+  try {
+    const [vehicles, fuels] = await Promise.all([
+      fetchJson(`${VEHICLES}?kenteken=${plate}`),
+      fetchJson(`${FUELS}?kenteken=${plate}`).catch(() => [] as unknown[]),
+    ]);
+    const v = vehicles[0] as Record<string, unknown> | undefined;
+    if (!v) return null;
+    const f = (fuels[0] as Record<string, unknown> | undefined) ?? {};
+    const fuelDescriptions = fuels
+      .map((row) => (row as Record<string, unknown>).brandstof_omschrijving)
+      .filter((d): d is string => typeof d === 'string');
+
+    const firstAdmission = parseRdwDate(v.datum_eerste_toelating);
+    const firstNlRegistration = parseRdwDate(v.datum_eerste_tenaamstelling_in_nederland);
+    const isImport =
+      !!firstAdmission && !!firstNlRegistration && firstNlRegistration.slice(0, 4) > firstAdmission.slice(0, 4);
+
+    return {
+      plate,
+      make: titleCase(v.merk),
+      model: titleCase(v.handelsbenaming),
+      vehicleType: titleCase(v.voertuigsoort),
+      bodywork: titleCase(v.inrichting),
+      color: titleCase(v.eerste_kleur),
+      secondColor: titleCase(v.tweede_kleur),
+      category: typeof v.europese_voertuigcategorie === 'string' ? v.europese_voertuigcategorie : null,
+      fuel: mapFuel(fuelDescriptions),
+      powerKw: num(f.nettomaximumvermogen),
+      displacementCc: num(v.cilinderinhoud),
+      cylinders: num(v.aantal_cilinders),
+      co2: num(f.co2_uitstoot_gecombineerd),
+      emissionClass: typeof f.emissiecode_omschrijving === 'string' ? f.emissiecode_omschrijving : null,
+      energyLabel: typeof v.zuinigheidslabel === 'string' ? v.zuinigheidslabel : null,
+      consumption: num(f.brandstofverbruik_gecombineerd),
+      lengthCm: num(v.lengte),
+      widthCm: num(v.breedte),
+      wheelbaseCm: num(v.wielbasis),
+      massEmpty: num(v.massa_ledig_voertuig),
+      massReady: num(v.massa_rijklaar),
+      massMaxAllowed: num(v.toegestane_maximum_massa),
+      towingBraked: num(v.maximum_trekken_massa_geremd),
+      seats: num(v.aantal_zitplaatsen),
+      doors: num(v.aantal_deuren),
+      firstAdmission,
+      firstNlRegistration,
+      registeredSince: parseRdwDate(v.datum_tenaamstelling),
+      isImport,
+      catalogPrice: num(v.catalogusprijs),
+      apkExpiry: parseRdwDate(v.vervaldatum_apk),
+      insuredWam: yesNo(v.wam_verzekerd),
+      openRecall: yesNo(v.openstaande_terugroepactie_indicator),
+      odometerJudgement: typeof v.tellerstandoordeel === 'string' ? v.tellerstandoordeel : null,
+    };
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Look a plate up at the RDW. Returns null on unknown plate or any failure —
  * the caller then simply lets the mechanic fill the fields by hand.

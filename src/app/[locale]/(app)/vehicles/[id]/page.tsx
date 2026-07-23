@@ -14,6 +14,9 @@ import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
 import { CarIllustration } from '@/components/vehicles/car-illustration';
 import { VAN_MODEL_PATTERN } from '@/components/vehicles/vehicle-card';
+import { VehicleDossierSection } from '@/components/vehicles/vehicle-dossier';
+import { SHEET } from '@/lib/vehicle-sheet-copy';
+import type { Locale } from '@/components/landing/content';
 import { PhotoDiagnosisPanel, type DiagnosisRow } from '@/components/diagnosis/photo-diagnosis-panel';
 import { TimelineList, type TimelineItemView } from '@/components/timeline/timeline-list';
 import type { DiagnosisSeverity, VehicleAngle } from '@/integrations/ai';
@@ -173,6 +176,25 @@ export default async function VehicleDetailPage({
 
       {saved ? <p className="mt-3 text-sm text-success">{t('vehicles.saved')}</p> : null}
       {photoError ? <p className="mt-3 text-sm text-destructive">{t('vehicles.photoError')}</p> : null}
+
+      {/* Public vehicle dossier (RDW) — the instant, rich first impression. */}
+      {v.license_plate ? (
+        <VehicleDossierSection
+          plate={v.license_plate}
+          locale={(['nl', 'en', 'fr'] as const).includes(locale as Locale) ? (locale as Locale) : 'nl'}
+          customerId={v.customer_id}
+        />
+      ) : null}
+
+      {/* Divider into the garage-owned file. */}
+      <div className="mt-8 border-t border-border pt-6">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-gold">
+          {SHEET[(['nl', 'en', 'fr'] as const).includes(locale as Locale) ? (locale as Locale) : 'nl'].dossierTag}
+        </span>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {SHEET[(['nl', 'en', 'fr'] as const).includes(locale as Locale) ? (locale as Locale) : 'nl'].dossierIntro}
+        </p>
+      </div>
 
       {/* Photo */}
       <div className="mt-5 overflow-hidden rounded-xl border border-border bg-card shadow-soft">
