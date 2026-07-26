@@ -35,6 +35,7 @@
       "subtitle": "Nog een stap voordat u begint.",
       "name": "Naam van uw garage",
       "namePlaceholder": "bijv. Garage De Vries",
+      "country": "Land",
       "businessType": "Type onderneming",
       "cta": "Garage aanmaken",
       "error": "Aanmaken mislukt. Probeer opnieuw.",

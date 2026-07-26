@@ -1,6 +1,7 @@
 import { Sparkles, ShieldCheck, AlertTriangle, ShieldAlert, Gauge, PlaneLanding } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
-import { getVehicleDossier, type VehicleDossier } from '@/integrations/rdw/client';
+import type { VehicleDossier } from '@/integrations/rdw/client';
+import { getVehicleDataProvider } from '@/integrations/vehicle-data';
 import { analyzeVehicle, type InsightLevel } from '@/lib/vehicle-analysis';
 import { SHEET } from '@/lib/vehicle-sheet-copy';
 import type { Locale } from '@/components/landing/content';
@@ -59,13 +60,15 @@ export async function VehicleDossierSection({
   locale,
   customerId,
   withSummary = false,
+  country,
 }: {
   plate: string;
   locale: Locale;
   customerId?: string | null;
   withSummary?: boolean;
+  country?: string;
 }) {
-  const dossier: VehicleDossier | null = await getVehicleDossier(plate);
+  const dossier: VehicleDossier | null = await getVehicleDataProvider(country).lookup(plate);
   const c = SHEET[locale];
 
   if (!dossier) {

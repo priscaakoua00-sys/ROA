@@ -8,6 +8,7 @@ import { createSupabaseServerClient } from '@/data/supabase/server';
 import { createOrgAction } from '@/data/orgs/actions';
 import { signOutAction } from '@/data/auth/actions';
 import { PLANS, formatMonthlyPrice, type PlanKey } from '@/lib/plans';
+import { COUNTRIES } from '@/integrations/vehicle-data';
 import { cn } from '@/lib/utils';
 
 export default async function OnboardingPage({
@@ -28,6 +29,7 @@ export default async function OnboardingPage({
   const t = await getTranslations('app');
   const tPricing = await getTranslations('pricing');
   const defaultPlan: PlanKey = PLANS.find((p) => p.key === plan)?.key ?? 'starter';
+  const regionNames = new Intl.DisplayNames([locale], { type: 'region' });
 
   return (
     <AuthShell title={t('onboarding.title')} subtitle={t('onboarding.subtitle')}>
@@ -41,6 +43,21 @@ export default async function OnboardingPage({
           placeholder={t('onboarding.namePlaceholder')}
           required
         />
+        <label className="block space-y-1.5">
+          <span className="text-sm font-medium">{t('onboarding.country')}</span>
+          <select
+            name="country"
+            defaultValue="NL"
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {COUNTRIES.map((cn) => (
+              <option key={cn.code} value={cn.code}>
+                {regionNames.of(cn.code) ?? cn.code}
+                {cn.hasVehicleData ? '' : ' —'}
+              </option>
+            ))}
+          </select>
+        </label>
         <label className="block space-y-1.5">
           <span className="text-sm font-medium">{t('onboarding.businessType')}</span>
           <select

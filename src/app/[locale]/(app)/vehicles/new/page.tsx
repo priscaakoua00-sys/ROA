@@ -45,7 +45,7 @@ export default async function NewVehiclePage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
+  const { data: orgs } = await supabase.from('organizations').select('id, country').limit(1);
   const org = orgs?.[0];
   if (!org) redirect(`/${locale}/onboarding`);
 
@@ -96,7 +96,7 @@ export default async function NewVehiclePage({
       ) : null}
 
       {/* The file opens: public dossier + Ruben's read, first. */}
-      <VehicleDossierSection plate={plate} locale={l} withSummary customerId={null} />
+      <VehicleDossierSection plate={plate} locale={l} withSummary customerId={null} country={org.country} />
 
       {error === 'limit' ? (
         <p className="mt-4 text-sm text-destructive">{t('newVehicle.limitReached')}</p>
