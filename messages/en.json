@@ -591,6 +591,7 @@
       "address": "Address",
       "postalCode": "Postal code",
       "city": "City",
+      "kvkNumber": "Chamber of Commerce (KvK) number",
       "vatNumber": "VAT number",
       "website": "Website",
       "ibanIntro": "Setting an IBAN adds a scan-to-pay QR code to your invoices (optional).",

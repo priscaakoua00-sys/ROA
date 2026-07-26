@@ -591,6 +591,7 @@
       "address": "Adres",
       "postalCode": "Postcode",
       "city": "Plaats",
+      "kvkNumber": "KvK-nummer",
       "vatNumber": "Btw-nummer",
       "website": "Website",
       "ibanIntro": "Met een IBAN krijgt uw factuur een scan-en-betaal QR-code (optioneel).",

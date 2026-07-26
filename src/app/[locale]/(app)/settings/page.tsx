@@ -66,7 +66,7 @@ export default async function SettingsPage({
 
   const { data: orgs } = await supabase
     .from('organizations')
-    .select('id, name, slug, default_language, phone, email, address, postal_code, city, vat_number, website, iban, bic, logo_url, default_margin_percent')
+    .select('id, name, slug, default_language, phone, email, address, postal_code, city, kvk_number, vat_number, website, iban, bic, logo_url, default_margin_percent')
     .limit(1);
   const org = orgs?.[0];
   if (!org) redirect(`/${locale}/onboarding`);
@@ -314,9 +314,10 @@ export default async function SettingsPage({
             <Field label={t('settings.city')} name="city" defaultValue={org.city ?? ''} />
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <Field label={t('settings.kvkNumber')} name="kvkNumber" defaultValue={org.kvk_number ?? ''} />
             <Field label={t('settings.vatNumber')} name="vatNumber" defaultValue={org.vat_number ?? ''} />
-            <Field label={t('settings.website')} name="website" defaultValue={org.website ?? ''} placeholder="https://" />
           </div>
+          <Field label={t('settings.website')} name="website" defaultValue={org.website ?? ''} placeholder="https://" />
           <p className="text-xs text-muted-foreground">{t('settings.ibanIntro')}</p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label={t('settings.iban')} name="iban" defaultValue={org.iban ?? ''} />
