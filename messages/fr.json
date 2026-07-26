@@ -739,7 +739,9 @@
       "convertToInvoice": "Convertir en facture",
       "convertToInvoiceHint": "Le devis doit d'abord être accepté avant de pouvoir être converti en facture.",
       "viewWorkOrder": "Voir l'ordre de réparation",
-      "viewInvoice": "Voir la facture"
+      "viewInvoice": "Voir la facture",
+      "publicLink": "Lien pour le client",
+      "publicLinkHint": "Le client peut ouvrir ce lien pour consulter le devis et l'accepter ou le refuser — aucun compte nécessaire. Passer le statut à « Envoyé » lui envoie aussi automatiquement un e-mail si une adresse est connue."
     },
     "quoteStatus": {
       "draft": "Brouillon",
@@ -929,6 +931,29 @@
       "mileage": "Kilométrage",
       "description": "Quel est le problème avec votre voiture ?"
     }
+  },
+  "publicQuote": {
+    "title": "Devis {number}",
+    "greeting": "Bonjour {name},",
+    "greetingGeneric": "Bonjour,",
+    "intro": "voici le devis pour votre véhicule. Vérifiez les détails et indiquez-nous si vous l'acceptez.",
+    "vehicle": "Véhicule",
+    "validUntil": "Valable jusqu'au {date}",
+    "subtotal": "Sous-total",
+    "vat": "TVA ({rate}%)",
+    "total": "Total",
+    "accept": "J'accepte",
+    "decline": "Je refuse",
+    "acceptedTitle": "Vous avez accepté ce devis",
+    "acceptedBody": "Merci. {garage} traite le devis et planifie les travaux.",
+    "refusedTitle": "Vous avez refusé ce devis",
+    "refusedBody": "Aucun souci. {garage} a été informé de votre choix.",
+    "expiredTitle": "Ce devis a expiré",
+    "expiredBody": "Contactez {garage} pour obtenir un nouveau devis.",
+    "convertedTitle": "Ce devis est déjà en cours de traitement",
+    "convertedBody": "{garage} a déjà commencé les travaux.",
+    "notFound": "Ce devis n'est plus disponible.",
+    "disclaimer": "Vous seul(e) pouvez répondre via ce lien. Ne le conservez pas et ne le partagez pas."
   },
   "pricing": {
     "title": "Tarifs",
