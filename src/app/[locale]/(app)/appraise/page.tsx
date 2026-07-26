@@ -75,6 +75,8 @@ export default async function AppraisePage({
           catalogPrice={dossier.catalogPrice}
           firstAdmission={dossier.firstAdmission}
           fuel={dossier.fuel}
+          powerKw={dossier.powerKw}
+          massEmpty={dossier.massEmpty}
           isImport={dossier.isImport}
           apkExpired={apkExpired}
           openRecall={dossier.openRecall === true}

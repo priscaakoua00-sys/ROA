@@ -22,6 +22,8 @@ export interface ValuationInput {
   firstAdmission: string | null; // ISO date
   mileageKm: number | null;
   fuel: FuelKey | null;
+  powerKw?: number | null; // used to estimate a base price when no catalogue price
+  massEmpty?: number | null; // fallback signal when power is unknown
   isImport: boolean;
   apkExpired: boolean;
   openRecall: boolean;
@@ -35,7 +37,7 @@ export interface ValuationInput {
 
 export type BreakdownKind = 'base' | 'factor' | 'deduction';
 export interface BreakdownItem {
-  code: 'catalog' | 'age' | 'mileage' | 'import' | 'odometer' | 'defects' | 'mechanical' | 'aesthetic' | 'apk' | 'repairs';
+  code: 'catalog' | 'profile' | 'age' | 'mileage' | 'import' | 'odometer' | 'defects' | 'mechanical' | 'aesthetic' | 'apk' | 'repairs';
   kind: BreakdownKind;
   /** € for base/deduction, a multiplier for factor. */
   value: number;
@@ -46,6 +48,10 @@ export type Confidence = 'high' | 'medium' | 'low';
 
 export interface ValuationResult {
   status: 'ok' | 'insufficient';
+  /** What the estimate is anchored on: the RDW catalogue price, or — when that
+   * is missing (common on older cars) — a base estimated from the vehicle's
+   * profile (power / mass / fuel). 'profile' estimates are flagged low-confidence. */
+  basis: 'catalog' | 'profile';
   min: number;
   avg: number;
   max: number;
@@ -75,6 +81,32 @@ function ageOf(firstAdmission: string, now: Date): number {
   return Math.max(0, (now.getTime() - new Date(firstAdmission).getTime()) / (365.25 * 24 * 3_600_000));
 }
 
+/**
+ * Estimates the original (new) list price from the vehicle's profile, for the
+ * common case where the RDW has no catalogue price on record (older cars).
+ * Deliberately transparent and conservative: engine power is the strongest
+ * single signal of a car's segment, empty mass is the fallback, and a plain
+ * mid-market anchor covers the rest. Diesel/hybrid/electric cost a little more
+ * new. Estimates built on this are always flagged low-confidence with a wider
+ * range, so no false precision is implied.
+ */
+export function profileBaseNewPrice(input: {
+  powerKw?: number | null;
+  massEmpty?: number | null;
+  fuel: FuelKey | null;
+}): number {
+  let base: number;
+  if (input.powerKw && input.powerKw > 0) {
+    base = 4500 + input.powerKw * 230; // ~110 kW → €29.8k, ~130 kW → €34.4k
+  } else if (input.massEmpty && input.massEmpty > 0) {
+    base = 2500 + input.massEmpty * 13; // ~1350 kg → €20k
+  } else {
+    base = 22_000; // generic mid-market new price when nothing else is known
+  }
+  if (input.fuel === 'diesel' || input.fuel === 'hybrid' || input.fuel === 'electric') base *= 1.08;
+  return base;
+}
+
 function round(n: number): number {
   return Math.round(n / 50) * 50; // round to the nearest €50 — no false precision
 }
@@ -89,13 +121,19 @@ export function estimateValue(input: ValuationInput): ValuationResult {
   if (input.apkExpired) risks.push('apk');
   if (input.isImport) risks.push('import');
 
-  // Without a catalogue price and an age we have nothing honest to anchor on
-  // (Phase 2 comparables will cover this case). Say so rather than guess.
-  if (input.catalogPrice === null || ageYears === null) {
-    return { status: 'insufficient', min: 0, avg: 0, max: 0, confidence: 'low', spreadPct: 0, ageYears, breakdown: [], risks };
+  // Age is the one thing we cannot work without — a value has to depreciate
+  // from somewhere over time. Almost every plate has a first-admission date, so
+  // this branch is rare; when it happens we say so rather than guess.
+  if (ageYears === null) {
+    return { status: 'insufficient', basis: 'catalog', min: 0, avg: 0, max: 0, confidence: 'low', spreadPct: 0, ageYears, breakdown: [], risks };
   }
 
-  const breakdown: BreakdownItem[] = [{ code: 'catalog', kind: 'base', value: input.catalogPrice }];
+  // Anchor on the RDW catalogue price when it exists; otherwise estimate a base
+  // from the vehicle's profile so a range still appears (older cars rarely have
+  // a catalogue price on record). Either way, we always produce an estimate.
+  const basis: 'catalog' | 'profile' = input.catalogPrice !== null ? 'catalog' : 'profile';
+  const basePrice = input.catalogPrice ?? profileBaseNewPrice(input);
+  const breakdown: BreakdownItem[] = [{ code: basis === 'catalog' ? 'catalog' : 'profile', kind: 'base', value: basePrice }];
 
   const fAge = ageFactor(ageYears);
   breakdown.push({ code: 'age', kind: 'factor', value: fAge });
@@ -111,7 +149,7 @@ export function estimateValue(input: ValuationInput): ValuationResult {
     mileageMissing = true;
   }
 
-  let value = input.catalogPrice * fAge * fMileage;
+  let value = basePrice * fAge * fMileage;
 
   if (input.isImport) {
     breakdown.push({ code: 'import', kind: 'factor', value: 0.92 });
@@ -147,16 +185,24 @@ export function estimateValue(input: ValuationInput): ValuationResult {
   const avg = Math.max(MIN_VALUE_FLOOR, value);
 
   // The range widens honestly with age, missing data and a dodgy odometer.
+  // A profile-based estimate (no catalogue price) is inherently less certain,
+  // so it starts wider still.
   let spread = 0.08 + ageYears * 0.008;
   if (input.odometerIllogical) spread += 0.1;
   if (mileageMissing) spread += 0.06;
-  spread = Math.min(0.4, spread);
+  if (basis === 'profile') spread += 0.1;
+  spread = Math.min(0.45, spread);
 
-  const missingSignals = (mileageMissing ? 1 : 0) + (input.odometerIllogical ? 1 : 0) + (ageYears > 12 ? 1 : 0);
-  const confidence: Confidence = missingSignals >= 2 ? 'low' : missingSignals === 1 ? 'medium' : 'high';
+  const missingSignals =
+    (mileageMissing ? 1 : 0) + (input.odometerIllogical ? 1 : 0) + (ageYears > 12 ? 1 : 0) + (basis === 'profile' ? 1 : 0);
+  // A profile-based estimate is never more than "medium" — we didn't have the
+  // catalogue price to anchor on.
+  let confidence: Confidence = missingSignals >= 2 ? 'low' : missingSignals === 1 ? 'medium' : 'high';
+  if (basis === 'profile' && confidence === 'high') confidence = 'medium';
 
   return {
     status: 'ok',
+    basis,
     min: round(avg * (1 - spread)),
     avg: round(avg),
     max: round(avg * (1 + spread)),

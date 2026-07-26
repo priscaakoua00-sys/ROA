@@ -27,6 +27,8 @@ export interface ValuationCopy {
   confidenceValue: Record<Confidence, string>;
   breakdownTitle: string;
   breakdownLabel: Record<BreakdownItem['code'], string>;
+  /** Shown when there is no catalogue price and the base was estimated from the vehicle's profile. */
+  profileNote: string;
   risksTitle: string;
   riskLabel: Record<RiskCode, string>;
   insufficient: string;
@@ -61,9 +63,10 @@ export const VALUATION: Record<Locale, ValuationCopy> = {
     confidenceValue: { high: 'High', medium: 'Medium', low: 'Low' },
     breakdownTitle: 'How Ruben got there',
     breakdownLabel: {
-      catalog: 'List price (new)', age: 'Age', mileage: 'Mileage', import: 'Import',
+      catalog: 'List price (new)', profile: 'Estimated base (profile)', age: 'Age', mileage: 'Mileage', import: 'Import',
       odometer: 'Odometer flagged', defects: 'Known defects', mechanical: 'Mechanical', aesthetic: 'Bodywork', apk: 'Expired MOT', repairs: 'Repairs',
     },
+    profileNote: 'No catalogue price on record for this vehicle, so Ruben estimated the base from its profile (power, weight, fuel). Treat the range as broadly indicative.',
     risksTitle: 'Points of attention',
     riskLabel: { odometer: 'Odometer judged illogical — verify the history', recall: 'Open manufacturer recall', apk: 'MOT has expired', import: 'Imported vehicle', highMileage: 'High mileage for its age' },
     insufficient: 'Not enough official data to estimate a value for this vehicle (no catalogue price on record). The rest of the file is still shown.',
@@ -99,9 +102,10 @@ export const VALUATION: Record<Locale, ValuationCopy> = {
     confidenceValue: { high: 'Hoog', medium: 'Gemiddeld', low: 'Laag' },
     breakdownTitle: 'Zo komt Ruben erbij',
     breakdownLabel: {
-      catalog: 'Catalogusprijs (nieuw)', age: 'Leeftijd', mileage: 'Kilometerstand', import: 'Import',
+      catalog: 'Catalogusprijs (nieuw)', profile: 'Geschatte basis (profiel)', age: 'Leeftijd', mileage: 'Kilometerstand', import: 'Import',
       odometer: 'Teller onlogisch', defects: 'Bekende gebreken', mechanical: 'Techniek', aesthetic: 'Carrosserie', apk: 'APK verlopen', repairs: 'Reparaties',
     },
+    profileNote: 'Geen catalogusprijs bekend voor dit voertuig, dus Ruben heeft de basis geschat op basis van het profiel (vermogen, gewicht, brandstof). Zie de bandbreedte als grove indicatie.',
     risksTitle: 'Aandachtspunten',
     riskLabel: { odometer: 'Teller als onlogisch beoordeeld — controleer de historie', recall: 'Openstaande terugroepactie', apk: 'APK is verlopen', import: 'Geïmporteerd voertuig', highMileage: 'Hoge kilometerstand voor de leeftijd' },
     insufficient: 'Onvoldoende officiële data om een waarde te schatten (geen catalogusprijs bekend). De rest van het dossier blijft zichtbaar.',
@@ -137,9 +141,10 @@ export const VALUATION: Record<Locale, ValuationCopy> = {
     confidenceValue: { high: 'Élevée', medium: 'Moyenne', low: 'Faible' },
     breakdownTitle: 'Comment Ruben y arrive',
     breakdownLabel: {
-      catalog: 'Prix catalogue (neuf)', age: 'Âge', mileage: 'Kilométrage', import: 'Import',
+      catalog: 'Prix catalogue (neuf)', profile: 'Base estimée (profil)', age: 'Âge', mileage: 'Kilométrage', import: 'Import',
       odometer: 'Compteur signalé', defects: 'Défauts connus', mechanical: 'Mécanique', aesthetic: 'Carrosserie', apk: 'CT expiré', repairs: 'Réparations',
     },
+    profileNote: 'Pas de prix catalogue enregistré pour ce véhicule : Ruben a donc estimé la base à partir de son profil (puissance, poids, carburant). Considérez la fourchette comme une indication large.',
     risksTitle: 'Points d’attention',
     riskLabel: { odometer: 'Compteur jugé illogique — vérifiez l’historique', recall: 'Rappel constructeur ouvert', apk: 'Le contrôle technique est expiré', import: 'Véhicule importé', highMileage: 'Kilométrage élevé pour l’âge' },
     insufficient: 'Données officielles insuffisantes pour estimer une valeur (pas de prix catalogue connu). Le reste du dossier reste affiché.',
