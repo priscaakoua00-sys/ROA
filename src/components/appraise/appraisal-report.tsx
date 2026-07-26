@@ -81,7 +81,7 @@ export function AppraisalReport(props: Props) {
       {/* Condition & mileage inputs */}
       <div className="rounded-xl border border-border bg-card p-5 shadow-soft">
         <h3 className="mb-3 text-sm font-semibold">{c.conditionTitle}</h3>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="block space-y-1.5 text-sm">
             <span className="font-medium">{c.mileage}</span>
             <input type="number" inputMode="numeric" value={mileage} onChange={(e) => setMileage(e.target.value)} className={inputCls} />

@@ -63,15 +63,15 @@ export default async function PublicRequestPage({
           className="absolute left-[-9999px] h-0 w-0 opacity-0"
         />
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Field label={t('fields.firstName')} name="firstName" autoComplete="given-name" />
           <Field label={t('fields.lastName')} name="lastName" autoComplete="family-name" />
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Field label={t('fields.phone')} name="phone" type="tel" autoComplete="tel" />
           <Field label={t('fields.email')} name="email" type="email" autoComplete="email" />
         </div>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <Field label={t('fields.licensePlate')} name="licensePlate" />
           <Field label={t('fields.make')} name="make" />
           <Field label={t('fields.model')} name="model" />
