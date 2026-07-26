@@ -8,7 +8,15 @@ import { ArrowRight, Loader2 } from 'lucide-react';
  * The empty state of vehicle creation: not a form, a search. Type a plate and
  * ROAVAA opens the file (navigates to ?plate=…), where the full dossier renders.
  */
-export function PlateOpener({ placeholder, open }: { placeholder: string; open: string }) {
+export function PlateOpener({
+  placeholder,
+  open,
+  basePath = '/vehicles/new',
+}: {
+  placeholder: string;
+  open: string;
+  basePath?: string;
+}) {
   const router = useRouter();
   const [plate, setPlate] = useState('');
   const [busy, setBusy] = useState(false);
@@ -17,7 +25,7 @@ export function PlateOpener({ placeholder, open }: { placeholder: string; open: 
     const clean = plate.trim();
     if (clean.replace(/[^A-Za-z0-9]/g, '').length < 4 || busy) return;
     setBusy(true);
-    router.push(`/vehicles/new?plate=${encodeURIComponent(clean)}`);
+    router.push(`${basePath}?plate=${encodeURIComponent(clean)}`);
   };
 
   return (

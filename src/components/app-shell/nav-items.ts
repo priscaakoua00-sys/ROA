@@ -12,6 +12,7 @@ import {
   Inbox,
   CreditCard,
   FileText,
+  Scale,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -37,6 +38,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: '/leads', labelKey: 'leads', icon: Inbox },
   { href: '/customers', labelKey: 'customers', icon: Users, mobilePrimary: true },
   { href: '/vehicles', labelKey: 'vehicles', icon: Car, mobilePrimary: true },
+  { href: '/appraise', labelKey: 'appraise', icon: Scale },
   { href: '/work-orders', labelKey: 'workOrders', icon: Wrench, mobilePrimary: true },
   { href: '/quotes', labelKey: 'quotes', icon: FileText },
   { href: '/invoices', labelKey: 'invoices', icon: Receipt },
