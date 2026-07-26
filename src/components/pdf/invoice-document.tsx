@@ -70,6 +70,7 @@ export interface InvoicePdfData {
     phone: string | null;
     email: string | null;
     website: string | null;
+    kvkNumber: string | null;
     vatNumber: string | null;
     iban: string | null;
     bic: string | null;
@@ -127,6 +128,7 @@ export function InvoiceDocument({ data }: { data: InvoicePdfData }) {
             {org.phone ? <Text style={styles.muted}>{org.phone}</Text> : null}
             {org.email ? <Text style={styles.muted}>{org.email}</Text> : null}
             {org.website ? <Text style={styles.muted}>{org.website}</Text> : null}
+            {org.kvkNumber ? <Text style={styles.muted}>KvK {org.kvkNumber}</Text> : null}
             {org.vatNumber ? <Text style={styles.muted}>VAT {org.vatNumber}</Text> : null}
           </View>
           <View style={styles.titleBlock}>

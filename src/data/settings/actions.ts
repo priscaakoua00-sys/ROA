@@ -41,6 +41,7 @@ export async function updateCompanyAction(formData: FormData) {
       address: clean('address'),
       postal_code: clean('postalCode'),
       city: clean('city'),
+      kvk_number: clean('kvkNumber'),
       vat_number: clean('vatNumber'),
       website: clean('website'),
       iban: clean('iban'),

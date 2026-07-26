@@ -591,6 +591,7 @@
       "address": "Adresse",
       "postalCode": "Code postal",
       "city": "Ville",
+      "kvkNumber": "Numéro KvK (chambre de commerce)",
       "vatNumber": "Numéro de TVA",
       "website": "Site web",
       "ibanIntro": "L'IBAN permet d'afficher un QR code de paiement sur vos factures (optionnel).",

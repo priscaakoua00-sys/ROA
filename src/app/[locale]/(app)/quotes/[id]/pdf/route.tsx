@@ -24,7 +24,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
   const [{ data: org }, { data: lineItemsData }] = await Promise.all([
     supabase
       .from('organizations')
-      .select('name, logo_url, address, postal_code, city, phone, email, website, vat_number')
+      .select('name, logo_url, address, postal_code, city, phone, email, website, kvk_number, vat_number')
       .eq('id', quote.organization_id)
       .maybeSingle(),
     supabase
@@ -71,6 +71,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
           phone: org?.phone ?? null,
           email: org?.email ?? null,
           website: org?.website ?? null,
+          kvkNumber: org?.kvk_number ?? null,
           vatNumber: org?.vat_number ?? null,
         },
         customer: {
