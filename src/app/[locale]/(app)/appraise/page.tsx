@@ -84,7 +84,7 @@ export default async function AppraisePage({
         />
       ) : (
         <p className="mt-6 rounded-xl border border-dashed border-border bg-card p-4 text-sm text-muted-foreground">
-          {c.insufficient}
+          {c.notFound}
         </p>
       )}
     </div>

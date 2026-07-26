@@ -31,7 +31,15 @@ export interface ValuationCopy {
   profileNote: string;
   risksTitle: string;
   riskLabel: Record<RiskCode, string>;
+  /** Shown only in the rare case where the engine truly cannot estimate: the
+   * vehicle's first-admission date itself is unknown (age is unknowable). This
+   * is NOT shown for a missing catalogue price — that case now always gets a
+   * profile-based estimate instead. */
   insufficient: string;
+  /** Shown when the plate itself wasn't found at the RDW at all (typo, non-Dutch
+   * plate, or unknown vehicle) — distinct from `insufficient`, which is about
+   * the valuation engine specifically once a vehicle dossier does exist. */
+  notFound: string;
   disclaimer: string;
   save: string;
   saved: string;
@@ -69,7 +77,8 @@ export const VALUATION: Record<Locale, ValuationCopy> = {
     profileNote: 'No catalogue price on record for this vehicle, so Ruben estimated the base from its profile (power, weight, fuel). Treat the range as broadly indicative.',
     risksTitle: 'Points of attention',
     riskLabel: { odometer: 'Odometer judged illogical — verify the history', recall: 'Open manufacturer recall', apk: 'MOT has expired', import: 'Imported vehicle', highMileage: 'High mileage for its age' },
-    insufficient: 'Not enough official data to estimate a value for this vehicle (no catalogue price on record). The rest of the file is still shown.',
+    insufficient: 'Ruben cannot estimate a value for this vehicle: its first-registration date is unknown, so its age cannot be determined. The rest of the file is still shown.',
+    notFound: 'This plate could not be found in the RDW registry — check for a typo, or it may not be a Dutch-registered vehicle.',
     disclaimer: 'An indicative range from objective data — not a guarantee. The real price depends on condition, negotiation, and supply and demand. Always inspect the vehicle.',
     save: 'Save this analysis',
     saved: 'Analysis saved.',
@@ -108,7 +117,8 @@ export const VALUATION: Record<Locale, ValuationCopy> = {
     profileNote: 'Geen catalogusprijs bekend voor dit voertuig, dus Ruben heeft de basis geschat op basis van het profiel (vermogen, gewicht, brandstof). Zie de bandbreedte als grove indicatie.',
     risksTitle: 'Aandachtspunten',
     riskLabel: { odometer: 'Teller als onlogisch beoordeeld — controleer de historie', recall: 'Openstaande terugroepactie', apk: 'APK is verlopen', import: 'Geïmporteerd voertuig', highMileage: 'Hoge kilometerstand voor de leeftijd' },
-    insufficient: 'Onvoldoende officiële data om een waarde te schatten (geen catalogusprijs bekend). De rest van het dossier blijft zichtbaar.',
+    insufficient: 'Ruben kan voor dit voertuig geen waarde schatten: de datum van eerste toelating is onbekend, waardoor de leeftijd niet vast te stellen is. De rest van het dossier blijft zichtbaar.',
+    notFound: 'Dit kenteken is niet gevonden bij de RDW — controleer op een typefout, of het voertuig staat niet in Nederland geregistreerd.',
     disclaimer: 'Een indicatieve bandbreedte op basis van objectieve gegevens — geen garantie. De echte prijs hangt af van de staat, de onderhandeling en vraag en aanbod. Inspecteer het voertuig altijd.',
     save: 'Analyse opslaan',
     saved: 'Analyse opgeslagen.',
@@ -147,7 +157,8 @@ export const VALUATION: Record<Locale, ValuationCopy> = {
     profileNote: 'Pas de prix catalogue enregistré pour ce véhicule : Ruben a donc estimé la base à partir de son profil (puissance, poids, carburant). Considérez la fourchette comme une indication large.',
     risksTitle: 'Points d’attention',
     riskLabel: { odometer: 'Compteur jugé illogique — vérifiez l’historique', recall: 'Rappel constructeur ouvert', apk: 'Le contrôle technique est expiré', import: 'Véhicule importé', highMileage: 'Kilométrage élevé pour l’âge' },
-    insufficient: 'Données officielles insuffisantes pour estimer une valeur (pas de prix catalogue connu). Le reste du dossier reste affiché.',
+    insufficient: 'Ruben ne peut pas estimer de valeur pour ce véhicule : sa date de première mise en circulation est inconnue, donc son âge ne peut pas être déterminé. Le reste du dossier reste affiché.',
+    notFound: 'Cette plaque est introuvable au RDW — vérifiez une faute de frappe, ou il ne s’agit pas d’un véhicule immatriculé aux Pays-Bas.',
     disclaimer: 'Une fourchette indicative à partir de données objectives — pas une garantie. Le prix réel dépend de l’état, de la négociation et de l’offre et la demande. Inspectez toujours le véhicule.',
     save: 'Enregistrer cette analyse',
     saved: 'Analyse enregistrée.',
