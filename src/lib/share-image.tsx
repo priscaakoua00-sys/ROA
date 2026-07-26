@@ -15,7 +15,7 @@ export function renderShareImage(signature: string, subtitle: string) {
           justifyContent: 'center',
           padding: '80px 96px',
           background:
-            'radial-gradient(60% 70% at 15% 10%, rgba(69,140,227,0.22), transparent 60%), radial-gradient(55% 65% at 90% 95%, rgba(231,176,64,0.20), transparent 60%), linear-gradient(160deg, #10131a 0%, #0c0e13 55%, #090b10 100%)',
+            'radial-gradient(60% 70% at 12% 8%, rgba(231,176,64,0.24), transparent 62%), radial-gradient(55% 65% at 92% 96%, rgba(205,162,80,0.18), transparent 60%), linear-gradient(160deg, #12100b 0%, #0c0a06 55%, #090705 100%)',
           fontFamily: 'system-ui, sans-serif',
         }}
       >

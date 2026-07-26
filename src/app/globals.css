@@ -24,8 +24,10 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 22% 12%;
 
-    --primary: 221 55% 27%;
-    --primary-foreground: 210 40% 98%;
+    /* One brand accent: the warm gold, matching the marketing site and the
+       wordmark. Dark ink sits on top for readable, premium-looking buttons. */
+    --primary: 38 70% 44%;
+    --primary-foreground: 40 55% 10%;
 
     --secondary: 214 18% 93%;
     --secondary-foreground: 220 20% 20%;
@@ -47,7 +49,7 @@
 
     --border: 214 16% 88%;
     --input: 214 16% 88%;
-    --ring: 221 50% 40%;
+    --ring: 38 62% 46%;
 
     --brand: var(--primary);
     --brand-foreground: var(--primary-foreground);
@@ -77,8 +79,8 @@
     --popover: 222 20% 9%;
     --popover-foreground: 210 20% 93%;
 
-    --primary: 213 74% 58%;
-    --primary-foreground: 220 45% 8%;
+    --primary: 40 78% 56%;
+    --primary-foreground: 40 55% 8%;
 
     --secondary: 222 16% 15%;
     --secondary-foreground: 210 18% 90%;
@@ -100,7 +102,7 @@
 
     --border: 222 15% 19%;
     --input: 222 15% 20%;
-    --ring: 213 70% 55%;
+    --ring: 40 70% 55%;
 
     --brand: var(--primary);
     --brand-foreground: var(--primary-foreground);
@@ -109,8 +111,8 @@
   }
 
   [data-tenant='demo'] {
-    --primary: 231 44% 40%;
-    --ring: 231 44% 46%;
+    --primary: 40 78% 54%;
+    --ring: 40 70% 52%;
   }
 
   * {
