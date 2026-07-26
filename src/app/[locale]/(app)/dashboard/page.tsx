@@ -471,11 +471,11 @@ export default async function DashboardPage({
                   return (
                     <li
                       key={item.key}
-                      className={`flex items-center justify-between gap-3 rounded-xl border p-3 transition ${
+                      className={`flex flex-col gap-3 rounded-xl border p-3 transition sm:flex-row sm:items-center sm:justify-between ${
                         item.tone === 'urgent' ? 'border-urgent/30 bg-urgent/5' : 'border-border bg-card/70'
                       }`}
                     >
-                      <div className="flex min-w-0 items-center gap-3">
+                      <div className="flex min-w-0 items-start gap-3">
                         <span
                           className={`flex size-8 shrink-0 items-center justify-center rounded-full ${
                             item.tone === 'urgent' ? 'bg-urgent/12 text-urgent' : 'bg-gold/12 text-gold'
@@ -485,8 +485,8 @@ export default async function DashboardPage({
                         </span>
                         <span className="min-w-0 text-sm">{item.text}</span>
                       </div>
-                      <a href={href} className="shrink-0">
-                        <Button size="sm" variant={item.tone === 'urgent' ? 'default' : 'outline'}>
+                      <a href={href} className="shrink-0 max-sm:w-full">
+                        <Button size="sm" variant={item.tone === 'urgent' ? 'default' : 'outline'} className="max-sm:w-full">
                           {item.cta}
                         </Button>
                       </a>
