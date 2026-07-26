@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { createOrgSchema } from '@/lib/validation/auth';
+import { normalizeCountry } from '@/integrations/vehicle-data';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -27,6 +28,9 @@ export async function createOrgAction(formData: FormData) {
     p_default_language: parsed.data.language,
   });
   if (error || !org) redirect(`/${locale}/onboarding?error=create`);
+
+  const country = normalizeCountry(formData.get('country'));
+  await supabase.from('organizations').update({ country }).eq('id', org.id);
 
   if (parsed.data.planKey !== 'starter') {
     await supabase

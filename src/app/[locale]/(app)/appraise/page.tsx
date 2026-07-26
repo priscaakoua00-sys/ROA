@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
-import { getVehicleDossier } from '@/integrations/rdw/client';
+import { getVehicleDataProvider } from '@/integrations/vehicle-data';
 import { AppraisalReport } from '@/components/appraise/appraisal-report';
 import { PlateOpener } from '@/components/vehicles/plate-opener';
 import { FlashToast } from '@/components/flash-toast';
@@ -48,7 +48,8 @@ export default async function AppraisePage({
     );
   }
 
-  const dossier = await getVehicleDossier(plate);
+  const { data: orgs } = await supabase.from('organizations').select('country').limit(1);
+  const dossier = await getVehicleDataProvider(orgs?.[0]?.country).lookup(plate);
   const title = dossier ? [dossier.make, dossier.model].filter(Boolean).join(' ') || plate : plate;
   const apkExpired = dossier?.apkExpiry ? new Date(dossier.apkExpiry).getTime() < Date.now() : false;
   const odometerIllogical = dossier?.odometerJudgement ? /onlogisch|illogical/i.test(dossier.odometerJudgement) : false;

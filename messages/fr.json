@@ -35,6 +35,7 @@
       "subtitle": "Une etape avant de commencer.",
       "name": "Nom de votre garage",
       "namePlaceholder": "ex. Garage De Vries",
+      "country": "Pays",
       "businessType": "Type d'entreprise",
       "cta": "Creer le garage",
       "error": "Creation impossible. Reessayez.",
