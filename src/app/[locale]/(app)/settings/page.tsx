@@ -304,21 +304,21 @@ export default async function SettingsPage({
               ))}
             </select>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label={t('settings.phone')} name="phone" defaultValue={org.phone ?? ''} />
             <Field label={t('settings.email')} name="email" type="email" defaultValue={org.email ?? ''} />
           </div>
           <Field label={t('settings.address')} name="address" defaultValue={org.address ?? ''} />
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label={t('settings.postalCode')} name="postalCode" defaultValue={org.postal_code ?? ''} />
             <Field label={t('settings.city')} name="city" defaultValue={org.city ?? ''} />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label={t('settings.vatNumber')} name="vatNumber" defaultValue={org.vat_number ?? ''} />
             <Field label={t('settings.website')} name="website" defaultValue={org.website ?? ''} placeholder="https://" />
           </div>
           <p className="text-xs text-muted-foreground">{t('settings.ibanIntro')}</p>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label={t('settings.iban')} name="iban" defaultValue={org.iban ?? ''} />
             <Field label={t('settings.bic')} name="bic" defaultValue={org.bic ?? ''} />
           </div>

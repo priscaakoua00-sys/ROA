@@ -72,7 +72,7 @@ export function CustomerAttach() {
   if (mode === 'new') {
     return (
       <div className="space-y-3">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <label className="block space-y-1.5 text-sm">
             <span className="font-medium">{t('newCustomer.firstName')}</span>
             <input name="firstName" className={inputCls} />
@@ -81,7 +81,7 @@ export function CustomerAttach() {
             <span className="font-medium">{t('newCustomer.lastName')}</span>
             <input name="lastName" className={inputCls} />
           </label>
-          <label className="col-span-2 block space-y-1.5 text-sm">
+          <label className="block space-y-1.5 text-sm sm:col-span-2">
             <span className="font-medium">{t('newCustomer.phone')}</span>
             <input name="phone" type="tel" className={inputCls} />
           </label>

@@ -40,7 +40,7 @@ export default async function NewCustomerPage({
 
         <div className="rounded-xl border border-border bg-card p-5 shadow-soft">
           <h2 className="text-base font-semibold tracking-tight">{t('newCustomer.customer')}</h2>
-          <div className="mt-3 grid grid-cols-2 gap-3">
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label={t('newCustomer.firstName')} name="firstName" />
             <Field label={t('newCustomer.lastName')} name="lastName" />
             <Field label={t('newCustomer.phone')} name="phone" />
