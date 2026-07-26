@@ -739,7 +739,9 @@
       "convertToInvoice": "Convert to invoice",
       "convertToInvoiceHint": "The quote must be accepted before it can be converted into an invoice.",
       "viewWorkOrder": "View work order",
-      "viewInvoice": "View invoice"
+      "viewInvoice": "View invoice",
+      "publicLink": "Link for the customer",
+      "publicLinkHint": "The customer can open this link to view the quote and accept or decline it — no account needed. Setting the status to \"Sent\" also emails it automatically when an email address is known."
     },
     "quoteStatus": {
       "draft": "Draft",
@@ -929,6 +931,29 @@
       "mileage": "Mileage",
       "description": "What is wrong with your car?"
     }
+  },
+  "publicQuote": {
+    "title": "Quote {number}",
+    "greeting": "Hi {name},",
+    "greetingGeneric": "Hi,",
+    "intro": "here is the quote for your vehicle. Review the details and let us know if you approve.",
+    "vehicle": "Vehicle",
+    "validUntil": "Valid until {date}",
+    "subtotal": "Subtotal",
+    "vat": "VAT ({rate}%)",
+    "total": "Total",
+    "accept": "I approve",
+    "decline": "I don't approve",
+    "acceptedTitle": "You approved this quote",
+    "acceptedBody": "Thank you. {garage} will process the quote and schedule the work.",
+    "refusedTitle": "You declined this quote",
+    "refusedBody": "No problem. {garage} has been notified of your decision.",
+    "expiredTitle": "This quote has expired",
+    "expiredBody": "Contact {garage} for a new quote.",
+    "convertedTitle": "This quote is already being handled",
+    "convertedBody": "{garage} has already started the work.",
+    "notFound": "This quote is no longer available.",
+    "disclaimer": "Only you can respond via this link. Don't save or share it with others."
   },
   "pricing": {
     "title": "Pricing",

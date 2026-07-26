@@ -4,9 +4,26 @@ import { redirect } from 'next/navigation';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { instantiateChecklist, logStatus } from '@/data/work-orders/helpers';
+import { sendEmail } from '@/integrations/email';
+import { SITE_URL } from '@/lib/site';
 
 type Locale = 'nl' | 'en' | 'fr';
 type LineItemKind = 'part' | 'labor' | 'other';
+
+const SENT_EMAIL_COPY: Record<Locale, { subject: (n: string) => string; body: (garage: string, n: string, url: string) => string }> = {
+  nl: {
+    subject: (n) => `Uw offerte ${n}`,
+    body: (garage, n, url) => `${garage} heeft offerte ${n} voor u klaargezet. Bekijk de details en laat weten of u akkoord gaat: ${url}`,
+  },
+  en: {
+    subject: (n) => `Your quote ${n}`,
+    body: (garage, n, url) => `${garage} has prepared quote ${n} for you. Review the details and let us know if you approve: ${url}`,
+  },
+  fr: {
+    subject: (n) => `Votre devis ${n}`,
+    body: (garage, n, url) => `${garage} a préparé le devis ${n} pour vous. Consultez les détails et indiquez si vous l'acceptez : ${url}`,
+  },
+};
 
 function localeOf(formData: FormData): Locale {
   const raw = String(formData.get('locale') ?? 'nl');
@@ -125,6 +142,31 @@ export async function updateQuoteStatusAction(formData: FormData) {
 
   const supabase = await createSupabaseServerClient();
   await supabase.from('quotes').update({ status }).eq('id', quoteId);
+
+  // Marking a quote "sent" is also when the customer actually gets it: email
+  // them a link to the public quote page so they can review and respond
+  // without calling in. Best-effort — a failed email must not block saving.
+  if (status === 'sent') {
+    const { data: quote } = await supabase
+      .from('quotes')
+      .select('quote_number, organization_id, customers(email, preferred_language)')
+      .eq('id', quoteId)
+      .maybeSingle();
+    const customer = quote?.customers as unknown as { email: string | null; preferred_language: string | null } | null;
+    if (quote && customer?.email) {
+      const { data: org } = await supabase.from('organizations').select('name').eq('id', quote.organization_id).maybeSingle();
+      const lang: Locale = (['nl', 'en', 'fr'] as const).includes(customer.preferred_language as Locale)
+        ? (customer.preferred_language as Locale)
+        : locale;
+      const copy = SENT_EMAIL_COPY[lang];
+      const url = `${SITE_URL}/${lang}/quote/${quoteId}`;
+      await sendEmail({
+        to: customer.email,
+        subject: copy.subject(quote.quote_number),
+        text: copy.body(org?.name ?? 'ROAVAA', quote.quote_number, url),
+      }).catch(() => undefined);
+    }
+  }
 
   redirect(`/${locale}/quotes/${quoteId}?saved=1`);
 }

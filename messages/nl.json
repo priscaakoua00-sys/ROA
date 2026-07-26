@@ -739,7 +739,9 @@
       "convertToInvoice": "Omzetten naar factuur",
       "convertToInvoiceHint": "De offerte moet eerst geaccepteerd zijn voordat u ze kunt omzetten naar een factuur.",
       "viewWorkOrder": "Werkorder bekijken",
-      "viewInvoice": "Factuur bekijken"
+      "viewInvoice": "Factuur bekijken",
+      "publicLink": "Link voor de klant",
+      "publicLinkHint": "De klant kan deze link openen om de offerte te bekijken en te accepteren of te weigeren — geen account nodig. Bij \"Verzonden\" wordt hij ook automatisch gemaild als er een e-mailadres bekend is."
     },
     "quoteStatus": {
       "draft": "Concept",
@@ -929,6 +931,29 @@
       "mileage": "Kilometerstand",
       "description": "Wat is er met uw auto?"
     }
+  },
+  "publicQuote": {
+    "title": "Offerte {number}",
+    "greeting": "Hallo {name},",
+    "greetingGeneric": "Hallo,",
+    "intro": "hieronder vindt u de offerte voor uw voertuig. Bekijk de details en laat ons weten of u akkoord gaat.",
+    "vehicle": "Voertuig",
+    "validUntil": "Geldig tot {date}",
+    "subtotal": "Subtotaal",
+    "vat": "Btw ({rate}%)",
+    "total": "Totaal",
+    "accept": "Ik ga akkoord",
+    "decline": "Ik ga niet akkoord",
+    "acceptedTitle": "U bent akkoord gegaan",
+    "acceptedBody": "Bedankt. {garage} neemt de offerte in behandeling en plant de werkzaamheden in.",
+    "refusedTitle": "U bent niet akkoord gegaan",
+    "refusedBody": "Geen probleem. {garage} is op de hoogte gebracht van uw keuze.",
+    "expiredTitle": "Deze offerte is verlopen",
+    "expiredBody": "Neem contact op met {garage} voor een nieuwe offerte.",
+    "convertedTitle": "Deze offerte is al verwerkt",
+    "convertedBody": "{garage} is al met de werkzaamheden bezig.",
+    "notFound": "Deze offerte is niet (meer) beschikbaar.",
+    "disclaimer": "Alleen u kunt op deze link reageren. Bewaar of deel de link niet met anderen."
   },
   "pricing": {
     "title": "Prijzen",
