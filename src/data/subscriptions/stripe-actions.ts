@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { getStripeClient } from '@/integrations/stripe/client';
-import { getStripePriceId } from '@/integrations/stripe/prices';
+import { createTrialCheckoutUrl } from '@/data/subscriptions/checkout';
 import { PLANS, type PlanKey } from '@/lib/plans';
 
 type Locale = 'nl' | 'en' | 'fr';
@@ -36,56 +36,19 @@ export async function startCheckoutAction(formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const stripe = getStripeClient();
-  const priceId = getStripePriceId(planKey, 'month');
-  if (!stripe || !priceId) redirect(`/${locale}/settings?stripe=pending`);
-
   const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
   const orgId = orgs?.[0]?.id as string | undefined;
   if (!orgId) redirect(`/${locale}/onboarding`);
 
-  const { data: sub } = await supabase
-    .from('organization_subscriptions')
-    .select('provider_customer_id, trial_ends_at')
-    .eq('organization_id', orgId)
-    .maybeSingle();
-
-  let customerId = sub?.provider_customer_id ?? null;
-  if (!customerId) {
-    const customer = await stripe.customers.create({
-      email: user.email ?? undefined,
-      metadata: { organization_id: orgId },
-    });
-    customerId = customer.id;
-  }
-
-  const trialEndsAt = sub?.trial_ends_at ? new Date(sub.trial_ends_at) : null;
-  const trialEnd =
-    trialEndsAt && trialEndsAt.getTime() > Date.now()
-      ? Math.floor(trialEndsAt.getTime() / 1000)
-      : Math.floor((Date.now() + 30 * 86_400_000) / 1000);
-
-  const session = await stripe.checkout.sessions.create({
-    mode: 'subscription',
-    customer: customerId,
-    payment_method_collection: 'always',
-    line_items: [{ price: priceId, quantity: 1 }],
-    subscription_data: {
-      trial_end: trialEnd,
-      metadata: { organization_id: orgId, plan_key: planKey },
-    },
-    metadata: { organization_id: orgId, plan_key: planKey },
-    allow_promotion_codes: true,
-    success_url: `${siteUrl()}/${locale}/settings?saved=billing`,
-    cancel_url: `${siteUrl()}/${locale}/settings?stripe=cancelled`,
+  const url = await createTrialCheckoutUrl({
+    supabase,
+    orgId,
+    planKey,
+    email: user.email ?? null,
+    successPath: `/${locale}/settings?saved=billing`,
+    cancelPath: `/${locale}/settings?stripe=cancelled`,
   });
-
-  await supabase
-    .from('organization_subscriptions')
-    .update({ provider: 'stripe', provider_customer_id: customerId, plan_key: planKey })
-    .eq('organization_id', orgId);
-
-  redirect(session.url ?? `/${locale}/settings?stripe=pending`);
+  redirect(url ?? `/${locale}/settings?stripe=pending`);
 }
 
 /**

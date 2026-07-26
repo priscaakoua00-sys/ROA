@@ -18,6 +18,8 @@ interface Props {
   catalogPrice: number | null;
   firstAdmission: string | null;
   fuel: FuelKey | null;
+  powerKw: number | null;
+  massEmpty: number | null;
   isImport: boolean;
   apkExpired: boolean;
   openRecall: boolean;
@@ -46,6 +48,8 @@ export function AppraisalReport(props: Props) {
     firstAdmission: props.firstAdmission,
     mileageKm: mileage ? Number(mileage) : null,
     fuel: props.fuel,
+    powerKw: props.powerKw,
+    massEmpty: props.massEmpty,
     isImport: props.isImport,
     apkExpired: props.apkExpired,
     openRecall: props.openRecall,
@@ -119,6 +123,11 @@ export function AppraisalReport(props: Props) {
                 <div className="text-lg font-semibold tracking-tight">{money(result.max)}</div>
               </div>
             </div>
+            {result.basis === 'profile' ? (
+              <p className="mt-3 rounded-lg border border-amber-500/25 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+                {c.profileNote}
+              </p>
+            ) : null}
           </div>
 
           {/* Ruben's verdict on the asking price */}

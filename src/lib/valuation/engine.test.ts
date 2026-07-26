@@ -46,8 +46,29 @@ describe('estimateValue', () => {
     expect(r.confidence).toBe('high');
   });
 
-  it('is insufficient without a catalogue price', () => {
-    expect(estimateValue({ ...base, catalogPrice: null }).status).toBe('insufficient');
+  it('falls back to a profile-based estimate when there is no catalogue price', () => {
+    const r = estimateValue({ ...base, catalogPrice: null, powerKw: 110 });
+    expect(r.status).toBe('ok');
+    expect(r.basis).toBe('profile');
+    expect(r.breakdown[0]!.code).toBe('profile');
+    expect(r.avg).toBeGreaterThan(0);
+    expect(r.min).toBeLessThan(r.avg);
+    expect(r.avg).toBeLessThan(r.max);
+    // a profile estimate is never sold as high confidence
+    expect(r.confidence).not.toBe('high');
+  });
+
+  it('still estimates from mass, then a generic anchor, when power is unknown too', () => {
+    const fromMass = estimateValue({ ...base, catalogPrice: null, powerKw: null, massEmpty: 1_350 });
+    expect(fromMass.status).toBe('ok');
+    expect(fromMass.avg).toBeGreaterThan(0);
+    const generic = estimateValue({ ...base, catalogPrice: null, powerKw: null, massEmpty: null });
+    expect(generic.status).toBe('ok');
+    expect(generic.avg).toBeGreaterThan(0);
+  });
+
+  it('is insufficient only when the age is unknown', () => {
+    expect(estimateValue({ ...base, catalogPrice: null, firstAdmission: null }).status).toBe('insufficient');
   });
 
   it('an illogical odometer lowers the value, widens the range and flags a risk', () => {
