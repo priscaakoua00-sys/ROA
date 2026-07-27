@@ -217,7 +217,11 @@
       "openConversation": "Gesprek openen",
       "listening": "Ik luister...",
       "startListening": "Praat met Ruben",
-      "stopListening": "Opname stoppen"
+      "stopListening": "Opname stoppen",
+      "micDenied": "Microfoon geblokkeerd. Sta microfoontoegang toe in je browserinstellingen en probeer opnieuw.",
+      "micNetwork": "Verbinding te zwak voor spraakherkenning. Controleer je netwerk en probeer opnieuw, of typ je bericht.",
+      "micNoSpeech": "Ik hoorde niets. Probeer opnieuw en praat direct nadat je op de microfoon drukt.",
+      "micError": "Spraakherkenning is mislukt. Probeer opnieuw, of typ je bericht."
     },
     "newVehicle": {
       "title": "Nieuw voertuig",

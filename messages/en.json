@@ -217,7 +217,11 @@
       "openConversation": "Open conversation",
       "listening": "Listening...",
       "startListening": "Talk to Ruben",
-      "stopListening": "Stop recording"
+      "stopListening": "Stop recording",
+      "micDenied": "Microphone blocked. Allow microphone access in your browser settings, then try again.",
+      "micNetwork": "Connection too weak for voice recognition. Check your network and try again, or type your message.",
+      "micNoSpeech": "I didn't hear anything. Try again and speak right after pressing the microphone.",
+      "micError": "Voice recognition failed. Try again, or type your message."
     },
     "newVehicle": {
       "title": "New vehicle",
