@@ -137,6 +137,7 @@ const OPEN_LEAD_STATUSES = ['new', 'qualifying', 'qualified', 'appointment_propo
 const CONTEXT_LABELS: Record<
   Locale,
   {
+    now: string;
     activeWorkOrders: string;
     newLeads: string;
     apptsToday: string;
@@ -147,6 +148,7 @@ const CONTEXT_LABELS: Record<
   }
 > = {
   nl: {
+    now: 'Huidige datum en tijd (Nederland)',
     activeWorkOrders: 'Actieve werkorders',
     newLeads: 'Nieuwe aanvragen',
     apptsToday: 'Afspraken vandaag',
@@ -156,6 +158,7 @@ const CONTEXT_LABELS: Record<
     none: 'geen',
   },
   en: {
+    now: 'Current date and time (Netherlands)',
     activeWorkOrders: 'Active work orders',
     newLeads: 'New leads',
     apptsToday: 'Appointments today',
@@ -165,6 +168,7 @@ const CONTEXT_LABELS: Record<
     none: 'none',
   },
   fr: {
+    now: 'Date et heure actuelles (Pays-Bas)',
     activeWorkOrders: 'Ordres de réparation actifs',
     newLeads: 'Nouvelles demandes',
     apptsToday: "Rendez-vous aujourd'hui",
@@ -174,6 +178,20 @@ const CONTEXT_LABELS: Record<
     none: 'aucun',
   },
 };
+
+/** e.g. "maandag 27 juli 2026, 21:14" in the garage's own timezone (Netherlands). */
+function formatNowForAssistant(locale: Locale): string {
+  return new Intl.DateTimeFormat(locale, {
+    timeZone: 'Europe/Amsterdam',
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(new Date());
+}
 
 /**
  * A real-data-only snapshot of the garage's current state, handed to the AI so
@@ -247,6 +265,7 @@ async function buildAssistantContext(
   const urgentList = urgent.length > 0 ? urgent.map((u) => nameOf(u.customers)).join(', ') : l.none;
 
   return [
+    `${l.now}: ${formatNowForAssistant(locale)}`,
     `${l.activeWorkOrders}: ${activeWorkOrders ?? 0}`,
     `${l.newLeads}: ${newLeads ?? 0}`,
     `${l.apptsToday} (${appts.length}): ${apptsList}`,
