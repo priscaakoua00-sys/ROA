@@ -51,7 +51,25 @@ const UNANSWERED_PHRASES = [
   'sans réponse',
   'sans reponse',
 ];
-const GREETING_WORDS = ['hallo', 'hoi', 'hey', 'hi', 'hello', 'goedemorgen', 'goedemiddag', 'goedenavond', 'bonjour', 'salut', 'coucou'];
+const GREETING_WORDS = [
+  'hallo',
+  'hoi',
+  'hey',
+  'hi',
+  'hello',
+  'good morning',
+  'good afternoon',
+  'good evening',
+  'goedemorgen',
+  'goedemiddag',
+  'goedenavond',
+  'goedendag',
+  'bonjour',
+  'bonsoir',
+  'bonne soirée',
+  'salut',
+  'coucou',
+];
 const THANKS_WORDS = ['dank', 'bedankt', 'thanks', 'thank you', 'thx', 'merci'];
 const HOWS_MY_DAY_PHRASES = [
   'hoe gaat het',
