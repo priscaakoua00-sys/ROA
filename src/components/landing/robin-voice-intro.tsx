@@ -62,6 +62,7 @@ export function RobinVoiceIntro({ locale }: { locale: Locale }) {
     }
     synth.cancel();
     const utter = speakAsRobin(c.text, locale, voicesRef.current);
+    if (!utter) return;
     utter.onstart = () => setPlaying(true);
     utter.onend = () => setPlaying(false);
     utter.onerror = () => setPlaying(false);

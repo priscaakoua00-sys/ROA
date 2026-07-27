@@ -52,12 +52,13 @@ function qualityScore(voice: SpeechSynthesisVoice): number {
 }
 
 /**
- * Picks Ruben's voice for a locale. Gender takes strict priority over voice
- * "quality" hints: a named male voice always wins over an unnamed/generic
- * one, which in turn always wins over an explicitly female-named voice — so
- * a generic "Google français"-style entry never outranks an actual male
- * voice just because it matched a quality regex. Ruben must sound like the
- * same person in every language.
+ * Picks Ruben's voice for a locale. Never returns a female-named voice: if
+ * the device has no male-named voice for this language, we fall back to an
+ * unnamed/generic one (quality hints break the tie) rather than let Ruben's
+ * identity flip to a different gender per language — that inconsistency is
+ * worse than the feature staying silent, so a caller that gets `null` back
+ * must not speak at all instead of falling through to the browser's
+ * unfiltered default voice.
  */
 export function pickVoice(voices: SpeechSynthesisVoice[], locale: Locale): SpeechSynthesisVoice | null {
   const prefix = LANG_PREFIX[locale];
@@ -67,21 +68,26 @@ export function pickVoice(voices: SpeechSynthesisVoice[], locale: Locale): Speec
   const byGender: Record<Gender, SpeechSynthesisVoice[]> = { male: [], unknown: [], female: [] };
   for (const v of candidates) byGender[genderOf(v)].push(v);
 
-  const pool = byGender.male.length > 0 ? byGender.male : byGender.unknown.length > 0 ? byGender.unknown : byGender.female;
+  const pool = byGender.male.length > 0 ? byGender.male : byGender.unknown;
+  if (pool.length === 0) return null;
   return pool.slice().sort((a, b) => qualityScore(b) - qualityScore(a))[0]!;
 }
 
 /**
  * Speaks a line with Ruben's voice settings (calm, mature, slightly grave —
  * never the default robotic cadence). Always user-triggered by the caller;
- * never called on page load.
+ * never called on page load. Returns `null` when no acceptable (male or
+ * gender-unknown) system voice exists for this locale on this device —
+ * callers must treat that as "voice unsupported here" and stay silent,
+ * rather than let the browser fall back to its unfiltered default voice.
  */
-export function speakAsRobin(text: string, locale: Locale, voices: SpeechSynthesisVoice[]): SpeechSynthesisUtterance {
+export function speakAsRobin(text: string, locale: Locale, voices: SpeechSynthesisVoice[]): SpeechSynthesisUtterance | null {
   const synth = window.speechSynthesis;
-  const utter = new SpeechSynthesisUtterance(text);
   const voice = pickVoice(voices.length > 0 ? voices : synth.getVoices(), locale);
-  if (voice) utter.voice = voice;
-  utter.lang = voice?.lang ?? `${LANG_PREFIX[locale]}-${LANG_PREFIX[locale].toUpperCase()}`;
+  if (!voice) return null;
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.voice = voice;
+  utter.lang = voice.lang;
   utter.rate = 0.92;
   utter.pitch = 0.82;
   utter.volume = 1;

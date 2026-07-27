@@ -99,7 +99,7 @@ export function HeroCarExperience({ locale }: { locale: Locale }) {
     window.speechSynthesis?.cancel();
     setTimeout(() => {
       const utter = speakAsRobin(c.doorLine, locale, voicesRef.current);
-      window.speechSynthesis?.speak(utter);
+      if (utter) window.speechSynthesis?.speak(utter);
     }, 300);
   }, [muted, c.doorLine, locale, recordedSrc]);
 

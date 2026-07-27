@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { RevenueChart } from '@/components/dashboard/revenue-chart';
+import { DashboardGreeting } from '@/components/dashboard/greeting';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { signOutAction } from '@/data/auth/actions';
 import { loadFollowUpsDueCount } from '@/data/automations/due';
@@ -265,9 +266,9 @@ export default async function DashboardPage({
 
   const rawName = profileData?.full_name || (user.email ? user.email.split('@')[0] : '');
   const name = rawName ? rawName.charAt(0).toUpperCase() + rawName.slice(1) : '';
-  const hour = (new Date().getUTCHours() + 2) % 24;
-  const period = hour < 12 ? 'Morning' : hour < 18 ? 'Afternoon' : 'Evening';
-  const greeting = t(`dashboard.greet${period}`, { name });
+  const greetingMorning = t('dashboard.greetMorning', { name });
+  const greetingAfternoon = t('dashboard.greetAfternoon', { name });
+  const greetingEvening = t('dashboard.greetEvening', { name });
 
   const firstWaitingId = waiting[0]?.id;
 
@@ -442,7 +443,9 @@ export default async function DashboardPage({
               {t('dashboard.robinName')}
             </div>
           </div>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight">{greeting}</h1>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight">
+            <DashboardGreeting morning={greetingMorning} afternoon={greetingAfternoon} evening={greetingEvening} />
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">{t('dashboard.briefing.startedWorking')}</p>
 
           {handledChips.length > 0 ? (
