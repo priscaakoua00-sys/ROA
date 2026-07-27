@@ -19,7 +19,7 @@ interface MinimalSpeechRecognition extends EventTarget {
   start(): void;
   stop(): void;
   onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
-  onerror: (() => void) | null;
+  onerror: ((event: { error: string }) => void) | null;
   onend: (() => void) | null;
 }
 
@@ -72,6 +72,7 @@ export function RobinChat({ orgId }: { orgId: string }) {
   const recognitionRef = useRef<MinimalSpeechRecognition | null>(null);
   const [speechSupported, setSpeechSupported] = useState(false);
   const [listening, setListening] = useState(false);
+  const [micError, setMicError] = useState<string | null>(null);
 
   useEffect(() => {
     const SpeechRecognitionCtor =
@@ -80,6 +81,13 @@ export function RobinChat({ orgId }: { orgId: string }) {
       (window as unknown as { webkitSpeechRecognition?: new () => MinimalSpeechRecognition }).webkitSpeechRecognition;
     setSpeechSupported(Boolean(SpeechRecognitionCtor));
   }, []);
+
+  function micErrorMessage(code: string): string {
+    if (code === 'not-allowed' || code === 'permission-denied' || code === 'service-not-allowed') return t('micDenied');
+    if (code === 'network') return t('micNetwork');
+    if (code === 'no-speech') return t('micNoSpeech');
+    return t('micError');
+  }
 
   function toggleListening() {
     if (listening) {
@@ -92,6 +100,7 @@ export function RobinChat({ orgId }: { orgId: string }) {
       (window as unknown as { webkitSpeechRecognition?: new () => MinimalSpeechRecognition }).webkitSpeechRecognition;
     if (!SpeechRecognitionCtor) return;
 
+    setMicError(null);
     const recognition = new SpeechRecognitionCtor();
     recognition.lang = SPEECH_LANG[locale] ?? 'en-US';
     recognition.interimResults = false;
@@ -100,11 +109,21 @@ export function RobinChat({ orgId }: { orgId: string }) {
       const transcript = event.results[0]?.[0]?.transcript ?? '';
       if (transcript) setInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
     };
-    recognition.onerror = () => setListening(false);
+    recognition.onerror = (event) => {
+      setMicError(micErrorMessage(event.error));
+      setListening(false);
+    };
     recognition.onend = () => setListening(false);
     recognitionRef.current = recognition;
     setListening(true);
-    recognition.start();
+    try {
+      recognition.start();
+    } catch {
+      // Some browsers throw synchronously (e.g. a recognition session is
+      // already active) instead of firing onerror.
+      setMicError(t('micError'));
+      setListening(false);
+    }
   }
 
   // Draggable launcher (mobile only — see handlePointerDown). `dragPos` is null
@@ -369,8 +388,10 @@ export function RobinChat({ orgId }: { orgId: string }) {
               e.preventDefault();
               ask(input);
             }}
-            className="flex items-center gap-2 border-t border-border p-3"
+            className="border-t border-border p-3"
           >
+            {micError ? <p className="mb-2 text-xs text-destructive">{micError}</p> : null}
+            <div className="flex items-center gap-2">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -391,6 +412,7 @@ export function RobinChat({ orgId }: { orgId: string }) {
             <Button type="submit" size="icon" disabled={isPending || !input.trim()} aria-label={t('send')}>
               <Send className="size-4" aria-hidden />
             </Button>
+            </div>
           </form>
         </div>
       </div>

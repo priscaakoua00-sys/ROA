@@ -217,7 +217,11 @@
       "openConversation": "Ouvrir la conversation",
       "listening": "Je vous écoute...",
       "startListening": "Parler à Ruben",
-      "stopListening": "Arrêter l'enregistrement"
+      "stopListening": "Arrêter l'enregistrement",
+      "micDenied": "Micro bloqué. Autorisez l'accès au micro dans les réglages de votre navigateur, puis réessayez.",
+      "micNetwork": "Connexion trop faible pour la reconnaissance vocale. Vérifiez votre réseau et réessayez, ou tapez votre message.",
+      "micNoSpeech": "Je n'ai rien entendu. Réessayez en parlant juste après avoir appuyé sur le micro.",
+      "micError": "La reconnaissance vocale a échoué. Réessayez, ou tapez votre message."
     },
     "newVehicle": {
       "title": "Nouveau véhicule",
