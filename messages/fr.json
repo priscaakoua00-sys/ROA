@@ -321,7 +321,23 @@
         "won": "Gagné",
         "lost": "Perdu",
         "archived": "Archivé"
-      }
+      },
+      "filters": {
+        "all": "Toutes",
+        "new": "Nouvelles",
+        "urgent": "Urgentes",
+        "scheduled": "Planifiées",
+        "done": "Terminées"
+      },
+      "vehicleUnknown": "Véhicule non précisé",
+      "agoMinutes": "Il y a {count} min",
+      "agoHours": "Il y a {count} h",
+      "agoDays": "Il y a {count} j",
+      "actionCall": "Appeler",
+      "actionWhatsapp": "WhatsApp",
+      "actionSchedule": "Planifier",
+      "actionAccept": "Accepter",
+      "actionRefuse": "Refuser"
     },
     "lead": {
       "back": "Retour à la vue d'ensemble",

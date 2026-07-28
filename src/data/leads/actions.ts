@@ -7,6 +7,18 @@ import { qualifyLead } from './qualify';
 
 type Locale = 'nl' | 'en' | 'fr';
 
+/** Quick-action from the leads list: decline a request without opening it. */
+export async function refuseLeadAction(formData: FormData) {
+  const locale = String(formData.get('locale') ?? 'nl');
+  const leadId = String(formData.get('leadId') ?? '');
+  const back = String(formData.get('back') ?? `/${locale}/leads`);
+  if (!leadId) redirect(back);
+
+  const supabase = await createSupabaseServerClient();
+  await supabase.from('leads').update({ status: 'lost' }).eq('id', leadId);
+  redirect(back);
+}
+
 export async function submitPublicRequestAction(formData: FormData) {
   const slug = String(formData.get('slug') ?? '').trim();
   const rawLang = String(formData.get('language') ?? 'nl');
