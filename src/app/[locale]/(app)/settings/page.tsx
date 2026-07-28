@@ -22,6 +22,15 @@ import {
 import { createAdditionalOrgAction } from '@/data/organizations/actions';
 import { getActiveOrgId, listUserOrgs } from '@/data/organizations/active';
 import { getCurrentRole, roleHas } from '@/lib/roles';
+import {
+  createApiKeyAction,
+  revokeApiKeyAction,
+  createWebhookEndpointAction,
+  deleteWebhookEndpointAction,
+  toggleWebhookEndpointAction,
+} from '@/data/developer/actions';
+import { loadApiKeys, loadWebhookEndpoints } from '@/data/developer/list';
+import { formatDateTimeUTC } from '@/lib/datetime';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
@@ -58,11 +67,19 @@ export default async function SettingsPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ saved?: string; error?: string; stripe?: string; security?: string; mfaError?: string }>;
+  searchParams: Promise<{
+    saved?: string;
+    error?: string;
+    stripe?: string;
+    security?: string;
+    mfaError?: string;
+    newApiKey?: string;
+    newWebhookSecret?: string;
+  }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { saved, error, stripe, security, mfaError } = await searchParams;
+  const { saved, error, stripe, security, mfaError, newApiKey, newWebhookSecret } = await searchParams;
   const t = await getTranslations('app');
   const tPricing = await getTranslations('pricing');
 
@@ -130,6 +147,12 @@ export default async function SettingsPage({
   // layer (organizations_update_admin) — manager gets services/hours/
   // checklist (below) but not this section.
   const canManageCompany = role === 'owner' || role === 'admin';
+  // API keys and webhooks grant broad programmatic access to org data, so
+  // they're gated at the same owner/admin tier as company identity — not
+  // extended to manager like the general manage_settings capability.
+  const [apiKeys, webhookEndpoints] = canManageCompany
+    ? await Promise.all([loadApiKeys(supabase, org.id), loadWebhookEndpoints(supabase, org.id)])
+    : [[], []];
   const currentPlan = PLANS.find((p) => p.key === subscription.planKey) ?? PLANS[0]!;
   const trialDaysLeft = subscription.trialEndsAt
     ? Math.max(0, Math.ceil((new Date(subscription.trialEndsAt).getTime() - Date.now()) / 86_400_000))
@@ -637,6 +660,163 @@ export default async function SettingsPage({
           </>
         ) : (
           <p className="mt-3 text-sm text-muted-foreground">{t('settings.readOnlyNotice')}</p>
+        )}
+      </section>
+
+      {/* Developers: API keys + outbound webhooks */}
+      <section id="developers" className="mt-6 scroll-mt-20 rounded-xl border border-border bg-card p-6 shadow-soft">
+        <h2 className="text-base font-semibold tracking-tight">{t('settings.developersTitle')}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t('settings.developersIntro')}</p>
+
+        {canManageCompany ? (
+          <>
+            {newApiKey ? (
+              <div className="mt-4 rounded-lg border border-gold/30 bg-gold/5 p-4">
+                <p className="text-sm font-semibold">{t('settings.apiKeyCreatedTitle')}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{t('settings.apiKeyCreatedIntro')}</p>
+                <p className="mt-2 select-all break-all rounded-md bg-background px-2 py-1.5 font-mono text-xs">{newApiKey}</p>
+              </div>
+            ) : null}
+
+            {/* API keys */}
+            <div className="mt-4 border-t border-border pt-4">
+              <h3 className="text-sm font-semibold">{t('settings.apiKeysTitle')}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">{t('settings.apiKeysIntro')}</p>
+
+              {apiKeys.length > 0 ? (
+                <ul className="mt-3 space-y-2">
+                  {apiKeys.map((key) => (
+                    <li
+                      key={key.id}
+                      className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-background p-3 text-sm"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate font-medium">{key.name}</p>
+                        <p className="font-mono text-xs text-muted-foreground">{key.keyPrefix}…</p>
+                        <p className="text-xs text-muted-foreground">
+                          {key.lastUsedAt
+                            ? t('settings.apiKeyLastUsed', { date: formatDateTimeUTC(key.lastUsedAt, locale) })
+                            : t('settings.apiKeyNeverUsed')}
+                        </p>
+                      </div>
+                      {key.revokedAt ? (
+                        <Badge variant="muted">{t('settings.apiKeyRevoked')}</Badge>
+                      ) : (
+                        <form action={revokeApiKeyAction}>
+                          <input type="hidden" name="locale" value={locale} />
+                          <input type="hidden" name="keyId" value={key.id} />
+                          <Button type="submit" variant="outline" size="sm">{t('settings.apiKeyRevoke')}</Button>
+                        </form>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+
+              <form action={createApiKeyAction} className="mt-3 flex flex-wrap items-end gap-2 border-t border-border pt-3">
+                <input type="hidden" name="locale" value={locale} />
+                <div className="min-w-[150px] flex-1">
+                  <Field label={t('settings.apiKeyNewLabel')} name="name" placeholder={t('settings.apiKeyNamePlaceholder')} required />
+                </div>
+                <Button type="submit" variant="outline" size="sm">{t('settings.apiKeyCreate')}</Button>
+              </form>
+            </div>
+
+            {/* Webhooks */}
+            <div className="mt-4 border-t border-border pt-4">
+              <h3 className="text-sm font-semibold">{t('settings.webhooksTitle')}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">{t('settings.webhooksIntro')}</p>
+
+              {webhookEndpoints.length > 0 ? (
+                <ul className="mt-3 space-y-2">
+                  {webhookEndpoints.map((endpoint) => (
+                    <li key={endpoint.id} className="rounded-lg border border-border bg-background p-3 text-sm">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="min-w-0 truncate font-mono text-xs">{endpoint.url}</p>
+                        <Badge variant={endpoint.enabled ? 'success' : 'muted'}>
+                          {endpoint.enabled ? t('settings.webhookEnabled') : t('settings.webhookDisabled')}
+                        </Badge>
+                      </div>
+                      <div className="mt-1.5 flex flex-wrap gap-1.5">
+                        {endpoint.eventTypes.map((ev) => (
+                          <span
+                            key={ev}
+                            className="rounded-full border border-border bg-card px-2 py-0.5 text-[11px] text-muted-foreground"
+                          >
+                            {t(`settings.webhookEvent.${ev}`)}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="mt-2 flex justify-end gap-2">
+                        <form action={toggleWebhookEndpointAction}>
+                          <input type="hidden" name="locale" value={locale} />
+                          <input type="hidden" name="endpointId" value={endpoint.id} />
+                          <input type="hidden" name="enabled" value={String(endpoint.enabled)} />
+                          <Button type="submit" variant="outline" size="sm">
+                            {endpoint.enabled ? t('settings.webhookDisable') : t('settings.webhookEnable')}
+                          </Button>
+                        </form>
+                        <form id={`delete-webhook-${endpoint.id}`} action={deleteWebhookEndpointAction}>
+                          <input type="hidden" name="locale" value={locale} />
+                          <input type="hidden" name="endpointId" value={endpoint.id} />
+                        </form>
+                        <ConfirmDeleteButton
+                          formId={`delete-webhook-${endpoint.id}`}
+                          triggerLabel={t('settings.delete')}
+                          title={t('common.confirmDeleteTitle')}
+                          description={t('settings.webhookDeleteConfirm')}
+                          cancelLabel={t('common.cancel')}
+                          confirmLabel={t('common.confirm')}
+                        />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+
+              {newWebhookSecret ? (
+                <div className="mt-3 rounded-lg border border-gold/30 bg-gold/5 p-4">
+                  <p className="text-sm font-semibold">{t('settings.webhookSecretCreatedTitle')}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{t('settings.webhookSecretCreatedIntro')}</p>
+                  <p className="mt-2 select-all break-all rounded-md bg-background px-2 py-1.5 font-mono text-xs">{newWebhookSecret}</p>
+                </div>
+              ) : null}
+
+              <form action={createWebhookEndpointAction} className="mt-3 space-y-2 border-t border-border pt-3">
+                <input type="hidden" name="locale" value={locale} />
+                <Field label={t('settings.webhookUrlLabel')} name="url" type="url" placeholder="https://" required />
+                <div className="flex flex-wrap gap-3 text-sm">
+                  {(['lead.created', 'work_order.status_changed', 'invoice.paid'] as const).map((ev) => (
+                    <label key={ev} className="flex items-center gap-1.5">
+                      <input type="checkbox" name="eventTypes" value={ev} />
+                      {t(`settings.webhookEvent.${ev}`)}
+                    </label>
+                  ))}
+                </div>
+                <div className="flex justify-end">
+                  <Button type="submit" variant="outline" size="sm">{t('settings.webhookCreate')}</Button>
+                </div>
+              </form>
+            </div>
+
+            {/* Docs */}
+            <div className="mt-4 border-t border-border pt-4">
+              <h3 className="text-sm font-semibold">{t('settings.apiDocsTitle')}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">{t('settings.apiDocsIntro')}</p>
+              <pre className="mt-2 overflow-x-auto rounded-md bg-background p-3 text-xs">
+{`Authorization: Bearer rk_live_...
+
+GET  /api/v1/vehicles
+GET  /api/v1/customers
+GET  /api/v1/work-orders
+GET  /api/v1/invoices
+POST /api/v1/leads`}
+              </pre>
+              <p className="mt-2 text-xs text-muted-foreground">{t('settings.apiDocsSignature')}</p>
+            </div>
+          </>
+        ) : (
+          <p className="mt-4 text-sm text-muted-foreground">{t('settings.readOnlyNotice')}</p>
         )}
       </section>
     </div>
