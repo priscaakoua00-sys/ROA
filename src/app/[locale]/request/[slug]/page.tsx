@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Field } from '@/components/auth/auth-shell';
-import { Button } from '@/components/ui/button';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { submitPublicRequestAction } from '@/data/leads/actions';
+import { SmartRequestFields } from '@/components/leads/smart-request-fields';
 
 export const dynamic = 'force-dynamic';
 
@@ -71,26 +71,9 @@ export default async function PublicRequestPage({
           <Field label={t('fields.phone')} name="phone" type="tel" autoComplete="tel" />
           <Field label={t('fields.email')} name="email" type="email" autoComplete="email" />
         </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <Field label={t('fields.licensePlate')} name="licensePlate" />
-          <Field label={t('fields.make')} name="make" />
-          <Field label={t('fields.model')} name="model" />
-        </div>
         <Field label={t('fields.mileage')} name="mileage" type="number" />
 
-        <label className="block space-y-1.5">
-          <span className="text-sm font-medium">{t('fields.description')}</span>
-          <textarea
-            name="description"
-            required
-            rows={4}
-            placeholder={t('descriptionPlaceholder')}
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
-          />
-        </label>
-
-        <Button type="submit" className="w-full">{t('submit')}</Button>
-        <p className="text-center text-xs text-muted-foreground">{t('privacy')}</p>
+        <SmartRequestFields submitLabel={t('submit')} privacyText={t('privacy')} />
       </form>
     </main>
   );
