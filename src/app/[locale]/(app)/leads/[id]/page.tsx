@@ -16,6 +16,7 @@ import { Link } from '@/i18n/navigation';
 import { PhotoDiagnosisPanel, type DiagnosisRow } from '@/components/diagnosis/photo-diagnosis-panel';
 import type { DiagnosisSeverity, VehicleAngle } from '@/integrations/ai';
 import { FlashToast } from '@/components/flash-toast';
+import { RelatedArticles } from '@/components/knowledge/related-articles';
 
 type Urgency = 'low' | 'normal' | 'high' | 'critical';
 const URGENCY_VARIANT: Record<Urgency, 'muted' | 'default' | 'gold' | 'urgent'> = {
@@ -239,6 +240,8 @@ export default async function LeadDetailPage({
           </div>
         </div>
       </div>
+
+      <RelatedArticles orgId={lead.organization_id} query={lead.ai_summary ?? lead.description ?? ''} />
 
       {booked ? (
         <div className="mt-4 rounded-xl border border-success/30 bg-success/10 p-4 text-sm">
