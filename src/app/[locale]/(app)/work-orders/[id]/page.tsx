@@ -15,6 +15,8 @@ import {
   generateRepairReportAction,
 } from '@/data/work-orders/actions';
 import { saveReportAsArticleAction } from '@/data/knowledge/actions';
+import { recordPartUsageAction } from '@/data/inventory/actions';
+import { loadParts } from '@/data/inventory/list';
 import { RelatedArticles } from '@/components/knowledge/related-articles';
 import { getWorkOrderTimeline } from '@/data/timeline/build';
 import { Button } from '@/components/ui/button';
@@ -76,11 +78,12 @@ export default async function WorkOrderDetailPage({
     diagSaved?: string;
     diagError?: string;
     articleSaved?: string;
+    partSaved?: string;
   }>;
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  const { error, reportSaved, reportError, diagSaved, diagError, articleSaved } = await searchParams;
+  const { error, reportSaved, reportError, diagSaved, diagError, articleSaved, partSaved } = await searchParams;
   const t = await getTranslations('app');
 
   const supabase = await createSupabaseServerClient();
@@ -106,6 +109,8 @@ export default async function WorkOrderDetailPage({
     { data: reportData },
     { data: diagData },
     timeline,
+    parts,
+    { data: partUsageData },
   ] = await Promise.all([
     supabase.from('work_order_tasks').select('id, description, done').eq('work_order_id', id).order('created_at', { ascending: true }),
     supabase.rpc('org_members', { p_org: wo.organization_id }),
@@ -130,9 +135,22 @@ export default async function WorkOrderDetailPage({
       .eq('work_order_id', id)
       .order('created_at', { ascending: false }),
     getWorkOrderTimeline(supabase, id),
+    loadParts(supabase, wo.organization_id),
+    supabase
+      .from('part_movements')
+      .select('id, quantity, created_at, parts(name, unit)')
+      .eq('work_order_id', id)
+      .eq('reason', 'usage')
+      .order('created_at', { ascending: false }),
   ]);
 
   const tasks = (taskData ?? []) as Task[];
+  const partUsage = (partUsageData ?? []) as unknown as {
+    id: string;
+    quantity: number;
+    created_at: string;
+    parts: { name: string; unit: string } | null;
+  }[];
   const checklist = (checklistData ?? []) as ChecklistItem[];
   const members = ((memData ?? []) as {
     user_id: string | null;
@@ -237,7 +255,9 @@ export default async function WorkOrderDetailPage({
               ? t('diagnosis.saved')
               : articleSaved === '1'
                 ? t('knowledge.articleSaved')
-                : null
+                : partSaved === '1'
+                  ? t('inventory.saved')
+                  : null
         }
         error={
           reportError === 'empty'
@@ -474,6 +494,53 @@ export default async function WorkOrderDetailPage({
           </div>
           <Button type="submit" variant="outline" size="sm">{t('workOrders.addTask')}</Button>
         </form>
+      </section>
+
+      {/* Parts used */}
+      <section className="mt-6">
+        <h2 className="text-base font-semibold tracking-tight">{t('inventory.partsUsedTitle')}</h2>
+        {partUsage.length === 0 ? (
+          <p className="mt-2 text-sm text-muted-foreground">{t('inventory.noPartsUsed')}</p>
+        ) : (
+          <ul className="mt-2 space-y-1.5">
+            {partUsage.map((u) => (
+              <li key={u.id} className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2 text-sm shadow-soft">
+                <span>{u.parts?.name ?? '—'}</span>
+                <span className="text-muted-foreground">
+                  {Math.abs(u.quantity)} {u.parts?.unit}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {parts.length > 0 ? (
+          <form action={recordPartUsageAction} className="mt-3 flex flex-wrap items-end gap-2">
+            <input type="hidden" name="locale" value={locale} />
+            <input type="hidden" name="workOrderId" value={wo.id} />
+            <div className="min-w-[160px] flex-1">
+              <label className="mb-1 block text-sm font-medium">{t('inventory.usePartLabel')}</label>
+              <select
+                name="partId"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                {parts.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} ({p.quantity_on_hand} {p.unit})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="w-24">
+              <Field label={t('inventory.usePartQuantity')} name="quantity" type="number" step="0.01" min="0.01" defaultValue="1" required />
+            </div>
+            <Button type="submit" variant="outline" size="sm">{t('inventory.usePartSubmit')}</Button>
+          </form>
+        ) : (
+          <p className="mt-3 text-xs text-muted-foreground">
+            <Link href="/inventory" className="text-gold hover:underline">{t('inventory.noPartsAvailable')}</Link>
+          </p>
+        )}
       </section>
     </div>
   );

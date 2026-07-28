@@ -21,6 +21,7 @@ import {
   TrendingDown,
   Users,
   UserX,
+  Package,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import QRCode from 'qrcode';
@@ -33,6 +34,7 @@ import { signOutAction } from '@/data/auth/actions';
 import { loadFollowUpsDueCount } from '@/data/automations/due';
 import { computeRobinInsight } from '@/data/robin/insight';
 import { customerStatus } from '@/data/customers/status';
+import { countLowStockParts } from '@/data/inventory/list';
 import { getModuleImageSrc } from '@/lib/module-images';
 import { formatDateTimeUTC } from '@/lib/datetime';
 import { formatCurrency } from '@/lib/pricing';
@@ -262,6 +264,7 @@ export default async function DashboardPage({
     { data: allWorkOrdersData },
     { data: allInvoicesData },
     { data: allPaymentsData },
+    lowStockCount,
   ] = await Promise.all([
     supabase.from('invoice_payments').select('amount').eq('organization_id', org.id).gte('paid_at', monthStartISO),
     supabase.from('invoice_payments').select('amount, paid_at').eq('organization_id', org.id).gte('paid_at', last14DaysStart),
@@ -275,6 +278,7 @@ export default async function DashboardPage({
     supabase.from('work_orders').select('customer_id, created_at').eq('organization_id', org.id),
     supabase.from('invoices').select('customer_id, status, due_date').eq('organization_id', org.id),
     supabase.from('invoice_payments').select('amount, invoices(customer_id)').eq('organization_id', org.id),
+    countLowStockParts(supabase, org.id),
   ]);
 
   // "Clients inactifs": same rule as the Customers page (data/customers/status.ts),
@@ -429,6 +433,7 @@ export default async function DashboardPage({
     { icon: Clock, label: t('dashboard.notifFollowups'), value: followUpsDue, href: '/automations', tone: 'default' },
     { icon: Receipt, label: t('dashboard.notifInvoices'), value: invoicesToPrepare, href: '/invoices', tone: 'default' },
     { icon: UserX, label: t('dashboard.notifInactiveCustomers'), value: inactiveCustomersCount, href: '/customers?filter=inactive', tone: 'default' },
+    { icon: Package, label: t('dashboard.notifLowStock'), value: lowStockCount, href: '/inventory', tone: 'urgent' },
   ];
 
   const metrics: { label: string; value: string | number }[] = [
