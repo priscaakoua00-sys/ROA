@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -22,8 +23,7 @@ export async function markNotificationReadAction(formData: FormData) {
 export async function markAllNotificationsReadAction(formData: FormData) {
   const locale = localeOf(formData);
   const supabase = await createSupabaseServerClient();
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const orgId = orgs?.[0]?.id;
+  const orgId = await getActiveOrgId(supabase);
   if (orgId) {
     await supabase
       .from('notifications')

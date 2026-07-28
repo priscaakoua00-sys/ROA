@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { listUserOrgs, getActiveOrgId } from '@/data/organizations/active';
 import { AppShell } from '@/components/app-shell/app-shell';
 
 /** The authenticated app is private per-organization data — never indexable. */
@@ -30,17 +31,18 @@ export default async function AppLayout({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const [{ data: orgs }, { data: profile }] = await Promise.all([
-    supabase.from('organizations').select('id, name').limit(1),
+  const [orgs, { data: profile }] = await Promise.all([
+    listUserOrgs(supabase),
     supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle(),
   ]);
-  const org = orgs?.[0];
-  if (!org) redirect(`/${locale}/onboarding`);
+  if (orgs.length === 0) redirect(`/${locale}/onboarding`);
+  const activeOrgId = await getActiveOrgId(supabase);
+  const activeOrg = orgs.find((o) => o.id === activeOrgId) ?? orgs[0]!;
 
   const displayName = profile?.full_name || user.email?.split('@')[0] || '';
 
   return (
-    <AppShell orgName={org.name} locale={locale} displayName={displayName}>
+    <AppShell orgName={activeOrg.name} orgs={orgs} activeOrgId={activeOrg.id} locale={locale} displayName={displayName}>
       {children}
     </AppShell>
   );

@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import {
   inviteMemberAction,
   updateMemberRoleAction,
@@ -56,11 +57,10 @@ export default async function TeamPage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: orgs } = await supabase.from('organizations').select('id, name').limit(1);
-  const org = orgs?.[0];
-  if (!org) redirect(`/${locale}/onboarding`);
+  const orgId = await getActiveOrgId(supabase);
+  if (!orgId) redirect(`/${locale}/onboarding`);
 
-  const { data } = await supabase.rpc('org_members', { p_org: org.id });
+  const { data } = await supabase.rpc('org_members', { p_org: orgId });
   const members = (data ?? []) as Member[];
   const me = members.find((m) => m.user_id === user.id);
   const canManage = me?.role === 'owner' || me?.role === 'admin';
@@ -71,16 +71,16 @@ export default async function TeamPage({
   const todayEnd = new Date(todayStart.getTime() + 24 * 3_600_000);
 
   const [{ data: woRows }, { data: apptRows }, { data: paymentRows }] = await Promise.all([
-    supabase.from('work_orders').select('id, status, assigned_to').eq('organization_id', org.id).not('assigned_to', 'is', null),
+    supabase.from('work_orders').select('id, status, assigned_to').eq('organization_id', orgId).not('assigned_to', 'is', null),
     supabase
       .from('appointments')
       .select('assigned_to')
-      .eq('organization_id', org.id)
+      .eq('organization_id', orgId)
       .neq('status', 'cancelled')
       .gte('starts_at', todayStart.toISOString())
       .lt('starts_at', todayEnd.toISOString())
       .not('assigned_to', 'is', null),
-    supabase.from('invoice_payments').select('amount, invoices(work_order_id)').eq('organization_id', org.id),
+    supabase.from('invoice_payments').select('amount, invoices(work_order_id)').eq('organization_id', orgId),
   ]);
 
   const workOrders = (woRows ?? []) as { id: string; status: string; assigned_to: string }[];

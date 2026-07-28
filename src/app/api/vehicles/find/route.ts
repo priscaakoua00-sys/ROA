@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import { normalizePlate } from '@/integrations/rdw/client';
 
 /**
@@ -18,8 +19,7 @@ export async function GET(request: Request) {
   const target = normalizePlate(new URL(request.url).searchParams.get('plate') ?? '');
   if (target.length < 4) return NextResponse.json({ id: null });
 
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const orgId = orgs?.[0]?.id;
+  const orgId = await getActiveOrgId(supabase);
   if (!orgId) return NextResponse.json({ id: null });
 
   // Plates may be stored with separators ("6-XKD-69"), so normalize both sides.

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 
 export interface CustomerHit {
   id: string;
@@ -19,8 +20,7 @@ export async function GET(request: Request) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ customers: [] }, { status: 401 });
 
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const orgId = orgs?.[0]?.id;
+  const orgId = await getActiveOrgId(supabase);
   if (!orgId) return NextResponse.json({ customers: [] });
 
   const q = (new URL(request.url).searchParams.get('q') ?? '').trim();

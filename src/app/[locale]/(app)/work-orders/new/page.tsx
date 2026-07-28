@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import { createManualWorkOrderAction } from '@/data/work-orders/actions';
 import { Button } from '@/components/ui/button';
 import { SubmitButton } from '@/components/ui/submit-button';
@@ -49,9 +50,8 @@ export default async function NewWorkOrderPage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const org = orgs?.[0];
-  if (!org) redirect(`/${locale}/onboarding`);
+  const orgId = await getActiveOrgId(supabase);
+  if (!orgId) redirect(`/${locale}/onboarding`);
 
   const name = (c: Customer) =>
     [c.first_name, c.last_name].filter(Boolean).join(' ') || t('leads.anonymous');
@@ -61,7 +61,7 @@ export default async function NewWorkOrderPage({
       .from('customers')
       .select('id, first_name, last_name, phone, email')
       .eq('id', customerId)
-      .eq('organization_id', org.id)
+      .eq('organization_id', orgId)
       .maybeSingle();
 
     if (customer) {
@@ -71,7 +71,7 @@ export default async function NewWorkOrderPage({
           .select('id, license_plate, make, model')
           .eq('customer_id', customer.id)
           .order('created_at', { ascending: false }),
-        supabase.rpc('org_members', { p_org: org.id }),
+        supabase.rpc('org_members', { p_org: orgId }),
       ]);
       const vehicles = (vehicleRows ?? []) as Vehicle[];
       const members = ((memData ?? []) as Member[]).filter((m) => m.status === 'active' && m.user_id);
@@ -150,7 +150,7 @@ export default async function NewWorkOrderPage({
   const { data } = await supabase
     .from('customers')
     .select('id, first_name, last_name, phone, email')
-    .eq('organization_id', org.id)
+    .eq('organization_id', orgId)
     .eq('archived', false)
     .order('created_at', { ascending: false })
     .limit(200);

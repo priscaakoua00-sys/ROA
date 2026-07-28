@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import {
   markNotificationReadAction,
   markAllNotificationsReadAction,
@@ -37,14 +38,13 @@ export default async function NotificationsPage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const org = orgs?.[0];
-  if (!org) redirect(`/${locale}/onboarding`);
+  const orgId = await getActiveOrgId(supabase);
+  if (!orgId) redirect(`/${locale}/onboarding`);
 
   const { data } = await supabase
     .from('notifications')
     .select('id, type, title, body, lead_id, read, created_at')
-    .eq('organization_id', org.id)
+    .eq('organization_id', orgId)
     .order('read', { ascending: true })
     .order('created_at', { ascending: false })
     .limit(50);

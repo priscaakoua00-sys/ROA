@@ -6,6 +6,7 @@ import { isAppLocale, routing } from '@/i18n/routing';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import { RobinChat } from '@/components/robin-chat';
 import { SITE_URL } from '@/lib/site';
 import '../globals.css';
@@ -20,8 +21,7 @@ async function currentOrgId(): Promise<string | null> {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return null;
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  return orgs?.[0]?.id ?? null;
+  return getActiveOrgId(supabase);
 }
 
 export function generateStaticParams() {

@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import { sendEmail } from '@/integrations/email';
 import { getOrgEntitlements } from '@/data/subscriptions/get-subscription';
 import { countSeats } from '@/data/subscriptions/usage';
@@ -17,8 +18,8 @@ function localeOf(fd: FormData): Locale {
 
 async function currentOrgId() {
   const supabase = await createSupabaseServerClient();
-  const { data } = await supabase.from('organizations').select('id').limit(1);
-  return { supabase, orgId: data?.[0]?.id as string | undefined };
+  const orgId = (await getActiveOrgId(supabase)) ?? undefined;
+  return { supabase, orgId };
 }
 
 export async function inviteMemberAction(formData: FormData) {

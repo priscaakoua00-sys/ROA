@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { Phone, MessageCircle, Mail, CalendarClock, Bell } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import { computeFollowUps, type FollowUp, type FollowUpKind } from '@/data/automations/engine';
 import { markFollowUpAction } from '@/data/automations/actions';
 import { sendPaymentReminderAction } from '@/data/invoices/actions';
@@ -71,11 +72,10 @@ export default async function AutomationsPage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const org = orgs?.[0];
-  if (!org) redirect(`/${locale}/onboarding`);
+  const orgId = await getActiveOrgId(supabase);
+  if (!orgId) redirect(`/${locale}/onboarding`);
 
-  const { limits } = await getOrgEntitlements(supabase, org.id);
+  const { limits } = await getOrgEntitlements(supabase, orgId);
   if (!limits.automations) {
     return (
       <PlanLockedNotice
@@ -95,43 +95,43 @@ export default async function AutomationsPage({
       supabase
         .from('appointments')
         .select('id, starts_at, status, customers(first_name,last_name,phone,email)')
-        .eq('organization_id', org.id)
+        .eq('organization_id', orgId)
         .gte('starts_at', now.toISOString())
         .lte('starts_at', in48h)
         .limit(50),
       supabase
         .from('work_orders')
         .select('id, status, title, customers(first_name,last_name,phone,email)')
-        .eq('organization_id', org.id)
+        .eq('organization_id', orgId)
         .in('status', ['parts_received', 'ready_for_delivery', 'delivered'])
         .order('updated_at', { ascending: false })
         .limit(50),
       supabase
         .from('leads')
         .select('id, status, created_at, ai_summary, description, customers(first_name,last_name,phone,email)')
-        .eq('organization_id', org.id)
+        .eq('organization_id', orgId)
         .order('created_at', { ascending: false })
         .limit(100),
       supabase
         .from('invoices')
         .select('id, status, due_date, invoice_number, customers(first_name,last_name,phone,email)')
-        .eq('organization_id', org.id)
+        .eq('organization_id', orgId)
         .in('status', ['sent', 'partially_paid', 'overdue'])
         .limit(100),
       supabase
         .from('quotes')
         .select('id, status, issue_date, quote_number, customers(first_name,last_name,phone,email)')
-        .eq('organization_id', org.id)
+        .eq('organization_id', orgId)
         .eq('status', 'sent')
         .limit(100),
       supabase
         .from('vehicles')
         .select('id, license_plate, make, model, customers(first_name,last_name,phone,email)')
-        .eq('organization_id', org.id)
+        .eq('organization_id', orgId)
         .not('license_plate', 'is', null)
         .order('created_at', { ascending: false })
         .limit(MAX_APK_CHECKS),
-      supabase.from('follow_ups').select('kind, ref_id').eq('organization_id', org.id),
+      supabase.from('follow_ups').select('kind, ref_id').eq('organization_id', orgId),
     ]);
 
   const handled = new Set((handledRows ?? []).map((h) => `${h.kind}:${h.ref_id}`));

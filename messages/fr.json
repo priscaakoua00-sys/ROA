@@ -29,7 +29,8 @@
       "billing": "Abonnement",
       "quotes": "Devis",
       "appraise": "Acheter / Revendre",
-      "reports": "Rapports"
+      "reports": "Rapports",
+      "switchGarage": "Changer de garage"
     },
     "onboarding": {
       "title": "Configurez votre garage",
@@ -724,6 +725,11 @@
       "ibanIntro": "L'IBAN permet d'afficher un QR code de paiement sur vos factures (optionnel).",
       "iban": "IBAN",
       "bic": "BIC",
+      "garagesTitle": "Garages",
+      "garagesIntro": "Gérez plusieurs garages sous un seul compte et passez de l'un à l'autre depuis le menu en haut de l'écran.",
+      "garageActive": "Actif",
+      "newGarage": "Nom du nouveau garage",
+      "addGarage": "Ajouter un garage",
       "securityTitle": "Sécurité",
       "securityIntro": "Activez la double authentification (2FA) pour protéger l'accès à votre compte avec un code en plus de votre mot de passe.",
       "mfaEnable": "Activer la double authentification",

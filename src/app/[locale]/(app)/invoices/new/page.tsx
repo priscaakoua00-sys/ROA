@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import { createInvoiceAction } from '@/data/invoices/actions';
 import { Button } from '@/components/ui/button';
 import { SubmitButton } from '@/components/ui/submit-button';
@@ -42,9 +43,8 @@ export default async function NewInvoicePage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const org = orgs?.[0];
-  if (!org) redirect(`/${locale}/onboarding`);
+  const orgId = await getActiveOrgId(supabase);
+  if (!orgId) redirect(`/${locale}/onboarding`);
 
   const name = (c: Customer) =>
     [c.first_name, c.last_name].filter(Boolean).join(' ') || t('leads.anonymous');
@@ -61,7 +61,7 @@ export default async function NewInvoicePage({
       .from('work_orders')
       .select('id, title, customer_id, vehicle_id, customers(first_name,last_name), vehicles(license_plate,make,model)')
       .eq('id', workOrderId)
-      .eq('organization_id', org.id)
+      .eq('organization_id', orgId)
       .maybeSingle();
     if (!wo || !wo.customer_id) redirect(`/${locale}/invoices/new`);
 
@@ -109,7 +109,7 @@ export default async function NewInvoicePage({
       .from('customers')
       .select('id, first_name, last_name, phone, email')
       .eq('id', customerId)
-      .eq('organization_id', org.id)
+      .eq('organization_id', orgId)
       .maybeSingle();
 
     if (customer) {
@@ -176,7 +176,7 @@ export default async function NewInvoicePage({
   const { data } = await supabase
     .from('customers')
     .select('id, first_name, last_name, phone, email')
-    .eq('organization_id', org.id)
+    .eq('organization_id', orgId)
     .eq('archived', false)
     .order('created_at', { ascending: false })
     .limit(200);

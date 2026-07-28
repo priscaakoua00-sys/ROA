@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { ChevronLeft, ChevronRight, CalendarClock, Sparkles } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import { createAppointmentAction, updateAppointmentStatusAction } from '@/data/appointments/actions';
 import { proposeSlots, type WeekdayRule } from '@/data/appointments/propose';
 import { formatMonthYearUTC, formatTimeUTC, weekdayShortLabelsUTC } from '@/lib/datetime';
@@ -108,9 +109,8 @@ export default async function AgendaPage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const org = orgs?.[0];
-  if (!org) redirect(`/${locale}/onboarding`);
+  const orgId = await getActiveOrgId(supabase);
+  if (!orgId) redirect(`/${locale}/onboarding`);
 
   const { year, month } = parseMonthParam(monthParam);
   const monthKey = `${year}-${pad2(month + 1)}`;
@@ -152,7 +152,7 @@ export default async function AgendaPage({
   const { data } = await supabase
     .from('appointments')
     .select('id, starts_at, ends_at, status, notes, customers(first_name,last_name), vehicles(make,model,license_plate), services(name)')
-    .eq('organization_id', org.id)
+    .eq('organization_id', orgId)
     .neq('status', 'cancelled')
     .gte('starts_at', rangeStart)
     .lt('starts_at', rangeEnd)
@@ -191,7 +191,7 @@ export default async function AgendaPage({
     const { data: svc } = await supabase
       .from('services')
       .select('id, name, duration_minutes, buffer_minutes')
-      .eq('organization_id', org.id)
+      .eq('organization_id', orgId)
       .eq('active', true)
       .order('created_at', { ascending: true });
     services = svc ?? [];
@@ -199,7 +199,7 @@ export default async function AgendaPage({
     const { data: rules } = await supabase
       .from('availability_rules')
       .select('weekday, start_time, end_time')
-      .eq('organization_id', org.id);
+      .eq('organization_id', orgId);
     const rulesByWeekday: Record<number, WeekdayRule[]> = {};
     for (const r of rules ?? []) {
       (rulesByWeekday[r.weekday] ??= []).push({ start: r.start_time, end: r.end_time });
@@ -222,7 +222,7 @@ export default async function AgendaPage({
         .from('customers')
         .select('id, first_name, last_name, phone, email')
         .eq('id', newCustomerId)
-        .eq('organization_id', org.id)
+        .eq('organization_id', orgId)
         .maybeSingle();
       pickedCustomer = cust ?? null;
       if (pickedCustomer) {
@@ -237,7 +237,7 @@ export default async function AgendaPage({
       const { data: custData } = await supabase
         .from('customers')
         .select('id, first_name, last_name, phone, email')
-        .eq('organization_id', org.id)
+        .eq('organization_id', orgId)
         .eq('archived', false)
         .order('created_at', { ascending: false })
         .limit(200);
@@ -258,7 +258,7 @@ export default async function AgendaPage({
         const { data: plateMatches } = await supabase
           .from('vehicles')
           .select('customers(id, first_name, last_name, phone, email)')
-          .eq('organization_id', org.id)
+          .eq('organization_id', orgId)
           .ilike('license_plate', `%${q.trim()}%`)
           .limit(20);
         const plateCustomers = (plateMatches ?? [])

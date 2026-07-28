@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Phone, MessageCircle, CalendarClock, Check, X } from 'lucide-react';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import { createWorkOrderAction } from '@/data/work-orders/actions';
 import { refuseLeadAction } from '@/data/leads/actions';
 import { Badge } from '@/components/ui/badge';
@@ -58,16 +59,15 @@ export default async function LeadsPage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const org = orgs?.[0];
-  if (!org) redirect(`/${locale}/onboarding`);
+  const orgId = await getActiveOrgId(supabase);
+  if (!orgId) redirect(`/${locale}/onboarding`);
 
   let query = supabase
     .from('leads')
     .select(
       'id, description, ai_summary, urgency, status, created_at, customers(first_name,last_name,phone), vehicles(make,model,license_plate)',
     )
-    .eq('organization_id', org.id)
+    .eq('organization_id', orgId)
     .order('created_at', { ascending: false })
     .limit(100);
 

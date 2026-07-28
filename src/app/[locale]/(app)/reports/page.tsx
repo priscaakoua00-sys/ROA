@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { Download, FileSpreadsheet, BarChart3 } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import { loadReportData } from '@/data/reports/load';
 import { periodRange, type ReportPeriod } from '@/data/reports/summarize';
 import { formatCurrency } from '@/lib/pricing';
@@ -27,15 +28,14 @@ export default async function ReportsPage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const org = orgs?.[0];
-  if (!org) redirect(`/${locale}/onboarding`);
+  const orgId = await getActiveOrgId(supabase);
+  if (!orgId) redirect(`/${locale}/onboarding`);
 
   const now = new Date();
   const summaries = await Promise.all(
     PERIODS.map(async (period) => {
       const { from, to } = periodRange(period, now);
-      return { period, summary: await loadReportData(supabase, org.id, from, to) };
+      return { period, summary: await loadReportData(supabase, orgId, from, to) };
     }),
   );
 

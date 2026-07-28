@@ -29,7 +29,8 @@
       "billing": "Billing",
       "quotes": "Quotes",
       "appraise": "Buy / Resell",
-      "reports": "Reports"
+      "reports": "Reports",
+      "switchGarage": "Switch garage"
     },
     "onboarding": {
       "title": "Set up your garage",
@@ -724,6 +725,11 @@
       "ibanIntro": "Setting an IBAN adds a scan-to-pay QR code to your invoices (optional).",
       "iban": "IBAN",
       "bic": "BIC",
+      "garagesTitle": "Garages",
+      "garagesIntro": "Manage several garages under one account and switch between them from the menu at the top of the screen.",
+      "garageActive": "Active",
+      "newGarage": "New garage name",
+      "addGarage": "Add a garage",
       "securityTitle": "Security",
       "securityIntro": "Turn on two-factor authentication (2FA) to protect your account with a code in addition to your password.",
       "mfaEnable": "Enable two-factor authentication",

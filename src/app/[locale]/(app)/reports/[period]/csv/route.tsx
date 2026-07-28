@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getTranslations } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import { loadReportData } from '@/data/reports/load';
 import { periodRange, type ReportPeriod } from '@/data/reports/summarize';
 
@@ -23,12 +24,12 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
   } = await supabase.auth.getUser();
   if (!user) return new NextResponse('Unauthorized', { status: 401 });
 
-  const { data: org } = await supabase.from('organizations').select('id').limit(1).maybeSingle();
-  if (!org) return new NextResponse('Not found', { status: 404 });
+  const orgId = await getActiveOrgId(supabase);
+  if (!orgId) return new NextResponse('Not found', { status: 404 });
 
   const now = new Date();
   const { from, to } = periodRange(period, now);
-  const summary = await loadReportData(supabase, org.id, from, to);
+  const summary = await loadReportData(supabase, orgId, from, to);
 
   const t = await getTranslations({ locale, namespace: 'app.reports' });
   const rows: [string, string | number][] = [

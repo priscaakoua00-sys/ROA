@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import { getStripeClient } from '@/integrations/stripe/client';
 import { createTrialCheckoutUrl } from '@/data/subscriptions/checkout';
 import { PLANS, type PlanKey } from '@/lib/plans';
@@ -36,8 +37,7 @@ export async function startCheckoutAction(formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const orgId = orgs?.[0]?.id as string | undefined;
+  const orgId = await getActiveOrgId(supabase);
   if (!orgId) redirect(`/${locale}/onboarding`);
 
   const url = await createTrialCheckoutUrl({
@@ -62,8 +62,7 @@ export async function openBillingPortalAction(formData: FormData) {
   if (!stripe) redirect(`/${locale}/settings?stripe=pending`);
 
   const supabase = await createSupabaseServerClient();
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const orgId = orgs?.[0]?.id as string | undefined;
+  const orgId = await getActiveOrgId(supabase);
   if (!orgId) redirect(`/${locale}/onboarding`);
 
   const { data: sub } = await supabase
