@@ -14,6 +14,11 @@ import {
   updateChecklistTemplateItemAction,
   deleteChecklistTemplateItemAction,
 } from '@/data/settings/actions';
+import {
+  verifyMfaEnrollmentAction,
+  cancelMfaEnrollmentAction,
+  disableMfaAction,
+} from '@/data/security/actions';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
@@ -50,11 +55,11 @@ export default async function SettingsPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ saved?: string; error?: string; stripe?: string }>;
+  searchParams: Promise<{ saved?: string; error?: string; stripe?: string; security?: string; mfaError?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { saved, error, stripe } = await searchParams;
+  const { saved, error, stripe, security, mfaError } = await searchParams;
   const t = await getTranslations('app');
   const tPricing = await getTranslations('pricing');
 
@@ -63,6 +68,27 @@ export default async function SettingsPage({
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
+
+  const { data: mfaData } = await supabase.auth.mfa.listFactors();
+  const allFactors = mfaData?.all ?? [];
+  const verifiedTotp = allFactors.find((f) => f.factor_type === 'totp' && f.status === 'verified') ?? null;
+  const unverifiedTotp = allFactors.find((f) => f.factor_type === 'totp' && f.status === 'unverified') ?? null;
+
+  // Starting fresh every time the user clicks "Enable 2FA": Supabase only
+  // returns the TOTP secret/QR once, at enroll time, so a stale unverified
+  // factor from a previous attempt can't show its QR again — clean it up and
+  // issue a new one instead of leaving an orphaned, unusable factor behind.
+  let enrollment: { factorId: string; qrCodeSvg: string; secret: string } | null = null;
+  if (security === 'enroll' && !verifiedTotp) {
+    if (unverifiedTotp) await supabase.auth.mfa.unenroll({ factorId: unverifiedTotp.id });
+    const { data: enrolled, error: enrollError } = await supabase.auth.mfa.enroll({
+      factorType: 'totp',
+      issuer: 'ROAVAA',
+    });
+    if (!enrollError && enrolled) {
+      enrollment = { factorId: enrolled.id, qrCodeSvg: enrolled.totp.qr_code, secret: enrolled.totp.secret };
+    }
+  }
 
   const { data: orgs } = await supabase
     .from('organizations')
@@ -338,6 +364,73 @@ export default async function SettingsPage({
             <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>
           </div>
         </form>
+      </section>
+
+      {/* Security / 2FA */}
+      <section id="security" className="mt-6 scroll-mt-20 rounded-xl border border-border bg-card p-6 shadow-soft">
+        <h2 className="text-base font-semibold tracking-tight">{t('settings.securityTitle')}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t('settings.securityIntro')}</p>
+
+        {mfaError === 'disable' ? (
+          <p className="mt-3 text-sm text-destructive">{t('settings.mfaDisableError')}</p>
+        ) : mfaError ? (
+          <p className="mt-3 text-sm text-destructive">{t('settings.mfaVerifyError')}</p>
+        ) : null}
+
+        {enrollment ? (
+          <div className="mt-4 rounded-lg border border-gold/30 bg-gold/5 p-4">
+            <p className="text-sm font-medium">{t('settings.mfaScanTitle')}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t('settings.mfaScanIntro')}</p>
+            <div className="mt-3 flex justify-center">
+              <div
+                className="size-40 rounded-lg border border-border bg-white p-2"
+                dangerouslySetInnerHTML={{ __html: enrollment.qrCodeSvg }}
+              />
+            </div>
+            <p className="mt-3 text-xs text-muted-foreground">{t('settings.mfaManualEntry')}</p>
+            <p className="mt-1 select-all break-all rounded-md bg-background px-2 py-1.5 font-mono text-xs">{enrollment.secret}</p>
+
+            <form action={verifyMfaEnrollmentAction} className="mt-4 flex flex-wrap items-end gap-2">
+              <input type="hidden" name="locale" value={locale} />
+              <input type="hidden" name="factorId" value={enrollment.factorId} />
+              <label className="block w-32 text-sm">
+                <span className="mb-1 block font-medium">{t('settings.mfaCodeLabel')}</span>
+                <input
+                  name="code"
+                  inputMode="numeric"
+                  pattern="\d{6}"
+                  maxLength={6}
+                  required
+                  className={`${inputCls} w-full`}
+                />
+              </label>
+              <Button type="submit" size="sm">{t('settings.mfaVerify')}</Button>
+            </form>
+            <form action={cancelMfaEnrollmentAction} className="mt-2">
+              <input type="hidden" name="locale" value={locale} />
+              <input type="hidden" name="factorId" value={enrollment.factorId} />
+              <button type="submit" className="text-xs text-muted-foreground hover:underline">{t('common.cancel')}</button>
+            </form>
+          </div>
+        ) : verifiedTotp ? (
+          <div className="mt-4 flex items-center justify-between rounded-lg border border-success/30 bg-success/5 p-4">
+            <div>
+              <p className="text-sm font-medium text-success">{t('settings.mfaEnabled')}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t('settings.mfaEnabledHint')}</p>
+            </div>
+            <form action={disableMfaAction}>
+              <input type="hidden" name="locale" value={locale} />
+              <input type="hidden" name="factorId" value={verifiedTotp.id} />
+              <Button type="submit" variant="outline" size="sm">{t('settings.mfaDisable')}</Button>
+            </form>
+          </div>
+        ) : (
+          <div className="mt-4">
+            <a href="?security=enroll#security">
+              <Button variant="outline" size="sm">{t('settings.mfaEnable')}</Button>
+            </a>
+          </div>
+        )}
       </section>
 
       {/* Digital business card */}
