@@ -209,7 +209,7 @@ export function RobinChat({ orgId }: { orgId: string }) {
     setOpen((v) => !v);
   }
 
-  const suggestions = [t('suggestion1'), t('suggestion2'), t('suggestion3'), t('suggestion4')];
+  const suggestions = [t('suggestion1'), t('suggestion2'), t('suggestion3'), t('suggestion4'), t('suggestion5')];
 
   useEffect(() => {
     if (!open || hasOpened) return;

@@ -207,6 +207,7 @@
       "suggestion2": "Welke voertuigen staan te wachten?",
       "suggestion3": "Wie heeft nog geen antwoord gekregen?",
       "suggestion4": "Bel Jan Jansen",
+      "suggestion5": "Waarom daalt mijn omzet deze maand?",
       "answers": {
         "apptsTomorrowNone": "Je hebt morgen niks gepland.",
         "apptsTomorrowCount": "Morgen heb je {count} afspraak/afspraken: {list}",

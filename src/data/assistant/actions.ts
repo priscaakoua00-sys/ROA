@@ -6,6 +6,7 @@ import { formatTimeUTC } from '@/lib/datetime';
 import { formatCurrency } from '@/lib/pricing';
 import { loadRobinInsight } from '@/data/robin/load';
 import { ACTIVE_WORK_ORDER_STATUSES } from '@/lib/work-order-status';
+import { buildExecutiveContext } from '@/data/assistant/executive-context';
 import { getAIProvider } from '@/integrations/ai';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
@@ -477,7 +478,11 @@ export async function askRobinAction(
   // falls back to the same canned message as before — never worse than the
   // deterministic path.
   try {
-    const context = await buildAssistantContext(supabase, orgId, locale, anon);
+    const [dayToDayContext, executiveContext] = await Promise.all([
+      buildAssistantContext(supabase, orgId, locale, anon),
+      buildExecutiveContext(supabase, orgId, locale, anon),
+    ]);
+    const context = `${dayToDayContext}\n${executiveContext}`;
     const result = await getAIProvider().answerAssistantQuestion({ language: locale, question, context });
     if (result.status === 'ok') {
       return { text: result.data.answer, links: [], topic: 'fallback' };

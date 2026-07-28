@@ -207,6 +207,7 @@
       "suggestion2": "Which vehicles are waiting?",
       "suggestion3": "Who hasn't replied yet?",
       "suggestion4": "Call John Smith",
+      "suggestion5": "Why is my revenue down this month?",
       "answers": {
         "apptsTomorrowNone": "Nothing on the books for tomorrow.",
         "apptsTomorrowCount": "You've got {count} appointment(s) tomorrow: {list}",
