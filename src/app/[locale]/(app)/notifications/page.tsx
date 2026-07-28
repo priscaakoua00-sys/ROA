@@ -12,6 +12,7 @@ import { formatDateTimeUTC } from '@/lib/datetime';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Link } from '@/i18n/navigation';
+import { NotificationsLiveRefresh } from '@/components/notifications/notifications-live-refresh';
 
 interface N {
   id: string;
@@ -53,6 +54,7 @@ export default async function NotificationsPage({
 
   return (
     <div className="container max-w-2xl py-10">
+      <NotificationsLiveRefresh organizationId={orgId} />
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">{t('notifications.title')}</h1>
         <Link href="/dashboard" className="text-sm text-muted-foreground hover:underline">

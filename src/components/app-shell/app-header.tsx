@@ -1,8 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Bell, MessageCircle, LogOut, ChevronDown, Check } from 'lucide-react';
-import { Link } from '@/i18n/navigation';
+import { MessageCircle, LogOut, ChevronDown, Check } from 'lucide-react';
 import { signOutAction } from '@/data/auth/actions';
 import { switchOrgAction } from '@/data/organizations/actions';
 import type { OrgOption } from '@/data/organizations/active';
@@ -18,6 +17,7 @@ import { LanguageSwitcher } from '@/components/language-switcher';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { ROBIN_OPEN_EVENT } from '@/components/robin-chat';
 import { PlateCommandBar } from '@/components/app-shell/plate-command-bar';
+import { NotificationBell } from '@/components/notifications/notification-bell';
 
 function initialsOf(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -31,12 +31,14 @@ export function AppHeader({
   activeOrgId,
   locale,
   displayName,
+  unreadNotificationCount,
 }: {
   orgName: string;
   orgs: OrgOption[];
   activeOrgId: string;
   locale: string;
   displayName: string;
+  unreadNotificationCount: number;
 }) {
   const t = useTranslations('app.nav');
 
@@ -98,11 +100,7 @@ export function AppHeader({
         <MessageCircle className="size-4" aria-hidden />
       </Button>
 
-      <Link href="/notifications">
-        <Button variant="outline" size="icon" aria-label={t('notifications')}>
-          <Bell className="size-4" aria-hidden />
-        </Button>
-      </Link>
+      <NotificationBell organizationId={activeOrgId} initialUnreadCount={unreadNotificationCount} />
 
       <div className="hidden items-center gap-2 md:flex">
         <LanguageSwitcher />

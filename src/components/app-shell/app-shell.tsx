@@ -10,6 +10,7 @@ export function AppShell({
   activeOrgId,
   locale,
   displayName,
+  unreadNotificationCount,
   children,
 }: {
   orgName: string;
@@ -17,13 +18,21 @@ export function AppShell({
   activeOrgId: string;
   locale: string;
   displayName: string;
+  unreadNotificationCount: number;
   children: ReactNode;
 }) {
   return (
     <div className="flex min-h-screen">
       <SidebarNav />
       <div className="flex min-w-0 flex-1 flex-col">
-        <AppHeader orgName={orgName} orgs={orgs} activeOrgId={activeOrgId} locale={locale} displayName={displayName} />
+        <AppHeader
+          orgName={orgName}
+          orgs={orgs}
+          activeOrgId={activeOrgId}
+          locale={locale}
+          displayName={displayName}
+          unreadNotificationCount={unreadNotificationCount}
+        />
         <main className="min-w-0 flex-1 pb-20 md:pb-0">{children}</main>
       </div>
       <MobileNav />
