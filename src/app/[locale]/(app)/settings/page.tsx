@@ -259,6 +259,9 @@ export default async function SettingsPage({
             <div className="mt-4 rounded-lg border border-gold/30 bg-gold/5 p-4">
               <p className="text-sm font-semibold">{t('settings.billingSuperAdmin')}</p>
               <p className="mt-1 text-xs text-muted-foreground">{t('settings.billingSuperAdminNote')}</p>
+              <Link href="/admin/errors" className="mt-2 inline-block text-xs text-gold hover:underline">
+                {t('admin.errorsTitle')}
+              </Link>
             </div>
           ) : subscription.provider === 'stripe' ? (
             <div className="mt-4 border-t border-border pt-4">

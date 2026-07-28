@@ -7,6 +7,12 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
     // Next.js swallows render errors from this boundary unless we log them
     // ourselves — without this, every production crash left zero trace.
     console.error(error);
+    fetch('/api/log-error', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: error.message, stack: error.stack, route: window.location.pathname }),
+      keepalive: true,
+    }).catch(() => {});
   }, [error]);
 
   return (

@@ -858,6 +858,12 @@
       "usePartQuantity": "Quantity used",
       "usePartSubmit": "Record usage"
     },
+    "admin": {
+      "errorsTitle": "Error log",
+      "errorsIntro": "Technical errors captured across the whole platform, visible only to the ROAVAA team.",
+      "errorsEmpty": "No errors recorded.",
+      "errorsStackTrace": "View stack trace"
+    },
     "automations": {
       "title": "Follow-ups",
       "intro": "What Roavaa would follow up today. You decide and send.",

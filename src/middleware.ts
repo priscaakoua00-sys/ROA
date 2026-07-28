@@ -57,7 +57,7 @@ export async function middleware(request: NextRequest) {
     : routing.defaultLocale;
   const rest = '/' + parts.slice(2).join('/');
 
-  const isApp = /^\/(dashboard|onboarding|team|settings|leads|agenda|customers|work-orders|vehicles|invoices|quotes|notifications|knowledge|automations|reports|inventory)/.test(rest);
+  const isApp = /^\/(dashboard|onboarding|team|settings|leads|agenda|customers|work-orders|vehicles|invoices|quotes|notifications|knowledge|automations|reports|inventory|admin)/.test(rest);
   const isAuthPage = /^\/(login|signup|forgot-password|reset-password)/.test(rest);
 
   if (isApp && !user) {
