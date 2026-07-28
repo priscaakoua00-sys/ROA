@@ -2,7 +2,9 @@
 
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseAdminClient } from '@/data/supabase/admin';
 import { publicRequestSchema } from '@/lib/validation/lead';
+import { dispatchWebhooks } from '@/lib/webhooks';
 import { qualifyLead } from './qualify';
 
 type Locale = 'nl' | 'en' | 'fr';
@@ -62,7 +64,7 @@ export async function submitPublicRequestAction(formData: FormData) {
   });
 
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.rpc('submit_public_request', {
+  const { data: leadId, error } = await supabase.rpc('submit_public_request', {
     p_org_slug: slug,
     p_first_name: parsed.data.firstName ?? null,
     p_last_name: parsed.data.lastName ?? null,
@@ -84,5 +86,26 @@ export async function submitPublicRequestAction(formData: FormData) {
   if (error) {
     redirect(`/${parsed.data.language}/request/${slug}?error=1`);
   }
+
+  // No Supabase Auth session for this anonymous form submission, so use the
+  // service-role client to resolve the org and fire lead.created — same
+  // pattern as the Stripe webhook / billing-reminders cron.
+  if (leadId) {
+    const admin = createSupabaseAdminClient();
+    const { data: lead } = await admin
+      .from('leads')
+      .select('organization_id, customer_id, vehicle_id')
+      .eq('id', leadId)
+      .maybeSingle();
+    if (lead) {
+      await dispatchWebhooks(admin, lead.organization_id, 'lead.created', {
+        leadId,
+        customerId: lead.customer_id,
+        vehicleId: lead.vehicle_id,
+        description: parsed.data.description,
+      });
+    }
+  }
+
   redirect(`/${parsed.data.language}/request/${slug}?sent=1`);
 }

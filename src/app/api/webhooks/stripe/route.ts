@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { getStripeClient } from '@/integrations/stripe/client';
 import { getPlanKeyForPriceId } from '@/integrations/stripe/prices';
 import { createSupabaseAdminClient } from '@/data/supabase/admin';
+import { dispatchWebhooks } from '@/lib/webhooks';
 import type { PlanKey } from '@/lib/plans';
 
 export const dynamic = 'force-dynamic';
@@ -124,19 +125,26 @@ export async function POST(req: Request) {
           });
           const { data: invoice } = await admin
             .from('invoices')
-            .select('total, paid_amount')
+            .select('total, paid_amount, invoice_number')
             .eq('id', invoiceId)
             .maybeSingle();
           if (invoice) {
             const newPaidAmount = Number(invoice.paid_amount) + amount;
+            const newStatus = newPaidAmount >= Number(invoice.total) ? 'paid' : 'partially_paid';
             await admin
               .from('invoices')
               .update({
                 paid_amount: newPaidAmount,
-                status: newPaidAmount >= Number(invoice.total) ? 'paid' : 'partially_paid',
-                paid_at: newPaidAmount >= Number(invoice.total) ? new Date().toISOString() : null,
+                status: newStatus,
+                paid_at: newStatus === 'paid' ? new Date().toISOString() : null,
               })
               .eq('id', invoiceId);
+            if (newStatus === 'paid') {
+              await dispatchWebhooks(admin, organizationId, 'invoice.paid', {
+                invoiceId,
+                invoiceNumber: invoice.invoice_number,
+              });
+            }
           }
         }
         break;

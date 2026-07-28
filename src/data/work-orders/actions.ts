@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from '@/data/supabase/server';
 import { getAIProvider } from '@/integrations/ai';
 import type { ChecklistFindingInput, MediaDiagnosis } from '@/integrations/ai';
 import { isWorkOrderStatus } from '@/lib/work-order-status';
+import { dispatchWebhooks } from '@/lib/webhooks';
 import { instantiateChecklist, logStatus } from './helpers';
 
 type Locale = 'nl' | 'en' | 'fr';
@@ -119,6 +120,10 @@ export async function updateWorkOrderStatusAction(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
   await logStatus(supabase, wo.organization_id, woId, statusRaw, user?.id ?? null, note);
+  await dispatchWebhooks(supabase, wo.organization_id, 'work_order.status_changed', {
+    workOrderId: woId,
+    status: statusRaw,
+  });
 
   redirect(`/${locale}/work-orders/${woId}`);
 }

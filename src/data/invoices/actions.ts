@@ -6,6 +6,7 @@ import { createSupabaseServerClient } from '@/data/supabase/server';
 import { sendEmail } from '@/integrations/email';
 import { formatCurrency } from '@/lib/pricing';
 import { logActivity } from '@/data/activity/log';
+import { dispatchWebhooks } from '@/lib/webhooks';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -167,6 +168,12 @@ export async function updateInvoiceStatusAction(formData: FormData) {
     entityLabel: invoice.invoice_number,
     action: 'updated',
   });
+  if (status === 'paid') {
+    await dispatchWebhooks(supabase, invoice.organization_id, 'invoice.paid', {
+      invoiceId,
+      invoiceNumber: invoice.invoice_number,
+    });
+  }
 
   redirect(`/${locale}/invoices/${invoiceId}?saved=1`);
 }
@@ -231,6 +238,12 @@ export async function recordPaymentAction(formData: FormData) {
     entityLabel: invoice.invoice_number,
     action: 'updated',
   });
+  if (status === 'paid') {
+    await dispatchWebhooks(supabase, invoice.organization_id, 'invoice.paid', {
+      invoiceId,
+      invoiceNumber: invoice.invoice_number,
+    });
+  }
 
   redirect(`/${locale}/invoices/${invoiceId}?saved=1`);
 }
@@ -273,6 +286,10 @@ export async function markInvoicePaidAction(formData: FormData) {
     entityId: invoiceId,
     entityLabel: invoice.invoice_number,
     action: 'updated',
+  });
+  await dispatchWebhooks(supabase, invoice.organization_id, 'invoice.paid', {
+    invoiceId,
+    invoiceNumber: invoice.invoice_number,
   });
 
   redirect(back);
