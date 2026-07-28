@@ -207,6 +207,7 @@
       "suggestion2": "Quels véhicules sont en attente ?",
       "suggestion3": "Qui n'a pas encore reçu de réponse ?",
       "suggestion4": "Appeler Jean Dupont",
+      "suggestion5": "Pourquoi mon chiffre d'affaires baisse-t-il ce mois-ci ?",
       "answers": {
         "apptsTomorrowNone": "Rien de prévu demain.",
         "apptsTomorrowCount": "Vous avez {count} rendez-vous demain : {list}",
