@@ -30,7 +30,8 @@
       "quotes": "Offertes",
       "appraise": "Kopen / Verkopen",
       "reports": "Rapporten",
-      "switchGarage": "Wissel van garage"
+      "switchGarage": "Wissel van garage",
+      "inventory": "Voorraad"
     },
     "onboarding": {
       "title": "Uw garage instellen",
@@ -164,6 +165,7 @@
       "notifMessages": "Berichten te beantwoorden",
       "notifInvoices": "Facturen op te stellen",
       "notifInactiveCustomers": "Inactieve klanten",
+      "notifLowStock": "Onderdelen met lage voorraad",
       "apptsTodayTitle": "Afspraken vandaag",
       "apptsTodayEmpty": "Geen afspraken vandaag.",
       "urgentWorkTitle": "Urgente reparaties",
@@ -187,7 +189,8 @@
       "invoices": "Reparatieorders",
       "diagnostics": "Technische kennisbank",
       "history": "Voertuiggeschiedenis",
-      "reports": "Activiteitsrapporten"
+      "reports": "Activiteitsrapporten",
+      "parts": "Voorraadbeheer"
     },
     "robinChat": {
       "launcher": "Praat met Ruben",
@@ -822,6 +825,38 @@
         "work_order": "werkorder"
       },
       "retentionNote": "Toont de 150 meest recente gebeurtenissen."
+    },
+    "inventory": {
+      "title": "Voorraad",
+      "intro": "Uw onderdelen en benodigdheden: aantallen, bestelniveaus en leveranciers.",
+      "saved": "Opgeslagen.",
+      "lowStockSummary": "{count, plural, one {# onderdeel zit onder het bestelniveau} other {# onderdelen zitten onder het bestelniveau}}",
+      "lowStock": "Lage voorraad",
+      "threshold": "Drempel: {count}",
+      "adjustDelta": "Aantal (+/-)",
+      "adjustNote": "Reden",
+      "adjustApply": "Toepassen",
+      "editDetails": "Details bewerken",
+      "name": "Naam",
+      "sku": "Artikelnummer",
+      "category": "Categorie",
+      "unit": "Eenheid",
+      "quantityOnHand": "Startaantal",
+      "reorderThreshold": "Bestelniveau",
+      "unitCost": "Kostprijs per stuk",
+      "supplierName": "Leverancier",
+      "supplierPhone": "Telefoon leverancier",
+      "notes": "Notities",
+      "deleteConfirm": "Dit onderdeel wordt uit de voorraad verwijderd.",
+      "empty": "Nog geen onderdelen geregistreerd.",
+      "addTitle": "Onderdeel toevoegen",
+      "addPart": "Toevoegen",
+      "partsUsedTitle": "Gebruikte onderdelen",
+      "noPartsUsed": "Nog geen onderdelen geregistreerd op deze werkorder.",
+      "noPartsAvailable": "Voeg eerst onderdelen toe bij Voorraad.",
+      "usePartLabel": "Onderdeel",
+      "usePartQuantity": "Gebruikt aantal",
+      "usePartSubmit": "Gebruik registreren"
     },
     "automations": {
       "title": "Opvolging",

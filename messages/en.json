@@ -30,7 +30,8 @@
       "quotes": "Quotes",
       "appraise": "Buy / Resell",
       "reports": "Reports",
-      "switchGarage": "Switch garage"
+      "switchGarage": "Switch garage",
+      "inventory": "Inventory"
     },
     "onboarding": {
       "title": "Set up your garage",
@@ -164,6 +165,7 @@
       "notifMessages": "Messages to answer",
       "notifInvoices": "Invoices to prepare",
       "notifInactiveCustomers": "Inactive customers",
+      "notifLowStock": "Parts low on stock",
       "apptsTodayTitle": "Today's appointments",
       "apptsTodayEmpty": "No appointments today.",
       "urgentWorkTitle": "Urgent repairs",
@@ -187,7 +189,8 @@
       "invoices": "Work orders",
       "diagnostics": "Technical knowledge base",
       "history": "Vehicle history",
-      "reports": "Activity reports"
+      "reports": "Activity reports",
+      "parts": "Stock management"
     },
     "robinChat": {
       "launcher": "Ask Ruben",
@@ -822,6 +825,38 @@
         "work_order": "work order"
       },
       "retentionNote": "Showing the 150 most recent events."
+    },
+    "inventory": {
+      "title": "Inventory",
+      "intro": "Your parts and supplies: quantities, reorder thresholds, and suppliers.",
+      "saved": "Saved.",
+      "lowStockSummary": "{count, plural, one {# part is below its reorder threshold} other {# parts are below their reorder threshold}}",
+      "lowStock": "Low stock",
+      "threshold": "Threshold: {count}",
+      "adjustDelta": "Quantity (+/-)",
+      "adjustNote": "Reason",
+      "adjustApply": "Apply",
+      "editDetails": "Edit details",
+      "name": "Name",
+      "sku": "SKU",
+      "category": "Category",
+      "unit": "Unit",
+      "quantityOnHand": "Starting quantity",
+      "reorderThreshold": "Reorder threshold",
+      "unitCost": "Unit cost",
+      "supplierName": "Supplier",
+      "supplierPhone": "Supplier phone",
+      "notes": "Notes",
+      "deleteConfirm": "This part will be removed from inventory.",
+      "empty": "No parts recorded yet.",
+      "addTitle": "Add a part",
+      "addPart": "Add",
+      "partsUsedTitle": "Parts used",
+      "noPartsUsed": "No parts recorded on this work order.",
+      "noPartsAvailable": "Add parts to Inventory first.",
+      "usePartLabel": "Part",
+      "usePartQuantity": "Quantity used",
+      "usePartSubmit": "Record usage"
     },
     "automations": {
       "title": "Follow-ups",

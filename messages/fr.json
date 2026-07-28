@@ -30,7 +30,8 @@
       "quotes": "Devis",
       "appraise": "Acheter / Revendre",
       "reports": "Rapports",
-      "switchGarage": "Changer de garage"
+      "switchGarage": "Changer de garage",
+      "inventory": "Stock"
     },
     "onboarding": {
       "title": "Configurez votre garage",
@@ -164,6 +165,7 @@
       "notifMessages": "Messages à répondre",
       "notifInvoices": "Factures à préparer",
       "notifInactiveCustomers": "Clients inactifs",
+      "notifLowStock": "Pièces en stock bas",
       "apptsTodayTitle": "Rendez-vous du jour",
       "apptsTodayEmpty": "Aucun rendez-vous aujourd'hui.",
       "urgentWorkTitle": "Réparations urgentes",
@@ -187,7 +189,8 @@
       "invoices": "Ordres de réparation",
       "diagnostics": "Base de connaissances technique",
       "history": "Historique du véhicule",
-      "reports": "Rapports d'activité"
+      "reports": "Rapports d'activité",
+      "parts": "Gestion du stock"
     },
     "robinChat": {
       "launcher": "Parler à Ruben",
@@ -822,6 +825,38 @@
         "work_order": "l'ordre de réparation"
       },
       "retentionNote": "Affiche les 150 événements les plus récents."
+    },
+    "inventory": {
+      "title": "Stock",
+      "intro": "Vos pièces et fournitures : quantités, seuils de réapprovisionnement et fournisseurs.",
+      "saved": "Enregistré.",
+      "lowStockSummary": "{count, plural, one {# pièce est sous le seuil de réapprovisionnement} other {# pièces sont sous le seuil de réapprovisionnement}}",
+      "lowStock": "Stock bas",
+      "threshold": "Seuil : {count}",
+      "adjustDelta": "Quantité (+/-)",
+      "adjustNote": "Motif",
+      "adjustApply": "Appliquer",
+      "editDetails": "Modifier les détails",
+      "name": "Nom",
+      "sku": "Référence",
+      "category": "Catégorie",
+      "unit": "Unité",
+      "quantityOnHand": "Quantité initiale",
+      "reorderThreshold": "Seuil de réapprovisionnement",
+      "unitCost": "Coût unitaire",
+      "supplierName": "Fournisseur",
+      "supplierPhone": "Téléphone fournisseur",
+      "notes": "Notes",
+      "deleteConfirm": "Cette pièce sera supprimée du stock.",
+      "empty": "Aucune pièce enregistrée pour l'instant.",
+      "addTitle": "Ajouter une pièce",
+      "addPart": "Ajouter",
+      "partsUsedTitle": "Pièces utilisées",
+      "noPartsUsed": "Aucune pièce enregistrée sur cet ordre.",
+      "noPartsAvailable": "Ajoutez d'abord des pièces dans Stock.",
+      "usePartLabel": "Pièce",
+      "usePartQuantity": "Quantité utilisée",
+      "usePartSubmit": "Enregistrer l'utilisation"
     },
     "automations": {
       "title": "Relances",
