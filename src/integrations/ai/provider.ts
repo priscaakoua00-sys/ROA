@@ -3,6 +3,7 @@ import type {
   DraftReplyInput,
   LanguageDetectionInput,
   LeadSummaryInput,
+  MaintenanceSuggestionInput,
   MediaDiagnosisInput,
   RepairReportInput,
   UrgencyInput,
@@ -13,6 +14,7 @@ import type {
   DraftedReply,
   LanguageDetection,
   LeadSummary,
+  MaintenanceSuggestions,
   MediaDiagnosis,
   RepairReport,
   UrgencyAssessment,
@@ -78,4 +80,17 @@ export interface AIProvider {
   answerAssistantQuestion(
     input: AssistantQuestionInput,
   ): Promise<AIResult<AssistantAnswer>>;
+
+  /**
+   * Suggest preventive-maintenance / upsell items (timing belt, brakes,
+   * tires, fluids...) for one vehicle, reasoning from its mileage, age and
+   * whatever visit history the garage has on record. General automotive
+   * service-interval knowledge is expected here — that's not "inventing
+   * data" the way a specific fault claim about THIS vehicle would be.
+   * Always a suggestion for the mechanic to confirm in person, never a
+   * diagnosis or a promise to the customer.
+   */
+  suggestMaintenance(
+    input: MaintenanceSuggestionInput,
+  ): Promise<AIResult<MaintenanceSuggestions>>;
 }

@@ -18,6 +18,8 @@ import { VehicleDossierSection } from '@/components/vehicles/vehicle-dossier';
 import { SHEET } from '@/lib/vehicle-sheet-copy';
 import type { Locale } from '@/components/landing/content';
 import { PhotoDiagnosisPanel, type DiagnosisRow } from '@/components/diagnosis/photo-diagnosis-panel';
+import { MaintenanceSuggestionsPanel } from '@/components/maintenance/maintenance-suggestions-panel';
+import { loadMaintenanceSuggestions } from '@/data/maintenance/list';
 import { TimelineList, type TimelineItemView } from '@/components/timeline/timeline-list';
 import type { DiagnosisSeverity, VehicleAngle } from '@/integrations/ai';
 import { isExternalPhotoUrl } from '@/lib/utils';
@@ -63,11 +65,18 @@ export default async function VehicleDetailPage({
   searchParams,
 }: {
   params: Promise<{ locale: string; id: string }>;
-  searchParams: Promise<{ saved?: string; photoError?: string; diagSaved?: string; diagError?: string }>;
+  searchParams: Promise<{
+    saved?: string;
+    photoError?: string;
+    diagSaved?: string;
+    diagError?: string;
+    maintSaved?: string;
+    maintError?: string;
+  }>;
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  const { saved, photoError, diagSaved, diagError } = await searchParams;
+  const { saved, photoError, diagSaved, diagError, maintSaved, maintError } = await searchParams;
   const t = await getTranslations('app');
 
   const supabase = await createSupabaseServerClient();
@@ -94,7 +103,7 @@ export default async function VehicleDetailPage({
   }
   const kind = VAN_MODEL_PATTERN.test(`${v.make ?? ''} ${v.model ?? ''}`) ? 'van' : 'hatch';
 
-  const [{ data: diagData }, timeline] = await Promise.all([
+  const [{ data: diagData }, timeline, maintenanceSuggestions] = await Promise.all([
     supabase
       .from('photo_diagnoses')
       .select(
@@ -103,6 +112,7 @@ export default async function VehicleDetailPage({
       .eq('vehicle_id', id)
       .order('created_at', { ascending: false }),
     getVehicleTimeline(supabase, id),
+    loadMaintenanceSuggestions(supabase, id),
   ]);
   const diagRows = (diagData ?? []) as unknown as {
     id: string;
@@ -150,7 +160,15 @@ export default async function VehicleDetailPage({
   return (
     <div className="container max-w-2xl py-10">
       <FlashToast
-        success={saved ? t('vehicles.saved') : diagSaved === '1' ? t('diagnosis.saved') : null}
+        success={
+          saved
+            ? t('vehicles.saved')
+            : diagSaved === '1'
+              ? t('diagnosis.saved')
+              : maintSaved === '1'
+                ? t('maintenance.saved')
+                : null
+        }
         error={
           photoError
             ? t('vehicles.photoError')
@@ -158,7 +176,9 @@ export default async function VehicleDetailPage({
               ? t('diagnosis.limitReached')
               : diagError === '1'
                 ? t('diagnosis.error')
-                : null
+                : maintError === '1'
+                  ? t('maintenance.error')
+                  : null
         }
       />
       <ModuleBanner moduleKey="history" label={t('moduleBanner.history')} icon={History} />
@@ -373,6 +393,14 @@ export default async function VehicleDetailPage({
         diagnoses={diagnoses}
         saved={diagSaved === '1'}
         error={diagError === '1'}
+      />
+
+      <MaintenanceSuggestionsPanel
+        locale={locale}
+        vehicleId={v.id}
+        suggestions={maintenanceSuggestions}
+        saved={maintSaved === '1'}
+        error={maintError === '1'}
       />
     </div>
   );

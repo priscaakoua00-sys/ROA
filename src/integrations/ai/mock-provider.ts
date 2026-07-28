@@ -6,6 +6,7 @@ import type {
   DraftReplyInput,
   LanguageDetectionInput,
   LeadSummaryInput,
+  MaintenanceSuggestionInput,
   MediaDiagnosisInput,
   RepairReportInput,
   SupportedLanguage,
@@ -16,6 +17,7 @@ import {
   draftedReplySchema,
   languageDetectionSchema,
   leadSummarySchema,
+  maintenanceSuggestionsSchema,
   mediaDiagnosisSchema,
   repairReportSchema,
   urgencyAssessmentSchema,
@@ -23,6 +25,7 @@ import {
   type DraftedReply,
   type LanguageDetection,
   type LeadSummary,
+  type MaintenanceSuggestions,
   type MediaDiagnosis,
   type RecommendedRepair,
   type RepairReport,
@@ -349,4 +352,65 @@ export class MockAIProvider implements AIProvider {
       meta: this.meta(0.3),
     };
   }
+
+  async suggestMaintenance(input: MaintenanceSuggestionInput): Promise<AIResult<MaintenanceSuggestions>> {
+    const mileage = input.vehicle.mileage ?? 0;
+    const age = input.vehicle.year ? new Date().getUTCFullYear() - input.vehicle.year : 0;
+    const history = input.recentWorkOrderTitles.join(' ').toLowerCase();
+    const alreadyDone = (keywords: string[]) => keywords.some((k) => history.includes(k));
+    const T = MAINTENANCE_TEXT[input.language];
+
+    const suggestions: MaintenanceSuggestions['suggestions'] = [];
+    if (mileage >= 15_000 && !alreadyDone(['vidange', 'oil', 'olie'])) {
+      suggestions.push({ item: T.oilChange.item, reason: T.oilChange.reason(mileage), urgency: 'low' });
+    }
+    if (mileage >= 30_000 && !alreadyDone(['frein', 'brake', 'rem'])) {
+      suggestions.push({ item: T.brakes.item, reason: T.brakes.reason(mileage), urgency: 'medium' });
+    }
+    if (mileage >= 60_000 && !alreadyDone(['distribution', 'timing belt', 'distributieriem'])) {
+      suggestions.push({ item: T.timingBelt.item, reason: T.timingBelt.reason(mileage), urgency: 'high' });
+    }
+    if (age >= 4 && !alreadyDone(['pneu', 'tire', 'band'])) {
+      suggestions.push({ item: T.tires.item, reason: T.tires.reason(age), urgency: 'medium' });
+    }
+
+    return {
+      status: 'ok',
+      data: maintenanceSuggestionsSchema.parse({ suggestions, disclaimer: T.disclaimer }),
+      meta: this.meta(0.5),
+    };
+  }
 }
+
+const MAINTENANCE_TEXT: Record<
+  SupportedLanguage,
+  {
+    oilChange: { item: string; reason: (mileage: number) => string };
+    brakes: { item: string; reason: (mileage: number) => string };
+    timingBelt: { item: string; reason: (mileage: number) => string };
+    tires: { item: string; reason: (age: number) => string };
+    disclaimer: string;
+  }
+> = {
+  nl: {
+    oilChange: { item: 'Olie- en filterwissel', reason: (m) => `Kilometerstand (${m.toLocaleString('nl-NL')} km) wijst op een routinebeurt.` },
+    brakes: { item: 'Remmen controleren', reason: (m) => `Bij ${m.toLocaleString('nl-NL')} km is een visuele controle van blokken/schijven aan te raden.` },
+    timingBelt: { item: 'Distributieriem controleren', reason: (m) => `Bij ${m.toLocaleString('nl-NL')} km valt dit vaak binnen het vervangingsinterval.` },
+    tires: { item: 'Banden controleren', reason: (a) => `Voertuig is ${a} jaar oud — rubber veroudert ook zonder veel kilometers.` },
+    disclaimer: 'Suggesties op basis van kilometerstand, leeftijd en bekende historie — altijd in persoon te bevestigen voordat u dit aan de klant voorstelt.',
+  },
+  en: {
+    oilChange: { item: 'Oil & filter change', reason: (m) => `Mileage (${m.toLocaleString('en-US')} km) suggests a routine service is due.` },
+    brakes: { item: 'Brake inspection', reason: (m) => `At ${m.toLocaleString('en-US')} km, a visual check of pads/discs is worth doing.` },
+    timingBelt: { item: 'Timing belt check', reason: (m) => `At ${m.toLocaleString('en-US')} km this often falls within the replacement interval.` },
+    tires: { item: 'Tire condition check', reason: (a) => `Vehicle is ${a} years old — rubber ages even at low mileage.` },
+    disclaimer: 'Suggestions based on mileage, age, and known history — always confirm in person before proposing to the customer.',
+  },
+  fr: {
+    oilChange: { item: 'Vidange et filtre', reason: (m) => `Le kilométrage (${m.toLocaleString('fr-FR')} km) suggère un entretien de routine.` },
+    brakes: { item: 'Contrôle des freins', reason: (m) => `À ${m.toLocaleString('fr-FR')} km, un contrôle visuel des plaquettes/disques est pertinent.` },
+    timingBelt: { item: 'Contrôle de la distribution', reason: (m) => `À ${m.toLocaleString('fr-FR')} km, ceci tombe souvent dans l'intervalle de remplacement.` },
+    tires: { item: 'Contrôle des pneus', reason: (a) => `Véhicule âgé de ${a} ans — le caoutchouc vieillit même à faible kilométrage.` },
+    disclaimer: "Suggestions basées sur le kilométrage, l'âge et l'historique connu — à confirmer en personne avant de proposer au client.",
+  },
+};

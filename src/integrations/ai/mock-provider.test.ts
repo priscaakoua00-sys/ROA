@@ -5,6 +5,7 @@ import {
   draftedReplySchema,
   languageDetectionSchema,
   leadSummarySchema,
+  maintenanceSuggestionsSchema,
   mediaDiagnosisSchema,
   urgencyAssessmentSchema,
 } from './schemas';
@@ -157,6 +158,51 @@ describe('MockAIProvider', () => {
     if (result.status === 'ok') {
       expect(() => assistantAnswerSchema.parse(result.data)).not.toThrow();
       expect(result.data.answer).toContain('3');
+    }
+  });
+
+  it('suggests maintenance for a high-mileage, older vehicle with no matching history', async () => {
+    const result = await provider.suggestMaintenance({
+      language: 'en',
+      vehicle: { make: 'Volkswagen', model: 'Golf', year: 2015, mileage: 90_000, fuel: 'diesel' },
+      recentWorkOrderTitles: ['Wheel alignment'],
+    });
+    expect(result.status).toBe('ok');
+    if (result.status === 'ok') {
+      expect(() => maintenanceSuggestionsSchema.parse(result.data)).not.toThrow();
+      const items = result.data.suggestions.map((s) => s.item);
+      expect(items).toEqual([
+        'Oil & filter change',
+        'Brake inspection',
+        'Timing belt check',
+        'Tire condition check',
+      ]);
+    }
+  });
+
+  it('skips a maintenance suggestion already covered by recent work order history', async () => {
+    const result = await provider.suggestMaintenance({
+      language: 'en',
+      vehicle: { make: 'Volkswagen', model: 'Golf', year: 2015, mileage: 90_000, fuel: 'diesel' },
+      recentWorkOrderTitles: ['Oil change and filter replacement'],
+    });
+    expect(result.status).toBe('ok');
+    if (result.status === 'ok') {
+      const items = result.data.suggestions.map((s) => s.item);
+      expect(items).not.toContain('Oil & filter change');
+    }
+  });
+
+  it('suggests nothing for a low-mileage, new vehicle', async () => {
+    const result = await provider.suggestMaintenance({
+      language: 'fr',
+      vehicle: { make: 'Peugeot', model: '208', year: new Date().getUTCFullYear(), mileage: 2_000, fuel: 'petrol' },
+      recentWorkOrderTitles: [],
+    });
+    expect(result.status).toBe('ok');
+    if (result.status === 'ok') {
+      expect(result.data.suggestions).toEqual([]);
+      expect(result.data.disclaimer.length).toBeGreaterThan(0);
     }
   });
 });

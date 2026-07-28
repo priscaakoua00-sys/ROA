@@ -951,6 +951,18 @@
       "recommendations": "Recommandations",
       "limitReached": "Vous avez atteint le nombre d'analyses IA Ruben incluses ce mois-ci dans votre formule. Passez à une formule supérieure pour continuer."
     },
+    "maintenance": {
+      "title": "Suggestions d'entretien",
+      "intro": "Ruben analyse le kilométrage, l'âge et l'historique d'entretien de ce véhicule et suggère quoi proposer à la prochaine visite.",
+      "submit": "Suggérer un entretien",
+      "analyzing": "Ruben réfléchit...",
+      "saved": "Suggestions ajoutées.",
+      "error": "Une erreur s'est produite. Réessayez.",
+      "empty": "Pas encore assez de données pour suggérer quoi que ce soit pour ce véhicule.",
+      "urgencyLow": "Faible",
+      "urgencyMedium": "Moyenne",
+      "urgencyHigh": "Élevée"
+    },
     "checklistResult": {
       "pending": "À faire",
       "ok": "OK",
