@@ -296,8 +296,11 @@
     "roles": {
       "owner": "Eigenaar",
       "admin": "Beheerder",
+      "manager": "Manager",
       "receptionist": "Receptie",
       "mechanic": "Monteur",
+      "apprentice": "Leerling",
+      "accountant": "Boekhouding",
       "viewer": "Kijker"
     },
     "leads": {
@@ -405,7 +408,21 @@
       "email": "E-mailadres",
       "invite": "Uitnodigen",
       "inviteNote": "De uitnodiging staat klaar. E-mailverzending volgt in een latere stap.",
-      "limitReached": "U heeft het maximum aantal gebruikers van uw abonnement bereikt. Upgrade om meer mensen uit te nodigen."
+      "limitReached": "U heeft het maximum aantal gebruikers van uw abonnement bereikt. Upgrade om meer mensen uit te nodigen.",
+      "statOpenWorkOrders": "Lopende reparatieorders",
+      "statCompleted": "Afgeronde reparaties",
+      "statRevenue": "Gegenereerde omzet",
+      "statToday": "Vandaag",
+      "lastLogin": "Laatst ingelogd {date}",
+      "neverLoggedIn": "Nog nooit ingelogd",
+      "actionResetPassword": "Wachtwoord resetten",
+      "resetPasswordSent": "Reset-e-mail verstuurd.",
+      "resetPasswordError": "Kon de reset-e-mail niet versturen.",
+      "transferTo": "Dossiers overdragen aan…",
+      "transferAction": "Overdragen",
+      "transferDone": "Dossiers overgedragen.",
+      "transferError": "Kon de dossiers niet overdragen.",
+      "permissionsNote": "Gedetailleerde rechten per rol zijn een apart project — voorlopig geeft elke rol standaardtoegang tot de applicatie."
     },
     "customers": {
       "title": "Klanten",

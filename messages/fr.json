@@ -296,8 +296,11 @@
     "roles": {
       "owner": "Proprietaire",
       "admin": "Administrateur",
+      "manager": "Gérant",
       "receptionist": "Reception",
       "mechanic": "Mecanicien",
+      "apprentice": "Apprenti",
+      "accountant": "Comptabilité",
       "viewer": "Observateur"
     },
     "leads": {
@@ -405,7 +408,21 @@
       "email": "E-mail",
       "invite": "Inviter",
       "inviteNote": "L'invitation est prête. L'envoi par e-mail viendra plus tard.",
-      "limitReached": "Vous avez atteint le nombre maximal d'utilisateurs inclus dans votre formule. Passez à une formule supérieure pour inviter plus de monde."
+      "limitReached": "Vous avez atteint le nombre maximal d'utilisateurs inclus dans votre formule. Passez à une formule supérieure pour inviter plus de monde.",
+      "statOpenWorkOrders": "Ordres en cours",
+      "statCompleted": "Réparations terminées",
+      "statRevenue": "Chiffre d'affaires généré",
+      "statToday": "Aujourd'hui",
+      "lastLogin": "Dernière connexion {date}",
+      "neverLoggedIn": "Jamais connecté",
+      "actionResetPassword": "Réinitialiser le mot de passe",
+      "resetPasswordSent": "E-mail de réinitialisation envoyé.",
+      "resetPasswordError": "Impossible d'envoyer l'e-mail de réinitialisation.",
+      "transferTo": "Transférer les dossiers à…",
+      "transferAction": "Transférer",
+      "transferDone": "Dossiers transférés.",
+      "transferError": "Impossible de transférer les dossiers.",
+      "permissionsNote": "Les autorisations détaillées par rôle sont un chantier à part — pour l'instant, chaque rôle donne un accès standard à l'application."
     },
     "customers": {
       "title": "Clients",
