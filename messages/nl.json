@@ -951,6 +951,18 @@
       "recommendations": "Aanbevelingen",
       "limitReached": "U heeft het aantal Ruben AI-analyses van deze maand in uw abonnement bereikt. Upgrade om door te gaan."
     },
+    "maintenance": {
+      "title": "Onderhoudssuggesties",
+      "intro": "Ruben kijkt naar de kilometerstand, leeftijd en onderhoudsgeschiedenis van dit voertuig en stelt voor wat u bij het volgende bezoek kunt voorstellen.",
+      "submit": "Onderhoud voorstellen",
+      "analyzing": "Ruben denkt na...",
+      "saved": "Suggesties toegevoegd.",
+      "error": "Er ging iets mis. Probeer opnieuw.",
+      "empty": "Nog niet genoeg gegevens om iets voor te stellen voor dit voertuig.",
+      "urgencyLow": "Laag",
+      "urgencyMedium": "Gemiddeld",
+      "urgencyHigh": "Hoog"
+    },
     "checklistResult": {
       "pending": "Nog te doen",
       "ok": "OK",

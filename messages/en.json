@@ -951,6 +951,18 @@
       "recommendations": "Recommendations",
       "limitReached": "You've reached this month's Ruben AI analyses included in your plan. Upgrade to continue."
     },
+    "maintenance": {
+      "title": "Maintenance suggestions",
+      "intro": "Ruben looks at this vehicle's mileage, age and service history and suggests what to propose at the next visit.",
+      "submit": "Suggest maintenance",
+      "analyzing": "Ruben is thinking...",
+      "saved": "Suggestions added.",
+      "error": "Something went wrong. Try again.",
+      "empty": "Not enough data yet to suggest anything for this vehicle.",
+      "urgencyLow": "Low",
+      "urgencyMedium": "Medium",
+      "urgencyHigh": "High"
+    },
     "checklistResult": {
       "pending": "Pending",
       "ok": "OK",

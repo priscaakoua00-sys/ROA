@@ -8,6 +8,7 @@ import type {
   DraftReplyInput,
   LanguageDetectionInput,
   LeadSummaryInput,
+  MaintenanceSuggestionInput,
   MediaDiagnosisInput,
   RepairReportInput,
   UrgencyInput,
@@ -17,6 +18,7 @@ import {
   draftedReplySchema,
   languageDetectionSchema,
   leadSummarySchema,
+  maintenanceSuggestionsSchema,
   mediaDiagnosisSchema,
   repairReportSchema,
   urgencyAssessmentSchema,
@@ -24,6 +26,7 @@ import {
   type DraftedReply,
   type LanguageDetection,
   type LeadSummary,
+  type MaintenanceSuggestions,
   type MediaDiagnosis,
   type RepairReport,
   type UrgencyAssessment,
@@ -405,6 +408,66 @@ export class AnthropicAIProvider implements AIProvider {
     if ('error' in result) return { status: 'error', error: result.error, meta: this.meta(0, Date.now() - started) };
 
     const parsed = assistantAnswerSchema.safeParse(result.input);
+    if (!parsed.success) {
+      return { status: 'handoff', reason: 'Model output failed validation.', meta: this.meta(0.2, Date.now() - started) };
+    }
+    return { status: 'ok', data: parsed.data, meta: this.meta(0.65, Date.now() - started) };
+  }
+
+  async suggestMaintenance(input: MaintenanceSuggestionInput): Promise<AIResult<MaintenanceSuggestions>> {
+    const started = Date.now();
+    const vehicleLabel = [input.vehicle.make, input.vehicle.model, input.vehicle.year]
+      .filter(Boolean)
+      .join(' ');
+    if (!vehicleLabel && input.vehicle.mileage == null) {
+      return {
+        status: 'handoff',
+        reason: 'Not enough vehicle data (make/model/year/mileage) to suggest maintenance.',
+        meta: this.meta(0.1, Date.now() - started),
+      };
+    }
+
+    const tool: Tool = {
+      name: 'submit_maintenance_suggestions',
+      description: 'Submit preventive-maintenance / upsell suggestions for this vehicle.',
+      input_schema: {
+        type: 'object',
+        properties: {
+          suggestions: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                item: { type: 'string' },
+                reason: { type: 'string' },
+                urgency: { type: 'string', enum: ['low', 'medium', 'high'] },
+              },
+              required: ['item', 'reason', 'urgency'],
+            },
+          },
+          disclaimer: { type: 'string' },
+        },
+        required: ['suggestions', 'disclaimer'],
+      },
+    };
+
+    const vehicleText = [
+      `Vehicle: ${vehicleLabel || 'unknown make/model/year'}`,
+      `Mileage: ${input.vehicle.mileage != null ? `${input.vehicle.mileage} km` : 'unknown'}`,
+      `Fuel: ${input.vehicle.fuel ?? 'unknown'}`,
+      input.recentWorkOrderTitles.length > 0
+        ? `Recent work orders (most recent first): ${input.recentWorkOrderTitles.join('; ')}`
+        : 'No recorded work order history for this vehicle.',
+    ].join('\n');
+
+    const result = await this.callTool({
+      system: `You are Ruben, a technical assistant for a car garage's mechanics, in ${LANGUAGE_NAME[input.language] ?? input.language}. Using general automotive service-interval knowledge (oil changes, brake wear, timing belt/chain, tires, fluids, filters...) combined with this vehicle's mileage, age, and recorded history below, suggest preventive-maintenance / upsell items worth proposing to the customer at the next visit. Do NOT invent a specific fault on this vehicle — these are generic interval-based suggestions to confirm in person, never a diagnosis. Skip anything the recent work order history shows was already done recently. If there isn't enough data to say anything useful, return an empty suggestions array rather than guessing. Always include a disclaimer sentence stating these are proposals for the mechanic to verify in person, not a diagnosis or a promise to the customer.\n\n${vehicleText}`,
+      userContent: [{ type: 'text', text: 'Suggest preventive-maintenance items for this vehicle.' }],
+      tool,
+    });
+    if ('error' in result) return { status: 'error', error: result.error, meta: this.meta(0, Date.now() - started) };
+
+    const parsed = maintenanceSuggestionsSchema.safeParse(result.input);
     if (!parsed.success) {
       return { status: 'handoff', reason: 'Model output failed validation.', meta: this.meta(0.2, Date.now() - started) };
     }

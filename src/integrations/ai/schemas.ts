@@ -103,3 +103,19 @@ export const assistantAnswerSchema = z.object({
   answer: z.string().min(1),
 });
 export type AssistantAnswer = z.infer<typeof assistantAnswerSchema>;
+
+export const maintenanceSuggestionSchema = z.object({
+  /** e.g. "Timing belt", "Brake pads (front)", "Tires" — short, concrete. */
+  item: z.string().min(1),
+  /** Why this is being suggested now — mileage/age reasoning, in one sentence. */
+  reason: z.string().min(1),
+  urgency: z.enum(['low', 'medium', 'high']),
+});
+export type MaintenanceSuggestion = z.infer<typeof maintenanceSuggestionSchema>;
+
+export const maintenanceSuggestionsSchema = z.object({
+  suggestions: z.array(maintenanceSuggestionSchema),
+  /** Always shown alongside the list: these are proposals to verify in person, not a diagnosis. */
+  disclaimer: z.string().min(1),
+});
+export type MaintenanceSuggestions = z.infer<typeof maintenanceSuggestionsSchema>;

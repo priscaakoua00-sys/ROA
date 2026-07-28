@@ -128,3 +128,24 @@ export interface AssistantQuestionInput {
   question: string;
   context: string;
 }
+
+/**
+ * What's needed to suggest maintenance/upsell items for a specific vehicle:
+ * mileage- and age-based service intervals (timing belt, brakes, tires,
+ * fluids...) refined by whatever visit history the garage actually has.
+ * Never a diagnosis of a real fault — general preventive-maintenance
+ * reasoning only, clearly framed as suggestions for the mechanic to confirm
+ * in person before proposing to the customer.
+ */
+export interface MaintenanceSuggestionInput {
+  language: SupportedLanguage;
+  vehicle: {
+    make: string | null;
+    model: string | null;
+    year: number | null;
+    mileage: number | null;
+    fuel: string | null;
+  };
+  /** Titles of past work orders on this vehicle, most recent first — real history, not invented. */
+  recentWorkOrderTitles: string[];
+}
