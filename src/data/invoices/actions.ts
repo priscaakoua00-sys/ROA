@@ -3,6 +3,8 @@
 import { redirect } from 'next/navigation';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { sendEmail } from '@/integrations/email';
+import { formatCurrency } from '@/lib/pricing';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -187,6 +189,84 @@ export async function recordPaymentAction(formData: FormData) {
     .eq('id', invoiceId);
 
   redirect(`/${locale}/invoices/${invoiceId}?saved=1`);
+}
+
+/** Quick action from the invoices list: mark fully paid without opening the record. */
+export async function markInvoicePaidAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const invoiceId = String(formData.get('invoiceId') ?? '');
+  const back = String(formData.get('back') ?? `/${locale}/invoices`);
+  if (!invoiceId) redirect(back);
+
+  const supabase = await createSupabaseServerClient();
+  const { data: invoice } = await supabase
+    .from('invoices')
+    .select('organization_id, total, paid_amount')
+    .eq('id', invoiceId)
+    .maybeSingle();
+  if (!invoice) redirect(back);
+
+  const remaining = Math.round((Number(invoice.total) - Number(invoice.paid_amount)) * 100) / 100;
+  if (remaining > 0) {
+    await supabase.from('invoice_payments').insert({
+      organization_id: invoice.organization_id,
+      invoice_id: invoiceId,
+      amount: remaining,
+    });
+  }
+  await supabase
+    .from('invoices')
+    .update({ paid_amount: invoice.total, status: 'paid', paid_at: new Date().toISOString() })
+    .eq('id', invoiceId);
+
+  redirect(back);
+}
+
+const REMINDER_TEXT: Record<Locale, (args: { garage: string; number: string; amount: string; dueDate: string }) => { subject: string; text: string }> = {
+  nl: ({ garage, number, amount, dueDate }) => ({
+    subject: `Betalingsherinnering — factuur ${number}`,
+    text: `Beste klant,\n\nEen korte herinnering: factuur ${number} van ${amount} had als vervaldatum ${dueDate} en staat nog open.\n\nWilt u deze op korte termijn voldoen? Bij vragen horen we het graag.\n\nMet vriendelijke groet,\n${garage}`,
+  }),
+  en: ({ garage, number, amount, dueDate }) => ({
+    subject: `Payment reminder — invoice ${number}`,
+    text: `Hello,\n\nA quick reminder: invoice ${number} for ${amount} was due on ${dueDate} and is still unpaid.\n\nCould you settle it soon? Let us know if you have any questions.\n\nBest regards,\n${garage}`,
+  }),
+  fr: ({ garage, number, amount, dueDate }) => ({
+    subject: `Rappel de paiement — facture ${number}`,
+    text: `Bonjour,\n\nPetit rappel : la facture ${number} de ${amount}, échue le ${dueDate}, est toujours en attente de règlement.\n\nPourriez-vous la régler prochainement ? N'hésitez pas si vous avez des questions.\n\nCordialement,\n${garage}`,
+  }),
+};
+
+/** Quick action from the invoices list: one-click payment reminder for an overdue invoice. */
+export async function sendPaymentReminderAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const invoiceId = String(formData.get('invoiceId') ?? '');
+  const back = String(formData.get('back') ?? `/${locale}/invoices`);
+  if (!invoiceId) redirect(back);
+
+  const supabase = await createSupabaseServerClient();
+  const { data: invoice } = await supabase
+    .from('invoices')
+    .select('invoice_number, total, due_date, organization_id, customers(email, preferred_language)')
+    .eq('id', invoiceId)
+    .maybeSingle();
+  const customer = invoice?.customers as unknown as { email: string | null; preferred_language: string | null } | null;
+  if (!invoice || !customer?.email) redirect(`${back}${back.includes('?') ? '&' : '?'}reminderError=1`);
+
+  const { data: org } = await supabase.from('organizations').select('name').eq('id', invoice.organization_id).maybeSingle();
+
+  const lang: Locale = (['nl', 'en', 'fr'] as const).includes(customer.preferred_language as Locale)
+    ? (customer.preferred_language as Locale)
+    : locale;
+  const { subject, text } = REMINDER_TEXT[lang]({
+    garage: org?.name ?? 'Roavaa',
+    number: invoice.invoice_number,
+    amount: formatCurrency(Number(invoice.total), lang),
+    dueDate: invoice.due_date ?? '',
+  });
+
+  const result = await sendEmail({ to: customer.email, subject, text });
+  redirect(`${back}${back.includes('?') ? '&' : '?'}${result.sent ? 'reminderSent=1' : 'reminderError=1'}`);
 }
 
 /* ----------------------------- Line items -------------------------------- */
