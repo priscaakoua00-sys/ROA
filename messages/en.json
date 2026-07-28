@@ -473,7 +473,9 @@
       "mileage": "Mileage",
       "addVehicle": "Add vehicle",
       "historyTitle": "History",
-      "noHistory": "No history yet."
+      "noHistory": "No history yet.",
+      "portalTitle": "Customer portal",
+      "portalHint": "Share this link with the customer: they can track repairs, view quotes and invoices, and pay online, with a simple sign-in link sent by email."
     },
     "workOrders": {
       "title": "Work orders",
@@ -1213,6 +1215,30 @@
     "paymentCancelled": "Payment cancelled. You can try again any time.",
     "paymentUnavailable": "Online payment isn't set up for this garage yet. Please contact the garage directly to settle this invoice.",
     "disclaimer": "Only you can view this invoice via this link. Don't save or share it with others."
+  },
+  "portal": {
+    "loginTitle": "Customer portal",
+    "loginSubtitle": "Track your repairs, quotes, and invoices.",
+    "emailLabel": "Email address",
+    "sendLink": "Send my sign-in link",
+    "linkSent": "A sign-in link was sent to your email. Open it to access your portal.",
+    "loginError": "Couldn't send the link. Check the email address and try again.",
+    "loginNote": "No password needed: we send you a secure, single-use sign-in link.",
+    "greeting": "Hello {name}",
+    "greetingGeneric": "Hello",
+    "signOut": "Sign out",
+    "noCustomerRecord": "No customer record was found for this email address. Contact your garage to have your access activated.",
+    "vehiclesTitle": "Your vehicles",
+    "vehiclesEmpty": "No vehicle registered yet.",
+    "vehicleUnknown": "Vehicle",
+    "workOrdersTitle": "Repairs in progress",
+    "quotesTitle": "Quotes",
+    "validUntil": "Valid until {date}",
+    "invoicesTitle": "Invoices",
+    "dueDate": "Due on {date}",
+    "appointmentsTitle": "Upcoming appointments",
+    "contactNote": "Any question? Contact {org} directly.",
+    "contactNotePhone": "Any question? Contact {org} at {phone}."
   },
   "pricing": {
     "title": "Pricing",

@@ -473,7 +473,9 @@
       "mileage": "Km-stand",
       "addVehicle": "Voertuig toevoegen",
       "historyTitle": "Geschiedenis",
-      "noHistory": "Nog geen geschiedenis."
+      "noHistory": "Nog geen geschiedenis.",
+      "portalTitle": "Klantenportaal",
+      "portalHint": "Deel deze link met de klant: die kan reparaties volgen, offertes en facturen bekijken en online betalen, met een eenvoudige inloglink per e-mail."
     },
     "workOrders": {
       "title": "Reparatieorders",
@@ -1213,6 +1215,30 @@
     "paymentCancelled": "Betaling geannuleerd. U kunt het op elk moment opnieuw proberen.",
     "paymentUnavailable": "Online betalen is nog niet ingesteld voor deze garage. Neem rechtstreeks contact op met de garage om deze factuur te voldoen.",
     "disclaimer": "Alleen u kunt deze factuur via deze link bekijken. Bewaar of deel de link niet met anderen."
+  },
+  "portal": {
+    "loginTitle": "Klantenportaal",
+    "loginSubtitle": "Volg uw reparaties, offertes en facturen.",
+    "emailLabel": "E-mailadres",
+    "sendLink": "Stuur mij een inloglink",
+    "linkSent": "Er is een inloglink naar uw e-mail gestuurd. Open deze om naar uw portaal te gaan.",
+    "loginError": "Kon de link niet versturen. Controleer het e-mailadres en probeer het opnieuw.",
+    "loginNote": "Geen wachtwoord nodig: we sturen u een beveiligde, eenmalige inloglink.",
+    "greeting": "Hallo {name}",
+    "greetingGeneric": "Hallo",
+    "signOut": "Uitloggen",
+    "noCustomerRecord": "Er is geen klantdossier gevonden met dit e-mailadres. Neem contact op met uw garage om uw toegang te activeren.",
+    "vehiclesTitle": "Uw voertuigen",
+    "vehiclesEmpty": "Nog geen voertuig geregistreerd.",
+    "vehicleUnknown": "Voertuig",
+    "workOrdersTitle": "Lopende reparaties",
+    "quotesTitle": "Offertes",
+    "validUntil": "Geldig tot {date}",
+    "invoicesTitle": "Facturen",
+    "dueDate": "Vervaldatum {date}",
+    "appointmentsTitle": "Aankomende afspraken",
+    "contactNote": "Vragen? Neem rechtstreeks contact op met {org}.",
+    "contactNotePhone": "Vragen? Neem contact op met {org} via {phone}."
   },
   "pricing": {
     "title": "Prijzen",

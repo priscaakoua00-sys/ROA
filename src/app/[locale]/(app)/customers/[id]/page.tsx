@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
+import { SITE_URL } from '@/lib/site';
 
 export default async function CustomerDetailPage({
   params,
@@ -65,6 +66,19 @@ export default async function CustomerDetailPage({
       <p className="mt-1 text-sm text-muted-foreground">
         {[customer.phone, customer.email].filter(Boolean).join(' · ') || '·'}
       </p>
+
+      {customer.email ? (
+        <div className="mt-4 rounded-xl border border-border bg-card p-4">
+          <p className="text-sm font-medium">{t('customers.portalTitle')}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{t('customers.portalHint')}</p>
+          <input
+            type="text"
+            readOnly
+            value={`${SITE_URL}/${locale}/portal/login`}
+            className="mt-2 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-muted-foreground"
+          />
+        </div>
+      ) : null}
 
       {/* Vehicles */}
       <section className="mt-6">

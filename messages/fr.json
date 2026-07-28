@@ -473,7 +473,9 @@
       "mileage": "Km",
       "addVehicle": "Ajouter un véhicule",
       "historyTitle": "Historique",
-      "noHistory": "Aucun historique."
+      "noHistory": "Aucun historique.",
+      "portalTitle": "Espace client",
+      "portalHint": "Partagez ce lien avec le client : il pourra suivre ses réparations, consulter ses devis et factures, et payer en ligne, avec un simple lien de connexion envoyé par e-mail."
     },
     "workOrders": {
       "title": "Ordres de réparation",
@@ -1213,6 +1215,30 @@
     "paymentCancelled": "Paiement annulé. Vous pouvez réessayer à tout moment.",
     "paymentUnavailable": "Le paiement en ligne n'est pas encore activé pour ce garage. Merci de contacter directement le garage pour régler cette facture.",
     "disclaimer": "Vous seul(e) pouvez consulter cette facture via ce lien. Ne le conservez pas et ne le partagez pas."
+  },
+  "portal": {
+    "loginTitle": "Espace client",
+    "loginSubtitle": "Suivez vos réparations, devis et factures.",
+    "emailLabel": "Adresse e-mail",
+    "sendLink": "Recevoir mon lien de connexion",
+    "linkSent": "Un lien de connexion vous a été envoyé par e-mail. Ouvrez-le pour accéder à votre espace.",
+    "loginError": "Impossible d'envoyer le lien. Vérifiez l'adresse e-mail et réessayez.",
+    "loginNote": "Aucun mot de passe nécessaire : nous vous envoyons un lien de connexion sécurisé à usage unique.",
+    "greeting": "Bonjour {name}",
+    "greetingGeneric": "Bonjour",
+    "signOut": "Déconnexion",
+    "noCustomerRecord": "Aucun dossier client n'a été trouvé avec cette adresse e-mail. Contactez votre garage pour qu'il active votre accès.",
+    "vehiclesTitle": "Vos véhicules",
+    "vehiclesEmpty": "Aucun véhicule enregistré pour l'instant.",
+    "vehicleUnknown": "Véhicule",
+    "workOrdersTitle": "Réparations en cours",
+    "quotesTitle": "Devis",
+    "validUntil": "Valable jusqu'au {date}",
+    "invoicesTitle": "Factures",
+    "dueDate": "Échéance le {date}",
+    "appointmentsTitle": "Prochains rendez-vous",
+    "contactNote": "Une question ? Contactez {org} directement.",
+    "contactNotePhone": "Une question ? Contactez {org} au {phone}."
   },
   "pricing": {
     "title": "Tarifs",
