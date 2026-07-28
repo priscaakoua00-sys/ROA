@@ -427,6 +427,33 @@
       "title": "Work orders",
       "empty": "No work orders yet.",
       "back": "Back to work orders",
+      "stage": {
+        "reception": "Reception",
+        "diagnostic": "Diagnostic",
+        "parts": "Parts ordered",
+        "repair": "Repair in progress",
+        "qualityControl": "Quality control",
+        "delivery": "Ready for delivery"
+      },
+      "filters": {
+        "all": "All",
+        "waiting": "Waiting",
+        "inProgress": "In progress",
+        "partsOrdered": "Parts ordered",
+        "readyToDeliver": "Ready to deliver",
+        "done": "Done"
+      },
+      "priority": {
+        "urgent": "Urgent",
+        "today": "Today",
+        "thisWeek": "This week",
+        "scheduled": "Scheduled"
+      },
+      "actionCall": "Call",
+      "actionWhatsapp": "WhatsApp",
+      "actionOpenVehicle": "Vehicle",
+      "actionOpenInvoice": "Invoice",
+      "estimateLabel": "Estimate",
       "viewLead": "View request",
       "tasksTitle": "Tasks",
       "noTasks": "No tasks yet.",

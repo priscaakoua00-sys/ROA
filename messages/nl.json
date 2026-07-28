@@ -427,6 +427,33 @@
       "title": "Reparatieorders",
       "empty": "Nog geen reparatieorders.",
       "back": "Terug naar reparatieorders",
+      "stage": {
+        "reception": "Ontvangst",
+        "diagnostic": "Diagnose",
+        "parts": "Onderdelen besteld",
+        "repair": "Reparatie bezig",
+        "qualityControl": "Kwaliteitscontrole",
+        "delivery": "Klaar voor aflevering"
+      },
+      "filters": {
+        "all": "Alle",
+        "waiting": "Wachtend",
+        "inProgress": "Bezig",
+        "partsOrdered": "Onderdelen besteld",
+        "readyToDeliver": "Klaar voor aflevering",
+        "done": "Afgerond"
+      },
+      "priority": {
+        "urgent": "Urgent",
+        "today": "Vandaag",
+        "thisWeek": "Deze week",
+        "scheduled": "Ingepland"
+      },
+      "actionCall": "Bellen",
+      "actionWhatsapp": "WhatsApp",
+      "actionOpenVehicle": "Voertuig",
+      "actionOpenInvoice": "Factuur",
+      "estimateLabel": "Schatting",
       "viewLead": "Bekijk aanvraag",
       "tasksTitle": "Taken",
       "noTasks": "Nog geen taken.",
