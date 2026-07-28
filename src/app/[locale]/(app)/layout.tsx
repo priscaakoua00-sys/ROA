@@ -41,8 +41,21 @@ export default async function AppLayout({
 
   const displayName = profile?.full_name || user.email?.split('@')[0] || '';
 
+  const { count: unreadNotificationCount } = await supabase
+    .from('notifications')
+    .select('id', { count: 'exact', head: true })
+    .eq('organization_id', activeOrg.id)
+    .eq('read', false);
+
   return (
-    <AppShell orgName={activeOrg.name} orgs={orgs} activeOrgId={activeOrg.id} locale={locale} displayName={displayName}>
+    <AppShell
+      orgName={activeOrg.name}
+      orgs={orgs}
+      activeOrgId={activeOrg.id}
+      locale={locale}
+      displayName={displayName}
+      unreadNotificationCount={unreadNotificationCount ?? 0}
+    >
       {children}
     </AppShell>
   );
