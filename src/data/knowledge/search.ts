@@ -13,10 +13,15 @@ const STOPWORDS = new Set([
   'le', 'la', 'les', 'un', 'une', 'et', 'du', 'des', 'est', 'pour', 'avec', 'sur', 'dans',
 ]);
 
+/** Strips accents so "reparation" matches "réparation" regardless of which way the user types it. */
+function foldAccents(text: string): string {
+  return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
 function keywordsOf(text: string): string[] {
-  return text
+  return foldAccents(text)
     .toLowerCase()
-    .split(/[^a-z0-9àâäéèêëïîôöùûüçñ]+/i)
+    .split(/[^a-z0-9]+/i)
     .filter((w) => w.length >= 3 && !STOPWORDS.has(w));
 }
 
@@ -37,8 +42,8 @@ export function scoreArticles(
 
   return articles
     .map((a) => {
-      const titleLower = a.title.toLowerCase();
-      const contentLower = a.content.toLowerCase();
+      const titleLower = foldAccents(a.title).toLowerCase();
+      const contentLower = foldAccents(a.content).toLowerCase();
       let score = 0;
       for (const w of words) {
         if (titleLower.includes(w)) score += 2;

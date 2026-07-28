@@ -56,11 +56,16 @@ const APPOINTMENT_STATUSES = [
   'no_show',
 ] as const;
 
+function viewParam(formData: FormData): string {
+  const v = String(formData.get('view') ?? '');
+  return v === 'week' ? '&view=week' : '';
+}
+
 export async function createAppointmentAction(formData: FormData) {
   const locale = localeOf(formData);
   const day = String(formData.get('day') ?? '');
   const month = day.slice(0, 7);
-  const backHref = `/${locale}/agenda?month=${month}&day=${day}`;
+  const backHref = `/${locale}/agenda?month=${month}&day=${day}${viewParam(formData)}`;
 
   const customerId = String(formData.get('customerId') ?? '').trim();
   const time = String(formData.get('time') ?? '').trim() || '09:00';
@@ -84,6 +89,19 @@ export async function createAppointmentAction(formData: FormData) {
   const start = new Date(`${day}T${time}:00.000Z`);
   const end = new Date(start.getTime() + durationMin * 60_000);
 
+  // Conflict check: two appointments for the same garage should never overlap.
+  const { data: sameDay } = await supabase
+    .from('appointments')
+    .select('starts_at, ends_at')
+    .eq('organization_id', customer.organization_id)
+    .neq('status', 'cancelled')
+    .gte('starts_at', `${day}T00:00:00.000Z`)
+    .lt('starts_at', `${day}T23:59:59.999Z`);
+  const overlaps = (sameDay ?? []).some(
+    (a) => start.getTime() < new Date(a.ends_at).getTime() && new Date(a.starts_at).getTime() < end.getTime(),
+  );
+  if (overlaps) redirect(`${backHref}&conflict=1`);
+
   const { error } = await supabase.from('appointments').insert({
     organization_id: customer.organization_id,
     customer_id: customerId,
@@ -104,7 +122,7 @@ export async function updateAppointmentStatusAction(formData: FormData) {
   const appointmentId = String(formData.get('appointmentId') ?? '');
   const month = String(formData.get('month') ?? '');
   const day = String(formData.get('day') ?? '');
-  const backHref = `/${locale}/agenda?month=${month}&day=${day}`;
+  const backHref = `/${locale}/agenda?month=${month}&day=${day}${viewParam(formData)}`;
   if (!appointmentId) redirect(backHref);
 
   const status = String(formData.get('status') ?? '');

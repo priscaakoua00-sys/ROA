@@ -5,10 +5,26 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { instantiateChecklist, logStatus } from '@/data/work-orders/helpers';
 import { sendEmail } from '@/integrations/email';
+import { formatCurrency } from '@/lib/pricing';
 import { SITE_URL } from '@/lib/site';
 
 type Locale = 'nl' | 'en' | 'fr';
 type LineItemKind = 'part' | 'labor' | 'other';
+
+const REMINDER_TEXT: Record<Locale, (args: { garage: string; number: string; amount: string; validUntil: string }) => { subject: string; text: string }> = {
+  nl: ({ garage, number, amount, validUntil }) => ({
+    subject: `Herinnering — offerte ${number}`,
+    text: `Beste klant,\n\nEen korte herinnering: offerte ${number} van ${amount}${validUntil ? ` (geldig tot ${validUntil})` : ''} staat nog open. Laat ons weten of u akkoord gaat, zodat we verder kunnen plannen.\n\nMet vriendelijke groet,\n${garage}`,
+  }),
+  en: ({ garage, number, amount, validUntil }) => ({
+    subject: `Reminder — quote ${number}`,
+    text: `Hello,\n\nA quick reminder: quote ${number} for ${amount}${validUntil ? ` (valid until ${validUntil})` : ''} is still awaiting your response. Let us know if you approve so we can plan accordingly.\n\nBest regards,\n${garage}`,
+  }),
+  fr: ({ garage, number, amount, validUntil }) => ({
+    subject: `Rappel — devis ${number}`,
+    text: `Bonjour,\n\nPetit rappel : le devis ${number} de ${amount}${validUntil ? ` (valable jusqu'au ${validUntil})` : ''} est toujours en attente de votre réponse. Merci de nous indiquer si vous l'acceptez afin que nous puissions planifier la suite.\n\nCordialement,\n${garage}`,
+  }),
+};
 
 const SENT_EMAIL_COPY: Record<Locale, { subject: (n: string) => string; body: (garage: string, n: string, url: string) => string }> = {
   nl: {
@@ -365,4 +381,102 @@ export async function convertQuoteToInvoiceAction(formData: FormData) {
   await supabase.from('quotes').update({ status: 'converted', invoice_id: invoice.id }).eq('id', quoteId);
 
   redirect(`/${locale}/invoices/${invoice.id}`);
+}
+
+/** Quick action from the quotes list: one-click reminder for a quote the customer hasn't responded to yet. */
+export async function sendQuoteReminderAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const quoteId = String(formData.get('quoteId') ?? '');
+  const back = String(formData.get('back') ?? `/${locale}/quotes`);
+  if (!quoteId) redirect(back);
+
+  const supabase = await createSupabaseServerClient();
+  const { data: quote } = await supabase
+    .from('quotes')
+    .select('quote_number, total, valid_until, organization_id, customers(email, preferred_language)')
+    .eq('id', quoteId)
+    .maybeSingle();
+  const customer = quote?.customers as unknown as { email: string | null; preferred_language: string | null } | null;
+  if (!quote || !customer?.email) redirect(`${back}${back.includes('?') ? '&' : '?'}reminderError=1`);
+
+  const { data: org } = await supabase.from('organizations').select('name').eq('id', quote.organization_id).maybeSingle();
+
+  const lang: Locale = (['nl', 'en', 'fr'] as const).includes(customer.preferred_language as Locale)
+    ? (customer.preferred_language as Locale)
+    : locale;
+  const { subject, text } = REMINDER_TEXT[lang]({
+    garage: org?.name ?? 'Roavaa',
+    number: quote.quote_number,
+    amount: formatCurrency(Number(quote.total), lang),
+    validUntil: quote.valid_until ?? '',
+  });
+
+  const result = await sendEmail({ to: customer.email, subject, text });
+  redirect(`${back}${back.includes('?') ? '&' : '?'}${result.sent ? 'reminderSent=1' : 'reminderError=1'}`);
+}
+
+/** Duplicates a quote (customer, vehicle, VAT rate, notes, and every line item) into a fresh draft — for near-identical repeat quotes. */
+export async function duplicateQuoteAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const quoteId = String(formData.get('quoteId') ?? '');
+  if (!quoteId) redirect(`/${locale}/quotes`);
+
+  const supabase = await createSupabaseServerClient();
+  const { data: quote } = await supabase
+    .from('quotes')
+    .select('organization_id, customer_id, vehicle_id, vat_rate, notes')
+    .eq('id', quoteId)
+    .maybeSingle();
+  if (!quote) redirect(`/${locale}/quotes`);
+
+  const { data: lines } = await supabase
+    .from('quote_line_items')
+    .select('description, kind, quantity, unit_price, sort_order')
+    .eq('quote_id', quoteId)
+    .order('sort_order', { ascending: true });
+
+  const { data: quoteNumber, error: numberError } = await supabase.rpc('next_quote_number', {
+    p_org: quote.organization_id,
+  });
+  if (numberError || !quoteNumber) redirect(`/${locale}/quotes/${quoteId}?error=1`);
+
+  const subtotal = Math.round(
+    (lines ?? []).reduce((sum, l) => sum + Number(l.quantity) * Number(l.unit_price), 0) * 100,
+  ) / 100;
+  const vatAmount = Math.round(subtotal * (Number(quote.vat_rate) / 100) * 100) / 100;
+  const total = Math.round((subtotal + vatAmount) * 100) / 100;
+
+  const { data: newQuote, error } = await supabase
+    .from('quotes')
+    .insert({
+      organization_id: quote.organization_id,
+      quote_number: quoteNumber,
+      customer_id: quote.customer_id,
+      vehicle_id: quote.vehicle_id,
+      status: 'draft',
+      subtotal,
+      vat_rate: quote.vat_rate,
+      vat_amount: vatAmount,
+      total,
+      notes: quote.notes,
+    })
+    .select('id')
+    .maybeSingle();
+  if (error || !newQuote) redirect(`/${locale}/quotes/${quoteId}?error=1`);
+
+  if (lines && lines.length > 0) {
+    await supabase.from('quote_line_items').insert(
+      lines.map((l) => ({
+        organization_id: quote.organization_id,
+        quote_id: newQuote.id,
+        description: l.description,
+        kind: l.kind,
+        quantity: l.quantity,
+        unit_price: l.unit_price,
+        sort_order: l.sort_order,
+      })),
+    );
+  }
+
+  redirect(`/${locale}/quotes/${newQuote.id}?saved=1`);
 }

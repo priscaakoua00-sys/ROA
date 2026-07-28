@@ -14,6 +14,7 @@ const CATEGORIES = [
   'part',
   'intervention_time',
   'failure',
+  'internal_note',
 ] as const;
 
 function localeOf(fd: FormData): Locale {
@@ -172,4 +173,35 @@ export async function saveReportAsArticleAction(formData: FormData) {
   });
 
   redirect(`/${locale}/work-orders/${workOrderId}?articleSaved=1`);
+}
+
+/** Toggles the current user's favorite flag on an article. Per-user, so each mechanic curates their own shortlist. */
+export async function toggleFavoriteAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const articleId = String(formData.get('articleId') ?? '');
+  if (!articleId) redirect(`/${locale}/knowledge`);
+
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect(`/${locale}/login`);
+
+  const { data: article } = await supabase.from('knowledge_articles').select('organization_id').eq('id', articleId).maybeSingle();
+  if (!article) redirect(`/${locale}/knowledge`);
+
+  const { data: existing } = await supabase
+    .from('knowledge_favorites')
+    .select('id')
+    .eq('article_id', articleId)
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (existing) {
+    await supabase.from('knowledge_favorites').delete().eq('id', existing.id);
+  } else {
+    await supabase.from('knowledge_favorites').insert({ organization_id: article.organization_id, article_id: articleId, user_id: user.id });
+  }
+
+  redirect(`/${locale}/knowledge?saved=1#article-${articleId}`);
 }
