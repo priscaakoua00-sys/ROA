@@ -141,6 +141,9 @@ export default async function TeamPage({
         </Link>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">{t('team.permissionsNote')}</p>
+      <Link href="/team/activity" className="mt-2 inline-block text-sm text-gold hover:underline">
+        {t('team.viewActivityLog')}
+      </Link>
 
       <ul className="mt-6 space-y-2">
         {members.map((m) => {

@@ -435,7 +435,9 @@
       "transferAction": "Transférer",
       "transferDone": "Dossiers transférés.",
       "transferError": "Impossible de transférer les dossiers.",
-      "permissionsNote": "Les autorisations détaillées par rôle sont un chantier à part — pour l'instant, chaque rôle donne un accès standard à l'application."
+      "permissionsNote": "Les autorisations détaillées par rôle sont un chantier à part — pour l'instant, chaque rôle donne un accès standard à l'application.",
+      "viewActivityLog": "Voir le journal d'activité",
+      "back": "Retour à l'équipe"
     },
     "customers": {
       "title": "Clients",
@@ -796,6 +798,22 @@
       "generatedAt": "Généré le",
       "pdfFooter": "Rapport généré automatiquement par ROAVAA.",
       "csvMetric": "Indicateur"
+    },
+    "activityLog": {
+      "title": "Journal d'activité",
+      "intro": "Qui a créé ou modifié une facture, un client ou un ordre de réparation, et quand.",
+      "empty": "Aucune activité enregistrée pour l'instant.",
+      "unknownActor": "Quelqu'un",
+      "action": {
+        "created": "a créé",
+        "updated": "a modifié"
+      },
+      "entity": {
+        "invoice": "la facture",
+        "customer": "le client",
+        "work_order": "l'ordre de réparation"
+      },
+      "retentionNote": "Affiche les 150 événements les plus récents."
     },
     "automations": {
       "title": "Relances",

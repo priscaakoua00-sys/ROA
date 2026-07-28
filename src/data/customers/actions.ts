@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { getOrgEntitlements } from '@/data/subscriptions/get-subscription';
 import { countVehicles } from '@/data/subscriptions/usage';
+import { logActivity } from '@/data/activity/log';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -165,5 +166,18 @@ export async function addCustomerAction(formData: FormData) {
       mileage: mileageRaw ? Number(mileageRaw) : null,
     });
   }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  await logActivity(supabase, {
+    organizationId: orgId,
+    actorId: user?.id ?? null,
+    entityType: 'customer',
+    entityId: customer.id,
+    entityLabel: [firstName, lastName].filter(Boolean).join(' ') || clean('phone') || clean('email') || customer.id,
+    action: 'created',
+  });
+
   redirect(`/${locale}/customers/${customer.id}`);
 }
