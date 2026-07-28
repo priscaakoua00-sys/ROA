@@ -427,6 +427,33 @@
       "title": "Ordres de réparation",
       "empty": "Aucun ordre de réparation.",
       "back": "Retour aux ordres",
+      "stage": {
+        "reception": "Réception",
+        "diagnostic": "Diagnostic",
+        "parts": "Pièces commandées",
+        "repair": "Réparation en cours",
+        "qualityControl": "Contrôle qualité",
+        "delivery": "Prêt à livrer"
+      },
+      "filters": {
+        "all": "Tous",
+        "waiting": "En attente",
+        "inProgress": "En cours",
+        "partsOrdered": "Pièces commandées",
+        "readyToDeliver": "Prêt à livrer",
+        "done": "Terminé"
+      },
+      "priority": {
+        "urgent": "Urgent",
+        "today": "Aujourd'hui",
+        "thisWeek": "Cette semaine",
+        "scheduled": "Planifié"
+      },
+      "actionCall": "Appeler",
+      "actionWhatsapp": "WhatsApp",
+      "actionOpenVehicle": "Véhicule",
+      "actionOpenInvoice": "Facture",
+      "estimateLabel": "Estimation",
       "viewLead": "Voir la demande",
       "tasksTitle": "Tâches",
       "noTasks": "Aucune tâche.",

@@ -57,3 +57,30 @@ export const WORK_ORDER_STATUS_VARIANT: Record<
 export function isWorkOrderStatus(value: string): value is WorkOrderStatus {
   return (WORK_ORDER_STATUSES as readonly string[]).includes(value);
 }
+
+/**
+ * The 13 real statuses collapsed to the 6 stages a mechanic actually thinks
+ * in, for a shop-floor progress bar: reception, diagnostic (incl. waiting
+ * on a customer/leasing decision — still "not started yet"), parts,
+ * repair, quality control, ready for delivery. `delivered` fills the same
+ * last stage; `cancelled` has no place on a progress bar and is handled
+ * separately by callers.
+ */
+export const WORK_ORDER_STAGES = ['reception', 'diagnostic', 'parts', 'repair', 'qualityControl', 'delivery'] as const;
+export type WorkOrderStage = (typeof WORK_ORDER_STAGES)[number];
+
+export const WORK_ORDER_STAGE_OF: Record<WorkOrderStatus, WorkOrderStage | null> = {
+  received: 'reception',
+  inspection_in_progress: 'diagnostic',
+  diagnostic_done: 'diagnostic',
+  awaiting_customer_approval: 'diagnostic',
+  awaiting_leasing_approval: 'diagnostic',
+  quote_accepted: 'diagnostic',
+  parts_ordered: 'parts',
+  parts_received: 'parts',
+  repair_in_progress: 'repair',
+  final_control: 'qualityControl',
+  ready_for_delivery: 'delivery',
+  delivered: 'delivery',
+  cancelled: null,
+};
