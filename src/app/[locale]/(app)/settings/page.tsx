@@ -21,6 +21,7 @@ import {
 } from '@/data/security/actions';
 import { createAdditionalOrgAction } from '@/data/organizations/actions';
 import { getActiveOrgId, listUserOrgs } from '@/data/organizations/active';
+import { getCurrentRole, roleHas } from '@/lib/roles';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
@@ -107,7 +108,7 @@ export default async function SettingsPage({
     logoUrl = data.publicUrl;
   }
 
-  const [{ data: rules }, { data: svc }, subscription, vehicleCount, seatCount, aiAnalysesUsed] = await Promise.all([
+  const [{ data: rules }, { data: svc }, subscription, vehicleCount, seatCount, aiAnalysesUsed, role] = await Promise.all([
     supabase
       .from('availability_rules')
       .select('weekday, start_time, end_time')
@@ -121,8 +122,14 @@ export default async function SettingsPage({
     countVehicles(supabase, org.id),
     countSeats(supabase, org.id),
     countAiAnalysesThisMonth(supabase, org.id),
+    getCurrentRole(supabase, org.id),
   ]);
   const isPlatformOwner = isPlatformOwnerEmail(user.email);
+  const canManageSettings = roleHas(role, 'manage_settings');
+  // Company identity (IBAN, VAT, margin) stays owner/admin-only at the RLS
+  // layer (organizations_update_admin) — manager gets services/hours/
+  // checklist (below) but not this section.
+  const canManageCompany = role === 'owner' || role === 'admin';
   const currentPlan = PLANS.find((p) => p.key === subscription.planKey) ?? PLANS[0]!;
   const trialDaysLeft = subscription.trialEndsAt
     ? Math.max(0, Math.ceil((new Date(subscription.trialEndsAt).getTime() - Date.now()) / 86_400_000))
@@ -303,74 +310,80 @@ export default async function SettingsPage({
         <h2 className="text-base font-semibold tracking-tight">{t('settings.companyTitle')}</h2>
         <p className="mt-1 text-sm text-muted-foreground">{t('settings.companyIntro')}</p>
 
-        <form action={uploadOrgLogoAction} encType="multipart/form-data" className="mt-4 flex flex-wrap items-center gap-3">
-          <input type="hidden" name="locale" value={locale} />
-          {logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoUrl} alt="" className="size-14 rounded-lg border border-border object-contain bg-background" />
-          ) : (
-            <span className="flex size-14 items-center justify-center rounded-lg border border-dashed border-border text-xs text-muted-foreground">
-              {t('settings.noLogo')}
-            </span>
-          )}
-          <label className="flex-1 text-sm">
-            <span className="mb-1.5 block font-medium">{t('settings.logoUpload')}</span>
-            <input
-              type="file"
-              name="logo"
-              accept="image/*"
-              required
-              className="block w-full text-xs text-muted-foreground file:mr-2 file:rounded-md file:border-0 file:bg-primary file:px-2 file:py-1 file:text-xs file:font-medium file:text-primary-foreground hover:file:bg-primary/90"
-            />
-          </label>
-          <Button type="submit" variant="outline" size="sm">{t('vehicles.photoSave')}</Button>
-        </form>
+        {canManageCompany ? (
+          <>
+            <form action={uploadOrgLogoAction} encType="multipart/form-data" className="mt-4 flex flex-wrap items-center gap-3">
+              <input type="hidden" name="locale" value={locale} />
+              {logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={logoUrl} alt="" className="size-14 rounded-lg border border-border object-contain bg-background" />
+              ) : (
+                <span className="flex size-14 items-center justify-center rounded-lg border border-dashed border-border text-xs text-muted-foreground">
+                  {t('settings.noLogo')}
+                </span>
+              )}
+              <label className="flex-1 text-sm">
+                <span className="mb-1.5 block font-medium">{t('settings.logoUpload')}</span>
+                <input
+                  type="file"
+                  name="logo"
+                  accept="image/*"
+                  required
+                  className="block w-full text-xs text-muted-foreground file:mr-2 file:rounded-md file:border-0 file:bg-primary file:px-2 file:py-1 file:text-xs file:font-medium file:text-primary-foreground hover:file:bg-primary/90"
+                />
+              </label>
+              <Button type="submit" variant="outline" size="sm">{t('vehicles.photoSave')}</Button>
+            </form>
 
-        <form action={updateCompanyAction} className="mt-4 space-y-3 border-t border-border pt-4">
-          <input type="hidden" name="locale" value={locale} />
-          <Field label={t('settings.name')} name="name" defaultValue={org.name} required />
-          <div>
-            <label className="mb-1 block text-sm font-medium">{t('settings.language')}</label>
-            <select name="defaultLanguage" defaultValue={org.default_language ?? 'nl'} className={inputCls}>
-              {LANGS.map((l) => (
-                <option key={l} value={l}>{t(`settings.lang.${l}`)}</option>
-              ))}
-            </select>
-          </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Field label={t('settings.phone')} name="phone" defaultValue={org.phone ?? ''} />
-            <Field label={t('settings.email')} name="email" type="email" defaultValue={org.email ?? ''} />
-          </div>
-          <Field label={t('settings.address')} name="address" defaultValue={org.address ?? ''} />
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Field label={t('settings.postalCode')} name="postalCode" defaultValue={org.postal_code ?? ''} />
-            <Field label={t('settings.city')} name="city" defaultValue={org.city ?? ''} />
-          </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Field label={t('settings.kvkNumber')} name="kvkNumber" defaultValue={org.kvk_number ?? ''} />
-            <Field label={t('settings.vatNumber')} name="vatNumber" defaultValue={org.vat_number ?? ''} />
-          </div>
-          <Field label={t('settings.website')} name="website" defaultValue={org.website ?? ''} placeholder="https://" />
-          <p className="text-xs text-muted-foreground">{t('settings.ibanIntro')}</p>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Field label={t('settings.iban')} name="iban" defaultValue={org.iban ?? ''} />
-            <Field label={t('settings.bic')} name="bic" defaultValue={org.bic ?? ''} />
-          </div>
-          <div>
-            <Field
-              label={t('settings.marginPercent')}
-              name="marginPercent"
-              type="number"
-              min="0"
-              step="1"
-              defaultValue={String(org.default_margin_percent)}
-            />
-            <p className="mt-1 text-xs text-muted-foreground">{t('settings.marginPercentIntro')}</p>
-          </div>
-          <div className="flex justify-end">
-            <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>
-          </div>
-        </form>
+            <form action={updateCompanyAction} className="mt-4 space-y-3 border-t border-border pt-4">
+              <input type="hidden" name="locale" value={locale} />
+              <Field label={t('settings.name')} name="name" defaultValue={org.name} required />
+              <div>
+                <label className="mb-1 block text-sm font-medium">{t('settings.language')}</label>
+                <select name="defaultLanguage" defaultValue={org.default_language ?? 'nl'} className={inputCls}>
+                  {LANGS.map((l) => (
+                    <option key={l} value={l}>{t(`settings.lang.${l}`)}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <Field label={t('settings.phone')} name="phone" defaultValue={org.phone ?? ''} />
+                <Field label={t('settings.email')} name="email" type="email" defaultValue={org.email ?? ''} />
+              </div>
+              <Field label={t('settings.address')} name="address" defaultValue={org.address ?? ''} />
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <Field label={t('settings.postalCode')} name="postalCode" defaultValue={org.postal_code ?? ''} />
+                <Field label={t('settings.city')} name="city" defaultValue={org.city ?? ''} />
+              </div>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <Field label={t('settings.kvkNumber')} name="kvkNumber" defaultValue={org.kvk_number ?? ''} />
+                <Field label={t('settings.vatNumber')} name="vatNumber" defaultValue={org.vat_number ?? ''} />
+              </div>
+              <Field label={t('settings.website')} name="website" defaultValue={org.website ?? ''} placeholder="https://" />
+              <p className="text-xs text-muted-foreground">{t('settings.ibanIntro')}</p>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <Field label={t('settings.iban')} name="iban" defaultValue={org.iban ?? ''} />
+                <Field label={t('settings.bic')} name="bic" defaultValue={org.bic ?? ''} />
+              </div>
+              <div>
+                <Field
+                  label={t('settings.marginPercent')}
+                  name="marginPercent"
+                  type="number"
+                  min="0"
+                  step="1"
+                  defaultValue={String(org.default_margin_percent)}
+                />
+                <p className="mt-1 text-xs text-muted-foreground">{t('settings.marginPercentIntro')}</p>
+              </div>
+              <div className="flex justify-end">
+                <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>
+              </div>
+            </form>
+          </>
+        ) : (
+          <p className="mt-4 text-sm text-muted-foreground">{t('settings.readOnlyNotice')}</p>
+        )}
       </section>
 
       {/* Garages (multi-location) */}
@@ -484,26 +497,30 @@ export default async function SettingsPage({
       <section className="mt-6 rounded-xl border border-border bg-card p-6 shadow-soft">
         <h2 className="text-base font-semibold tracking-tight">{t('settings.hoursTitle')}</h2>
         <p className="mt-1 text-sm text-muted-foreground">{t('settings.hoursIntro')}</p>
-        <form action={setHoursAction} className="mt-3 space-y-2">
-          <input type="hidden" name="locale" value={locale} />
-          {WEEKDAYS.map((wd) => {
-            const h = hours.get(wd);
-            return (
-              <div key={wd} className="flex items-center gap-3">
-                <label className="flex w-32 items-center gap-2 text-sm">
-                  <input type="checkbox" name={`open_${wd}`} defaultChecked={!!h} />
-                  {t(`settings.weekday.${wd}`)}
-                </label>
-                <input type="time" name={`start_${wd}`} defaultValue={h?.start ?? '09:00'} className={inputCls} />
-                <span className="text-muted-foreground">-</span>
-                <input type="time" name={`end_${wd}`} defaultValue={h?.end ?? '17:00'} className={inputCls} />
-              </div>
-            );
-          })}
-          <div className="flex justify-end pt-2">
-            <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>
-          </div>
-        </form>
+        {canManageSettings ? (
+          <form action={setHoursAction} className="mt-3 space-y-2">
+            <input type="hidden" name="locale" value={locale} />
+            {WEEKDAYS.map((wd) => {
+              const h = hours.get(wd);
+              return (
+                <div key={wd} className="flex items-center gap-3">
+                  <label className="flex w-32 items-center gap-2 text-sm">
+                    <input type="checkbox" name={`open_${wd}`} defaultChecked={!!h} />
+                    {t(`settings.weekday.${wd}`)}
+                  </label>
+                  <input type="time" name={`start_${wd}`} defaultValue={h?.start ?? '09:00'} className={inputCls} />
+                  <span className="text-muted-foreground">-</span>
+                  <input type="time" name={`end_${wd}`} defaultValue={h?.end ?? '17:00'} className={inputCls} />
+                </div>
+              );
+            })}
+            <div className="flex justify-end pt-2">
+              <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>
+            </div>
+          </form>
+        ) : (
+          <p className="mt-3 text-sm text-muted-foreground">{t('settings.readOnlyNotice')}</p>
+        )}
       </section>
 
       {/* Services */}
@@ -511,61 +528,67 @@ export default async function SettingsPage({
         <h2 className="text-base font-semibold tracking-tight">{t('settings.servicesTitle')}</h2>
         <p className="mt-1 text-sm text-muted-foreground">{t('settings.servicesIntro')}</p>
 
-        <ul className="mt-3 space-y-2">
-          {services.map((s) => (
-            <li key={s.id} className="rounded-lg border border-border bg-background p-3">
-              <form action={updateServiceAction} className="flex flex-wrap items-end gap-2">
-                <input type="hidden" name="locale" value={locale} />
-                <input type="hidden" name="serviceId" value={s.id} />
-                <div className="min-w-[150px] flex-1">
-                  <label className="mb-1 block text-xs text-muted-foreground">{t('settings.serviceName')}</label>
-                  <input name="name" defaultValue={s.name} className={`${inputCls} w-full`} />
-                </div>
-                <div className="w-20">
-                  <label className="mb-1 block text-xs text-muted-foreground">{t('settings.duration')}</label>
-                  <input name="duration" type="number" defaultValue={s.duration_minutes} className={`${inputCls} w-full`} />
-                </div>
-                <div className="w-20">
-                  <label className="mb-1 block text-xs text-muted-foreground">{t('settings.buffer')}</label>
-                  <input name="buffer" type="number" defaultValue={s.buffer_minutes} className={`${inputCls} w-full`} />
-                </div>
-                <label className="flex items-center gap-1 pb-1.5 text-xs">
-                  <input type="checkbox" name="active" defaultChecked={s.active} />
-                  {t('settings.active')}
-                </label>
-                <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>
-              </form>
-              <form id={`delete-service-${s.id}`} action={deleteServiceAction} className="mt-1 flex justify-end">
-                <input type="hidden" name="locale" value={locale} />
-                <input type="hidden" name="serviceId" value={s.id} />
-              </form>
-              <div className="flex justify-end">
-                <ConfirmDeleteButton
-                  formId={`delete-service-${s.id}`}
-                  triggerLabel={t('settings.delete')}
-                  title={t('common.confirmDeleteTitle')}
-                  description={t('settings.deleteConfirm')}
-                  cancelLabel={t('common.cancel')}
-                  confirmLabel={t('common.confirm')}
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
+        {canManageSettings ? (
+          <>
+            <ul className="mt-3 space-y-2">
+              {services.map((s) => (
+                <li key={s.id} className="rounded-lg border border-border bg-background p-3">
+                  <form action={updateServiceAction} className="flex flex-wrap items-end gap-2">
+                    <input type="hidden" name="locale" value={locale} />
+                    <input type="hidden" name="serviceId" value={s.id} />
+                    <div className="min-w-[150px] flex-1">
+                      <label className="mb-1 block text-xs text-muted-foreground">{t('settings.serviceName')}</label>
+                      <input name="name" defaultValue={s.name} className={`${inputCls} w-full`} />
+                    </div>
+                    <div className="w-20">
+                      <label className="mb-1 block text-xs text-muted-foreground">{t('settings.duration')}</label>
+                      <input name="duration" type="number" defaultValue={s.duration_minutes} className={`${inputCls} w-full`} />
+                    </div>
+                    <div className="w-20">
+                      <label className="mb-1 block text-xs text-muted-foreground">{t('settings.buffer')}</label>
+                      <input name="buffer" type="number" defaultValue={s.buffer_minutes} className={`${inputCls} w-full`} />
+                    </div>
+                    <label className="flex items-center gap-1 pb-1.5 text-xs">
+                      <input type="checkbox" name="active" defaultChecked={s.active} />
+                      {t('settings.active')}
+                    </label>
+                    <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>
+                  </form>
+                  <form id={`delete-service-${s.id}`} action={deleteServiceAction} className="mt-1 flex justify-end">
+                    <input type="hidden" name="locale" value={locale} />
+                    <input type="hidden" name="serviceId" value={s.id} />
+                  </form>
+                  <div className="flex justify-end">
+                    <ConfirmDeleteButton
+                      formId={`delete-service-${s.id}`}
+                      triggerLabel={t('settings.delete')}
+                      title={t('common.confirmDeleteTitle')}
+                      description={t('settings.deleteConfirm')}
+                      cancelLabel={t('common.cancel')}
+                      confirmLabel={t('common.confirm')}
+                    />
+                  </div>
+                </li>
+              ))}
+            </ul>
 
-        <form action={addServiceAction} className="mt-3 flex flex-wrap items-end gap-2 border-t border-border pt-3">
-          <input type="hidden" name="locale" value={locale} />
-          <div className="min-w-[150px] flex-1">
-            <Field label={t('settings.newService')} name="name" required />
-          </div>
-          <div className="w-20">
-            <Field label={t('settings.duration')} name="duration" type="number" defaultValue="60" />
-          </div>
-          <div className="w-20">
-            <Field label={t('settings.buffer')} name="buffer" type="number" defaultValue="0" />
-          </div>
-          <Button type="submit" variant="outline" size="sm">{t('settings.addService')}</Button>
-        </form>
+            <form action={addServiceAction} className="mt-3 flex flex-wrap items-end gap-2 border-t border-border pt-3">
+              <input type="hidden" name="locale" value={locale} />
+              <div className="min-w-[150px] flex-1">
+                <Field label={t('settings.newService')} name="name" required />
+              </div>
+              <div className="w-20">
+                <Field label={t('settings.duration')} name="duration" type="number" defaultValue="60" />
+              </div>
+              <div className="w-20">
+                <Field label={t('settings.buffer')} name="buffer" type="number" defaultValue="0" />
+              </div>
+              <Button type="submit" variant="outline" size="sm">{t('settings.addService')}</Button>
+            </form>
+          </>
+        ) : (
+          <p className="mt-3 text-sm text-muted-foreground">{t('settings.readOnlyNotice')}</p>
+        )}
       </section>
 
       {/* Inspection checklist */}
@@ -573,42 +596,48 @@ export default async function SettingsPage({
         <h2 className="text-base font-semibold tracking-tight">{t('settings.checklistTitle')}</h2>
         <p className="mt-1 text-sm text-muted-foreground">{t('settings.checklistIntro')}</p>
 
-        <ul className="mt-3 space-y-2">
-          {checklistItems.map((item) => (
-            <li key={item.id} className="rounded-lg border border-border bg-background p-3">
-              <form action={updateChecklistTemplateItemAction} className="flex flex-wrap items-end gap-2">
-                <input type="hidden" name="locale" value={locale} />
-                <input type="hidden" name="itemId" value={item.id} />
-                <div className="min-w-[150px] flex-1">
-                  <input name="label" defaultValue={item.label} className={`${inputCls} w-full`} />
-                </div>
-                <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>
-              </form>
-              <form id={`delete-checklist-item-${item.id}`} action={deleteChecklistTemplateItemAction} className="mt-1 flex justify-end">
-                <input type="hidden" name="locale" value={locale} />
-                <input type="hidden" name="itemId" value={item.id} />
-              </form>
-              <div className="flex justify-end">
-                <ConfirmDeleteButton
-                  formId={`delete-checklist-item-${item.id}`}
-                  triggerLabel={t('settings.delete')}
-                  title={t('common.confirmDeleteTitle')}
-                  description={t('settings.checklistDeleteConfirm')}
-                  cancelLabel={t('common.cancel')}
-                  confirmLabel={t('common.confirm')}
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
+        {canManageSettings ? (
+          <>
+            <ul className="mt-3 space-y-2">
+              {checklistItems.map((item) => (
+                <li key={item.id} className="rounded-lg border border-border bg-background p-3">
+                  <form action={updateChecklistTemplateItemAction} className="flex flex-wrap items-end gap-2">
+                    <input type="hidden" name="locale" value={locale} />
+                    <input type="hidden" name="itemId" value={item.id} />
+                    <div className="min-w-[150px] flex-1">
+                      <input name="label" defaultValue={item.label} className={`${inputCls} w-full`} />
+                    </div>
+                    <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>
+                  </form>
+                  <form id={`delete-checklist-item-${item.id}`} action={deleteChecklistTemplateItemAction} className="mt-1 flex justify-end">
+                    <input type="hidden" name="locale" value={locale} />
+                    <input type="hidden" name="itemId" value={item.id} />
+                  </form>
+                  <div className="flex justify-end">
+                    <ConfirmDeleteButton
+                      formId={`delete-checklist-item-${item.id}`}
+                      triggerLabel={t('settings.delete')}
+                      title={t('common.confirmDeleteTitle')}
+                      description={t('settings.checklistDeleteConfirm')}
+                      cancelLabel={t('common.cancel')}
+                      confirmLabel={t('common.confirm')}
+                    />
+                  </div>
+                </li>
+              ))}
+            </ul>
 
-        <form action={addChecklistTemplateItemAction} className="mt-3 flex flex-wrap items-end gap-2 border-t border-border pt-3">
-          <input type="hidden" name="locale" value={locale} />
-          <div className="min-w-[150px] flex-1">
-            <Field label={t('settings.checklistNewItem')} name="label" required />
-          </div>
-          <Button type="submit" variant="outline" size="sm">{t('settings.checklistAddItem')}</Button>
-        </form>
+            <form action={addChecklistTemplateItemAction} className="mt-3 flex flex-wrap items-end gap-2 border-t border-border pt-3">
+              <input type="hidden" name="locale" value={locale} />
+              <div className="min-w-[150px] flex-1">
+                <Field label={t('settings.checklistNewItem')} name="label" required />
+              </div>
+              <Button type="submit" variant="outline" size="sm">{t('settings.checklistAddItem')}</Button>
+            </form>
+          </>
+        ) : (
+          <p className="mt-3 text-sm text-muted-foreground">{t('settings.readOnlyNotice')}</p>
+        )}
       </section>
     </div>
   );

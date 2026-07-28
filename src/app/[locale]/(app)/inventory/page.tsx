@@ -5,6 +5,7 @@ import { Package } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { getActiveOrgId } from '@/data/organizations/active';
+import { getCurrentRole, roleHas } from '@/lib/roles';
 import { loadParts } from '@/data/inventory/list';
 import {
   addPartAction,
@@ -41,7 +42,8 @@ export default async function InventoryPage({
   const orgId = await getActiveOrgId(supabase);
   if (!orgId) redirect(`/${locale}/onboarding`);
 
-  const parts = await loadParts(supabase, orgId);
+  const [parts, role] = await Promise.all([loadParts(supabase, orgId), getCurrentRole(supabase, orgId)]);
+  const canManageInventory = roleHas(role, 'manage_inventory');
   const lowStockCount = parts.filter((p) => p.quantity_on_hand <= p.reorder_threshold).length;
 
   const inputCls =
@@ -85,59 +87,63 @@ export default async function InventoryPage({
                 </div>
               </div>
 
-              <form action={adjustStockAction} className="mt-3 flex flex-wrap items-end gap-2 border-t border-border pt-3">
-                <input type="hidden" name="locale" value={locale} />
-                <input type="hidden" name="partId" value={p.id} />
-                <div className="w-24">
-                  <Field label={t('inventory.adjustDelta')} name="delta" type="number" step="0.01" placeholder="+10" required />
-                </div>
-                <div className="min-w-[140px] flex-1">
-                  <Field label={t('inventory.adjustNote')} name="note" />
-                </div>
-                <Button type="submit" variant="outline" size="sm">{t('inventory.adjustApply')}</Button>
-              </form>
+              {canManageInventory ? (
+                <>
+                  <form action={adjustStockAction} className="mt-3 flex flex-wrap items-end gap-2 border-t border-border pt-3">
+                    <input type="hidden" name="locale" value={locale} />
+                    <input type="hidden" name="partId" value={p.id} />
+                    <div className="w-24">
+                      <Field label={t('inventory.adjustDelta')} name="delta" type="number" step="0.01" placeholder="+10" required />
+                    </div>
+                    <div className="min-w-[140px] flex-1">
+                      <Field label={t('inventory.adjustNote')} name="note" />
+                    </div>
+                    <Button type="submit" variant="outline" size="sm">{t('inventory.adjustApply')}</Button>
+                  </form>
 
-              <details className="mt-3 border-t border-border pt-3">
-                <summary className="cursor-pointer text-xs font-medium text-muted-foreground hover:text-foreground">
-                  {t('inventory.editDetails')}
-                </summary>
-                <form action={updatePartAction} className="mt-3 space-y-2">
-                  <input type="hidden" name="locale" value={locale} />
-                  <input type="hidden" name="partId" value={p.id} />
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    <Field label={t('inventory.name')} name="name" defaultValue={p.name} required />
-                    <Field label={t('inventory.sku')} name="sku" defaultValue={p.sku ?? ''} />
-                  </div>
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                    <Field label={t('inventory.category')} name="category" defaultValue={p.category ?? ''} />
-                    <Field label={t('inventory.unit')} name="unit" defaultValue={p.unit} />
-                    <Field label={t('inventory.reorderThreshold')} name="reorderThreshold" type="number" step="0.01" defaultValue={String(p.reorder_threshold)} />
-                  </div>
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                    <Field label={t('inventory.unitCost')} name="unitCost" type="number" step="0.01" defaultValue={p.unit_cost !== null ? String(p.unit_cost) : ''} />
-                    <Field label={t('inventory.supplierName')} name="supplierName" defaultValue={p.supplier_name ?? ''} />
-                    <Field label={t('inventory.supplierPhone')} name="supplierPhone" defaultValue={p.supplier_phone ?? ''} />
-                  </div>
-                  <Field label={t('inventory.notes')} name="notes" defaultValue={p.notes ?? ''} />
-                  <div className="flex justify-end gap-2">
-                    <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>
-                  </div>
-                </form>
-                <form id={`delete-part-${p.id}`} action={deletePartAction} className="mt-1 flex justify-end">
-                  <input type="hidden" name="locale" value={locale} />
-                  <input type="hidden" name="partId" value={p.id} />
-                </form>
-                <div className="mt-1 flex justify-end">
-                  <ConfirmDeleteButton
-                    formId={`delete-part-${p.id}`}
-                    triggerLabel={t('settings.delete')}
-                    title={t('common.confirmDeleteTitle')}
-                    description={t('inventory.deleteConfirm')}
-                    cancelLabel={t('common.cancel')}
-                    confirmLabel={t('common.confirm')}
-                  />
-                </div>
-              </details>
+                  <details className="mt-3 border-t border-border pt-3">
+                    <summary className="cursor-pointer text-xs font-medium text-muted-foreground hover:text-foreground">
+                      {t('inventory.editDetails')}
+                    </summary>
+                    <form action={updatePartAction} className="mt-3 space-y-2">
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="partId" value={p.id} />
+                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        <Field label={t('inventory.name')} name="name" defaultValue={p.name} required />
+                        <Field label={t('inventory.sku')} name="sku" defaultValue={p.sku ?? ''} />
+                      </div>
+                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                        <Field label={t('inventory.category')} name="category" defaultValue={p.category ?? ''} />
+                        <Field label={t('inventory.unit')} name="unit" defaultValue={p.unit} />
+                        <Field label={t('inventory.reorderThreshold')} name="reorderThreshold" type="number" step="0.01" defaultValue={String(p.reorder_threshold)} />
+                      </div>
+                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                        <Field label={t('inventory.unitCost')} name="unitCost" type="number" step="0.01" defaultValue={p.unit_cost !== null ? String(p.unit_cost) : ''} />
+                        <Field label={t('inventory.supplierName')} name="supplierName" defaultValue={p.supplier_name ?? ''} />
+                        <Field label={t('inventory.supplierPhone')} name="supplierPhone" defaultValue={p.supplier_phone ?? ''} />
+                      </div>
+                      <Field label={t('inventory.notes')} name="notes" defaultValue={p.notes ?? ''} />
+                      <div className="flex justify-end gap-2">
+                        <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>
+                      </div>
+                    </form>
+                    <form id={`delete-part-${p.id}`} action={deletePartAction} className="mt-1 flex justify-end">
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="partId" value={p.id} />
+                    </form>
+                    <div className="mt-1 flex justify-end">
+                      <ConfirmDeleteButton
+                        formId={`delete-part-${p.id}`}
+                        triggerLabel={t('settings.delete')}
+                        title={t('common.confirmDeleteTitle')}
+                        description={t('inventory.deleteConfirm')}
+                        cancelLabel={t('common.cancel')}
+                        confirmLabel={t('common.confirm')}
+                      />
+                    </div>
+                  </details>
+                </>
+              ) : null}
             </li>
           );
         })}
@@ -149,32 +155,34 @@ export default async function InventoryPage({
         </div>
       ) : null}
 
-      <form action={addPartAction} className="mt-6 space-y-2 rounded-xl border border-border bg-card p-5 shadow-soft">
-        <input type="hidden" name="locale" value={locale} />
-        <h2 className="text-base font-semibold tracking-tight">{t('inventory.addTitle')}</h2>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <Field label={t('inventory.name')} name="name" required />
-          <Field label={t('inventory.sku')} name="sku" />
-        </div>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-          <Field label={t('inventory.category')} name="category" />
-          <div>
-            <label className="mb-1 block text-sm font-medium">{t('inventory.unit')}</label>
-            <input name="unit" defaultValue="pcs" className={`${inputCls} w-full`} />
+      {canManageInventory ? (
+        <form action={addPartAction} className="mt-6 space-y-2 rounded-xl border border-border bg-card p-5 shadow-soft">
+          <input type="hidden" name="locale" value={locale} />
+          <h2 className="text-base font-semibold tracking-tight">{t('inventory.addTitle')}</h2>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <Field label={t('inventory.name')} name="name" required />
+            <Field label={t('inventory.sku')} name="sku" />
           </div>
-          <Field label={t('inventory.quantityOnHand')} name="quantityOnHand" type="number" step="0.01" defaultValue="0" />
-        </div>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-          <Field label={t('inventory.reorderThreshold')} name="reorderThreshold" type="number" step="0.01" defaultValue="0" />
-          <Field label={t('inventory.unitCost')} name="unitCost" type="number" step="0.01" />
-          <Field label={t('inventory.supplierName')} name="supplierName" />
-        </div>
-        <Field label={t('inventory.supplierPhone')} name="supplierPhone" />
-        <Field label={t('inventory.notes')} name="notes" />
-        <div className="flex justify-end">
-          <Button type="submit" size="sm">{t('inventory.addPart')}</Button>
-        </div>
-      </form>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <Field label={t('inventory.category')} name="category" />
+            <div>
+              <label className="mb-1 block text-sm font-medium">{t('inventory.unit')}</label>
+              <input name="unit" defaultValue="pcs" className={`${inputCls} w-full`} />
+            </div>
+            <Field label={t('inventory.quantityOnHand')} name="quantityOnHand" type="number" step="0.01" defaultValue="0" />
+          </div>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <Field label={t('inventory.reorderThreshold')} name="reorderThreshold" type="number" step="0.01" defaultValue="0" />
+            <Field label={t('inventory.unitCost')} name="unitCost" type="number" step="0.01" />
+            <Field label={t('inventory.supplierName')} name="supplierName" />
+          </div>
+          <Field label={t('inventory.supplierPhone')} name="supplierPhone" />
+          <Field label={t('inventory.notes')} name="notes" />
+          <div className="flex justify-end">
+            <Button type="submit" size="sm">{t('inventory.addPart')}</Button>
+          </div>
+        </form>
+      ) : null}
     </div>
   );
 }

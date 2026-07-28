@@ -715,6 +715,7 @@
       "checklistNewItem": "New checklist item",
       "checklistAddItem": "Add",
       "companyIntro": "This information appears on your invoices and your business card.",
+      "readOnlyNotice": "Your role doesn't allow changing these settings. Contact the garage owner or an admin.",
       "noLogo": "Logo",
       "logoUpload": "Garage logo",
       "phone": "Phone",
