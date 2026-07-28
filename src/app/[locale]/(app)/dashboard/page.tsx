@@ -20,6 +20,7 @@ import {
   TrendingUp,
   TrendingDown,
   Users,
+  UserX,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import QRCode from 'qrcode';
@@ -30,6 +31,7 @@ import { createSupabaseServerClient } from '@/data/supabase/server';
 import { signOutAction } from '@/data/auth/actions';
 import { loadFollowUpsDueCount } from '@/data/automations/due';
 import { computeRobinInsight } from '@/data/robin/insight';
+import { customerStatus } from '@/data/customers/status';
 import { getModuleImageSrc } from '@/lib/module-images';
 import { formatDateTimeUTC } from '@/lib/datetime';
 import { formatCurrency } from '@/lib/pricing';
@@ -246,7 +248,15 @@ export default async function DashboardPage({
   const weekStartISO = new Date(todayStart.getTime() - 6 * 86_400_000).toISOString();
   const prevWeekStartISO = new Date(todayStart.getTime() - 13 * 86_400_000).toISOString();
 
-  const [{ data: paymentsMonthData }, { data: payments14dData }, { data: deliveredThisMonthData }] = await Promise.all([
+  const [
+    { data: paymentsMonthData },
+    { data: payments14dData },
+    { data: deliveredThisMonthData },
+    { data: allCustomersData },
+    { data: allWorkOrdersData },
+    { data: allInvoicesData },
+    { data: allPaymentsData },
+  ] = await Promise.all([
     supabase.from('invoice_payments').select('amount').eq('organization_id', org.id).gte('paid_at', monthStartISO),
     supabase.from('invoice_payments').select('amount, paid_at').eq('organization_id', org.id).gte('paid_at', last14DaysStart),
     supabase
@@ -255,7 +265,43 @@ export default async function DashboardPage({
       .eq('organization_id', org.id)
       .eq('status', 'delivered')
       .gte('created_at', monthStartISO),
+    supabase.from('customers').select('id, created_at').eq('organization_id', org.id).eq('archived', false),
+    supabase.from('work_orders').select('customer_id, created_at').eq('organization_id', org.id),
+    supabase.from('invoices').select('customer_id, status, due_date').eq('organization_id', org.id),
+    supabase.from('invoice_payments').select('amount, invoices(customer_id)').eq('organization_id', org.id),
   ]);
+
+  // "Clients inactifs": same rule as the Customers page (data/customers/status.ts),
+  // computed here too so the dashboard count always matches what that filter shows.
+  const inactiveTodayStr = todayISO.slice(0, 10);
+  const lastVisitByCustomerId = new Map<string, string>();
+  for (const w of (allWorkOrdersData ?? []) as { customer_id: string; created_at: string }[]) {
+    const current = lastVisitByCustomerId.get(w.customer_id);
+    if (!current || w.created_at > current) lastVisitByCustomerId.set(w.customer_id, w.created_at);
+  }
+  const overdueCustomerIds = new Set(
+    ((allInvoicesData ?? []) as { customer_id: string; status: string; due_date: string | null }[])
+      .filter((i) => i.status === 'overdue' || (['sent', 'partially_paid'].includes(i.status) && !!i.due_date && i.due_date < inactiveTodayStr))
+      .map((i) => i.customer_id),
+  );
+  const spentByCustomerId = new Map<string, number>();
+  for (const p of (allPaymentsData ?? []) as unknown as { amount: number; invoices: { customer_id: string } | null }[]) {
+    const customerId = p.invoices?.customer_id;
+    if (!customerId) continue;
+    spentByCustomerId.set(customerId, (spentByCustomerId.get(customerId) ?? 0) + Number(p.amount));
+  }
+  const inactiveCustomersCount = ((allCustomersData ?? []) as { id: string; created_at: string }[]).filter(
+    (c) =>
+      customerStatus({
+        createdAt: c.created_at,
+        lastVisit: lastVisitByCustomerId.get(c.id) ?? null,
+        // hasVehicles only affects the 'active' fallback below, never the 'inactive' branch itself.
+        hasVehicles: true,
+        isOverdue: overdueCustomerIds.has(c.id),
+        totalSpent: spentByCustomerId.get(c.id) ?? 0,
+        now: now.getTime(),
+      }) === 'inactive',
+  ).length;
 
   const leads = (leadsData ?? []) as unknown as LeadRow[];
   const waiting = (waitingData ?? []) as unknown as WaitingRow[];
@@ -376,6 +422,7 @@ export default async function DashboardPage({
     { icon: CalendarClock, label: t('dashboard.notifApptsToday'), value: apptsStartingToday.count ?? 0, href: '#appointments', tone: 'default' },
     { icon: Clock, label: t('dashboard.notifFollowups'), value: followUpsDue, href: '/automations', tone: 'default' },
     { icon: Receipt, label: t('dashboard.notifInvoices'), value: invoicesToPrepare, href: '/invoices', tone: 'default' },
+    { icon: UserX, label: t('dashboard.notifInactiveCustomers'), value: inactiveCustomersCount, href: '/customers?filter=inactive', tone: 'default' },
   ];
 
   const metrics: { label: string; value: string | number }[] = [

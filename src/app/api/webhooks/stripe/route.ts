@@ -109,6 +109,39 @@ export async function POST(req: Request) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
       const organizationId = session.metadata?.organization_id;
+
+      // A one-time invoice payment (public /invoice/[id] page), distinguished
+      // from a subscription checkout by metadata.kind.
+      if (session.metadata?.kind === 'invoice_payment' && organizationId) {
+        const invoiceId = session.metadata.invoice_id;
+        const amount = (session.amount_total ?? 0) / 100;
+        if (invoiceId && amount > 0) {
+          await admin.from('invoice_payments').insert({
+            organization_id: organizationId,
+            invoice_id: invoiceId,
+            amount,
+            paid_at: new Date().toISOString(),
+          });
+          const { data: invoice } = await admin
+            .from('invoices')
+            .select('total, paid_amount')
+            .eq('id', invoiceId)
+            .maybeSingle();
+          if (invoice) {
+            const newPaidAmount = Number(invoice.paid_amount) + amount;
+            await admin
+              .from('invoices')
+              .update({
+                paid_amount: newPaidAmount,
+                status: newPaidAmount >= Number(invoice.total) ? 'paid' : 'partially_paid',
+                paid_at: newPaidAmount >= Number(invoice.total) ? new Date().toISOString() : null,
+              })
+              .eq('id', invoiceId);
+          }
+        }
+        break;
+      }
+
       const subscriptionId = typeof session.subscription === 'string' ? session.subscription : session.subscription?.id;
       if (organizationId && subscriptionId) {
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);

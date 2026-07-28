@@ -28,7 +28,8 @@
       "menu": "Menu",
       "billing": "Billing",
       "quotes": "Quotes",
-      "appraise": "Buy / Resell"
+      "appraise": "Buy / Resell",
+      "reports": "Reports"
     },
     "onboarding": {
       "title": "Set up your garage",
@@ -161,6 +162,7 @@
       "notifNewCustomers": "New customers",
       "notifMessages": "Messages to answer",
       "notifInvoices": "Invoices to prepare",
+      "notifInactiveCustomers": "Inactive customers",
       "apptsTodayTitle": "Today's appointments",
       "apptsTodayEmpty": "No appointments today.",
       "urgentWorkTitle": "Urgent repairs",
@@ -183,7 +185,8 @@
       "appointments": "Customer appointments",
       "invoices": "Work orders",
       "diagnostics": "Technical knowledge base",
-      "history": "Vehicle history"
+      "history": "Vehicle history",
+      "reports": "Activity reports"
     },
     "robinChat": {
       "launcher": "Ask Ruben",
@@ -443,7 +446,12 @@
         "vip": "VIP",
         "unpaid": "Unpaid",
         "new": "New",
-        "active": "Active"
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "filters": {
+        "all": "All",
+        "inactive": "Inactive"
       },
       "vehicleCount": "{count} vehicle",
       "vehicleCountPlural": "{count} vehicles",
@@ -591,7 +599,9 @@
       "lineQuantity": "Quantity",
       "lineUnitPrice": "Unit price",
       "lineDeleteConfirm": "This line will be removed from the invoice.",
-      "addLine": "Add a line"
+      "addLine": "Add a line",
+      "publicLink": "Payment link for the customer",
+      "publicLinkHint": "The customer can open this link to view the invoice and pay it online (card, Apple Pay, Google Pay) — no account needed."
     },
     "invoiceStatus": {
       "draft": "Draft",
@@ -750,6 +760,29 @@
       "articleSaved": "Article added to the knowledge base.",
       "favoritesOnly": "My favorites",
       "favoriteToggle": "Add/remove from favorites"
+    },
+    "reports": {
+      "title": "Reports",
+      "intro": "A numeric snapshot of activity, ready to export or print.",
+      "period": {
+        "daily": "Today",
+        "weekly": "This week",
+        "monthly": "This month"
+      },
+      "revenue": "Revenue collected",
+      "invoicesIssued": "Invoices issued",
+      "invoicesIssuedTotal": "Amount invoiced",
+      "appointments": "Appointments",
+      "appointmentsCompleted": "Completed",
+      "appointmentsNoShow": "No-shows",
+      "vehiclesDelivered": "Vehicles delivered",
+      "newCustomers": "New customers",
+      "newLeads": "New requests",
+      "downloadPdf": "Download PDF",
+      "downloadCsv": "Export as CSV (Excel)",
+      "generatedAt": "Generated on",
+      "pdfFooter": "Report generated automatically by ROAVAA.",
+      "csvMetric": "Metric"
     },
     "automations": {
       "title": "Follow-ups",
@@ -1129,6 +1162,25 @@
     "convertedBody": "{garage} has already started the work.",
     "notFound": "This quote is no longer available.",
     "disclaimer": "Only you can respond via this link. Don't save or share it with others."
+  },
+  "publicInvoice": {
+    "title": "Invoice {number}",
+    "greeting": "Hello {name},",
+    "greetingGeneric": "Hello,",
+    "intro": "here is your invoice. You can settle it online below.",
+    "vehicle": "Vehicle",
+    "dueDate": "Due date: {date}",
+    "subtotal": "Subtotal",
+    "vat": "VAT ({rate}%)",
+    "total": "Total",
+    "alreadyPaid": "Already paid",
+    "payOnline": "Pay {amount} online",
+    "paidTitle": "This invoice is settled",
+    "paidBody": "Thank you! {garage} appreciates your payment.",
+    "paidJustNow": "Payment received, thank you!",
+    "paymentCancelled": "Payment cancelled. You can try again any time.",
+    "paymentUnavailable": "Online payment isn't set up for this garage yet. Please contact the garage directly to settle this invoice.",
+    "disclaimer": "Only you can view this invoice via this link. Don't save or share it with others."
   },
   "pricing": {
     "title": "Pricing",

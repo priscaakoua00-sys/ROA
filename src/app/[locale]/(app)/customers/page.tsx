@@ -4,24 +4,24 @@ import { redirect } from 'next/navigation';
 import { Phone, MessageCircle, Mail, Car } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { customerStatus, type CustomerStatus } from '@/data/customers/status';
 import { formatCurrency } from '@/lib/pricing';
 import { formatDateUTC } from '@/lib/datetime';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Link } from '@/i18n/navigation';
 
-/** A customer who has spent at least this much (real payments received) is flagged VIP. */
-const VIP_THRESHOLD = 800;
-/** A customer created within this many days is flagged "new". */
-const NEW_DAYS = 30;
-
-type Status = 'unpaid' | 'vip' | 'new' | 'active' | null;
-const STATUS_VARIANT: Record<Exclude<Status, null>, 'urgent' | 'gold' | 'default' | 'success'> = {
+type Status = CustomerStatus;
+const STATUS_VARIANT: Record<Exclude<Status, null>, 'urgent' | 'gold' | 'default' | 'success' | 'muted'> = {
   unpaid: 'urgent',
   vip: 'gold',
   new: 'default',
+  inactive: 'muted',
   active: 'success',
 };
+
+type Filter = 'all' | 'inactive';
+const FILTERS: Filter[] = ['all', 'inactive'];
 
 interface Customer {
   id: string;
@@ -41,11 +41,12 @@ export default async function CustomersPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; filter?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { q } = await searchParams;
+  const { q, filter: rawFilter } = await searchParams;
+  const filter: Filter = FILTERS.includes(rawFilter as Filter) ? (rawFilter as Filter) : 'all';
   const t = await getTranslations('app');
 
   const supabase = await createSupabaseServerClient();
@@ -107,21 +108,23 @@ export default async function CustomersPage({
   }
 
   const now = Date.now();
-  const statusOf = (c: Customer): Status => {
-    if (overdueCustomers.has(c.id)) return 'unpaid';
-    if ((spentByCustomer.get(c.id) ?? 0) >= VIP_THRESHOLD) return 'vip';
-    if (now - new Date(c.created_at).getTime() < NEW_DAYS * 86_400_000) return 'new';
-    const hasVehicles = (vehiclesByCustomer.get(c.id)?.length ?? 0) > 0;
-    const hasVisits = lastVisitByCustomer.has(c.id);
-    return hasVehicles || hasVisits ? 'active' : null;
-  };
+  const statusOf = (c: Customer): Status =>
+    customerStatus({
+      createdAt: c.created_at,
+      lastVisit: lastVisitByCustomer.get(c.id) ?? null,
+      hasVehicles: (vehiclesByCustomer.get(c.id)?.length ?? 0) > 0,
+      isOverdue: overdueCustomers.has(c.id),
+      totalSpent: spentByCustomer.get(c.id) ?? 0,
+      now,
+    });
 
   const name = (c: Customer) => [c.first_name, c.last_name].filter(Boolean).join(' ') || t('leads.anonymous');
 
   let filtered = customers;
+  if (filter === 'inactive') filtered = filtered.filter((c) => statusOf(c) === 'inactive');
   if (q && q.trim()) {
     const term = q.trim().toLowerCase();
-    filtered = customers.filter((c) => {
+    filtered = filtered.filter((c) => {
       const ownVehicles = vehiclesByCustomer.get(c.id) ?? [];
       const haystack = [
         name(c),
@@ -151,6 +154,7 @@ export default async function CustomersPage({
       </div>
 
       <form className="mt-4" action={`/${locale}/customers`} method="get">
+        {filter !== 'all' ? <input type="hidden" name="filter" value={filter} /> : null}
         <input
           name="q"
           defaultValue={q ?? ''}
@@ -158,6 +162,22 @@ export default async function CustomersPage({
           className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
         />
       </form>
+
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        {FILTERS.map((f) => (
+          <Link
+            key={f}
+            href={`/customers${f !== 'all' ? `?filter=${f}` : ''}`}
+            className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+              filter === f
+                ? 'border-gold bg-gold text-primary-foreground'
+                : 'border-border bg-background text-foreground hover:border-gold/50 hover:bg-gold/5'
+            }`}
+          >
+            {t(`customers.filters.${f}`)}
+          </Link>
+        ))}
+      </div>
 
       {filtered.length === 0 ? (
         <div className="mt-6 rounded-xl border border-dashed border-border bg-card p-6 text-sm text-muted-foreground">
