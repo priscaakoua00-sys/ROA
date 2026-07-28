@@ -718,12 +718,25 @@
       "empty": "Nothing yet. Add your first knowledge.",
       "deleteConfirm": "This article will be permanently deleted. This cannot be undone.",
       "category": {
+        "procedure": "Repair procedures",
+        "recurring_problem": "Recurring problems",
+        "solution": "Solutions",
+        "tip": "Tips",
         "failure": "Common failures",
         "intervention_time": "Intervention times",
         "part": "Parts",
         "faq": "FAQ",
         "safety": "Safety rules"
-      }
+      },
+      "search": "Search a keyword, a failure, a solution...",
+      "searchNote": "Keyword search across your articles. AI search that understands synonyms is a separate, not-yet-built project.",
+      "filesLabel": "Files (photos, videos, PDFs, technical documents)",
+      "attachmentsLabel": "Attachments",
+      "removeFile": "Remove",
+      "relatedTitle": "Related knowledge-base articles",
+      "relatedNote": "Found by keyword match against the problem described here.",
+      "saveAsArticle": "Save as knowledge article",
+      "articleSaved": "Article added to the knowledge base."
     },
     "automations": {
       "title": "Follow-ups",

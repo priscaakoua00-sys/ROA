@@ -14,6 +14,8 @@ import {
   addChecklistItemAction,
   generateRepairReportAction,
 } from '@/data/work-orders/actions';
+import { saveReportAsArticleAction } from '@/data/knowledge/actions';
+import { RelatedArticles } from '@/components/knowledge/related-articles';
 import { getWorkOrderTimeline } from '@/data/timeline/build';
 import { Button } from '@/components/ui/button';
 import { SubmitButton } from '@/components/ui/submit-button';
@@ -67,11 +69,18 @@ export default async function WorkOrderDetailPage({
   searchParams,
 }: {
   params: Promise<{ locale: string; id: string }>;
-  searchParams: Promise<{ error?: string; reportSaved?: string; reportError?: string; diagSaved?: string; diagError?: string }>;
+  searchParams: Promise<{
+    error?: string;
+    reportSaved?: string;
+    reportError?: string;
+    diagSaved?: string;
+    diagError?: string;
+    articleSaved?: string;
+  }>;
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  const { error, reportSaved, reportError, diagSaved, diagError } = await searchParams;
+  const { error, reportSaved, reportError, diagSaved, diagError, articleSaved } = await searchParams;
   const t = await getTranslations('app');
 
   const supabase = await createSupabaseServerClient();
@@ -221,7 +230,15 @@ export default async function WorkOrderDetailPage({
   return (
     <div className="container max-w-2xl py-10">
       <FlashToast
-        success={reportSaved === '1' ? t('workOrders.reportSaved') : diagSaved === '1' ? t('diagnosis.saved') : null}
+        success={
+          reportSaved === '1'
+            ? t('workOrders.reportSaved')
+            : diagSaved === '1'
+              ? t('diagnosis.saved')
+              : articleSaved === '1'
+                ? t('knowledge.articleSaved')
+                : null
+        }
         error={
           reportError === 'empty'
             ? t('workOrders.reportEmpty')
@@ -244,6 +261,8 @@ export default async function WorkOrderDetailPage({
       </p>
 
       {error ? <p className="mt-3 text-sm text-urgent">{t('team.error')}</p> : null}
+
+      <RelatedArticles orgId={wo.organization_id} query={wo.description ?? ''} />
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <form action={updateWorkOrderStatusAction} className="flex items-center gap-1">
@@ -399,6 +418,11 @@ export default async function WorkOrderDetailPage({
               <p className="mt-1 text-sm font-medium">{report.client_message_subject}</p>
               <p className="mt-1 whitespace-pre-line text-sm text-muted-foreground">{report.client_message_body}</p>
             </div>
+            <form action={saveReportAsArticleAction}>
+              <input type="hidden" name="locale" value={locale} />
+              <input type="hidden" name="workOrderId" value={wo.id} />
+              <Button type="submit" variant="outline" size="sm">{t('knowledge.saveAsArticle')}</Button>
+            </form>
           </div>
         ) : null}
       </section>

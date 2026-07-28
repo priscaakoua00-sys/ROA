@@ -718,12 +718,25 @@
       "empty": "Rien pour l'instant. Ajoutez votre première connaissance.",
       "deleteConfirm": "Cet article sera définitivement supprimé. Cette action est irréversible.",
       "category": {
+        "procedure": "Procédures de réparation",
+        "recurring_problem": "Problèmes récurrents",
+        "solution": "Solutions",
+        "tip": "Conseils",
         "failure": "Pannes fréquentes",
         "intervention_time": "Temps d'intervention",
         "part": "Pièces",
         "faq": "Questions fréquentes",
         "safety": "Règles de sécurité"
-      }
+      },
+      "search": "Rechercher un mot-clé, une panne, une solution...",
+      "searchNote": "Recherche par mots-clés dans vos articles. Une recherche par IA capable de comprendre les synonymes est un chantier séparé, pas encore fait.",
+      "filesLabel": "Fichiers (photos, vidéos, PDF, documents techniques)",
+      "attachmentsLabel": "Pièces jointes",
+      "removeFile": "Retirer",
+      "relatedTitle": "Articles pertinents de la base de connaissances",
+      "relatedNote": "Trouvés par mots-clés à partir du problème décrit ici.",
+      "saveAsArticle": "Enregistrer comme article de connaissance",
+      "articleSaved": "Article ajouté à la base de connaissances."
     },
     "automations": {
       "title": "Relances",

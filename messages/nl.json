@@ -718,12 +718,25 @@
       "empty": "Nog niets. Voeg uw eerste kennis toe.",
       "deleteConfirm": "Dit artikel wordt definitief verwijderd. Dit kan niet ongedaan worden gemaakt.",
       "category": {
+        "procedure": "Reparatieprocedures",
+        "recurring_problem": "Terugkerende problemen",
+        "solution": "Oplossingen",
+        "tip": "Tips",
         "failure": "Veelvoorkomende storingen",
         "intervention_time": "Interventietijden",
         "part": "Onderdelen",
         "faq": "Veelgestelde vragen",
         "safety": "Veiligheidsregels"
-      }
+      },
+      "search": "Zoek op trefwoord, storing, oplossing...",
+      "searchNote": "Zoekt op trefwoorden in uw artikelen. Een AI-zoekfunctie die synoniemen begrijpt is een apart project, nog niet gebouwd.",
+      "filesLabel": "Bestanden (foto's, video's, pdf's, technische documenten)",
+      "attachmentsLabel": "Bijlagen",
+      "removeFile": "Verwijderen",
+      "relatedTitle": "Relevante artikelen uit de kennisbank",
+      "relatedNote": "Gevonden op trefwoorden uit het hier beschreven probleem.",
+      "saveAsArticle": "Opslaan als kennisartikel",
+      "articleSaved": "Artikel toegevoegd aan de kennisbank."
     },
     "automations": {
       "title": "Opvolging",
