@@ -22,8 +22,10 @@ import {
   Users,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import QRCode from 'qrcode';
 import { RevenueChart } from '@/components/dashboard/revenue-chart';
 import { DashboardGreeting } from '@/components/dashboard/greeting';
+import { RequestLinkCard } from '@/components/dashboard/request-link-card';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { signOutAction } from '@/data/auth/actions';
 import { loadFollowUpsDueCount } from '@/data/automations/due';
@@ -260,6 +262,7 @@ export default async function DashboardPage({
   const h = await headers();
   const origin = h.get('origin') ?? (h.get('host') ? `https://${h.get('host')}` : '');
   const formUrl = `${origin}/${locale}/request/${org.slug}`;
+  const qrDataUrl = await QRCode.toDataURL(formUrl, { margin: 1, width: 240 });
 
   const totalLeadCount = totalLeads.count ?? 0;
   const isEmpty = totalLeadCount === 0 && (customersCount.count ?? 0) === 0;
@@ -902,12 +905,22 @@ export default async function DashboardPage({
         <section className="mt-8 rounded-xl border border-border bg-card p-6 shadow-soft">
           <h2 className="text-base font-semibold tracking-tight">{t('dashboard.shareTitle')}</h2>
           <p className="mt-1 text-sm text-muted-foreground">{t('dashboard.shareIntro')}</p>
-          <div className="mt-3 flex flex-wrap items-center gap-3">
-            <code className="rounded-md border border-border bg-background px-3 py-2 text-xs">{formUrl}</code>
-            <a href={`/${locale}/request/${org.slug}`} target="_blank" rel="noreferrer">
-              <Button variant="outline" size="sm">{t('dashboard.openForm')}</Button>
-            </a>
+          <div className="mt-3">
+            <RequestLinkCard
+              formUrl={formUrl}
+              qrDataUrl={qrDataUrl}
+              orgSlug={org.slug}
+              labels={{
+                copy: t('dashboard.shareCopy'),
+                copied: t('dashboard.shareCopied'),
+                share: t('dashboard.shareShare'),
+                download: t('dashboard.shareDownload'),
+              }}
+            />
           </div>
+          <a href={`/${locale}/request/${org.slug}`} target="_blank" rel="noreferrer" className="mt-3 inline-block">
+            <Button variant="outline" size="sm">{t('dashboard.openForm')}</Button>
+          </a>
         </section>
       </div>
     </div>
