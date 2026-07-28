@@ -296,8 +296,11 @@
     "roles": {
       "owner": "Owner",
       "admin": "Admin",
+      "manager": "Manager",
       "receptionist": "Receptionist",
       "mechanic": "Mechanic",
+      "apprentice": "Apprentice",
+      "accountant": "Accounting",
       "viewer": "Viewer"
     },
     "leads": {
@@ -405,7 +408,21 @@
       "email": "Email",
       "invite": "Invite",
       "inviteNote": "The invitation is ready. Email delivery comes in a later step.",
-      "limitReached": "You've reached the maximum number of users included in your plan. Upgrade to invite more people."
+      "limitReached": "You've reached the maximum number of users included in your plan. Upgrade to invite more people.",
+      "statOpenWorkOrders": "Open work orders",
+      "statCompleted": "Completed repairs",
+      "statRevenue": "Revenue generated",
+      "statToday": "Today",
+      "lastLogin": "Last login {date}",
+      "neverLoggedIn": "Never logged in",
+      "actionResetPassword": "Reset password",
+      "resetPasswordSent": "Reset email sent.",
+      "resetPasswordError": "Couldn't send the reset email.",
+      "transferTo": "Transfer records to…",
+      "transferAction": "Transfer",
+      "transferDone": "Records transferred.",
+      "transferError": "Couldn't transfer the records.",
+      "permissionsNote": "Detailed per-role permissions are a separate project — for now, every role gets standard access to the app."
     },
     "customers": {
       "title": "Customers",

@@ -8,7 +8,7 @@ import { getOrgEntitlements } from '@/data/subscriptions/get-subscription';
 import { countSeats } from '@/data/subscriptions/usage';
 
 type Locale = 'nl' | 'en' | 'fr';
-const ROLES = ['owner', 'admin', 'receptionist', 'mechanic', 'viewer'] as const;
+const ROLES = ['owner', 'admin', 'manager', 'receptionist', 'mechanic', 'apprentice', 'accountant', 'viewer'] as const;
 
 function localeOf(fd: FormData): Locale {
   const l = String(fd.get('locale') ?? 'nl');
@@ -98,4 +98,55 @@ export async function assignLeadAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   await supabase.from('leads').update({ assigned_to: userId }).eq('id', leadId);
   redirect(`/${locale}/leads/${leadId}`);
+}
+
+const OPEN_LEAD_STATUSES = ['new', 'qualifying', 'qualified', 'appointment_proposed'];
+
+/** Quick action: send a member their own password-reset email. */
+export async function resetMemberPasswordAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const email = String(formData.get('email') ?? '').trim();
+  if (!email) redirect(`/${locale}/team?error=1`);
+
+  const h = await headers();
+  const origin = h.get('origin') ?? (h.get('host') ? `https://${h.get('host')}` : '');
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: origin ? `${origin}/${locale}/reset-password` : undefined,
+  });
+  redirect(`/${locale}/team${error ? '?resetError=1' : '?resetSent=1'}`);
+}
+
+/**
+ * Quick action: move a member's currently OPEN work orders and leads to
+ * another member — e.g. before someone goes on leave. Never touches
+ * finished/cancelled records; that history stays attributed to whoever
+ * actually did the work.
+ */
+export async function transferMemberRecordsAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const fromUserId = String(formData.get('fromUserId') ?? '');
+  const toUserId = String(formData.get('toUserId') ?? '');
+  if (!fromUserId || !toUserId || fromUserId === toUserId) redirect(`/${locale}/team?error=1`);
+
+  const { supabase, orgId } = await currentOrgId();
+  if (!orgId) redirect(`/${locale}/onboarding`);
+
+  const [woResult, leadResult] = await Promise.all([
+    supabase
+      .from('work_orders')
+      .update({ assigned_to: toUserId })
+      .eq('organization_id', orgId)
+      .eq('assigned_to', fromUserId)
+      .in('status', ['received', 'inspection_in_progress', 'diagnostic_done', 'awaiting_customer_approval', 'awaiting_leasing_approval', 'quote_accepted', 'parts_ordered', 'parts_received', 'repair_in_progress', 'final_control']),
+    supabase
+      .from('leads')
+      .update({ assigned_to: toUserId })
+      .eq('organization_id', orgId)
+      .eq('assigned_to', fromUserId)
+      .in('status', OPEN_LEAD_STATUSES),
+  ]);
+  if (woResult.error || leadResult.error) redirect(`/${locale}/team?transferError=1`);
+
+  redirect(`/${locale}/team?transferred=1`);
 }
