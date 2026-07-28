@@ -10,7 +10,8 @@ export type ModuleImageKey =
   | 'parts'
   | 'diagnostics'
   | 'history'
-  | 'robin';
+  | 'robin'
+  | 'reports';
 
 const MODULE_DIR = path.join(process.cwd(), 'public', 'images', 'modules');
 const EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'];

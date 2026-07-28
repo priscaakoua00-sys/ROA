@@ -13,6 +13,7 @@ import {
 } from '@/data/invoices/actions';
 import { formatCurrency } from '@/lib/pricing';
 import { formatDateTimeUTC } from '@/lib/datetime';
+import { SITE_URL } from '@/lib/site';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Field } from '@/components/auth/auth-shell';
@@ -203,6 +204,19 @@ export default async function InvoiceDetailPage({
         </dl>
         {invoice.notes ? <p className="mt-3 border-t border-border pt-3 text-sm text-muted-foreground">{invoice.notes}</p> : null}
       </div>
+
+      {status !== 'draft' && status !== 'cancelled' ? (
+        <div className="mt-4 rounded-xl border border-border bg-card p-4">
+          <p className="text-sm font-medium">{t('invoices.publicLink')}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{t('invoices.publicLinkHint')}</p>
+          <input
+            type="text"
+            readOnly
+            value={`${SITE_URL}/${locale}/invoice/${invoice.id}`}
+            className="mt-2 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-muted-foreground"
+          />
+        </div>
+      ) : null}
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <form action={updateInvoiceStatusAction} className="flex items-center gap-1">

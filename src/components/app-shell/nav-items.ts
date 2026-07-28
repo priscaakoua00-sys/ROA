@@ -13,6 +13,7 @@ import {
   CreditCard,
   FileText,
   Scale,
+  BarChart3,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -44,6 +45,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: '/invoices', labelKey: 'invoices', icon: Receipt },
   { href: '/automations', labelKey: 'automations', icon: Zap },
   { href: '/knowledge', labelKey: 'knowledge', icon: BookOpen },
+  { href: '/reports', labelKey: 'reports', icon: BarChart3 },
   { href: '/team', labelKey: 'team', icon: Users2 },
   { href: '/pricing', labelKey: 'billing', icon: CreditCard },
 ];
