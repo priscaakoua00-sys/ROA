@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { Receipt, Download, Check, Bell } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import { formatCurrency } from '@/lib/pricing';
 import { formatDateUTC } from '@/lib/datetime';
 import { markInvoicePaidAction, sendPaymentReminderAction } from '@/data/invoices/actions';
@@ -59,9 +60,8 @@ export default async function InvoicesPage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const org = orgs?.[0];
-  if (!org) redirect(`/${locale}/onboarding`);
+  const orgId = await getActiveOrgId(supabase);
+  if (!orgId) redirect(`/${locale}/onboarding`);
 
   const now = new Date();
   const todayStart = new Date(now);
@@ -78,12 +78,12 @@ export default async function InvoicesPage({
         .select(
           'id, invoice_number, status, issue_date, due_date, total, paid_amount, paid_at, customers(first_name,last_name,email), vehicles(license_plate,make,model)',
         )
-        .eq('organization_id', org.id)
+        .eq('organization_id', orgId)
         .order('created_at', { ascending: false })
         .limit(200),
-      supabase.from('invoice_payments').select('amount').eq('organization_id', org.id).gte('paid_at', todayISO),
-      supabase.from('invoice_payments').select('amount').eq('organization_id', org.id).gte('paid_at', weekStartISO),
-      supabase.from('invoice_payments').select('amount').eq('organization_id', org.id).gte('paid_at', monthStartISO),
+      supabase.from('invoice_payments').select('amount').eq('organization_id', orgId).gte('paid_at', todayISO),
+      supabase.from('invoice_payments').select('amount').eq('organization_id', orgId).gte('paid_at', weekStartISO),
+      supabase.from('invoice_payments').select('amount').eq('organization_id', orgId).gte('paid_at', monthStartISO),
     ]);
 
   const allInvoices = (invoicesData ?? []) as unknown as InvoiceRow[];

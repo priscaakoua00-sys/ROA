@@ -29,7 +29,8 @@
       "billing": "Abonnement",
       "quotes": "Offertes",
       "appraise": "Kopen / Verkopen",
-      "reports": "Rapporten"
+      "reports": "Rapporten",
+      "switchGarage": "Wissel van garage"
     },
     "onboarding": {
       "title": "Uw garage instellen",
@@ -724,6 +725,11 @@
       "ibanIntro": "Met een IBAN krijgt uw factuur een scan-en-betaal QR-code (optioneel).",
       "iban": "IBAN",
       "bic": "BIC",
+      "garagesTitle": "Garages",
+      "garagesIntro": "Beheer meerdere garages onder één account en wissel ertussen via het menu bovenaan het scherm.",
+      "garageActive": "Actief",
+      "newGarage": "Naam van de nieuwe garage",
+      "addGarage": "Garage toevoegen",
       "securityTitle": "Beveiliging",
       "securityIntro": "Zet tweefactorauthenticatie (2FA) aan om uw account naast uw wachtwoord met een extra code te beschermen.",
       "mfaEnable": "Tweefactorauthenticatie inschakelen",

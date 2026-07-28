@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -19,8 +20,7 @@ export async function markFollowUpAction(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const orgId = orgs?.[0]?.id;
+  const orgId = await getActiveOrgId(supabase);
   if (!orgId) redirect(`/${locale}/onboarding`);
 
   await supabase.from('follow_ups').insert({

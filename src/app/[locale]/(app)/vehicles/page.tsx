@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { Car, Plus } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import { ModuleBanner } from '@/components/module-banner';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
@@ -39,14 +40,13 @@ export default async function VehiclesPage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const org = orgs?.[0];
-  if (!org) redirect(`/${locale}/onboarding`);
+  const orgId = await getActiveOrgId(supabase);
+  if (!orgId) redirect(`/${locale}/onboarding`);
 
   let query = supabase
     .from('vehicles')
     .select('id, license_plate, make, model, year, mileage, photo_url, customers(first_name,last_name)')
-    .eq('organization_id', org.id)
+    .eq('organization_id', orgId)
     .order('created_at', { ascending: false })
     .limit(50);
   if (q && q.trim()) {

@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { Stethoscope, Image as ImageIcon, Video, File as FileIcon, X, Star } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import {
   addArticleAction,
   updateArticleAction,
@@ -72,15 +73,14 @@ export default async function KnowledgePage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const org = orgs?.[0];
-  if (!org) redirect(`/${locale}/onboarding`);
+  const orgId = await getActiveOrgId(supabase);
+  if (!orgId) redirect(`/${locale}/onboarding`);
 
   const [{ data }, { data: favRows }] = await Promise.all([
     supabase
       .from('knowledge_articles')
       .select('id, category, title, content')
-      .eq('organization_id', org.id)
+      .eq('organization_id', orgId)
       .order('created_at', { ascending: false })
       .limit(300),
     supabase.from('knowledge_favorites').select('article_id').eq('user_id', user.id),

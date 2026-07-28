@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import { getOrgEntitlements } from '@/data/subscriptions/get-subscription';
 import { countVehicles } from '@/data/subscriptions/usage';
 import { logActivity } from '@/data/activity/log';
@@ -42,8 +43,7 @@ export async function addVehicleAction(formData: FormData) {
       redirect(`/${locale}/vehicles/new?error=1`);
     }
 
-    const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-    const orgId = orgs?.[0]?.id;
+    const orgId = await getActiveOrgId(supabase);
     if (!orgId) redirect(`/${locale}/onboarding`);
 
     const { data: newCustomer } = await supabase
@@ -131,8 +131,7 @@ export async function addCustomerAction(formData: FormData) {
   }
 
   const supabase = await createSupabaseServerClient();
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const orgId = orgs?.[0]?.id;
+  const orgId = await getActiveOrgId(supabase);
   if (!orgId) redirect(`/${locale}/onboarding`);
 
   const { data: customer } = await supabase

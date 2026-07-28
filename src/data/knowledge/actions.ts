@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 
 type Locale = 'nl' | 'en' | 'fr';
 const CATEGORIES = [
@@ -61,8 +62,7 @@ export async function addArticleAction(formData: FormData) {
   if (!title) redirect(`/${locale}/knowledge?error=1`);
 
   const supabase = await createSupabaseServerClient();
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const orgId = orgs?.[0]?.id;
+  const orgId = await getActiveOrgId(supabase);
   if (!orgId) redirect(`/${locale}/onboarding`);
 
   const { data: article } = await supabase

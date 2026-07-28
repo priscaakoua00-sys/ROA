@@ -19,6 +19,8 @@ import {
   cancelMfaEnrollmentAction,
   disableMfaAction,
 } from '@/data/security/actions';
+import { createAdditionalOrgAction } from '@/data/organizations/actions';
+import { getActiveOrgId, listUserOrgs } from '@/data/organizations/active';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
@@ -90,11 +92,13 @@ export default async function SettingsPage({
     }
   }
 
-  const { data: orgs } = await supabase
+  const [userOrgs, activeOrgId] = await Promise.all([listUserOrgs(supabase), getActiveOrgId(supabase)]);
+  if (!activeOrgId) redirect(`/${locale}/onboarding`);
+  const { data: org } = await supabase
     .from('organizations')
     .select('id, name, slug, default_language, phone, email, address, postal_code, city, kvk_number, vat_number, website, iban, bic, logo_url, default_margin_percent')
-    .limit(1);
-  const org = orgs?.[0];
+    .eq('id', activeOrgId)
+    .maybeSingle();
   if (!org) redirect(`/${locale}/onboarding`);
 
   let logoUrl: string | null = null;
@@ -363,6 +367,32 @@ export default async function SettingsPage({
           <div className="flex justify-end">
             <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>
           </div>
+        </form>
+      </section>
+
+      {/* Garages (multi-location) */}
+      <section className="mt-6 rounded-xl border border-border bg-card p-6 shadow-soft">
+        <h2 className="text-base font-semibold tracking-tight">{t('settings.garagesTitle')}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t('settings.garagesIntro')}</p>
+
+        <ul className="mt-3 space-y-1.5">
+          {userOrgs.map((o) => (
+            <li
+              key={o.id}
+              className="flex items-center justify-between rounded-lg border border-border bg-background px-3 py-2 text-sm"
+            >
+              <span className="truncate">{o.name}</span>
+              {o.id === activeOrgId ? <Badge variant="gold">{t('settings.garageActive')}</Badge> : null}
+            </li>
+          ))}
+        </ul>
+
+        <form action={createAdditionalOrgAction} className="mt-3 flex flex-wrap items-end gap-2 border-t border-border pt-3">
+          <input type="hidden" name="locale" value={locale} />
+          <div className="min-w-[150px] flex-1">
+            <Field label={t('settings.newGarage')} name="name" required />
+          </div>
+          <Button type="submit" variant="outline" size="sm">{t('settings.addGarage')}</Button>
         </form>
       </section>
 

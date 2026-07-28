@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { History, Receipt, Users, Wrench } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import { loadActivityLog, type ActivityRow } from '@/data/activity/list';
 import { formatDateTimeUTC } from '@/lib/datetime';
 import { Link } from '@/i18n/navigation';
@@ -35,11 +36,10 @@ export default async function ActivityLogPage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const org = orgs?.[0];
-  if (!org) redirect(`/${locale}/onboarding`);
+  const orgId = await getActiveOrgId(supabase);
+  if (!orgId) redirect(`/${locale}/onboarding`);
 
-  const rows = await loadActivityLog(supabase, org.id, 150);
+  const rows = await loadActivityLog(supabase, orgId, 150);
 
   return (
     <div className="container max-w-2xl py-10">

@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -11,8 +12,7 @@ function localeOf(fd: FormData): Locale {
 }
 
 async function orgId(supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>) {
-  const { data } = await supabase.from('organizations').select('id').limit(1);
-  return data?.[0]?.id as string | undefined;
+  return (await getActiveOrgId(supabase)) ?? undefined;
 }
 
 export async function updateCompanyAction(formData: FormData) {

@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { Phone, MessageCircle, Mail, Car } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import { customerStatus, type CustomerStatus } from '@/data/customers/status';
 import { formatCurrency } from '@/lib/pricing';
 import { formatDateUTC } from '@/lib/datetime';
@@ -55,23 +56,22 @@ export default async function CustomersPage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const org = orgs?.[0];
-  if (!org) redirect(`/${locale}/onboarding`);
+  const orgId = await getActiveOrgId(supabase);
+  if (!orgId) redirect(`/${locale}/onboarding`);
 
   const [{ data: customersData }, { data: vehiclesData }, { data: workOrdersData }, { data: invoicesData }, { data: paymentsData }] =
     await Promise.all([
       supabase
         .from('customers')
         .select('id, first_name, last_name, phone, email, created_at')
-        .eq('organization_id', org.id)
+        .eq('organization_id', orgId)
         .eq('archived', false)
         .order('created_at', { ascending: false })
         .limit(300),
-      supabase.from('vehicles').select('id, customer_id, make, model, license_plate').eq('organization_id', org.id),
-      supabase.from('work_orders').select('customer_id, created_at').eq('organization_id', org.id),
-      supabase.from('invoices').select('customer_id, status, due_date').eq('organization_id', org.id),
-      supabase.from('invoice_payments').select('amount, invoices(customer_id)').eq('organization_id', org.id),
+      supabase.from('vehicles').select('id, customer_id, make, model, license_plate').eq('organization_id', orgId),
+      supabase.from('work_orders').select('customer_id, created_at').eq('organization_id', orgId),
+      supabase.from('invoices').select('customer_id, status, due_date').eq('organization_id', orgId),
+      supabase.from('invoice_payments').select('amount, invoices(customer_id)').eq('organization_id', orgId),
     ]);
 
   const customers = (customersData ?? []) as Customer[];

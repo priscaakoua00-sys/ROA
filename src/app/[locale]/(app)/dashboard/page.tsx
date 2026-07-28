@@ -28,6 +28,7 @@ import { RevenueChart } from '@/components/dashboard/revenue-chart';
 import { DashboardGreeting } from '@/components/dashboard/greeting';
 import { RequestLinkCard } from '@/components/dashboard/request-link-card';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import { signOutAction } from '@/data/auth/actions';
 import { loadFollowUpsDueCount } from '@/data/automations/due';
 import { computeRobinInsight } from '@/data/robin/insight';
@@ -137,8 +138,13 @@ export default async function DashboardPage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: orgs } = await supabase.from('organizations').select('id, name, slug, default_margin_percent').limit(1);
-  const org = orgs?.[0];
+  const orgId = await getActiveOrgId(supabase);
+  if (!orgId) redirect(`/${locale}/onboarding`);
+  const { data: org } = await supabase
+    .from('organizations')
+    .select('id, name, slug, default_margin_percent')
+    .eq('id', orgId)
+    .maybeSingle();
   if (!org) redirect(`/${locale}/onboarding`);
 
   const now = new Date();

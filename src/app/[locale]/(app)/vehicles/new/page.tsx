@@ -5,6 +5,7 @@ import { ChevronDown, FolderOpen } from 'lucide-react';
 import { setRequestLocale } from 'next-intl/server';
 import { getTranslations } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import { addVehicleAction } from '@/data/customers/actions';
 import { Button } from '@/components/ui/button';
 import { SubmitButton } from '@/components/ui/submit-button';
@@ -45,9 +46,9 @@ export default async function NewVehiclePage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: orgs } = await supabase.from('organizations').select('id, country').limit(1);
-  const org = orgs?.[0];
-  if (!org) redirect(`/${locale}/onboarding`);
+  const orgId = await getActiveOrgId(supabase);
+  if (!orgId) redirect(`/${locale}/onboarding`);
+  const { data: org } = await supabase.from('organizations').select('country').eq('id', orgId).maybeSingle();
 
   // Empty state — a search, not a form.
   if (!plate) {
@@ -70,7 +71,7 @@ export default async function NewVehiclePage({
   const { data: existingList } = await supabase
     .from('vehicles')
     .select('id, license_plate')
-    .eq('organization_id', org.id)
+    .eq('organization_id', orgId)
     .not('license_plate', 'is', null)
     .limit(2000);
   const existing = (existingList ?? []).find(
@@ -96,7 +97,7 @@ export default async function NewVehiclePage({
       ) : null}
 
       {/* The file opens: public dossier + Ruben's read, first. */}
-      <VehicleDossierSection plate={plate} locale={l} withSummary customerId={null} country={org.country} />
+      <VehicleDossierSection plate={plate} locale={l} withSummary customerId={null} country={org?.country ?? undefined} />
 
       {error === 'limit' ? (
         <p className="mt-4 text-sm text-destructive">{t('newVehicle.limitReached')}</p>

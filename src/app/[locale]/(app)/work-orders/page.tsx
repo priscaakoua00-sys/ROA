@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { ClipboardList, Phone, MessageCircle, Car, Receipt } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { getActiveOrgId } from '@/data/organizations/active';
 import { ModuleBanner } from '@/components/module-banner';
 import { Badge } from '@/components/ui/badge';
 import { Link } from '@/i18n/navigation';
@@ -88,16 +89,15 @@ export default async function WorkOrdersPage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: orgs } = await supabase.from('organizations').select('id').limit(1);
-  const org = orgs?.[0];
-  if (!org) redirect(`/${locale}/onboarding`);
+  const orgId = await getActiveOrgId(supabase);
+  if (!orgId) redirect(`/${locale}/onboarding`);
 
   let query = supabase
     .from('work_orders')
     .select(
       'id, title, status, created_at, customers(first_name,last_name,phone), vehicles(id,make,model,license_plate), appointments(starts_at), leads(urgency)',
     )
-    .eq('organization_id', org.id)
+    .eq('organization_id', orgId)
     .order('created_at', { ascending: false })
     .limit(100);
   if (filter !== 'all') query = query.in('status', FILTER_STATUSES[filter]);
