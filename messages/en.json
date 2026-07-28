@@ -321,7 +321,23 @@
         "won": "Won",
         "lost": "Lost",
         "archived": "Archived"
-      }
+      },
+      "filters": {
+        "all": "All",
+        "new": "New",
+        "urgent": "Urgent",
+        "scheduled": "Scheduled",
+        "done": "Done"
+      },
+      "vehicleUnknown": "No vehicle given",
+      "agoMinutes": "{count}m ago",
+      "agoHours": "{count}h ago",
+      "agoDays": "{count}d ago",
+      "actionCall": "Call",
+      "actionWhatsapp": "WhatsApp",
+      "actionSchedule": "Schedule",
+      "actionAccept": "Accept",
+      "actionRefuse": "Refuse"
     },
     "lead": {
       "back": "Back to overview",

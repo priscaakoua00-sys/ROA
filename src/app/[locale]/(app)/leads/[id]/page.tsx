@@ -285,7 +285,7 @@ export default async function LeadDetailPage({
         )}
       </section>
 
-      <section className="mt-6">
+      <section id="schedule" className="mt-6 scroll-mt-20">
         <h2 className="text-base font-semibold tracking-tight">{t('lead.proposeTitle')}</h2>
         {isBooked ? (
           <p className="mt-2 text-sm text-muted-foreground">

@@ -321,7 +321,23 @@
         "won": "Gewonnen",
         "lost": "Verloren",
         "archived": "Gearchiveerd"
-      }
+      },
+      "filters": {
+        "all": "Alle",
+        "new": "Nieuw",
+        "urgent": "Urgent",
+        "scheduled": "Ingepland",
+        "done": "Afgerond"
+      },
+      "vehicleUnknown": "Voertuig niet opgegeven",
+      "agoMinutes": "{count} min geleden",
+      "agoHours": "{count} u geleden",
+      "agoDays": "{count} d geleden",
+      "actionCall": "Bellen",
+      "actionWhatsapp": "WhatsApp",
+      "actionSchedule": "Inplannen",
+      "actionAccept": "Accepteren",
+      "actionRefuse": "Weigeren"
     },
     "lead": {
       "back": "Terug naar overzicht",

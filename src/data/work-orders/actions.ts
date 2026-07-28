@@ -50,6 +50,9 @@ export async function createWorkOrderAction(formData: FormData) {
   } = await supabase.auth.getUser();
   await logStatus(supabase, lead.organization_id, wo.id, 'received', user?.id ?? null);
   await instantiateChecklist(supabase, lead.organization_id, wo.id);
+  // Converting a lead into a work order IS accepting it — reflect that so
+  // it stops showing as an open "new" request in filters and lists.
+  await supabase.from('leads').update({ status: 'won' }).eq('id', lead.id);
 
   redirect(`/${locale}/work-orders/${wo.id}`);
 }

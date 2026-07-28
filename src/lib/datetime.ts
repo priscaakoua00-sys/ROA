@@ -42,6 +42,22 @@ export function formatMonthYearUTC(year: number, month: number, locale: string):
   }).format(new Date(Date.UTC(year, month, 1)));
 }
 
+/** Coarse "how long ago" bucket for a timestamp, in minutes/hours/days. */
+export type ElapsedUnit = 'minutes' | 'hours' | 'days';
+export interface Elapsed {
+  value: number;
+  unit: ElapsedUnit;
+}
+
+/** How long ago `iso` was, relative to now — for "received 2h ago" style labels. */
+export function elapsedSince(iso: string, now: Date = new Date()): Elapsed {
+  const minutes = Math.max(0, Math.round((now.getTime() - new Date(iso).getTime()) / 60_000));
+  if (minutes < 60) return { value: minutes, unit: 'minutes' };
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return { value: hours, unit: 'hours' };
+  return { value: Math.round(hours / 24), unit: 'days' };
+}
+
 /** Short weekday labels, Monday-first, for a calendar header row. */
 export function weekdayShortLabelsUTC(locale: string): string[] {
   const monday = new Date(Date.UTC(2024, 0, 1)); // a known Monday
