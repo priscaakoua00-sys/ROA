@@ -52,7 +52,10 @@ export async function createPhotoDiagnosisAction(formData: FormData) {
   for (const file of others) uploads.push({ file, angle: 'other' });
   uploads.splice(MAX_MEDIA);
 
-  if (uploads.length === 0) redirect(`${backHref}?diagError=1`);
+  // Photos are the richest input, but a mechanic without a camera to hand can
+  // still get a useful read from a typed description alone — only reject
+  // when there's genuinely nothing to work with.
+  if (uploads.length === 0 && !note) redirect(`${backHref}?diagError=1`);
   for (const { file } of uploads) {
     if (!file.type.startsWith('image/') || file.size > MAX_MEDIA_BYTES) {
       redirect(`${backHref}?diagError=1`);
@@ -107,12 +110,17 @@ export async function createPhotoDiagnosisAction(formData: FormData) {
       .upload(path, file, { contentType: file.type });
     if (!error) uploaded.push({ path, angle });
   }
-  if (uploaded.length === 0) redirect(`${backHref}?diagError=1`);
+  if (uploads.length > 0 && uploaded.length === 0) redirect(`${backHref}?diagError=1`);
 
-  const { data: signedUrls } = await supabase.storage
-    .from('diagnosis-photos')
-    .createSignedUrls(uploaded.map((u) => u.path), 3600);
-  const urlByPath = new Map((signedUrls ?? []).map((s) => [s.path, s.signedUrl]));
+  const urlByPath = new Map<string, string>();
+  if (uploaded.length > 0) {
+    const { data: signedUrls } = await supabase.storage
+      .from('diagnosis-photos')
+      .createSignedUrls(uploaded.map((u) => u.path), 3600);
+    for (const s of signedUrls ?? []) {
+      if (s.signedUrl && s.path) urlByPath.set(s.path, s.signedUrl);
+    }
+  }
 
   const media: DiagnosisMediaItem[] = [];
   for (const u of uploaded) {
