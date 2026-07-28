@@ -162,10 +162,10 @@ export class MockAIProvider implements AIProvider {
   async diagnoseFromMedia(
     input: MediaDiagnosisInput,
   ): Promise<AIResult<MediaDiagnosis>> {
-    if (input.media.length === 0) {
+    if (input.media.length === 0 && !input.note?.trim()) {
       return {
         status: 'handoff',
-        reason: 'No photos attached.',
+        reason: 'No photos and no description to work from.',
         meta: this.meta(0.1),
       };
     }
@@ -180,12 +180,19 @@ export class MockAIProvider implements AIProvider {
     }
 
     const match = input.note ? matchSymptom(input.note, input.language) : null;
+    const hasPhotos = input.media.length > 0;
 
-    const honestVisibleProblems: Record<SupportedLanguage, string[]> = {
-      nl: ['De foto’s zijn opgeslagen, maar automatische beeldherkenning is nog niet actief — deze inschatting komt van uw omschrijving.'],
-      en: ['The photos are saved, but automatic image recognition isn’t active yet — this read comes from your note.'],
-      fr: ["Les photos sont enregistrées, mais la reconnaissance d'image automatique n'est pas encore active — cette estimation vient de votre note."],
-    };
+    const honestVisibleProblems: Record<SupportedLanguage, string[]> = hasPhotos
+      ? {
+          nl: ['De foto’s zijn opgeslagen, maar automatische beeldherkenning is nog niet actief — deze inschatting komt van uw omschrijving.'],
+          en: ['The photos are saved, but automatic image recognition isn’t active yet — this read comes from your note.'],
+          fr: ["Les photos sont enregistrées, mais la reconnaissance d'image automatique n'est pas encore active — cette estimation vient de votre note."],
+        }
+      : {
+          nl: ['Geen foto’s bijgevoegd — deze inschatting komt uitsluitend van uw beschrijving.'],
+          en: ['No photos attached — this read comes purely from your description.'],
+          fr: ["Aucune photo jointe — cette estimation vient uniquement de votre description."],
+        };
 
     const fallback: Record<SupportedLanguage, MediaDiagnosis> = {
       nl: {

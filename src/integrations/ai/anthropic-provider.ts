@@ -246,8 +246,8 @@ export class AnthropicAIProvider implements AIProvider {
 
   async diagnoseFromMedia(input: MediaDiagnosisInput): Promise<AIResult<MediaDiagnosis>> {
     const started = Date.now();
-    if (input.media.length === 0) {
-      return { status: 'handoff', reason: 'No photos attached.', meta: this.meta(0.1, Date.now() - started) };
+    if (input.media.length === 0 && !input.note?.trim()) {
+      return { status: 'handoff', reason: 'No photos and no description to work from.', meta: this.meta(0.1, Date.now() - started) };
     }
     if (input.media.some((m) => m.kind === 'video')) {
       return { status: 'handoff', reason: 'Video analysis is not supported yet.', meta: this.meta(0.1, Date.now() - started) };
@@ -294,8 +294,13 @@ export class AnthropicAIProvider implements AIProvider {
       .filter(Boolean)
       .join('\n');
 
+    const systemPrompt =
+      imageBlocks.length > 0
+        ? `You are Ruben, a technical assistant for a car garage's mechanics — never a replacement for their judgment. Look closely at the attached photos of a vehicle and produce a diagnosis report in ${LANGUAGE_NAME[input.language] ?? input.language}: what's visibly wrong, which parts look affected, a severity level, possible causes (most likely first), further checks the mechanic should do in person, an estimated repair time, and practical recommendations. If the photos genuinely don't show enough to say anything useful, say so honestly in visibleProblems rather than guessing.`
+        : `You are Ruben, a technical assistant for a car garage's mechanics — never a replacement for their judgment. No photos were provided, only the mechanic's written description of the symptoms below. Reason from that description alone and produce a diagnosis report in ${LANGUAGE_NAME[input.language] ?? input.language}: what the description suggests is wrong, which parts are likely affected, a severity level, possible causes (most likely first), further checks the mechanic should do in person, an estimated repair time, and practical recommendations. State in visibleProblems that this reading comes from the description, not a visual inspection. If the description is too vague to say anything useful, say so honestly rather than guessing.`;
+
     const result = await this.callTool({
-      system: `You are Ruben, a technical assistant for a car garage's mechanics — never a replacement for their judgment. Look closely at the attached photos of a vehicle and produce a diagnosis report in ${LANGUAGE_NAME[input.language] ?? input.language}: what's visibly wrong, which parts look affected, a severity level, possible causes (most likely first), further checks the mechanic should do in person, an estimated repair time, and practical recommendations. If the photos genuinely don't show enough to say anything useful, say so honestly in visibleProblems rather than guessing.`,
+      system: systemPrompt,
       userContent: [...imageBlocks, { type: 'text', text: textParts }],
       tool,
     });

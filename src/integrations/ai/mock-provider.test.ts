@@ -91,12 +91,26 @@ describe('MockAIProvider', () => {
     }
   });
 
-  it('hands off a media diagnosis with no media', async () => {
+  it('hands off a media diagnosis with no media and no note', async () => {
     const result = await provider.diagnoseFromMedia({
       language: 'nl',
       media: [],
     });
     expect(result.status).toBe('handoff');
+  });
+
+  it('diagnoses from a typed description alone, with no photos', async () => {
+    const result = await provider.diagnoseFromMedia({
+      language: 'fr',
+      media: [],
+      note: 'Grince au freinage',
+    });
+    expect(result.status).toBe('ok');
+    if (result.status === 'ok') {
+      expect(() => mediaDiagnosisSchema.parse(result.data)).not.toThrow();
+      expect(result.data.affectedParts.length).toBeGreaterThan(0);
+      expect(result.data.severity).toBe('high');
+    }
   });
 
   it('hands off a media diagnosis when a video is attached (not supported yet)', async () => {

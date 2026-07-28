@@ -125,6 +125,7 @@ export async function PhotoDiagnosisPanel({
             placeholder={t('notePlaceholder')}
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
           />
+          <span className="mt-1 block text-xs text-muted-foreground">{t('noteHint')}</span>
         </label>
 
         <SubmitButton variant="outline" size="sm" pendingLabel={t('analyzing')}>{t('submit')}</SubmitButton>
