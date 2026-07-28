@@ -715,6 +715,7 @@
       "checklistNewItem": "Nieuw controlepunt",
       "checklistAddItem": "Toevoegen",
       "companyIntro": "Deze gegevens verschijnen op uw facturen en uw visitekaartje.",
+      "readOnlyNotice": "Uw rol staat het wijzigen van deze instellingen niet toe. Neem contact op met de garage-eigenaar of een beheerder.",
       "noLogo": "Logo",
       "logoUpload": "Logo van de garage",
       "phone": "Telefoon",

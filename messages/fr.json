@@ -715,6 +715,7 @@
       "checklistNewItem": "Nouveau point de contrôle",
       "checklistAddItem": "Ajouter",
       "companyIntro": "Ces informations apparaissent sur vos factures et votre carte de visite.",
+      "readOnlyNotice": "Votre rôle ne permet pas de modifier ces paramètres. Contactez le propriétaire ou un administrateur du garage.",
       "noLogo": "Logo",
       "logoUpload": "Logo du garage",
       "phone": "Téléphone",
