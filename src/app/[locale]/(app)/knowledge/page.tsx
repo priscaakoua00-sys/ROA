@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { redirect } from 'next/navigation';
-import { Stethoscope, Image as ImageIcon, Video, File as FileIcon, X } from 'lucide-react';
+import { Stethoscope, Image as ImageIcon, Video, File as FileIcon, X, Star } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import {
@@ -9,6 +9,7 @@ import {
   updateArticleAction,
   deleteArticleAction,
   deleteAttachmentAction,
+  toggleFavoriteAction,
 } from '@/data/knowledge/actions';
 import { scoreArticles } from '@/data/knowledge/search';
 import { ModuleBanner } from '@/components/module-banner';
@@ -17,6 +18,7 @@ import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
 import { FlashToast } from '@/components/flash-toast';
 import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button';
+import { cn } from '@/lib/utils';
 
 const CATEGORIES = [
   'procedure',
@@ -28,6 +30,7 @@ const CATEGORIES = [
   'part',
   'intervention_time',
   'failure',
+  'internal_note',
 ] as const;
 
 interface Article {
@@ -56,11 +59,11 @@ export default async function KnowledgePage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ saved?: string; error?: string; q?: string }>;
+  searchParams: Promise<{ saved?: string; error?: string; q?: string; favorites?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { saved, error, q } = await searchParams;
+  const { saved, error, q, favorites: favoritesOnly } = await searchParams;
   const t = await getTranslations('app');
 
   const supabase = await createSupabaseServerClient();
@@ -73,17 +76,22 @@ export default async function KnowledgePage({
   const org = orgs?.[0];
   if (!org) redirect(`/${locale}/onboarding`);
 
-  const { data } = await supabase
-    .from('knowledge_articles')
-    .select('id, category, title, content')
-    .eq('organization_id', org.id)
-    .order('created_at', { ascending: false })
-    .limit(300);
+  const [{ data }, { data: favRows }] = await Promise.all([
+    supabase
+      .from('knowledge_articles')
+      .select('id, category, title, content')
+      .eq('organization_id', org.id)
+      .order('created_at', { ascending: false })
+      .limit(300),
+    supabase.from('knowledge_favorites').select('article_id').eq('user_id', user.id),
+  ]);
   const allArticles = (data ?? []) as Article[];
+  const favoriteIds = new Set((favRows ?? []).map((f) => f.article_id as string));
 
   const query = (q ?? '').trim();
   const matchIds = query ? new Set(scoreArticles(allArticles, query, 300).map((m) => m.id)) : null;
-  const articles = matchIds ? allArticles.filter((a) => matchIds.has(a.id)) : allArticles;
+  let articles = matchIds ? allArticles.filter((a) => matchIds.has(a.id)) : allArticles;
+  if (favoritesOnly) articles = articles.filter((a) => favoriteIds.has(a.id));
 
   const articleIds = articles.map((a) => a.id);
   const attachmentsByArticle = new Map<string, Attachment[]>();
@@ -125,6 +133,7 @@ export default async function KnowledgePage({
       <p className="mt-1 text-sm text-muted-foreground">{t('knowledge.intro')}</p>
 
       <form className="mt-4" action={`/${locale}/knowledge`} method="get">
+        {favoritesOnly ? <input type="hidden" name="favorites" value="1" /> : null}
         <input
           name="q"
           defaultValue={q ?? ''}
@@ -133,6 +142,19 @@ export default async function KnowledgePage({
         />
         <p className="mt-1 text-xs text-muted-foreground">{t('knowledge.searchNote')}</p>
       </form>
+
+      <Link
+        href={`/knowledge${favoritesOnly ? '' : '?favorites=1'}${!favoritesOnly && q ? `&q=${encodeURIComponent(q)}` : ''}`}
+        className={cn(
+          'mt-2 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition',
+          favoritesOnly
+            ? 'border-gold bg-gold text-primary-foreground'
+            : 'border-border bg-background text-foreground hover:border-gold/50 hover:bg-gold/5',
+        )}
+      >
+        <Star className="size-3.5" aria-hidden fill={favoritesOnly ? 'currentColor' : 'none'} />
+        {t('knowledge.favoritesOnly')}
+      </Link>
 
       {/* Add */}
       <section className="mt-5 rounded-xl border border-border bg-card p-6 shadow-soft">
@@ -189,6 +211,17 @@ export default async function KnowledgePage({
                   const attachments = attachmentsByArticle.get(a.id) ?? [];
                   return (
                     <li key={a.id} id={`article-${a.id}`} className="scroll-mt-20 rounded-xl border border-border bg-card p-4 shadow-soft">
+                      <form action={toggleFavoriteAction} className="float-right">
+                        <input type="hidden" name="locale" value={locale} />
+                        <input type="hidden" name="articleId" value={a.id} />
+                        <button
+                          type="submit"
+                          aria-label={t('knowledge.favoriteToggle')}
+                          className={cn('transition hover:text-gold', favoriteIds.has(a.id) ? 'text-gold' : 'text-muted-foreground')}
+                        >
+                          <Star className="size-4" aria-hidden fill={favoriteIds.has(a.id) ? 'currentColor' : 'none'} />
+                        </button>
+                      </form>
                       <form action={updateArticleAction} className="space-y-2" encType="multipart/form-data">
                         <input type="hidden" name="locale" value={locale} />
                         <input type="hidden" name="articleId" value={a.id} />

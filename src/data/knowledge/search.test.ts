@@ -27,4 +27,12 @@ describe('scoreArticles', () => {
     const r = scoreArticles(articles, 'de la et', 5);
     expect(r).toHaveLength(0);
   });
+
+  it('matches an accented query against unaccented content and vice versa', () => {
+    const withoutAccent = scoreArticles(articles, 'vehicule usees', 5);
+    expect(withoutAccent.map((a) => a.id)).toContain('1');
+
+    const withAccent = scoreArticles(articles, 'entretien hivérnal', 5);
+    expect(withAccent.map((a) => a.id)).toContain('3');
+  });
 });

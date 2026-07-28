@@ -1,10 +1,11 @@
 export const dynamic = 'force-dynamic';
 
 import { redirect } from 'next/navigation';
-import { ChevronLeft, ChevronRight, CalendarClock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CalendarClock, Sparkles } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { createAppointmentAction, updateAppointmentStatusAction } from '@/data/appointments/actions';
+import { proposeSlots, type WeekdayRule } from '@/data/appointments/propose';
 import { formatMonthYearUTC, formatTimeUTC, weekdayShortLabelsUTC } from '@/lib/datetime';
 import { ModuleBanner } from '@/components/module-banner';
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,7 @@ const STATUS_VARIANT: Record<string, 'muted' | 'default' | 'gold' | 'urgent' | '
   no_show: 'urgent',
 };
 const STATUSES = ['proposed', 'pending', 'confirmed', 'completed', 'cancelled', 'no_show'] as const;
+type View = 'month' | 'week';
 
 interface Appt {
   id: string;
@@ -56,6 +58,17 @@ function parseMonthParam(raw: string | undefined): { year: number; month: number
   return { year: now.getUTCFullYear(), month: now.getUTCMonth() };
 }
 
+/** Monday (ISO date string) of the week containing `dateStr`. */
+function mondayOf(dateStr: string): string {
+  const d = new Date(`${dateStr}T00:00:00.000Z`);
+  const offset = (d.getUTCDay() + 6) % 7;
+  return new Date(d.getTime() - offset * 86_400_000).toISOString().slice(0, 10);
+}
+
+function addDaysISO(dateStr: string, days: number): string {
+  return new Date(new Date(`${dateStr}T00:00:00.000Z`).getTime() + days * 86_400_000).toISOString().slice(0, 10);
+}
+
 export default async function AgendaPage({
   params,
   searchParams,
@@ -64,15 +77,29 @@ export default async function AgendaPage({
   searchParams: Promise<{
     month?: string;
     day?: string;
+    view?: string;
     q?: string;
     newCustomerId?: string;
+    suggestedTime?: string;
     saved?: string;
     error?: string;
+    conflict?: string;
   }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { month: monthParam, day: dayParam, q, newCustomerId, saved, error } = await searchParams;
+  const {
+    month: monthParam,
+    day: dayParam,
+    view: viewParam,
+    q,
+    newCustomerId,
+    suggestedTime,
+    saved,
+    error,
+    conflict,
+  } = await searchParams;
+  const view: View = viewParam === 'week' ? 'week' : 'month';
   const t = await getTranslations('app');
 
   const supabase = await createSupabaseServerClient();
@@ -100,19 +127,35 @@ export default async function AgendaPage({
 
   const todayISO = new Date().toISOString().slice(0, 10);
   const isCurrentMonth = todayISO.slice(0, 7) === monthKey;
-  const selectedDay = dayParam && /^\d{4}-\d{2}-\d{2}$/.test(dayParam) && dayParam.startsWith(monthKey)
-    ? dayParam
-    : isCurrentMonth
-      ? todayISO
-      : null;
+  const dayParamValid = dayParam && /^\d{4}-\d{2}-\d{2}$/.test(dayParam) ? dayParam : null;
+
+  // Week view navigates independently of the month grid — the week can span two months.
+  const weekAnchor = dayParamValid ?? todayISO;
+  const weekStart = mondayOf(weekAnchor);
+  const weekDates = Array.from({ length: 7 }, (_, i) => addDaysISO(weekStart, i));
+  const isTodayInWeek = weekDates.includes(todayISO);
+  const prevWeekAnchor = addDaysISO(weekStart, -7);
+  const nextWeekAnchor = addDaysISO(weekStart, 7);
+
+  const selectedDay =
+    view === 'week'
+      ? weekAnchor
+      : dayParamValid && dayParamValid.startsWith(monthKey)
+        ? dayParamValid
+        : isCurrentMonth
+          ? todayISO
+          : null;
+
+  const rangeStart = view === 'week' ? `${weekStart}T00:00:00.000Z` : monthStart.toISOString();
+  const rangeEnd = view === 'week' ? `${addDaysISO(weekStart, 7)}T00:00:00.000Z` : monthEnd.toISOString();
 
   const { data } = await supabase
     .from('appointments')
     .select('id, starts_at, ends_at, status, notes, customers(first_name,last_name), vehicles(make,model,license_plate), services(name)')
     .eq('organization_id', org.id)
     .neq('status', 'cancelled')
-    .gte('starts_at', monthStart.toISOString())
-    .lt('starts_at', monthEnd.toISOString())
+    .gte('starts_at', rangeStart)
+    .lt('starts_at', rangeEnd)
     .order('starts_at', { ascending: true })
     .limit(500);
   const appts = (data ?? []) as unknown as Appt[];
@@ -133,22 +176,46 @@ export default async function AgendaPage({
   // Link (from '@/i18n/navigation') already prefixes the locale itself —
   // these hrefs must stay locale-agnostic or they double-prefix into a 404
   // (e.g. /nl/nl/agenda).
-  const dayHref = (d: string) => `/agenda?month=${monthKey}&day=${d}`;
+  const dayHref = (d: string) => (view === 'week' ? `/agenda?view=week&day=${d}` : `/agenda?month=${monthKey}&day=${d}`);
+  const monthTabHref = `/agenda?month=${(selectedDay ?? weekAnchor).slice(0, 7)}&day=${selectedDay ?? weekAnchor}`;
+  const weekTabHref = `/agenda?view=week&day=${selectedDay ?? todayISO}`;
   const selectedAppts = selectedDay ? (byDay.get(selectedDay) ?? []) : [];
 
   // "Add appointment" data: only fetched once a day is picked.
   let customers: Customer[] = [];
   let pickedCustomer: Customer | null = null;
   let pickedCustomerVehicles: { id: string; make: string | null; model: string | null; license_plate: string | null }[] = [];
-  let services: { id: string; name: string; duration_minutes: number }[] = [];
+  let services: { id: string; name: string; duration_minutes: number; buffer_minutes: number }[] = [];
+  let suggestedTimes: string[] = [];
   if (selectedDay) {
     const { data: svc } = await supabase
       .from('services')
-      .select('id, name, duration_minutes')
+      .select('id, name, duration_minutes, buffer_minutes')
       .eq('organization_id', org.id)
       .eq('active', true)
       .order('created_at', { ascending: true });
     services = svc ?? [];
+
+    const { data: rules } = await supabase
+      .from('availability_rules')
+      .select('weekday, start_time, end_time')
+      .eq('organization_id', org.id);
+    const rulesByWeekday: Record<number, WeekdayRule[]> = {};
+    for (const r of rules ?? []) {
+      (rulesByWeekday[r.weekday] ??= []).push({ start: r.start_time, end: r.end_time });
+    }
+    // "AI slot suggestion": free slots on this day given real opening hours and
+    // real bookings, sized to the garage's first active service. Deterministic,
+    // not a guess — same engine already used on the lead detail page.
+    suggestedTimes = proposeSlots({
+      fromUTC: new Date(`${selectedDay}T00:00:00.000Z`),
+      days: 1,
+      rulesByWeekday,
+      appointments: selectedAppts.map((a) => ({ start: new Date(a.starts_at), end: new Date(a.ends_at) })),
+      durationMin: services[0]?.duration_minutes ?? 60,
+      bufferMin: services[0]?.buffer_minutes ?? 0,
+      maxPerDay: 8,
+    }).map((iso) => iso.slice(11, 16));
 
     if (newCustomerId) {
       const { data: cust } = await supabase
@@ -174,10 +241,11 @@ export default async function AgendaPage({
         .eq('archived', false)
         .order('created_at', { ascending: false })
         .limit(200);
-      customers = (custData ?? []) as Customer[];
+      const base = (custData ?? []) as Customer[];
+
       if (q && q.trim()) {
         const term = q.trim().toLowerCase();
-        customers = customers.filter((c) => {
+        const nameMatches = base.filter((c) => {
           const full = `${c.first_name ?? ''} ${c.last_name ?? ''}`.trim().toLowerCase();
           return (
             full.includes(term) ||
@@ -185,14 +253,40 @@ export default async function AgendaPage({
             (c.email ?? '').toLowerCase().includes(term)
           );
         });
+
+        // Also match by license plate — a mechanic often has the plate, not the name, in hand.
+        const { data: plateMatches } = await supabase
+          .from('vehicles')
+          .select('customers(id, first_name, last_name, phone, email)')
+          .eq('organization_id', org.id)
+          .ilike('license_plate', `%${q.trim()}%`)
+          .limit(20);
+        const plateCustomers = (plateMatches ?? [])
+          .map((v) => v.customers as unknown as Customer | null)
+          .filter((c): c is Customer => !!c);
+
+        const seen = new Set<string>();
+        customers = [...plateCustomers, ...nameMatches].filter((c) => {
+          if (seen.has(c.id)) return false;
+          seen.add(c.id);
+          return true;
+        });
+      } else {
+        customers = base;
       }
       customers = customers.slice(0, 20);
     }
   }
 
+  const addApptHref = (extra: string) =>
+    pickedCustomer ? `${dayHref(selectedDay!)}&newCustomerId=${pickedCustomer.id}${extra}` : '';
+
   return (
     <div className="container max-w-3xl py-10">
-      <FlashToast success={saved ? t('agenda.saved') : null} error={error ? t('agenda.error') : null} />
+      <FlashToast
+        success={saved ? t('agenda.saved') : null}
+        error={conflict ? t('agenda.conflictError') : error ? t('agenda.error') : null}
+      />
       <ModuleBanner moduleKey="appointments" label={t('moduleBanner.appointments')} icon={CalendarClock} />
 
       <div className="flex items-center justify-between">
@@ -202,76 +296,159 @@ export default async function AgendaPage({
         </Link>
       </div>
 
-      {/* Month navigation */}
-      <div className="mt-5 flex items-center justify-between">
-        <Link
-          href={`/agenda?month=${prevMonthKey}`}
-          aria-label={t('agenda.prevMonth')}
-          className="flex size-8 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:border-gold/40 hover:text-foreground"
-        >
-          <ChevronLeft className="size-4" aria-hidden />
-        </Link>
-        <div className="flex items-center gap-3">
-          <h2 className="text-base font-semibold capitalize tracking-tight">{monthLabel}</h2>
-          {!isCurrentMonth ? (
-            <Link
-              href={`/agenda?month=${todayISO.slice(0, 7)}&day=${todayISO}`}
-              className="text-xs text-gold hover:underline"
-            >
-              {t('agenda.today')}
-            </Link>
-          ) : null}
-        </div>
-        <Link
-          href={`/agenda?month=${nextMonthKey}`}
-          aria-label={t('agenda.nextMonth')}
-          className="flex size-8 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:border-gold/40 hover:text-foreground"
-        >
-          <ChevronRight className="size-4" aria-hidden />
-        </Link>
+      {/* View switcher */}
+      <div className="mt-4 flex gap-1.5">
+        {(['month', 'week'] as const).map((v) => (
+          <Link
+            key={v}
+            href={v === 'month' ? monthTabHref : weekTabHref}
+            className={cn(
+              'rounded-full border px-3 py-1 text-xs font-medium transition',
+              view === v
+                ? 'border-gold bg-gold text-primary-foreground'
+                : 'border-border bg-background text-foreground hover:border-gold/50 hover:bg-gold/5',
+            )}
+          >
+            {t(`agenda.view.${v}`)}
+          </Link>
+        ))}
       </div>
 
-      {/* Month grid */}
-      <div className="mt-4 grid grid-cols-7 gap-1 text-center text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-        {weekdayLabels.map((w) => (
-          <div key={w} className="py-1">{w}</div>
-        ))}
-      </div>
-      <div className="grid grid-cols-7 gap-1">
-        {Array.from({ length: leadingBlanks }, (_, i) => (
-          <div key={`blank-${i}`} />
-        ))}
-        {Array.from({ length: daysInMonth }, (_, i) => {
-          const dayNum = i + 1;
-          const dayKey = `${monthKey}-${pad2(dayNum)}`;
-          const dayAppts = byDay.get(dayKey) ?? [];
-          const isSelected = dayKey === selectedDay;
-          const isToday = dayKey === todayISO;
-          return (
+      {view === 'month' ? (
+        <>
+          {/* Month navigation */}
+          <div className="mt-4 flex items-center justify-between">
             <Link
-              key={dayKey}
-              href={dayHref(dayKey)}
-              className={cn(
-                'group relative flex aspect-square flex-col items-center justify-center gap-0.5 rounded-lg border text-sm transition',
-                isSelected
-                  ? 'border-gold bg-gold/10 font-semibold text-gold'
-                  : isToday
-                    ? 'border-primary/40 text-primary'
-                    : 'border-transparent text-foreground hover:border-border hover:bg-accent',
-              )}
+              href={`/agenda?month=${prevMonthKey}`}
+              aria-label={t('agenda.prevMonth')}
+              className="flex size-8 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:border-gold/40 hover:text-foreground"
             >
-              <span>{dayNum}</span>
-              {dayAppts.length > 0 ? (
-                <span className="flex gap-0.5">
-                  {dayAppts.slice(0, 3).map((a) => (
-                    <span key={a.id} className="size-1 rounded-full bg-gold" />
-                  ))}
-                </span>
-              ) : null}
+              <ChevronLeft className="size-4" aria-hidden />
             </Link>
-          );
-        })}
-      </div>
+            <div className="flex items-center gap-3">
+              <h2 className="text-base font-semibold capitalize tracking-tight">{monthLabel}</h2>
+              {!isCurrentMonth ? (
+                <Link
+                  href={`/agenda?month=${todayISO.slice(0, 7)}&day=${todayISO}`}
+                  className="text-xs text-gold hover:underline"
+                >
+                  {t('agenda.today')}
+                </Link>
+              ) : null}
+            </div>
+            <Link
+              href={`/agenda?month=${nextMonthKey}`}
+              aria-label={t('agenda.nextMonth')}
+              className="flex size-8 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:border-gold/40 hover:text-foreground"
+            >
+              <ChevronRight className="size-4" aria-hidden />
+            </Link>
+          </div>
+
+          {/* Month grid */}
+          <div className="mt-4 grid grid-cols-7 gap-1 text-center text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            {weekdayLabels.map((w) => (
+              <div key={w} className="py-1">{w}</div>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-1">
+            {Array.from({ length: leadingBlanks }, (_, i) => (
+              <div key={`blank-${i}`} />
+            ))}
+            {Array.from({ length: daysInMonth }, (_, i) => {
+              const dayNum = i + 1;
+              const dayKey = `${monthKey}-${pad2(dayNum)}`;
+              const dayAppts = byDay.get(dayKey) ?? [];
+              const isSelected = dayKey === selectedDay;
+              const isToday = dayKey === todayISO;
+              return (
+                <Link
+                  key={dayKey}
+                  href={dayHref(dayKey)}
+                  className={cn(
+                    'group relative flex aspect-square flex-col items-center justify-center gap-0.5 rounded-lg border text-sm transition',
+                    isSelected
+                      ? 'border-gold bg-gold/10 font-semibold text-gold'
+                      : isToday
+                        ? 'border-primary/40 text-primary'
+                        : 'border-transparent text-foreground hover:border-border hover:bg-accent',
+                  )}
+                >
+                  <span>{dayNum}</span>
+                  {dayAppts.length > 0 ? (
+                    <span className="flex gap-0.5">
+                      {dayAppts.slice(0, 3).map((a) => (
+                        <span key={a.id} className="size-1 rounded-full bg-gold" />
+                      ))}
+                    </span>
+                  ) : null}
+                </Link>
+              );
+            })}
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Week navigation */}
+          <div className="mt-4 flex items-center justify-between">
+            <Link
+              href={`/agenda?view=week&day=${prevWeekAnchor}`}
+              aria-label={t('agenda.prevWeek')}
+              className="flex size-8 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:border-gold/40 hover:text-foreground"
+            >
+              <ChevronLeft className="size-4" aria-hidden />
+            </Link>
+            <div className="flex items-center gap-3">
+              <h2 className="text-base font-semibold tracking-tight">
+                {new Intl.DateTimeFormat(locale, { timeZone: 'UTC', day: 'numeric', month: 'short' }).format(new Date(`${weekDates[0]}T00:00:00.000Z`))}
+                {' – '}
+                {new Intl.DateTimeFormat(locale, { timeZone: 'UTC', day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(`${weekDates[6]}T00:00:00.000Z`))}
+              </h2>
+              {!isTodayInWeek ? (
+                <Link href={`/agenda?view=week&day=${todayISO}`} className="text-xs text-gold hover:underline">
+                  {t('agenda.today')}
+                </Link>
+              ) : null}
+            </div>
+            <Link
+              href={`/agenda?view=week&day=${nextWeekAnchor}`}
+              aria-label={t('agenda.nextWeek')}
+              className="flex size-8 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:border-gold/40 hover:text-foreground"
+            >
+              <ChevronRight className="size-4" aria-hidden />
+            </Link>
+          </div>
+
+          {/* Week strip */}
+          <div className="mt-4 grid grid-cols-7 gap-1">
+            {weekDates.map((dayKey, i) => {
+              const dayAppts = byDay.get(dayKey) ?? [];
+              const isSelected = dayKey === selectedDay;
+              const isToday = dayKey === todayISO;
+              return (
+                <Link
+                  key={dayKey}
+                  href={dayHref(dayKey)}
+                  className={cn(
+                    'flex flex-col items-center gap-0.5 rounded-lg border px-1 py-2 text-sm transition',
+                    isSelected
+                      ? 'border-gold bg-gold/10 font-semibold text-gold'
+                      : isToday
+                        ? 'border-primary/40 text-primary'
+                        : 'border-transparent text-foreground hover:border-border hover:bg-accent',
+                  )}
+                >
+                  <span className="text-[10px] uppercase tracking-wide text-muted-foreground">{weekdayLabels[i]}</span>
+                  <span>{Number(dayKey.slice(8, 10))}</span>
+                  {dayAppts.length > 0 ? (
+                    <span className="rounded-full bg-gold/15 px-1.5 text-[10px] font-medium text-gold">{dayAppts.length}</span>
+                  ) : null}
+                </Link>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       {/* Selected day panel */}
       {selectedDay ? (
@@ -282,6 +459,7 @@ export default async function AgendaPage({
 
           {saved ? <p className="mt-2 text-sm text-success">{t('agenda.saved')}</p> : null}
           {error ? <p className="mt-2 text-sm text-destructive">{t('agenda.error')}</p> : null}
+          {conflict ? <p className="mt-2 text-sm text-destructive">{t('agenda.conflictError')}</p> : null}
 
           {selectedAppts.length === 0 ? (
             <p className="mt-2 text-sm text-muted-foreground">{t('agenda.dayEmpty')}</p>
@@ -306,6 +484,7 @@ export default async function AgendaPage({
                     <input type="hidden" name="appointmentId" value={a.id} />
                     <input type="hidden" name="month" value={monthKey} />
                     <input type="hidden" name="day" value={selectedDay} />
+                    <input type="hidden" name="view" value={view} />
                     <select
                       name="status"
                       defaultValue={a.status}
@@ -334,13 +513,41 @@ export default async function AgendaPage({
                 >
                   {t('newVehicle.changeCustomer')}
                 </Link>
+
+                {suggestedTimes.length > 0 ? (
+                  <div className="mt-2 rounded-lg border border-gold/25 bg-gold/5 p-3">
+                    <div className="flex items-center gap-1.5 text-xs font-medium text-gold">
+                      <Sparkles className="size-3.5" aria-hidden />
+                      {t('agenda.suggestedTimesTitle')}
+                    </div>
+                    <div className="mt-1.5 flex flex-wrap gap-1.5">
+                      {suggestedTimes.map((time) => (
+                        <Link
+                          key={time}
+                          href={addApptHref(`&suggestedTime=${time}`)}
+                          className={cn(
+                            'rounded-full border px-2.5 py-1 text-xs font-medium transition',
+                            suggestedTime === time
+                              ? 'border-gold bg-gold text-primary-foreground'
+                              : 'border-gold/30 bg-background text-gold hover:bg-gold/10',
+                          )}
+                        >
+                          {time}
+                        </Link>
+                      ))}
+                    </div>
+                    <p className="mt-1.5 text-[11px] text-muted-foreground">{t('agenda.suggestedTimesNote')}</p>
+                  </div>
+                ) : null}
+
                 <form action={createAppointmentAction} className="mt-2 space-y-3">
                   <input type="hidden" name="locale" value={locale} />
                   <input type="hidden" name="day" value={selectedDay} />
+                  <input type="hidden" name="view" value={view} />
                   <input type="hidden" name="customerId" value={pickedCustomer.id} />
                   <p className="text-sm font-medium">{name({ customers: pickedCustomer })}</p>
                   <div className="grid grid-cols-2 gap-3">
-                    <Field label={t('agenda.timeLabel')} name="time" type="time" defaultValue="09:00" required />
+                    <Field label={t('agenda.timeLabel')} name="time" type="time" defaultValue={suggestedTime ?? '09:00'} required />
                     {services.length > 0 ? (
                       <label className="block space-y-1.5 text-sm">
                         <span className="text-sm font-medium">{t('agenda.serviceLabel')}</span>
@@ -381,12 +588,14 @@ export default async function AgendaPage({
                 <form className="mt-2" action={`/${locale}/agenda`} method="get">
                   <input type="hidden" name="month" value={monthKey} />
                   <input type="hidden" name="day" value={selectedDay} />
+                  {view === 'week' ? <input type="hidden" name="view" value="week" /> : null}
                   <input
                     name="q"
                     defaultValue={q ?? ''}
                     placeholder={t('newVehicle.search')}
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
                   />
+                  <p className="mt-1 text-xs text-muted-foreground">{t('agenda.searchHint')}</p>
                 </form>
                 {customers.length === 0 ? (
                   <p className="mt-2 text-sm text-muted-foreground">{t('newVehicle.noCustomers')}</p>

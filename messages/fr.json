@@ -374,7 +374,17 @@
       "notesLabel": "Notes (facultatif)",
       "save": "Enregistrer le rendez-vous",
       "saved": "Enregistré.",
-      "error": "Une erreur est survenue. Réessayez."
+      "error": "Une erreur est survenue. Réessayez.",
+      "conflictError": "Ce créneau chevauche déjà un autre rendez-vous. Choisissez une autre heure.",
+      "view": {
+        "month": "Mois",
+        "week": "Semaine"
+      },
+      "prevWeek": "Semaine précédente",
+      "nextWeek": "Semaine suivante",
+      "suggestedTimesTitle": "Créneaux libres suggérés",
+      "suggestedTimesNote": "Calculé à partir de vos horaires d'ouverture, des rendez-vous déjà pris et de la durée du premier service actif.",
+      "searchHint": "Nom, téléphone, e-mail ou plaque d'immatriculation."
     },
     "appointmentStatus": {
       "proposed": "Proposé",
@@ -726,7 +736,8 @@
         "intervention_time": "Temps d'intervention",
         "part": "Pièces",
         "faq": "Questions fréquentes",
-        "safety": "Règles de sécurité"
+        "safety": "Règles de sécurité",
+        "internal_note": "Notes internes"
       },
       "search": "Rechercher un mot-clé, une panne, une solution...",
       "searchNote": "Recherche par mots-clés dans vos articles. Une recherche par IA capable de comprendre les synonymes est un chantier séparé, pas encore fait.",
@@ -736,7 +747,9 @@
       "relatedTitle": "Articles pertinents de la base de connaissances",
       "relatedNote": "Trouvés par mots-clés à partir du problème décrit ici.",
       "saveAsArticle": "Enregistrer comme article de connaissance",
-      "articleSaved": "Article ajouté à la base de connaissances."
+      "articleSaved": "Article ajouté à la base de connaissances.",
+      "favoritesOnly": "Mes favoris",
+      "favoriteToggle": "Ajouter/retirer des favoris"
     },
     "automations": {
       "title": "Relances",
@@ -874,7 +887,16 @@
       "viewWorkOrder": "Voir l'ordre de réparation",
       "viewInvoice": "Voir la facture",
       "publicLink": "Lien pour le client",
-      "publicLinkHint": "Le client peut ouvrir ce lien pour consulter le devis et l'accepter ou le refuser — aucun compte nécessaire. Passer le statut à « Envoyé » lui envoie aussi automatiquement un e-mail si une adresse est connue."
+      "publicLinkHint": "Le client peut ouvrir ce lien pour consulter le devis et l'accepter ou le refuser — aucun compte nécessaire. Passer le statut à « Envoyé » lui envoie aussi automatiquement un e-mail si une adresse est connue.",
+      "statPendingAmount": "Montant en attente",
+      "search": "N° de devis, client, plaque, véhicule...",
+      "filters": {
+        "all": "Tous"
+      },
+      "actionSendReminder": "Envoyer un rappel",
+      "reminderSent": "Rappel envoyé au client.",
+      "reminderError": "Impossible d'envoyer le rappel (pas d'e-mail client, ou envoi désactivé).",
+      "actionDuplicate": "Dupliquer"
     },
     "quoteStatus": {
       "draft": "Brouillon",

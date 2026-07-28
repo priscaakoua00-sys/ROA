@@ -374,7 +374,17 @@
       "notesLabel": "Notities (optioneel)",
       "save": "Afspraak opslaan",
       "saved": "Opgeslagen.",
-      "error": "Er ging iets mis. Probeer opnieuw."
+      "error": "Er ging iets mis. Probeer opnieuw.",
+      "conflictError": "Dit tijdstip overlapt al met een andere afspraak. Kies een ander tijdstip.",
+      "view": {
+        "month": "Maand",
+        "week": "Week"
+      },
+      "prevWeek": "Vorige week",
+      "nextWeek": "Volgende week",
+      "suggestedTimesTitle": "Voorgestelde vrije tijden",
+      "suggestedTimesNote": "Berekend op basis van uw openingstijden, bestaande afspraken en de duur van de eerste actieve dienst.",
+      "searchHint": "Naam, telefoon, e-mail of kenteken."
     },
     "appointmentStatus": {
       "proposed": "Voorgesteld",
@@ -726,7 +736,8 @@
         "intervention_time": "Interventietijden",
         "part": "Onderdelen",
         "faq": "Veelgestelde vragen",
-        "safety": "Veiligheidsregels"
+        "safety": "Veiligheidsregels",
+        "internal_note": "Interne notities"
       },
       "search": "Zoek op trefwoord, storing, oplossing...",
       "searchNote": "Zoekt op trefwoorden in uw artikelen. Een AI-zoekfunctie die synoniemen begrijpt is een apart project, nog niet gebouwd.",
@@ -736,7 +747,9 @@
       "relatedTitle": "Relevante artikelen uit de kennisbank",
       "relatedNote": "Gevonden op trefwoorden uit het hier beschreven probleem.",
       "saveAsArticle": "Opslaan als kennisartikel",
-      "articleSaved": "Artikel toegevoegd aan de kennisbank."
+      "articleSaved": "Artikel toegevoegd aan de kennisbank.",
+      "favoritesOnly": "Mijn favorieten",
+      "favoriteToggle": "Toevoegen/verwijderen uit favorieten"
     },
     "automations": {
       "title": "Opvolging",
@@ -874,7 +887,16 @@
       "viewWorkOrder": "Werkorder bekijken",
       "viewInvoice": "Factuur bekijken",
       "publicLink": "Link voor de klant",
-      "publicLinkHint": "De klant kan deze link openen om de offerte te bekijken en te accepteren of te weigeren — geen account nodig. Bij \"Verzonden\" wordt hij ook automatisch gemaild als er een e-mailadres bekend is."
+      "publicLinkHint": "De klant kan deze link openen om de offerte te bekijken en te accepteren of te weigeren — geen account nodig. Bij \"Verzonden\" wordt hij ook automatisch gemaild als er een e-mailadres bekend is.",
+      "statPendingAmount": "Bedrag in afwachting",
+      "search": "Offertenummer, klant, kenteken, voertuig...",
+      "filters": {
+        "all": "Alle"
+      },
+      "actionSendReminder": "Herinnering sturen",
+      "reminderSent": "Herinnering verstuurd naar de klant.",
+      "reminderError": "Kon de herinnering niet versturen (geen klant-e-mail, of versturen staat uit).",
+      "actionDuplicate": "Dupliceren"
     },
     "quoteStatus": {
       "draft": "Concept",
