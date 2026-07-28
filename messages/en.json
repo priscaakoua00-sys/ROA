@@ -435,7 +435,9 @@
       "transferAction": "Transfer",
       "transferDone": "Records transferred.",
       "transferError": "Couldn't transfer the records.",
-      "permissionsNote": "Detailed per-role permissions are a separate project — for now, every role gets standard access to the app."
+      "permissionsNote": "Detailed per-role permissions are a separate project — for now, every role gets standard access to the app.",
+      "viewActivityLog": "View activity log",
+      "back": "Back to team"
     },
     "customers": {
       "title": "Customers",
@@ -796,6 +798,22 @@
       "generatedAt": "Generated on",
       "pdfFooter": "Report generated automatically by ROAVAA.",
       "csvMetric": "Metric"
+    },
+    "activityLog": {
+      "title": "Activity log",
+      "intro": "Who created or changed an invoice, customer, or work order, and when.",
+      "empty": "No activity recorded yet.",
+      "unknownActor": "Someone",
+      "action": {
+        "created": "created",
+        "updated": "updated"
+      },
+      "entity": {
+        "invoice": "invoice",
+        "customer": "customer",
+        "work_order": "work order"
+      },
+      "retentionNote": "Showing the 150 most recent events."
     },
     "automations": {
       "title": "Follow-ups",

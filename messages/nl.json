@@ -435,7 +435,9 @@
       "transferAction": "Overdragen",
       "transferDone": "Dossiers overgedragen.",
       "transferError": "Kon de dossiers niet overdragen.",
-      "permissionsNote": "Gedetailleerde rechten per rol zijn een apart project — voorlopig geeft elke rol standaardtoegang tot de applicatie."
+      "permissionsNote": "Gedetailleerde rechten per rol zijn een apart project — voorlopig geeft elke rol standaardtoegang tot de applicatie.",
+      "viewActivityLog": "Activiteitenlogboek bekijken",
+      "back": "Terug naar team"
     },
     "customers": {
       "title": "Klanten",
@@ -796,6 +798,22 @@
       "generatedAt": "Gegenereerd op",
       "pdfFooter": "Rapport automatisch gegenereerd door ROAVAA.",
       "csvMetric": "Indicator"
+    },
+    "activityLog": {
+      "title": "Activiteitenlogboek",
+      "intro": "Wie een factuur, klant of werkorder heeft aangemaakt of gewijzigd, en wanneer.",
+      "empty": "Nog geen activiteit geregistreerd.",
+      "unknownActor": "Iemand",
+      "action": {
+        "created": "heeft aangemaakt",
+        "updated": "heeft gewijzigd"
+      },
+      "entity": {
+        "invoice": "factuur",
+        "customer": "klant",
+        "work_order": "werkorder"
+      },
+      "retentionNote": "Toont de 150 meest recente gebeurtenissen."
     },
     "automations": {
       "title": "Opvolging",

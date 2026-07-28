@@ -5,6 +5,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { sendEmail } from '@/integrations/email';
 import { formatCurrency } from '@/lib/pricing';
+import { logActivity } from '@/data/activity/log';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -117,6 +118,18 @@ export async function createInvoiceAction(formData: FormData) {
     sort_order: 0,
   });
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  await logActivity(supabase, {
+    organizationId: cust.organization_id,
+    actorId: user?.id ?? null,
+    entityType: 'invoice',
+    entityId: invoice.id,
+    entityLabel: invoiceNumber,
+    action: 'created',
+  });
+
   redirect(`/${locale}/invoices/${invoice.id}?saved=1`);
 }
 
@@ -131,10 +144,29 @@ export async function updateInvoiceStatusAction(formData: FormData) {
   }
 
   const supabase = await createSupabaseServerClient();
+  const { data: invoice } = await supabase
+    .from('invoices')
+    .select('organization_id, invoice_number')
+    .eq('id', invoiceId)
+    .maybeSingle();
+  if (!invoice) redirect(`/${locale}/invoices`);
+
   await supabase
     .from('invoices')
     .update({ status, paid_at: status === 'paid' ? new Date().toISOString() : null })
     .eq('id', invoiceId);
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  await logActivity(supabase, {
+    organizationId: invoice.organization_id,
+    actorId: user?.id ?? null,
+    entityType: 'invoice',
+    entityId: invoiceId,
+    entityLabel: invoice.invoice_number,
+    action: 'updated',
+  });
 
   redirect(`/${locale}/invoices/${invoiceId}?saved=1`);
 }
@@ -164,7 +196,7 @@ export async function recordPaymentAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   const { data: invoice } = await supabase
     .from('invoices')
-    .select('organization_id, paid_amount, total')
+    .select('organization_id, invoice_number, paid_amount, total')
     .eq('id', invoiceId)
     .maybeSingle();
   if (!invoice) redirect(`/${locale}/invoices`);
@@ -188,6 +220,18 @@ export async function recordPaymentAction(formData: FormData) {
     })
     .eq('id', invoiceId);
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  await logActivity(supabase, {
+    organizationId: invoice.organization_id,
+    actorId: user?.id ?? null,
+    entityType: 'invoice',
+    entityId: invoiceId,
+    entityLabel: invoice.invoice_number,
+    action: 'updated',
+  });
+
   redirect(`/${locale}/invoices/${invoiceId}?saved=1`);
 }
 
@@ -201,7 +245,7 @@ export async function markInvoicePaidAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   const { data: invoice } = await supabase
     .from('invoices')
-    .select('organization_id, total, paid_amount')
+    .select('organization_id, invoice_number, total, paid_amount')
     .eq('id', invoiceId)
     .maybeSingle();
   if (!invoice) redirect(back);
@@ -218,6 +262,18 @@ export async function markInvoicePaidAction(formData: FormData) {
     .from('invoices')
     .update({ paid_amount: invoice.total, status: 'paid', paid_at: new Date().toISOString() })
     .eq('id', invoiceId);
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  await logActivity(supabase, {
+    organizationId: invoice.organization_id,
+    actorId: user?.id ?? null,
+    entityType: 'invoice',
+    entityId: invoiceId,
+    entityLabel: invoice.invoice_number,
+    action: 'updated',
+  });
 
   redirect(back);
 }
