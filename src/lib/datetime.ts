@@ -24,6 +24,13 @@ export function formatTimeUTC(iso: string, locale: string): string {
   }).format(new Date(iso));
 }
 
+/** A date-only value (e.g. a due date) — "12 aug 2026", no time component. */
+export function formatDateUTC(isoDate: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale, { timeZone: 'UTC', day: 'numeric', month: 'short', year: 'numeric' }).format(
+    new Date(isoDate),
+  );
+}
+
 export function formatDayUTC(iso: string, locale: string): string {
   return new Intl.DateTimeFormat(locale, {
     timeZone: 'UTC',
