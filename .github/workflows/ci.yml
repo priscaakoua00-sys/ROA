@@ -44,3 +44,38 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  e2e:
+    name: End-to-end (Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        env:
+          # The anon key is a public, RLS-protected credential (the same one
+          # shipped to every browser in production) — safe to use directly.
+          NEXT_PUBLIC_SUPABASE_URL: 'https://qbhtybzwkplmroqfgymn.supabase.co'
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFiaHR5Ynp3a3BsbXJvcWZneW1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4NjI3MDMsImV4cCI6MjA5OTQzODcwM30.AI1x4IHr9X9ACqEp2X7KklzHDi8IDPPYzva_44uzC7c'
+        run: npm run test:e2e
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
