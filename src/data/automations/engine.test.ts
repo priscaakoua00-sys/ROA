@@ -49,4 +49,57 @@ describe('computeFollowUps', () => {
     });
     expect(r).toHaveLength(0);
   });
+
+  it('flags an overdue invoice', () => {
+    const r = computeFollowUps({
+      ...base,
+      now,
+      invoices: [
+        { id: 'i1', status: 'sent', dueDate: new Date('2026-07-01T00:00:00.000Z'), number: 'F-1', name: 'A', phone: '+31600000000', email: null },
+        { id: 'i2', status: 'sent', dueDate: new Date('2026-08-01T00:00:00.000Z'), number: 'F-2', name: 'B', phone: null, email: null },
+      ],
+    });
+    expect(r).toHaveLength(1);
+    expect(r[0]?.kind).toBe('invoice_overdue');
+    expect(r[0]?.refId).toBe('i1');
+    expect(r[0]?.phone).toBe('+31600000000');
+  });
+
+  it('flags a quote sent more than 3 days ago with no answer', () => {
+    const r = computeFollowUps({
+      ...base,
+      now,
+      quotes: [
+        { id: 'q1', status: 'sent', issueDate: new Date('2026-07-09T00:00:00.000Z'), number: 'D-1', name: 'A', phone: null, email: 'a@x.com' },
+        { id: 'q2', status: 'sent', issueDate: new Date('2026-07-12T00:00:00.000Z'), number: 'D-2', name: 'B', phone: null, email: null },
+        { id: 'q3', status: 'accepted', issueDate: new Date('2026-07-01T00:00:00.000Z'), number: 'D-3', name: 'C', phone: null, email: null },
+      ],
+    });
+    expect(r.map((x) => x.refId)).toEqual(['q1']);
+  });
+
+  it('flags a vehicle whose APK expires within 60 days', () => {
+    const r = computeFollowUps({
+      ...base,
+      now,
+      apkVehicles: [
+        { id: 'v1', label: 'AB-123-C', apkExpiry: new Date('2026-08-01T00:00:00.000Z'), name: 'A', phone: null, email: null },
+        { id: 'v2', label: 'XY-999-Z', apkExpiry: new Date('2027-01-01T00:00:00.000Z'), name: 'B', phone: null, email: null },
+      ],
+    });
+    expect(r.map((x) => x.refId)).toEqual(['v1']);
+    expect(r[0]?.kind).toBe('apk_due');
+  });
+
+  it('flags parts arrived and ready-for-pickup work orders', () => {
+    const r = computeFollowUps({
+      ...base,
+      now,
+      workOrders: [
+        { id: 'w1', status: 'parts_received', name: 'A', title: 'Remmen' },
+        { id: 'w2', status: 'ready_for_delivery', name: 'B', title: 'Olie' },
+      ],
+    });
+    expect(r.map((x) => x.kind).sort()).toEqual(['parts_arrived', 'ready_for_pickup']);
+  });
 });
