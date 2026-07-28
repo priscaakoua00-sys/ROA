@@ -23,6 +23,7 @@ const PROTECTED_ROUTES = [
   'reports',
   'team',
   'notifications',
+  'admin/errors',
 ];
 
 test.describe('Protected routes redirect signed-out visitors to login', () => {

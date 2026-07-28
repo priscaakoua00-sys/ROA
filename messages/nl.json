@@ -858,6 +858,12 @@
       "usePartQuantity": "Gebruikt aantal",
       "usePartSubmit": "Gebruik registreren"
     },
+    "admin": {
+      "errorsTitle": "Foutenlogboek",
+      "errorsIntro": "Technische fouten van het hele platform, alleen zichtbaar voor het ROAVAA-team.",
+      "errorsEmpty": "Geen fouten geregistreerd.",
+      "errorsStackTrace": "Technische details bekijken"
+    },
     "automations": {
       "title": "Opvolging",
       "intro": "Wat Roavaa vandaag zou opvolgen. U beslist en verstuurt zelf.",

@@ -858,6 +858,12 @@
       "usePartQuantity": "Quantité utilisée",
       "usePartSubmit": "Enregistrer l'utilisation"
     },
+    "admin": {
+      "errorsTitle": "Journal des erreurs",
+      "errorsIntro": "Erreurs techniques capturées sur toute la plateforme, visibles uniquement par l'équipe ROAVAA.",
+      "errorsEmpty": "Aucune erreur enregistrée.",
+      "errorsStackTrace": "Voir la trace technique"
+    },
     "automations": {
       "title": "Relances",
       "intro": "Ce que Roavaa relancerait aujourd'hui. Vous décidez et envoyez.",
