@@ -34,16 +34,18 @@ function daysUntil(date: Date): number {
 /**
  * Runs once a day (Vercel Cron, see vercel.json). Notifies organizations
  * approaching the end of their free trial at J-7/J-3/J-1, in-app and by
- * email. Protected by CRON_SECRET when set, matching Vercel Cron's own
- * `Authorization: Bearer <secret>` convention.
+ * email. Protected by CRON_SECRET, matching Vercel Cron's own
+ * `Authorization: Bearer <secret>` convention. Fails closed: a misconfigured
+ * (unset) secret rejects every request rather than letting them all through.
  */
 export async function GET(req: Request) {
   const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) {
-    const auth = req.headers.get('authorization');
-    if (auth !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
-    }
+  if (!cronSecret) {
+    return NextResponse.json({ error: 'not configured' }, { status: 500 });
+  }
+  const auth = req.headers.get('authorization');
+  if (auth !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 
   const admin = createSupabaseAdminClient();

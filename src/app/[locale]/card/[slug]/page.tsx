@@ -1,11 +1,11 @@
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 import { notFound } from 'next/navigation';
 import QRCode from 'qrcode';
-import { headers } from 'next/headers';
 import { Phone, Mail, MapPin, Globe, Download } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabasePublicClient } from '@/data/supabase/public';
+import { SITE_URL } from '@/lib/site';
 
 function initialsOf(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -22,7 +22,7 @@ export default async function BusinessCardPage({
   setRequestLocale(locale);
   const t = await getTranslations('card');
 
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabasePublicClient();
   const { data: rows } = await supabase.rpc('public_org_card', { p_slug: slug });
   const org = rows?.[0] as
     | {
@@ -43,9 +43,7 @@ export default async function BusinessCardPage({
     logoUrl = supabase.storage.from('org-logos').getPublicUrl(org.logo_url).data.publicUrl;
   }
 
-  const h = await headers();
-  const origin = h.get('origin') ?? (h.get('host') ? `https://${h.get('host')}` : '');
-  const cardUrl = `${origin}/${locale}/card/${slug}`;
+  const cardUrl = `${SITE_URL}/${locale}/card/${slug}`;
   const qrDataUrl = await QRCode.toDataURL(cardUrl, { margin: 1, width: 240 });
 
   const addressLine = [org.postal_code, org.city].filter(Boolean).join(' ');

@@ -98,18 +98,10 @@ export default async function VehicleDetailPage({
     .maybeSingle();
   if (!v) notFound();
 
-  let photoUrl: string | null = null;
-  if (v.photo_url && isExternalPhotoUrl(v.photo_url)) {
-    photoUrl = v.photo_url;
-  } else if (v.photo_url) {
-    const { data: signed } = await supabase.storage
-      .from('vehicle-photos')
-      .createSignedUrl(v.photo_url, 3600);
-    photoUrl = signed?.signedUrl ?? null;
-  }
+  const needsSignedPhotoUrl = Boolean(v.photo_url) && !isExternalPhotoUrl(v.photo_url ?? '');
   const kind = VAN_MODEL_PATTERN.test(`${v.make ?? ''} ${v.model ?? ''}`) ? 'van' : 'hatch';
 
-  const [{ data: diagData }, timeline, maintenanceSuggestions, historySummaries] = await Promise.all([
+  const [{ data: diagData }, timeline, maintenanceSuggestions, historySummaries, signedVehiclePhoto] = await Promise.all([
     supabase
       .from('photo_diagnoses')
       .select(
@@ -120,7 +112,11 @@ export default async function VehicleDetailPage({
     getVehicleTimeline(supabase, id),
     loadMaintenanceSuggestions(supabase, id),
     loadVehicleHistorySummaries(supabase, id),
+    needsSignedPhotoUrl
+      ? supabase.storage.from('vehicle-photos').createSignedUrl(v.photo_url as string, 3600)
+      : Promise.resolve({ data: null }),
   ]);
+  const photoUrl = v.photo_url && isExternalPhotoUrl(v.photo_url) ? v.photo_url : (signedVehiclePhoto?.data?.signedUrl ?? null);
   const diagRows = (diagData ?? []) as unknown as {
     id: string;
     note: string | null;

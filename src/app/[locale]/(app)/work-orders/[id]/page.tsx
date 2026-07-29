@@ -165,13 +165,6 @@ export default async function WorkOrderDetailPage({
   }[]).filter((m) => m.status === 'active' && m.user_id);
 
   const checklistPhotoPaths = checklist.map((c) => c.photo_path).filter((p): p is string => Boolean(p));
-  const checklistPhotoUrls = new Map<string, string>();
-  if (checklistPhotoPaths.length > 0) {
-    const { data: signed } = await supabase.storage.from('checklist-photos').createSignedUrls(checklistPhotoPaths, 3600);
-    signed?.forEach((s) => {
-      if (s.signedUrl && s.path) checklistPhotoUrls.set(s.path, s.signedUrl);
-    });
-  }
 
   const diagRows = (diagData ?? []) as unknown as {
     id: string;
@@ -187,13 +180,23 @@ export default async function WorkOrderDetailPage({
     diagnosis_media: { storage_path: string; angle: VehicleAngle | null }[];
   }[];
   const allDiagPaths = diagRows.flatMap((d) => d.diagnosis_media.map((m) => m.storage_path));
+
+  const [{ data: signedChecklistPhotos }, { data: signedDiagPhotos }] = await Promise.all([
+    checklistPhotoPaths.length > 0
+      ? supabase.storage.from('checklist-photos').createSignedUrls(checklistPhotoPaths, 3600)
+      : Promise.resolve({ data: null }),
+    allDiagPaths.length > 0
+      ? supabase.storage.from('diagnosis-photos').createSignedUrls(allDiagPaths, 3600)
+      : Promise.resolve({ data: null }),
+  ]);
+  const checklistPhotoUrls = new Map<string, string>();
+  signedChecklistPhotos?.forEach((s) => {
+    if (s.signedUrl && s.path) checklistPhotoUrls.set(s.path, s.signedUrl);
+  });
   const diagPhotoUrls = new Map<string, string>();
-  if (allDiagPaths.length > 0) {
-    const { data: signed } = await supabase.storage.from('diagnosis-photos').createSignedUrls(allDiagPaths, 3600);
-    signed?.forEach((s) => {
-      if (s.signedUrl && s.path) diagPhotoUrls.set(s.path, s.signedUrl);
-    });
-  }
+  signedDiagPhotos?.forEach((s) => {
+    if (s.signedUrl && s.path) diagPhotoUrls.set(s.path, s.signedUrl);
+  });
   const diagnoses: DiagnosisRow[] = diagRows.map((d) => ({
     id: d.id,
     note: d.note,

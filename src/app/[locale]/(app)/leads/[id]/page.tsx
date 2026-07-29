@@ -70,31 +70,56 @@ export default async function LeadDetailPage({
     [customer?.first_name, customer?.last_name].filter(Boolean).join(' ') ||
     t('leads.anonymous');
 
-  // Build proposal inputs
-  const { data: services } = await supabase
-    .from('services')
-    .select('id, name, duration_minutes, buffer_minutes')
-    .eq('organization_id', lead.organization_id)
-    .eq('active', true)
-    .order('created_at', { ascending: true })
-    .limit(1);
+  // Build proposal inputs — these all depend only on lead.id / lead.organization_id
+  // (already known), so fetch them together instead of one round-trip at a time.
+  const [
+    { data: services },
+    { data: rules },
+    { data: appts },
+    { data: convs },
+    { data: memData },
+    { data: wos },
+    { data: diagData },
+  ] = await Promise.all([
+    supabase
+      .from('services')
+      .select('id, name, duration_minutes, buffer_minutes')
+      .eq('organization_id', lead.organization_id)
+      .eq('active', true)
+      .order('created_at', { ascending: true })
+      .limit(1),
+    supabase
+      .from('availability_rules')
+      .select('weekday, start_time, end_time')
+      .eq('organization_id', lead.organization_id),
+    supabase
+      .from('appointments')
+      .select('starts_at, ends_at')
+      .eq('organization_id', lead.organization_id)
+      .gte('starts_at', new Date().toISOString())
+      .limit(300),
+    supabase
+      .from('conversations')
+      .select('id')
+      .eq('lead_id', lead.id)
+      .order('created_at', { ascending: true })
+      .limit(1),
+    supabase.rpc('org_members', { p_org: lead.organization_id }),
+    supabase.from('work_orders').select('id').eq('lead_id', lead.id).limit(1),
+    supabase
+      .from('photo_diagnoses')
+      .select(
+        'id, note, visible_problems, affected_parts, severity, causes, additional_checks, estimated_repair_time, recommendations, created_at, diagnosis_media(storage_path, angle)',
+      )
+      .eq('lead_id', lead.id)
+      .order('created_at', { ascending: false }),
+  ]);
   const service = services?.[0];
 
-  const { data: rules } = await supabase
-    .from('availability_rules')
-    .select('weekday, start_time, end_time')
-    .eq('organization_id', lead.organization_id);
   const rulesByWeekday: Record<number, WeekdayRule[]> = {};
   for (const r of rules ?? []) {
     (rulesByWeekday[r.weekday] ??= []).push({ start: r.start_time, end: r.end_time });
   }
-
-  const { data: appts } = await supabase
-    .from('appointments')
-    .select('starts_at, ends_at')
-    .eq('organization_id', lead.organization_id)
-    .gte('starts_at', new Date().toISOString())
-    .limit(300);
 
   const slots =
     service && (rules?.length ?? 0) > 0
@@ -114,12 +139,6 @@ export default async function LeadDetailPage({
 
   const isBooked = lead.status === 'booked';
 
-  const { data: convs } = await supabase
-    .from('conversations')
-    .select('id')
-    .eq('lead_id', lead.id)
-    .order('created_at', { ascending: true })
-    .limit(1);
   const conv = convs?.[0];
   let messages: {
     id: string;
@@ -128,6 +147,8 @@ export default async function LeadDetailPage({
     is_ai_generated: boolean;
     created_at: string;
   }[] = [];
+  // Only draft a reply (an LLM call) when there's actually a conversation to reply to.
+  let draft: { reply: string; handoff: boolean } = { reply: '', handoff: false };
   if (conv) {
     const { data: msgs } = await supabase
       .from('messages')
@@ -136,13 +157,12 @@ export default async function LeadDetailPage({
       .order('created_at', { ascending: true })
       .limit(50);
     messages = (msgs ?? []) as unknown as typeof messages;
+    draft = await draftReply({
+      conversation: lead.description ?? '',
+      language: locale as 'nl' | 'en' | 'fr',
+    });
   }
-  const draft = await draftReply({
-    conversation: lead.description ?? '',
-    language: locale as 'nl' | 'en' | 'fr',
-  });
 
-  const { data: memData } = await supabase.rpc('org_members', { p_org: lead.organization_id });
   const members = ((memData ?? []) as {
     user_id: string | null;
     full_name: string | null;
@@ -150,20 +170,8 @@ export default async function LeadDetailPage({
     status: string;
   }[]).filter((m) => m.status === 'active' && m.user_id);
 
-  const { data: wos } = await supabase
-    .from('work_orders')
-    .select('id')
-    .eq('lead_id', lead.id)
-    .limit(1);
   const workOrder = wos?.[0];
 
-  const { data: diagData } = await supabase
-    .from('photo_diagnoses')
-    .select(
-      'id, note, visible_problems, affected_parts, severity, causes, additional_checks, estimated_repair_time, recommendations, created_at, diagnosis_media(storage_path, angle)',
-    )
-    .eq('lead_id', lead.id)
-    .order('created_at', { ascending: false });
   const diagRows = (diagData ?? []) as unknown as {
     id: string;
     note: string | null;

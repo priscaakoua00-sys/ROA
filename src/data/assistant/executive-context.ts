@@ -6,6 +6,7 @@ import { formatCurrency } from '@/lib/pricing';
 import { formatDateUTC } from '@/lib/datetime';
 import { ACTIVE_WORK_ORDER_STATUSES } from '@/lib/work-order-status';
 import { loadParts } from '@/data/inventory/list';
+import { loadOrgDefaults } from '@/data/organizations/defaults';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -107,7 +108,7 @@ export async function buildExecutiveContext(
     [row?.first_name, row?.last_name].filter(Boolean).join(' ') || anon;
 
   const [
-    { data: org },
+    orgDefaults,
     { data: revenueMonthData },
     { data: revenueLastMonthData },
     { data: overdueInvoicesData },
@@ -120,7 +121,7 @@ export async function buildExecutiveContext(
     { data: vehiclesForRecurring },
     parts,
   ] = await Promise.all([
-    supabase.from('organizations').select('default_margin_percent').eq('id', orgId).maybeSingle(),
+    loadOrgDefaults(supabase, orgId),
     supabase.from('invoice_payments').select('amount').eq('organization_id', orgId).gte('paid_at', monthStart.toISOString()),
     supabase
       .from('invoice_payments')
@@ -150,7 +151,7 @@ export async function buildExecutiveContext(
   const sum = (rows: { amount: number }[] | null) => (rows ?? []).reduce((acc, r) => acc + Number(r.amount), 0);
   const revenueMonth = sum(revenueMonthData);
   const revenueLastMonth = sum(revenueLastMonthData);
-  const marginPercent = Number(org?.default_margin_percent ?? 0);
+  const marginPercent = orgDefaults.marginPercent;
   const estimatedProfitMonth = Math.round(revenueMonth * (marginPercent / 100));
 
   const overdueList = (overdueInvoicesData ?? []) as { total: number; paid_amount: number; status: string; due_date: string | null }[];
