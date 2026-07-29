@@ -9,6 +9,7 @@ import type {
   RepairReportInput,
   UrgencyInput,
   VehicleHistorySummaryInput,
+  WorkOrderOversightInput,
   AIResult,
 } from './types';
 import type {
@@ -22,6 +23,7 @@ import type {
   RepairReport,
   UrgencyAssessment,
   VehicleHistorySummary,
+  WorkOrderOversightReport,
 } from './schemas';
 
 /**
@@ -116,4 +118,15 @@ export interface AIProvider {
   summarizeVehicleHistory(
     input: VehicleHistorySummaryInput,
   ): Promise<AIResult<VehicleHistorySummary>>;
+
+  /**
+   * Flag likely oversights before a work order closes: unfilled checklist
+   * items, attention/fail items with no note explaining what's needed, an
+   * unresolved high-severity diagnosis, or a delivered work order with no
+   * invoice yet. Never blocks the status change — purely advisory, and an
+   * empty findings array is the expected good outcome, not a failure.
+   */
+  detectWorkOrderOversights(
+    input: WorkOrderOversightInput,
+  ): Promise<AIResult<WorkOrderOversightReport>>;
 }

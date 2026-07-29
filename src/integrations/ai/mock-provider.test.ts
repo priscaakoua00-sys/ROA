@@ -10,6 +10,7 @@ import {
   quoteDraftSchema,
   urgencyAssessmentSchema,
   vehicleHistorySummarySchema,
+  workOrderOversightReportSchema,
 } from './schemas';
 
 const provider = new MockAIProvider();
@@ -291,6 +292,55 @@ describe('MockAIProvider', () => {
     expect(result.status).toBe('ok');
     if (result.status === 'ok') {
       expect(result.data.recurringIssues).toEqual([]);
+    }
+  });
+
+  it('reports a clean work order (no findings) when everything is filled in and billed', async () => {
+    const result = await provider.detectWorkOrderOversights({
+      language: 'en',
+      workOrder: { title: 'Brake service', status: 'delivered' },
+      checklistItems: [{ label: 'Brake pads', result: 'ok', note: null }],
+      diagnoses: [],
+      hasInvoice: true,
+    });
+    expect(result.status).toBe('ok');
+    if (result.status === 'ok') {
+      expect(() => workOrderOversightReportSchema.parse(result.data)).not.toThrow();
+      expect(result.data.findings).toEqual([]);
+    }
+  });
+
+  it('flags pending checklist items, unexplained attention items, and a missing invoice on delivery', async () => {
+    const result = await provider.detectWorkOrderOversights({
+      language: 'en',
+      workOrder: { title: 'Brake service', status: 'delivered' },
+      checklistItems: [
+        { label: 'Brake pads', result: 'pending', note: null },
+        { label: 'Tires', result: 'attention', note: null },
+      ],
+      diagnoses: [],
+      hasInvoice: false,
+    });
+    expect(result.status).toBe('ok');
+    if (result.status === 'ok') {
+      const labels = result.data.findings.map((f) => f.label);
+      expect(labels.some((l) => l.includes('1'))).toBe(true);
+      expect(result.data.findings.some((f) => f.severity === 'high')).toBe(true);
+      expect(result.data.findings.length).toBe(3);
+    }
+  });
+
+  it('flags an unresolved high-severity diagnosis', async () => {
+    const result = await provider.detectWorkOrderOversights({
+      language: 'fr',
+      workOrder: { title: 'Contrôle général', status: 'final_control' },
+      checklistItems: [],
+      diagnoses: [{ severity: 'urgent' }],
+      hasInvoice: false,
+    });
+    expect(result.status).toBe('ok');
+    if (result.status === 'ok') {
+      expect(result.data.findings.some((f) => f.severity === 'high')).toBe(true);
     }
   });
 });

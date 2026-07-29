@@ -7,7 +7,7 @@
  *  - The provider can always say "I don't know" -> status: 'handoff'.
  *  - Humans own the decisions; the AI only proposes.
  */
-import type { MediaDiagnosis } from './schemas';
+import type { DiagnosisSeverity, MediaDiagnosis } from './schemas';
 
 export type SupportedLanguage = 'nl' | 'en' | 'fr';
 
@@ -205,4 +205,29 @@ export interface VehicleHistorySummaryInput {
     mileage: number | null;
   };
   events: VehicleHistoryEventInput[];
+}
+
+/** One checklist item as filled in so far, real state — never invented. */
+export interface WorkOrderChecklistItemInput {
+  label: string;
+  result: 'pending' | 'ok' | 'attention' | 'fail' | 'na';
+  note?: string | null;
+}
+
+/**
+ * What's needed to catch oversights before a work order closes: its real
+ * checklist state, any photo diagnoses run during the visit, and whether an
+ * invoice already exists. Purely advisory — never blocks the status change,
+ * only flags what a mechanic or shop foreman should double-check.
+ */
+export interface WorkOrderOversightInput {
+  language: SupportedLanguage;
+  workOrder: {
+    title: string;
+    /** The status it's moving INTO (e.g. 'final_control', 'delivered'). */
+    status: string;
+  };
+  checklistItems: WorkOrderChecklistItemInput[];
+  diagnoses: { severity: DiagnosisSeverity }[];
+  hasInvoice: boolean;
 }

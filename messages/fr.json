@@ -1008,6 +1008,15 @@
       "saved": "Résumé ajouté.",
       "error": "Une erreur s'est produite. Réessayez."
     },
+    "oversight": {
+      "title": "Avant de clôturer",
+      "intro": "Ruben a vérifié la checklist, les diagnostics et la facturation, et a repéré ce qui suit.",
+      "severity": {
+        "low": "Faible",
+        "medium": "Moyenne",
+        "high": "Élevée"
+      }
+    },
     "checklistResult": {
       "pending": "À faire",
       "ok": "OK",

@@ -13,6 +13,7 @@ import type {
   SupportedLanguage,
   UrgencyInput,
   VehicleHistorySummaryInput,
+  WorkOrderOversightInput,
 } from './types';
 import {
   assistantAnswerSchema,
@@ -25,6 +26,7 @@ import {
   repairReportSchema,
   urgencyAssessmentSchema,
   vehicleHistorySummarySchema,
+  workOrderOversightReportSchema,
   type AssistantAnswer,
   type DraftedReply,
   type LanguageDetection,
@@ -36,6 +38,7 @@ import {
   type RepairReport,
   type UrgencyAssessment,
   type VehicleHistorySummary,
+  type WorkOrderOversightReport,
 } from './schemas';
 import { findEmergencyKeywords } from './emergency-keywords';
 import { matchSymptom } from './symptom-patterns';
@@ -467,6 +470,56 @@ export class MockAIProvider implements AIProvider {
       meta: this.meta(0.5),
     };
   }
+
+  async detectWorkOrderOversights(
+    input: WorkOrderOversightInput,
+  ): Promise<AIResult<WorkOrderOversightReport>> {
+    const T = OVERSIGHT_TEXT[input.language];
+    const findings: WorkOrderOversightReport['findings'] = [];
+
+    const pending = input.checklistItems.filter((i) => i.result === 'pending');
+    if (pending.length > 0) {
+      findings.push({
+        label: T.pendingLabel(pending.length),
+        detail: T.pendingDetail,
+        severity: 'medium',
+      });
+    }
+
+    const unexplained = input.checklistItems.filter(
+      (i) => (i.result === 'attention' || i.result === 'fail') && !i.note?.trim(),
+    );
+    if (unexplained.length > 0) {
+      findings.push({
+        label: T.unexplainedLabel(unexplained.length),
+        detail: T.unexplainedDetail,
+        severity: 'high',
+      });
+    }
+
+    const highSeverity = input.diagnoses.filter((d) => d.severity === 'high' || d.severity === 'urgent');
+    if (highSeverity.length > 0) {
+      findings.push({
+        label: T.highSeverityLabel(highSeverity.length),
+        detail: T.highSeverityDetail,
+        severity: 'high',
+      });
+    }
+
+    if (input.workOrder.status === 'delivered' && !input.hasInvoice) {
+      findings.push({
+        label: T.noInvoiceLabel,
+        detail: T.noInvoiceDetail,
+        severity: 'high',
+      });
+    }
+
+    return {
+      status: 'ok',
+      data: workOrderOversightReportSchema.parse({ findings }),
+      meta: this.meta(0.6),
+    };
+  }
 }
 
 /** Best-effort parse of a free-text repair-time estimate (e.g. "1-2 hours") into hours. Falls back to a conservative 1h — always editable before sending. */
@@ -603,5 +656,50 @@ const HISTORY_SUMMARY_TEXT: Record<
       ]
         .filter(Boolean)
         .join(' '),
+  },
+};
+
+const OVERSIGHT_TEXT: Record<
+  SupportedLanguage,
+  {
+    pendingLabel: (count: number) => string;
+    pendingDetail: string;
+    unexplainedLabel: (count: number) => string;
+    unexplainedDetail: string;
+    highSeverityLabel: (count: number) => string;
+    highSeverityDetail: string;
+    noInvoiceLabel: string;
+    noInvoiceDetail: string;
+  }
+> = {
+  nl: {
+    pendingLabel: (count) => `${count} checklist-item(s) nog niet ingevuld`,
+    pendingDetail: 'Controleer of deze punten echt gecontroleerd zijn voordat u afsluit.',
+    unexplainedLabel: (count) => `${count} item(s) met "aandacht"/"mislukt" zonder toelichting`,
+    unexplainedDetail: 'Voeg een korte notitie toe zodat de klant en collega\'s weten wat er nodig is.',
+    highSeverityLabel: (count) => `${count} diagnose(s) met hoge urgentie`,
+    highSeverityDetail: 'Controleer of dit daadwerkelijk is opgelost voordat het voertuig wordt afgeleverd.',
+    noInvoiceLabel: 'Nog geen factuur voor dit afgeleverde voertuig',
+    noInvoiceDetail: 'Dit werk lijkt nog niet gefactureerd — controleer voordat de klant het voertuig ophaalt.',
+  },
+  en: {
+    pendingLabel: (count) => `${count} checklist item(s) not filled in yet`,
+    pendingDetail: 'Make sure these were actually checked before closing this out.',
+    unexplainedLabel: (count) => `${count} item(s) marked "attention"/"fail" with no note`,
+    unexplainedDetail: 'Add a short note so the customer and colleagues know what needs attention.',
+    highSeverityLabel: (count) => `${count} high-severity diagnosis finding(s)`,
+    highSeverityDetail: 'Double-check this was actually resolved before the vehicle goes out.',
+    noInvoiceLabel: 'No invoice yet for this delivered vehicle',
+    noInvoiceDetail: 'This work doesn\'t appear to be billed yet — check before the customer picks up.',
+  },
+  fr: {
+    pendingLabel: (count) => `${count} point(s) de la checklist non renseigné(s)`,
+    pendingDetail: 'Vérifiez que ces points ont bien été contrôlés avant de clôturer.',
+    unexplainedLabel: (count) => `${count} point(s) « à surveiller »/« échec » sans note`,
+    unexplainedDetail: 'Ajoutez une courte note pour que le client et vos collègues sachent quoi vérifier.',
+    highSeverityLabel: (count) => `${count} constat(s) de diagnostic à sévérité élevée`,
+    highSeverityDetail: 'Vérifiez que cela a bien été résolu avant la sortie du véhicule.',
+    noInvoiceLabel: 'Aucune facture pour ce véhicule livré',
+    noInvoiceDetail: "Ce travail ne semble pas encore facturé — vérifiez avant que le client ne récupère le véhicule.",
   },
 };

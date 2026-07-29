@@ -6,7 +6,7 @@ import { getAIProvider } from '@/integrations/ai';
 import type { ChecklistFindingInput, MediaDiagnosis } from '@/integrations/ai';
 import { isWorkOrderStatus } from '@/lib/work-order-status';
 import { dispatchWebhooks } from '@/lib/webhooks';
-import { instantiateChecklist, logStatus } from './helpers';
+import { instantiateChecklist, logStatus, checkForOversights } from './helpers';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -110,7 +110,7 @@ export async function updateWorkOrderStatusAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   const { data: wo } = await supabase
     .from('work_orders')
-    .select('organization_id')
+    .select('organization_id, title')
     .eq('id', woId)
     .maybeSingle();
   if (!wo) redirect(`/${locale}/work-orders/${woId}?error=1`);
@@ -124,6 +124,7 @@ export async function updateWorkOrderStatusAction(formData: FormData) {
     workOrderId: woId,
     status: statusRaw,
   });
+  await checkForOversights(supabase, wo.organization_id, woId, statusRaw, wo.title, locale);
 
   redirect(`/${locale}/work-orders/${woId}`);
 }

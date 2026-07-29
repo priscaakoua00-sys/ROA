@@ -27,6 +27,8 @@ import { Link } from '@/i18n/navigation';
 import { FlashToast } from '@/components/flash-toast';
 import { TimelineList, type TimelineItemView } from '@/components/timeline/timeline-list';
 import { PhotoDiagnosisPanel, type DiagnosisRow } from '@/components/diagnosis/photo-diagnosis-panel';
+import { OversightPanel } from '@/components/work-orders/oversight-panel';
+import { loadLatestWorkOrderOversight } from '@/data/work-orders/oversight';
 import type { DiagnosisSeverity, VehicleAngle } from '@/integrations/ai';
 import { formatDateTimeUTC } from '@/lib/datetime';
 import {
@@ -112,6 +114,7 @@ export default async function WorkOrderDetailPage({
     timeline,
     parts,
     { data: partUsageData },
+    latestOversight,
   ] = await Promise.all([
     supabase.from('work_order_tasks').select('id, description, done').eq('work_order_id', id).order('created_at', { ascending: true }),
     supabase.rpc('org_members', { p_org: wo.organization_id }),
@@ -143,6 +146,7 @@ export default async function WorkOrderDetailPage({
       .eq('work_order_id', id)
       .eq('reason', 'usage')
       .order('created_at', { ascending: false }),
+    loadLatestWorkOrderOversight(supabase, id),
   ]);
 
   const tasks = (taskData ?? []) as Task[];
@@ -329,6 +333,8 @@ export default async function WorkOrderDetailPage({
           ) : null}
         </div>
       ) : null}
+
+      <OversightPanel oversight={latestOversight} />
 
       {/* Checklist */}
       <section className="mt-6">
