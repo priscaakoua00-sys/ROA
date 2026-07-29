@@ -5,24 +5,12 @@ import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server
 import { isAppLocale, routing } from '@/i18n/routing';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
-import { createSupabaseServerClient } from '@/data/supabase/server';
-import { getActiveOrgId } from '@/data/organizations/active';
-import { RobinChat } from '@/components/robin-chat';
 import { SITE_URL } from '@/lib/site';
 import '../globals.css';
 
 const OG_LOCALE: Record<string, string> = { nl: 'nl_NL', en: 'en_US', fr: 'fr_FR' };
 
 export const dynamic = 'force-dynamic';
-
-async function currentOrgId(): Promise<string | null> {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
-  return getActiveOrgId(supabase);
-}
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -85,7 +73,6 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   const messages = await getMessages();
-  const orgId = await currentOrgId();
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -106,7 +93,6 @@ export default async function LocaleLayout({
             disableTransitionOnChange
           >
             {children}
-            {orgId ? <RobinChat orgId={orgId} /> : null}
             <Toaster />
           </ThemeProvider>
         </NextIntlClientProvider>
