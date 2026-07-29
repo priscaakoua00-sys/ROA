@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { redirect } from 'next/navigation';
-import { History, Receipt, Users, Wrench } from 'lucide-react';
+import { FileText, History, Receipt, Users, Wrench } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { getActiveOrgId } from '@/data/organizations/active';
@@ -13,12 +13,14 @@ const ENTITY_ICON: Record<ActivityRow['entityType'], typeof Receipt> = {
   invoice: Receipt,
   customer: Users,
   work_order: Wrench,
+  quote: FileText,
 };
 
 const ENTITY_HREF: Record<ActivityRow['entityType'], (id: string) => string> = {
   invoice: (id) => `/invoices/${id}`,
   customer: (id) => `/customers/${id}`,
   work_order: (id) => `/work-orders/${id}`,
+  quote: (id) => `/quotes/${id}`,
 };
 
 export default async function ActivityLogPage({

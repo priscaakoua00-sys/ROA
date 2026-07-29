@@ -52,6 +52,7 @@ export default async function QuoteDetailPage({
   const { locale, id } = await params;
   setRequestLocale(locale);
   const { saved, error } = await searchParams;
+  const isQuoteLocked = error === 'quoteLocked';
   const t = await getTranslations('app');
 
   const supabase = await createSupabaseServerClient();
@@ -80,6 +81,10 @@ export default async function QuoteDetailPage({
   const vehicle = quote.vehicles as unknown as { license_plate: string | null; make: string | null; model: string | null } | null;
   const customerName = [customer?.first_name, customer?.last_name].filter(Boolean).join(' ') || t('leads.anonymous');
   const status = quote.status as QuoteStatus;
+  // A quote the customer has already responded to (or that's expired) is a
+  // record of what was agreed — its line items/VAT rate stop being editable
+  // in the UI, matching the server-side gate in the quote actions.
+  const isEditable = status === 'draft' || status === 'sent';
 
   const kindLabel: Record<LineItem['kind'], string> = {
     part: t('quotes.kindPart'),
@@ -89,7 +94,10 @@ export default async function QuoteDetailPage({
 
   return (
     <div className="container max-w-2xl py-10">
-      <FlashToast success={saved ? t('quotes.saved') : null} error={error ? t('quotes.error') : null} />
+      <FlashToast
+        success={saved ? t('quotes.saved') : null}
+        error={isQuoteLocked ? t('quotes.locked') : error ? t('quotes.error') : null}
+      />
       <Link href="/quotes" className="text-sm text-muted-foreground hover:underline">
         {t('quotes.back')}
       </Link>
@@ -113,82 +121,95 @@ export default async function QuoteDetailPage({
       </p>
 
       {saved ? <p className="mt-3 text-sm text-success">{t('quotes.saved')}</p> : null}
-      {error ? <p className="mt-3 text-sm text-destructive">{t('quotes.error')}</p> : null}
+      {error && !isQuoteLocked ? <p className="mt-3 text-sm text-destructive">{t('quotes.error')}</p> : null}
 
       {/* Line items */}
       <section className="mt-5 rounded-xl border border-border bg-card p-5 shadow-soft">
         <h2 className="text-base font-semibold tracking-tight">{t('invoices.lineItemsTitle')}</h2>
         <ul className="mt-3 space-y-2">
-          {lineItems.map((item) => (
-            <li key={item.id} className="rounded-lg border border-border bg-background p-3">
-              <form action={updateQuoteLineItemAction} className="flex flex-wrap items-end gap-2">
-                <input type="hidden" name="locale" value={locale} />
-                <input type="hidden" name="quoteId" value={quote.id} />
-                <input type="hidden" name="itemId" value={item.id} />
-                <div className="min-w-[150px] flex-1">
-                  <Field label={t('invoices.lineDescription')} name="description" defaultValue={item.description} required />
+          {lineItems.map((item) =>
+            isEditable ? (
+              <li key={item.id} className="rounded-lg border border-border bg-background p-3">
+                <form action={updateQuoteLineItemAction} className="flex flex-wrap items-end gap-2">
+                  <input type="hidden" name="locale" value={locale} />
+                  <input type="hidden" name="quoteId" value={quote.id} />
+                  <input type="hidden" name="itemId" value={item.id} />
+                  <div className="min-w-[150px] flex-1">
+                    <Field label={t('invoices.lineDescription')} name="description" defaultValue={item.description} required />
+                  </div>
+                  <label className="block space-y-1.5 text-sm">
+                    <span className="font-medium">{t('quotes.lineKind')}</span>
+                    <select name="kind" defaultValue={item.kind} className="rounded-md border border-input bg-background px-2 py-2 text-sm">
+                      <option value="part">{t('quotes.kindPart')}</option>
+                      <option value="labor">{t('quotes.kindLabor')}</option>
+                      <option value="other">{t('quotes.kindOther')}</option>
+                    </select>
+                  </label>
+                  <div className="w-20">
+                    <Field label={t('invoices.lineQuantity')} name="quantity" type="number" defaultValue={String(item.quantity)} min="0.01" step="0.01" />
+                  </div>
+                  <div className="w-24">
+                    <Field label={t('invoices.lineUnitPrice')} name="unitPrice" type="number" defaultValue={String(item.unit_price)} min="0" step="0.01" />
+                  </div>
+                  <span className="pb-2 text-sm text-muted-foreground">
+                    {formatCurrency(item.quantity * item.unit_price, locale)}
+                  </span>
+                  <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>
+                </form>
+                <form id={`delete-quote-line-item-${item.id}`} action={deleteQuoteLineItemAction} className="mt-1 flex justify-end">
+                  <input type="hidden" name="locale" value={locale} />
+                  <input type="hidden" name="quoteId" value={quote.id} />
+                  <input type="hidden" name="itemId" value={item.id} />
+                </form>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">{kindLabel[item.kind]}</span>
+                  <ConfirmDeleteButton
+                    formId={`delete-quote-line-item-${item.id}`}
+                    triggerLabel={t('settings.delete')}
+                    title={t('common.confirmDeleteTitle')}
+                    description={t('invoices.lineDeleteConfirm')}
+                    cancelLabel={t('common.cancel')}
+                    confirmLabel={t('common.confirm')}
+                  />
                 </div>
-                <label className="block space-y-1.5 text-sm">
-                  <span className="font-medium">{t('quotes.lineKind')}</span>
-                  <select name="kind" defaultValue={item.kind} className="rounded-md border border-input bg-background px-2 py-2 text-sm">
-                    <option value="part">{t('quotes.kindPart')}</option>
-                    <option value="labor">{t('quotes.kindLabor')}</option>
-                    <option value="other">{t('quotes.kindOther')}</option>
-                  </select>
-                </label>
-                <div className="w-20">
-                  <Field label={t('invoices.lineQuantity')} name="quantity" type="number" defaultValue={String(item.quantity)} min="0.01" step="0.01" />
-                </div>
-                <div className="w-24">
-                  <Field label={t('invoices.lineUnitPrice')} name="unitPrice" type="number" defaultValue={String(item.unit_price)} min="0" step="0.01" />
-                </div>
-                <span className="pb-2 text-sm text-muted-foreground">
-                  {formatCurrency(item.quantity * item.unit_price, locale)}
-                </span>
-                <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>
-              </form>
-              <form id={`delete-quote-line-item-${item.id}`} action={deleteQuoteLineItemAction} className="mt-1 flex justify-end">
-                <input type="hidden" name="locale" value={locale} />
-                <input type="hidden" name="quoteId" value={quote.id} />
-                <input type="hidden" name="itemId" value={item.id} />
-              </form>
-              <div className="flex items-center justify-between">
+              </li>
+            ) : (
+              <li key={item.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-background p-3 text-sm">
+                <span>{item.description}</span>
                 <span className="text-xs text-muted-foreground">{kindLabel[item.kind]}</span>
-                <ConfirmDeleteButton
-                  formId={`delete-quote-line-item-${item.id}`}
-                  triggerLabel={t('settings.delete')}
-                  title={t('common.confirmDeleteTitle')}
-                  description={t('invoices.lineDeleteConfirm')}
-                  cancelLabel={t('common.cancel')}
-                  confirmLabel={t('common.confirm')}
-                />
-              </div>
-            </li>
-          ))}
+                <span className="text-muted-foreground">{item.quantity} × {formatCurrency(item.unit_price, locale)}</span>
+                <span className="font-medium">{formatCurrency(item.quantity * item.unit_price, locale)}</span>
+              </li>
+            ),
+          )}
         </ul>
 
-        <form action={addQuoteLineItemAction} className="mt-3 flex flex-wrap items-end gap-2 border-t border-border pt-3">
-          <input type="hidden" name="locale" value={locale} />
-          <input type="hidden" name="quoteId" value={quote.id} />
-          <div className="min-w-[150px] flex-1">
-            <Field label={t('invoices.lineDescription')} name="description" required />
-          </div>
-          <label className="block space-y-1.5 text-sm">
-            <span className="font-medium">{t('quotes.lineKind')}</span>
-            <select name="kind" defaultValue="other" className="rounded-md border border-input bg-background px-2 py-2 text-sm">
-              <option value="part">{t('quotes.kindPart')}</option>
-              <option value="labor">{t('quotes.kindLabor')}</option>
-              <option value="other">{t('quotes.kindOther')}</option>
-            </select>
-          </label>
-          <div className="w-20">
-            <Field label={t('invoices.lineQuantity')} name="quantity" type="number" defaultValue="1" min="0.01" step="0.01" />
-          </div>
-          <div className="w-24">
-            <Field label={t('invoices.lineUnitPrice')} name="unitPrice" type="number" required min="0" step="0.01" />
-          </div>
-          <Button type="submit" variant="outline" size="sm">{t('invoices.addLine')}</Button>
-        </form>
+        {isEditable ? (
+          <form action={addQuoteLineItemAction} className="mt-3 flex flex-wrap items-end gap-2 border-t border-border pt-3">
+            <input type="hidden" name="locale" value={locale} />
+            <input type="hidden" name="quoteId" value={quote.id} />
+            <div className="min-w-[150px] flex-1">
+              <Field label={t('invoices.lineDescription')} name="description" required />
+            </div>
+            <label className="block space-y-1.5 text-sm">
+              <span className="font-medium">{t('quotes.lineKind')}</span>
+              <select name="kind" defaultValue="other" className="rounded-md border border-input bg-background px-2 py-2 text-sm">
+                <option value="part">{t('quotes.kindPart')}</option>
+                <option value="labor">{t('quotes.kindLabor')}</option>
+                <option value="other">{t('quotes.kindOther')}</option>
+              </select>
+            </label>
+            <div className="w-20">
+              <Field label={t('invoices.lineQuantity')} name="quantity" type="number" defaultValue="1" min="0.01" step="0.01" />
+            </div>
+            <div className="w-24">
+              <Field label={t('invoices.lineUnitPrice')} name="unitPrice" type="number" required min="0" step="0.01" />
+            </div>
+            <Button type="submit" variant="outline" size="sm">{t('invoices.addLine')}</Button>
+          </form>
+        ) : (
+          <p className="mt-3 border-t border-border pt-3 text-xs text-muted-foreground">{t('quotes.locked')}</p>
+        )}
       </section>
 
       <div className="mt-5 rounded-xl border border-border bg-card p-5 shadow-soft">
@@ -234,7 +255,7 @@ export default async function QuoteDetailPage({
           </form>
         ) : null}
 
-        {status !== 'converted' ? (
+        {status !== 'converted' && isEditable ? (
           <form action={updateQuoteVatRateAction} className="flex items-end gap-2">
             <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="quoteId" value={quote.id} />

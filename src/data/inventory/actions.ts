@@ -132,6 +132,13 @@ export async function recordPartUsageAction(formData: FormData) {
     .maybeSingle();
   if (!part) redirect(`/${locale}/work-orders/${workOrderId}?error=1`);
 
+  // Never let recorded usage drive stock unintentionally negative — a
+  // mis-typed quantity should surface as an error, not a silent negative
+  // count that then misreports as "in stock" everywhere else.
+  if (quantity > Number(part.quantity_on_hand)) {
+    redirect(`/${locale}/work-orders/${workOrderId}?error=insufficientStock`);
+  }
+
   await supabase
     .from('parts')
     .update({ quantity_on_hand: Number(part.quantity_on_hand) - quantity })

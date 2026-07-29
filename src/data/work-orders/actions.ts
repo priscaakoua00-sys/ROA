@@ -115,6 +115,20 @@ export async function updateWorkOrderStatusAction(formData: FormData) {
     .maybeSingle();
   if (!wo) redirect(`/${locale}/work-orders/${woId}?error=1`);
 
+  // Closing a work order with unchecked mandatory checklist points is easy
+  // to do by accident — require an explicit override rather than silently
+  // letting "delivered" through with pending safety/quality checks.
+  if (statusRaw === 'delivered' && formData.get('forceDeliver') !== '1') {
+    const { count: pendingCount } = await supabase
+      .from('work_order_checklist_items')
+      .select('id', { count: 'exact', head: true })
+      .eq('work_order_id', woId)
+      .eq('result', 'pending');
+    if ((pendingCount ?? 0) > 0) {
+      redirect(`/${locale}/work-orders/${woId}?error=checklistIncomplete`);
+    }
+  }
+
   await supabase.from('work_orders').update({ status: statusRaw }).eq('id', woId);
   const {
     data: { user },

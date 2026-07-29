@@ -541,7 +541,9 @@
       "reportSaved": "Rapport gegenereerd.",
       "reportEmpty": "Nog niets te melden: vul eerst de checklist in of voer een foto-diagnose uit.",
       "reportError": "Het genereren van het rapport is mislukt. Probeer het opnieuw.",
-      "clientMessageTitle": "Bericht voor de klant"
+      "clientMessageTitle": "Bericht voor de klant",
+      "checklistIncomplete": "Er staan nog checklistpunten open — controleer ze of vink hieronder aan om toch te leveren.",
+      "forceDeliverChecklist": "Toch leveren ({count} checklistpunt(en) nog open)"
     },
     "workOrderStatus": {
       "received": "Ontvangen",
@@ -888,7 +890,8 @@
       "entity": {
         "invoice": "factuur",
         "customer": "klant",
-        "work_order": "werkorder"
+        "work_order": "werkorder",
+        "quote": "offerte"
       },
       "retentionNote": "Toont de 150 meest recente gebeurtenissen."
     },
@@ -922,7 +925,8 @@
       "noPartsAvailable": "Voeg eerst onderdelen toe bij Voorraad.",
       "usePartLabel": "Onderdeel",
       "usePartQuantity": "Gebruikt aantal",
-      "usePartSubmit": "Gebruik registreren"
+      "usePartSubmit": "Gebruik registreren",
+      "insufficientStock": "Onvoldoende voorraad om deze hoeveelheid te registreren."
     },
     "admin": {
       "errorsTitle": "Foutenlogboek",
@@ -1109,7 +1113,8 @@
       "actionSendReminder": "Herinnering sturen",
       "reminderSent": "Herinnering verstuurd naar de klant.",
       "reminderError": "Kon de herinnering niet versturen (geen klant-e-mail, of versturen staat uit).",
-      "actionDuplicate": "Dupliceren"
+      "actionDuplicate": "Dupliceren",
+      "locked": "Deze offerte is al beantwoord door de klant en kan niet meer worden gewijzigd."
     },
     "quoteStatus": {
       "draft": "Concept",

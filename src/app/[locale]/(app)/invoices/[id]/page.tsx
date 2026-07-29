@@ -23,7 +23,10 @@ import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button';
 import { Download } from 'lucide-react';
 
 type InvoiceStatus = 'draft' | 'to_prepare' | 'sent' | 'partially_paid' | 'paid' | 'overdue' | 'cancelled';
-const STATUSES: InvoiceStatus[] = ['draft', 'to_prepare', 'sent', 'partially_paid', 'paid', 'overdue', 'cancelled'];
+// 'paid'/'partially_paid' can only be reached by recording an actual payment
+// (see the form below) — offering them in this manual dropdown let staff
+// mark an invoice paid with nothing backing it, so they're excluded here.
+const MANUALLY_SETTABLE_STATUSES: InvoiceStatus[] = ['draft', 'to_prepare', 'sent', 'overdue', 'cancelled'];
 
 const STATUS_VARIANT: Record<InvoiceStatus, 'muted' | 'gold' | 'default' | 'success' | 'urgent'> = {
   draft: 'muted',
@@ -223,7 +226,10 @@ export default async function InvoiceDetailPage({
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="invoiceId" value={invoice.id} />
           <select name="status" defaultValue={status} className="rounded-md border border-input bg-background px-2 py-1 text-sm">
-            {STATUSES.map((s) => (
+            {(MANUALLY_SETTABLE_STATUSES.includes(status)
+              ? MANUALLY_SETTABLE_STATUSES
+              : [status, ...MANUALLY_SETTABLE_STATUSES]
+            ).map((s) => (
               <option key={s} value={s}>{t(`invoiceStatus.${s}`)}</option>
             ))}
           </select>
