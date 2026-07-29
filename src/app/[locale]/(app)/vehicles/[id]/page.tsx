@@ -20,6 +20,8 @@ import type { Locale } from '@/components/landing/content';
 import { PhotoDiagnosisPanel, type DiagnosisRow } from '@/components/diagnosis/photo-diagnosis-panel';
 import { MaintenanceSuggestionsPanel } from '@/components/maintenance/maintenance-suggestions-panel';
 import { loadMaintenanceSuggestions } from '@/data/maintenance/list';
+import { HistorySummaryPanel } from '@/components/vehicles/history-summary-panel';
+import { loadVehicleHistorySummaries } from '@/data/vehicles/history-summary';
 import { TimelineList, type TimelineItemView } from '@/components/timeline/timeline-list';
 import type { DiagnosisSeverity, VehicleAngle } from '@/integrations/ai';
 import { isExternalPhotoUrl } from '@/lib/utils';
@@ -73,11 +75,14 @@ export default async function VehicleDetailPage({
     maintSaved?: string;
     maintError?: string;
     quoteError?: string;
+    historySaved?: string;
+    historyError?: string;
   }>;
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  const { saved, photoError, diagSaved, diagError, maintSaved, maintError, quoteError } = await searchParams;
+  const { saved, photoError, diagSaved, diagError, maintSaved, maintError, quoteError, historySaved, historyError } =
+    await searchParams;
   const t = await getTranslations('app');
 
   const supabase = await createSupabaseServerClient();
@@ -104,7 +109,7 @@ export default async function VehicleDetailPage({
   }
   const kind = VAN_MODEL_PATTERN.test(`${v.make ?? ''} ${v.model ?? ''}`) ? 'van' : 'hatch';
 
-  const [{ data: diagData }, timeline, maintenanceSuggestions] = await Promise.all([
+  const [{ data: diagData }, timeline, maintenanceSuggestions, historySummaries] = await Promise.all([
     supabase
       .from('photo_diagnoses')
       .select(
@@ -114,6 +119,7 @@ export default async function VehicleDetailPage({
       .order('created_at', { ascending: false }),
     getVehicleTimeline(supabase, id),
     loadMaintenanceSuggestions(supabase, id),
+    loadVehicleHistorySummaries(supabase, id),
   ]);
   const diagRows = (diagData ?? []) as unknown as {
     id: string;
@@ -168,7 +174,9 @@ export default async function VehicleDetailPage({
               ? t('diagnosis.saved')
               : maintSaved === '1'
                 ? t('maintenance.saved')
-                : null
+                : historySaved === '1'
+                  ? t('historySummary.saved')
+                  : null
         }
         error={
           photoError
@@ -179,7 +187,9 @@ export default async function VehicleDetailPage({
                 ? t('diagnosis.error')
                 : maintError === '1'
                   ? t('maintenance.error')
-                  : null
+                  : historyError === '1'
+                    ? t('historySummary.error')
+                    : null
         }
       />
       <ModuleBanner moduleKey="history" label={t('moduleBanner.history')} icon={History} />
@@ -304,6 +314,14 @@ export default async function VehicleDetailPage({
           <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>
         </div>
       </form>
+
+      <HistorySummaryPanel
+        locale={locale}
+        vehicleId={v.id}
+        summaries={historySummaries}
+        saved={historySaved === '1'}
+        error={historyError === '1'}
+      />
 
       {/* Timeline: a single chronological history, from arrival to delivery. */}
       <section className="mt-6">

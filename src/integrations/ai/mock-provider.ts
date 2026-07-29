@@ -12,6 +12,7 @@ import type {
   RepairReportInput,
   SupportedLanguage,
   UrgencyInput,
+  VehicleHistorySummaryInput,
 } from './types';
 import {
   assistantAnswerSchema,
@@ -23,6 +24,7 @@ import {
   quoteDraftSchema,
   repairReportSchema,
   urgencyAssessmentSchema,
+  vehicleHistorySummarySchema,
   type AssistantAnswer,
   type DraftedReply,
   type LanguageDetection,
@@ -33,6 +35,7 @@ import {
   type RecommendedRepair,
   type RepairReport,
   type UrgencyAssessment,
+  type VehicleHistorySummary,
 } from './schemas';
 import { findEmergencyKeywords } from './emergency-keywords';
 import { matchSymptom } from './symptom-patterns';
@@ -418,6 +421,52 @@ export class MockAIProvider implements AIProvider {
       meta: this.meta(lineItems.length > 0 ? 0.55 : 0.2),
     };
   }
+
+  async summarizeVehicleHistory(
+    input: VehicleHistorySummaryInput,
+  ): Promise<AIResult<VehicleHistorySummary>> {
+    const T = HISTORY_SUMMARY_TEXT[input.language];
+    if (input.events.length === 0) {
+      return {
+        status: 'handoff',
+        reason: 'No recorded history for this vehicle yet.',
+        meta: this.meta(0.1),
+      };
+    }
+
+    const sorted = [...input.events].sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
+    const statusEvents = sorted.filter((e) => e.kind === 'status' && e.meta);
+    const visitTitles = new Set(statusEvents.map((e) => e.meta as string));
+    const highSeverity = sorted.filter((e) => e.kind === 'diagnosis' && (e.status === 'high' || e.status === 'urgent'));
+
+    const buckets: { label: string; keywords: string[] }[] = [
+      { label: T.bucketOil, keywords: ['vidange', 'oil', 'olie'] },
+      { label: T.bucketBrakes, keywords: ['frein', 'brake', 'rem'] },
+      { label: T.bucketTires, keywords: ['pneu', 'tire', 'band'] },
+      { label: T.bucketBelt, keywords: ['distribution', 'timing belt', 'distributieriem'] },
+    ];
+    const recurringIssues: string[] = [];
+    for (const bucket of buckets) {
+      const count = [...visitTitles].filter((title) =>
+        bucket.keywords.some((k) => title.toLowerCase().includes(k)),
+      ).length;
+      if (count >= 2) recurringIssues.push(T.recurringLabel(bucket.label, count));
+    }
+
+    const mostRecent = sorted[0]!;
+    const narrative = T.narrative({
+      visits: visitTitles.size,
+      mostRecentDescription: mostRecent.meta ?? T.eventKind(mostRecent.kind),
+      highSeverityCount: highSeverity.length,
+      hasRecurring: recurringIssues.length > 0,
+    });
+
+    return {
+      status: 'ok',
+      data: vehicleHistorySummarySchema.parse({ narrative, recurringIssues }),
+      meta: this.meta(0.5),
+    };
+  }
 }
 
 /** Best-effort parse of a free-text repair-time estimate (e.g. "1-2 hours") into hours. Falls back to a conservative 1h — always editable before sending. */
@@ -485,5 +534,74 @@ const QUOTE_DRAFT_TEXT: Record<
     estimatedPart: (name) => `${name} — prix à confirmer`,
     labor: 'Main d\'œuvre',
     disclaimer: 'Brouillon basé sur le diagnostic et votre catalogue de pièces — vérifiez et ajustez chaque ligne avant de l\'envoyer au client.',
+  },
+};
+
+interface HistoryNarrativeArgs {
+  visits: number;
+  mostRecentDescription: string;
+  highSeverityCount: number;
+  hasRecurring: boolean;
+}
+
+const HISTORY_SUMMARY_TEXT: Record<
+  SupportedLanguage,
+  {
+    bucketOil: string;
+    bucketBrakes: string;
+    bucketTires: string;
+    bucketBelt: string;
+    recurringLabel: (label: string, count: number) => string;
+    eventKind: (kind: string) => string;
+    narrative: (args: HistoryNarrativeArgs) => string;
+  }
+> = {
+  nl: {
+    bucketOil: 'Olie/vidange',
+    bucketBrakes: 'Remmen',
+    bucketTires: 'Banden',
+    bucketBelt: 'Distributie',
+    recurringLabel: (label, count) => `${label} (${count}x)`,
+    eventKind: (kind) => ({ status: 'werkorder', appointment: 'afspraak', invoice: 'factuur', diagnosis: 'diagnose', lead: 'aanvraag', message: 'bericht' })[kind] ?? kind,
+    narrative: ({ visits, mostRecentDescription, highSeverityCount, hasRecurring }) =>
+      [
+        `Dit voertuig heeft ${visits} geregistreerde bezoek(en). Meest recente activiteit: ${mostRecentDescription}.`,
+        highSeverityCount > 0 ? `${highSeverityCount} bevinding(en) met hoge urgentie in eerdere diagnoses.` : null,
+        hasRecurring ? 'Er is een terugkerend probleem gedetecteerd — zie hieronder.' : 'Nog geen terugkerend probleem gedetecteerd.',
+      ]
+        .filter(Boolean)
+        .join(' '),
+  },
+  en: {
+    bucketOil: 'Oil changes',
+    bucketBrakes: 'Brakes',
+    bucketTires: 'Tires',
+    bucketBelt: 'Timing belt',
+    recurringLabel: (label, count) => `${label} (${count}x)`,
+    eventKind: (kind) => ({ status: 'work order', appointment: 'appointment', invoice: 'invoice', diagnosis: 'diagnosis', lead: 'request', message: 'message' })[kind] ?? kind,
+    narrative: ({ visits, mostRecentDescription, highSeverityCount, hasRecurring }) =>
+      [
+        `This vehicle has ${visits} recorded visit(s). Most recent activity: ${mostRecentDescription}.`,
+        highSeverityCount > 0 ? `${highSeverityCount} high-severity finding(s) were flagged in past diagnoses.` : null,
+        hasRecurring ? 'A recurring issue was detected — see below.' : 'No recurring issue detected yet.',
+      ]
+        .filter(Boolean)
+        .join(' '),
+  },
+  fr: {
+    bucketOil: 'Vidanges',
+    bucketBrakes: 'Freins',
+    bucketTires: 'Pneus',
+    bucketBelt: 'Distribution',
+    recurringLabel: (label, count) => `${label} (${count}x)`,
+    eventKind: (kind) => ({ status: 'ordre de réparation', appointment: 'rendez-vous', invoice: 'facture', diagnosis: 'diagnostic', lead: 'demande', message: 'message' })[kind] ?? kind,
+    narrative: ({ visits, mostRecentDescription, highSeverityCount, hasRecurring }) =>
+      [
+        `Ce véhicule a ${visits} visite(s) enregistrée(s). Activité la plus récente : ${mostRecentDescription}.`,
+        highSeverityCount > 0 ? `${highSeverityCount} constat(s) de sévérité élevée relevé(s) lors de diagnostics précédents.` : null,
+        hasRecurring ? 'Un problème récurrent a été détecté — voir ci-dessous.' : 'Aucun problème récurrent détecté pour le moment.',
+      ]
+        .filter(Boolean)
+        .join(' '),
   },
 };

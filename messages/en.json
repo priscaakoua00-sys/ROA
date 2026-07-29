@@ -1000,6 +1000,14 @@
       "urgencyMedium": "Medium",
       "urgencyHigh": "High"
     },
+    "historySummary": {
+      "title": "AI history summary",
+      "intro": "A quick narrative of this vehicle's visits and any recurring issue, for a fast handoff between mechanics.",
+      "submit": "Summarize history",
+      "summarizing": "Ruben is reading the history...",
+      "saved": "Summary added.",
+      "error": "Something went wrong. Try again."
+    },
     "checklistResult": {
       "pending": "Pending",
       "ok": "OK",

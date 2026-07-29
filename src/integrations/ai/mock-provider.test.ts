@@ -9,6 +9,7 @@ import {
   mediaDiagnosisSchema,
   quoteDraftSchema,
   urgencyAssessmentSchema,
+  vehicleHistorySummarySchema,
 } from './schemas';
 
 const provider = new MockAIProvider();
@@ -251,6 +252,45 @@ describe('MockAIProvider', () => {
       expect(part?.description).toContain('Radiator hose');
       const labor = result.data.lineItems.find((l) => l.kind === 'labor');
       expect(labor?.quantity).toBe(0.5);
+    }
+  });
+
+  it('hands off summarizing a vehicle with no recorded history', async () => {
+    const result = await provider.summarizeVehicleHistory({
+      language: 'en',
+      vehicle: { make: 'Renault', model: 'Clio', year: 2019, mileage: 40_000 },
+      events: [],
+    });
+    expect(result.status).toBe('handoff');
+  });
+
+  it('detects a recurring issue across brake-related visits', async () => {
+    const result = await provider.summarizeVehicleHistory({
+      language: 'en',
+      vehicle: { make: 'Renault', model: 'Clio', year: 2019, mileage: 40_000 },
+      events: [
+        { at: '2026-01-10T09:00:00Z', kind: 'status', status: 'completed', meta: 'Brake pads replacement' },
+        { at: '2026-04-12T09:00:00Z', kind: 'status', status: 'completed', meta: 'Front brake inspection' },
+        { at: '2026-06-01T09:00:00Z', kind: 'diagnosis', status: 'high', meta: null },
+      ],
+    });
+    expect(result.status).toBe('ok');
+    if (result.status === 'ok') {
+      expect(() => vehicleHistorySummarySchema.parse(result.data)).not.toThrow();
+      expect(result.data.narrative).toContain('2');
+      expect(result.data.recurringIssues.some((i) => i.includes('Brakes'))).toBe(true);
+    }
+  });
+
+  it('reports no recurring issue for a single, unrelated visit', async () => {
+    const result = await provider.summarizeVehicleHistory({
+      language: 'fr',
+      vehicle: { make: 'Peugeot', model: '208', year: 2021, mileage: 15_000 },
+      events: [{ at: '2026-05-01T09:00:00Z', kind: 'status', status: 'completed', meta: 'Contrôle général' }],
+    });
+    expect(result.status).toBe('ok');
+    if (result.status === 'ok') {
+      expect(result.data.recurringIssues).toEqual([]);
     }
   });
 });

@@ -1000,6 +1000,14 @@
       "urgencyMedium": "Moyenne",
       "urgencyHigh": "Élevée"
     },
+    "historySummary": {
+      "title": "Résumé IA de l'historique",
+      "intro": "Un résumé rapide des visites de ce véhicule et de tout problème récurrent, pour une transmission rapide entre mécaniciens.",
+      "submit": "Résumer l'historique",
+      "summarizing": "Ruben lit l'historique...",
+      "saved": "Résumé ajouté.",
+      "error": "Une erreur s'est produite. Réessayez."
+    },
     "checklistResult": {
       "pending": "À faire",
       "ok": "OK",

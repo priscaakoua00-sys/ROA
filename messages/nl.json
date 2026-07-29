@@ -1000,6 +1000,14 @@
       "urgencyMedium": "Gemiddeld",
       "urgencyHigh": "Hoog"
     },
+    "historySummary": {
+      "title": "AI-samenvatting geschiedenis",
+      "intro": "Een kort overzicht van de bezoeken van dit voertuig en eventuele terugkerende problemen, voor een snelle overdracht tussen monteurs.",
+      "submit": "Geschiedenis samenvatten",
+      "summarizing": "Ruben leest de geschiedenis...",
+      "saved": "Samenvatting toegevoegd.",
+      "error": "Er ging iets mis. Probeer opnieuw."
+    },
     "checklistResult": {
       "pending": "Nog te doen",
       "ok": "OK",

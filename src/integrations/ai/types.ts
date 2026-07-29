@@ -181,3 +181,28 @@ export interface QuoteDraftInput {
   hourlyRate: number;
   marginPercent: number;
 }
+
+/** One real event from a vehicle's timeline, exactly as already shown on its page. */
+export interface VehicleHistoryEventInput {
+  at: string;
+  kind: 'status' | 'appointment' | 'invoice' | 'diagnosis' | 'lead' | 'message';
+  status: string;
+  meta?: string | null;
+}
+
+/**
+ * What's needed to summarize a vehicle's full history for a quick mechanic
+ * handoff: the real timeline events already computed elsewhere in the app —
+ * never re-fetched or invented, only synthesized into a short narrative plus
+ * any recurring issue detected across visits.
+ */
+export interface VehicleHistorySummaryInput {
+  language: SupportedLanguage;
+  vehicle: {
+    make: string | null;
+    model: string | null;
+    year: number | null;
+    mileage: number | null;
+  };
+  events: VehicleHistoryEventInput[];
+}

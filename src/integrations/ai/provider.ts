@@ -8,6 +8,7 @@ import type {
   QuoteDraftInput,
   RepairReportInput,
   UrgencyInput,
+  VehicleHistorySummaryInput,
   AIResult,
 } from './types';
 import type {
@@ -20,6 +21,7 @@ import type {
   QuoteDraft,
   RepairReport,
   UrgencyAssessment,
+  VehicleHistorySummary,
 } from './schemas';
 
 /**
@@ -104,4 +106,14 @@ export interface AIProvider {
    * Always a DRAFT: staff review and edit every line before sending.
    */
   draftQuote(input: QuoteDraftInput): Promise<AIResult<QuoteDraft>>;
+
+  /**
+   * Synthesize a vehicle's full timeline (visits, repairs, invoices) into a
+   * short narrative and any recurring issue pattern, for a quick handoff
+   * between mechanics/shifts. Only ever reasons over the events given —
+   * never invents a visit, a repair, or a pattern not actually present.
+   */
+  summarizeVehicleHistory(
+    input: VehicleHistorySummaryInput,
+  ): Promise<AIResult<VehicleHistorySummary>>;
 }

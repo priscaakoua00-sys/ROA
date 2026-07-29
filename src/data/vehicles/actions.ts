@@ -3,6 +3,9 @@
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { isExternalPhotoUrl } from '@/lib/utils';
+import { getVehicleTimeline } from '@/data/timeline/build';
+import { getAIProvider } from '@/integrations/ai';
+import type { VehicleHistoryEventInput } from '@/integrations/ai';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -87,4 +90,55 @@ export async function uploadVehiclePhotoAction(formData: FormData) {
   }
 
   redirect(`/${locale}/vehicles/${vehicleId}?saved=1`);
+}
+
+/**
+ * Synthesizes the vehicle's real timeline (already computed for the page)
+ * into a short AI narrative for a quick mechanic/shift handoff. Never
+ * re-fetches or reshapes history beyond what the page already shows.
+ */
+export async function summarizeVehicleHistoryAction(formData: FormData) {
+  const rawLocale = String(formData.get('locale') ?? 'nl');
+  const locale: Locale = (['nl', 'en', 'fr'] as const).includes(rawLocale as Locale)
+    ? (rawLocale as Locale)
+    : 'nl';
+  const vehicleId = String(formData.get('vehicleId') ?? '');
+  if (!vehicleId) redirect(`/${locale}/vehicles`);
+
+  const supabase = await createSupabaseServerClient();
+  const { data: vehicle } = await supabase
+    .from('vehicles')
+    .select('organization_id, make, model, year, mileage')
+    .eq('id', vehicleId)
+    .maybeSingle();
+  if (!vehicle) redirect(`/${locale}/vehicles`);
+
+  const timeline = await getVehicleTimeline(supabase, vehicleId);
+  const events: VehicleHistoryEventInput[] = timeline.map((e) => ({
+    at: e.at,
+    kind: e.kind,
+    status: e.status,
+    meta: e.meta,
+  }));
+
+  const result = await getAIProvider().summarizeVehicleHistory({
+    language: locale,
+    vehicle: { make: vehicle.make, model: vehicle.model, year: vehicle.year, mileage: vehicle.mileage },
+    events,
+  });
+  if (result.status !== 'ok') redirect(`/${locale}/vehicles/${vehicleId}?historyError=1`);
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const { error } = await supabase.from('vehicle_history_summaries').insert({
+    organization_id: vehicle.organization_id,
+    vehicle_id: vehicleId,
+    narrative: result.data.narrative,
+    recurring_issues: result.data.recurringIssues,
+    created_by: user?.id ?? null,
+  });
+  if (error) redirect(`/${locale}/vehicles/${vehicleId}?historyError=1`);
+
+  redirect(`/${locale}/vehicles/${vehicleId}?historySaved=1`);
 }
