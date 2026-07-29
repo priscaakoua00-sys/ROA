@@ -135,3 +135,11 @@ export const quoteDraftSchema = z.object({
   disclaimer: z.string().min(1),
 });
 export type QuoteDraft = z.infer<typeof quoteDraftSchema>;
+
+export const vehicleHistorySummarySchema = z.object({
+  /** Short (2-4 sentence) narrative synthesizing the given timeline events. */
+  narrative: z.string().min(1),
+  /** e.g. "Brakes (3 visits)" — only patterns actually present across 2+ events. */
+  recurringIssues: z.array(z.string()),
+});
+export type VehicleHistorySummary = z.infer<typeof vehicleHistorySummarySchema>;

@@ -13,6 +13,7 @@ import type {
   QuoteDraftInput,
   RepairReportInput,
   UrgencyInput,
+  VehicleHistorySummaryInput,
 } from './types';
 import {
   assistantAnswerSchema,
@@ -24,6 +25,7 @@ import {
   quoteDraftSchema,
   repairReportSchema,
   urgencyAssessmentSchema,
+  vehicleHistorySummarySchema,
   type AssistantAnswer,
   type DraftedReply,
   type LanguageDetection,
@@ -33,6 +35,7 @@ import {
   type QuoteDraft,
   type RepairReport,
   type UrgencyAssessment,
+  type VehicleHistorySummary,
 } from './schemas';
 import { findEmergencyKeywords } from './emergency-keywords';
 
@@ -534,6 +537,50 @@ export class AnthropicAIProvider implements AIProvider {
     if ('error' in result) return { status: 'error', error: result.error, meta: this.meta(0, Date.now() - started) };
 
     const parsed = quoteDraftSchema.safeParse(result.input);
+    if (!parsed.success) {
+      return { status: 'handoff', reason: 'Model output failed validation.', meta: this.meta(0.2, Date.now() - started) };
+    }
+    return { status: 'ok', data: parsed.data, meta: this.meta(0.6, Date.now() - started) };
+  }
+
+  async summarizeVehicleHistory(
+    input: VehicleHistorySummaryInput,
+  ): Promise<AIResult<VehicleHistorySummary>> {
+    const started = Date.now();
+    if (input.events.length === 0) {
+      return {
+        status: 'handoff',
+        reason: 'No recorded history for this vehicle yet.',
+        meta: this.meta(0.1, Date.now() - started),
+      };
+    }
+
+    const tool: Tool = {
+      name: 'submit_vehicle_history_summary',
+      description: "Submit the vehicle's history narrative and any recurring issue.",
+      input_schema: {
+        type: 'object',
+        properties: {
+          narrative: { type: 'string' },
+          recurringIssues: { type: 'array', items: { type: 'string' } },
+        },
+        required: ['narrative', 'recurringIssues'],
+      },
+    };
+
+    const vehicleLabel = [input.vehicle.make, input.vehicle.model, input.vehicle.year].filter(Boolean).join(' ');
+    const eventsText = input.events
+      .map((e) => `- ${e.at} [${e.kind}] status=${e.status}${e.meta ? ` — ${e.meta}` : ''}`)
+      .join('\n');
+
+    const result = await this.callTool({
+      system: `You are Ruben, summarizing a vehicle's history for a car garage's mechanics, in ${LANGUAGE_NAME[input.language] ?? input.language}, for a quick handoff between shifts. Use ONLY the timeline events listed below — never invent a visit, a repair, or a pattern not actually present in them. Write a short narrative (2-4 sentences): how many visits, what the most recent activity was, and whether anything stands out (e.g. unresolved high-severity findings). List any recurring issue you can actually see repeated across 2+ events (e.g. "Brakes (3x)") — an empty list is fine if nothing recurs. This is context for a mechanic, not a diagnosis or a promise to the customer.\n\nVehicle: ${vehicleLabel || 'unknown'}${input.vehicle.mileage != null ? `, ${input.vehicle.mileage} km` : ''}\nTimeline events (most recent first):\n${eventsText}`,
+      userContent: [{ type: 'text', text: "Summarize this vehicle's history." }],
+      tool,
+    });
+    if ('error' in result) return { status: 'error', error: result.error, meta: this.meta(0, Date.now() - started) };
+
+    const parsed = vehicleHistorySummarySchema.safeParse(result.input);
     if (!parsed.success) {
       return { status: 'handoff', reason: 'Model output failed validation.', meta: this.meta(0.2, Date.now() - started) };
     }
