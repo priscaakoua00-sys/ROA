@@ -1008,6 +1008,15 @@
       "saved": "Summary added.",
       "error": "Something went wrong. Try again."
     },
+    "oversight": {
+      "title": "Before you close this out",
+      "intro": "Ruben checked the checklist, diagnoses and invoice status and noticed the following.",
+      "severity": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      }
+    },
     "checklistResult": {
       "pending": "Pending",
       "ok": "OK",

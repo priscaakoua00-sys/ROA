@@ -1008,6 +1008,15 @@
       "saved": "Samenvatting toegevoegd.",
       "error": "Er ging iets mis. Probeer opnieuw."
     },
+    "oversight": {
+      "title": "Voordat u afsluit",
+      "intro": "Ruben heeft de checklist, diagnoses en factuurstatus gecontroleerd en het volgende opgemerkt.",
+      "severity": {
+        "low": "Laag",
+        "medium": "Gemiddeld",
+        "high": "Hoog"
+      }
+    },
     "checklistResult": {
       "pending": "Nog te doen",
       "ok": "OK",

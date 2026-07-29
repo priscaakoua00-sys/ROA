@@ -143,3 +143,18 @@ export const vehicleHistorySummarySchema = z.object({
   recurringIssues: z.array(z.string()),
 });
 export type VehicleHistorySummary = z.infer<typeof vehicleHistorySummarySchema>;
+
+export const oversightFindingSchema = z.object({
+  /** Short label, e.g. "2 checklist items not filled in". */
+  label: z.string().min(1),
+  /** One sentence explaining what to check before closing. */
+  detail: z.string().min(1),
+  severity: z.enum(['low', 'medium', 'high']),
+});
+export type OversightFinding = z.infer<typeof oversightFindingSchema>;
+
+export const workOrderOversightReportSchema = z.object({
+  /** Empty array is the expected, good outcome — nothing to flag. */
+  findings: z.array(oversightFindingSchema),
+});
+export type WorkOrderOversightReport = z.infer<typeof workOrderOversightReportSchema>;

@@ -14,6 +14,7 @@ import type {
   RepairReportInput,
   UrgencyInput,
   VehicleHistorySummaryInput,
+  WorkOrderOversightInput,
 } from './types';
 import {
   assistantAnswerSchema,
@@ -26,6 +27,7 @@ import {
   repairReportSchema,
   urgencyAssessmentSchema,
   vehicleHistorySummarySchema,
+  workOrderOversightReportSchema,
   type AssistantAnswer,
   type DraftedReply,
   type LanguageDetection,
@@ -36,6 +38,7 @@ import {
   type RepairReport,
   type UrgencyAssessment,
   type VehicleHistorySummary,
+  type WorkOrderOversightReport,
 } from './schemas';
 import { findEmergencyKeywords } from './emergency-keywords';
 
@@ -581,6 +584,57 @@ export class AnthropicAIProvider implements AIProvider {
     if ('error' in result) return { status: 'error', error: result.error, meta: this.meta(0, Date.now() - started) };
 
     const parsed = vehicleHistorySummarySchema.safeParse(result.input);
+    if (!parsed.success) {
+      return { status: 'handoff', reason: 'Model output failed validation.', meta: this.meta(0.2, Date.now() - started) };
+    }
+    return { status: 'ok', data: parsed.data, meta: this.meta(0.6, Date.now() - started) };
+  }
+
+  async detectWorkOrderOversights(
+    input: WorkOrderOversightInput,
+  ): Promise<AIResult<WorkOrderOversightReport>> {
+    const started = Date.now();
+
+    const tool: Tool = {
+      name: 'submit_oversight_report',
+      description: 'Submit the list of oversights found before this work order closes (empty if none).',
+      input_schema: {
+        type: 'object',
+        properties: {
+          findings: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                label: { type: 'string' },
+                detail: { type: 'string' },
+                severity: { type: 'string', enum: ['low', 'medium', 'high'] },
+              },
+              required: ['label', 'detail', 'severity'],
+            },
+          },
+        },
+        required: ['findings'],
+      },
+    };
+
+    const checklistText = input.checklistItems.length > 0
+      ? input.checklistItems
+          .map((i) => `- ${i.label}: ${i.result}${i.note ? ` — note: ${i.note}` : ' — no note'}`)
+          .join('\n')
+      : 'No checklist recorded for this work order.';
+    const diagnosesText = input.diagnoses.length > 0
+      ? input.diagnoses.map((d) => `- severity ${d.severity}`).join('\n')
+      : 'No photo diagnoses recorded for this work order.';
+
+    const result = await this.callTool({
+      system: `You are Ruben, doing a final quality check for a car garage before a work order closes, in ${LANGUAGE_NAME[input.language] ?? input.language}. This work order ("${input.workOrder.title}") is moving to status "${input.workOrder.status}". Look ONLY at the real data below and flag concrete oversights a mechanic or shop foreman should double-check before delivery — e.g. checklist items still pending, "attention"/"fail" items with no note explaining what's needed, an unresolved high-severity diagnosis, or (if status is "delivered") no invoice yet. Never invent a problem that isn't visible in this data. An empty findings list is the expected, good outcome when nothing stands out — do not manufacture a finding just to have one. This is advisory only, never a blocker.\n\nChecklist:\n${checklistText}\n\nPhoto diagnoses:\n${diagnosesText}\n\nInvoice exists: ${input.hasInvoice}`,
+      userContent: [{ type: 'text', text: 'Check this work order for oversights before it closes.' }],
+      tool,
+    });
+    if ('error' in result) return { status: 'error', error: result.error, meta: this.meta(0, Date.now() - started) };
+
+    const parsed = workOrderOversightReportSchema.safeParse(result.input);
     if (!parsed.success) {
       return { status: 'handoff', reason: 'Model output failed validation.', meta: this.meta(0.2, Date.now() - started) };
     }
