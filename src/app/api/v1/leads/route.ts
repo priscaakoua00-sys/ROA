@@ -24,7 +24,12 @@ const bodySchema = z.object({
  */
 export async function POST(request: Request) {
   const auth = await authenticateApiKey(request);
-  if (!auth) return NextResponse.json({ error: 'Invalid or missing API key.' }, { status: 401 });
+  if (!auth.ok) {
+    return NextResponse.json(
+      { error: auth.reason === 'rate_limited' ? 'Rate limit exceeded.' : 'Invalid or missing API key.' },
+      { status: auth.reason === 'rate_limited' ? 429 : 401 },
+    );
+  }
 
   const json = await request.json().catch(() => null);
   const parsed = bodySchema.safeParse(json);

@@ -23,7 +23,11 @@ export default async function LoginPage({
           {t('messages.checkEmail')}
         </p>
       ) : null}
-      {error ? <p className="mb-4 text-sm text-urgent">{t('errors.generic')}</p> : null}
+      {error ? (
+        <p className="mb-4 text-sm text-urgent">
+          {error === 'rate_limited' ? t('errors.rateLimited') : t('errors.generic')}
+        </p>
+      ) : null}
       <form action={signInAction} className="space-y-4">
         <input type="hidden" name="locale" value={locale} />
         <Field label={t('fields.email')} name="email" type="email" autoComplete="email" required />

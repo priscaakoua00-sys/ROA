@@ -1245,7 +1245,8 @@
       "resetSent": "Si cet e-mail existe, un lien de reinitialisation a ete envoye."
     },
     "errors": {
-      "generic": "Une erreur est survenue. Verifiez vos informations et reessayez."
+      "generic": "Une erreur est survenue. Verifiez vos informations et reessayez.",
+      "rateLimited": "Trop de tentatives. Veuillez patienter quelques minutes puis reessayer."
     }
   },
   "request": {

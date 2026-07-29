@@ -3,6 +3,8 @@
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { SITE_URL } from '@/lib/site';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { getClientIp } from '@/lib/client-ip';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -21,6 +23,12 @@ export async function sendPortalLoginLinkAction(formData: FormData) {
   const locale = localeOf(formData);
   const email = String(formData.get('email') ?? '').trim().toLowerCase();
   if (!email) redirect(`/${locale}/portal/login?error=1`);
+
+  const ip = await getClientIp();
+  const allowed = await checkRateLimit(`magic-link:${ip}:${email}`, 5, 15 * 60);
+  // Report success even when rate-limited — never reveal whether the email
+  // is a real customer or that they're sending too many of these.
+  if (!allowed) redirect(`/${locale}/portal/login?sent=1`);
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.signInWithOtp({
