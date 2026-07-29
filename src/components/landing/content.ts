@@ -69,6 +69,12 @@ interface Copy {
     who: string; inMsg: string; outMsg: string;
     proposeLbl: string; propose: string; approve: string; adjust: string; decide: string;
   };
+  diagnosis: {
+    tag: string; titlePre: string; titleEm: string; sub: string;
+    vehicle: string;
+    hypotheses: { cause: string; probability: string; reasoning: string }[];
+    recurringTag: string; recurringNote: string;
+  };
   simulation: {
     tag: string; titlePre: string; titleEm: string; sub: string;
     tabs: string[];
@@ -149,6 +155,18 @@ export const COPY: Record<Locale, Copy> = {
       propose: 'Piepende remmen kunnen op slijtage wijzen. Ik markeer dit met voorrang en stel donderdag 09:00 of vrijdag 14:30 voor.',
       approve: 'Goedkeuren', adjust: 'Aanpassen', decide: 'U beslist',
     },
+    diagnosis: {
+      tag: 'Diagnose-intelligentie', titlePre: 'Geen giswerk. ', titleEm: 'Een onderbouwde diagnose.',
+      sub: 'Ruben geeft nooit één antwoord zonder uitleg. Elke oorzaak krijgt een waarschijnlijkheid én een reden — zodat u zelf kunt beoordelen of het klopt.',
+      vehicle: 'VW Golf VII · 2019 · 84.400 km',
+      hypotheses: [
+        { cause: 'Los onderdeel', probability: '45%', reasoning: 'Een los onderdeel is de meest voorkomende bron van een ratelend geluid, vooral over hobbels.' },
+        { cause: 'Versleten lager', probability: '30%', reasoning: 'Een versleten wiellager geeft doorgaans een laag zoemend geluid dat meeschaalt met de snelheid.' },
+        { cause: 'Probleem met de ophanging', probability: '20%', reasoning: 'Versleten rubbers of kogelgewrichten veroorzaken vaak een bonk-geluid tijdens bochten.' },
+      ],
+      recurringTag: 'Terugkerend probleem',
+      recurringNote: 'Dit voertuig kreeg al een vergelijkbare melding 45 dagen geleden. Ruben houdt dit automatisch bij en wordt scherper bij elk bezoek.',
+    },
     simulation: {
       tag: 'Live simulatie', titlePre: 'Bekijk ', titleEm: 'Ruben', sub: 'Van het eerste bericht tot de afgeronde reparatie volgt u dezelfde stroom die vandaag al in echte garages draait.',
       tabs: ['Bericht', 'Devis', 'Afspraak', 'Opvolging'],
@@ -170,7 +188,7 @@ export const COPY: Record<Locale, Copy> = {
       items: [
         { k: '01 · Uw bedrijf', t: 'Kent uw garage', p: 'Uw uren, uw team, uw toon en uw voorkeuren. Blijft privé, alleen van u.' },
         { k: '02 · Het vak', t: 'Kent de branche', p: 'Reparaties, onderdelen, urgenties en de vragen die klanten altijd stellen.' },
-        { k: '03 · Samen', t: 'Wordt slimmer', p: 'Leert anoniem welke antwoorden en herinneringen het best werken.' },
+        { k: '03 · Elk voertuig', t: 'Onthoudt elke reparatie', p: 'Elke diagnose, elk vervangen onderdeel en elke reparatie blijft bewaard per voertuig — en telt mee bij de volgende diagnose op datzelfde voertuig.' },
       ],
     },
     why: {
@@ -182,6 +200,8 @@ export const COPY: Record<Locale, Copy> = {
         'Professionele PDF-facturen.',
         'Automatische herinneringen.',
         'Elke dag tijd bespaard.',
+        'Ruben waarschuwt voor wat u zou kunnen vergeten voordat een klus wordt afgesloten.',
+        'Stel Ruben een vraag over uw cijfers, krijg meteen een antwoord op basis van uw echte gegevens.',
       ],
     },
     journey: {
@@ -262,6 +282,18 @@ export const COPY: Record<Locale, Copy> = {
       propose: 'Squeaking brakes can indicate wear. I am flagging this with priority and propose Thursday 09:00 or Friday 14:30.',
       approve: 'Approve', adjust: 'Adjust', decide: 'You decide',
     },
+    diagnosis: {
+      tag: 'Diagnostic intelligence', titlePre: 'No guesswork. ', titleEm: 'A reasoned diagnosis.',
+      sub: 'Ruben never gives one answer without explaining it. Every possible cause gets a probability and a reason — so you can judge for yourself whether it holds up.',
+      vehicle: 'VW Golf VII · 2019 · 84,400 km',
+      hypotheses: [
+        { cause: 'A loose part', probability: '45%', reasoning: 'A loose part is the most common source of a rattling noise, especially over bumps.' },
+        { cause: 'A worn bearing', probability: '30%', reasoning: 'A worn wheel bearing typically produces a low humming noise that scales with speed.' },
+        { cause: 'A suspension issue', probability: '20%', reasoning: 'Worn bushings or ball joints often cause a clunk during turns.' },
+      ],
+      recurringTag: 'Recurring issue',
+      recurringNote: 'This vehicle had a similar report 45 days ago. Ruben tracks this automatically and gets sharper with every visit.',
+    },
     simulation: {
       tag: 'Live simulation', titlePre: 'Watch ', titleEm: 'Ruben', sub: 'From the first message to a finished repair, follow the same flow already running in real garages today.',
       tabs: ['Message', 'Quote', 'Appointment', 'Follow-up'],
@@ -283,7 +315,7 @@ export const COPY: Record<Locale, Copy> = {
       items: [
         { k: '01 · Your company', t: 'Knows your garage', p: 'Your hours, your team, your tone and your preferences. Stays private, only yours.' },
         { k: '02 · The trade', t: 'Knows the industry', p: 'Repairs, parts, emergencies and the questions customers always ask.' },
-        { k: '03 · Together', t: 'Gets smarter', p: 'Learns anonymously which replies and reminders work best.' },
+        { k: '03 · Every vehicle', t: 'Remembers every repair', p: 'Every diagnosis, part replaced and repair stays on record per vehicle — and feeds into the next diagnosis on that same vehicle.' },
       ],
     },
     why: {
@@ -295,6 +327,8 @@ export const COPY: Record<Locale, Copy> = {
         'Professional PDF invoices.',
         'Automatic reminders.',
         'Time saved every single day.',
+        'Ruben flags what you might have missed before a job is closed out.',
+        'Ask Ruben anything about your numbers, get an answer from your real data instantly.',
       ],
     },
     journey: {
@@ -375,6 +409,18 @@ export const COPY: Record<Locale, Copy> = {
       propose: 'Des freins qui grincent peuvent indiquer de l\u2019usure. Je marque ceci en priorité et propose jeudi 09:00 ou vendredi 14:30.',
       approve: 'Approuver', adjust: 'Ajuster', decide: 'Vous décidez',
     },
+    diagnosis: {
+      tag: 'Intelligence diagnostique', titlePre: 'Plus de devinettes. ', titleEm: 'Un diagnostic argumenté.',
+      sub: 'Ruben ne donne jamais une réponse sans l\u2019expliquer. Chaque cause possible reçoit une probabilité et une raison — pour que vous puissiez juger vous-même si elle tient la route.',
+      vehicle: 'VW Golf VII · 2019 · 84 400 km',
+      hypotheses: [
+        { cause: 'Une pièce desserrée', probability: '45%', reasoning: 'Une pièce desserrée est la source la plus fréquente d\u2019un cliquetis, surtout sur les bosses.' },
+        { cause: 'Un roulement usé', probability: '30%', reasoning: 'Un roulement de roue usé produit en général un bourdonnement grave qui s\u2019accentue avec la vitesse.' },
+        { cause: 'Un problème de suspension', probability: '20%', reasoning: 'Des silentblocs ou rotules usés provoquent souvent un bruit sourd en virage.' },
+      ],
+      recurringTag: 'Problème récurrent',
+      recurringNote: 'Ce véhicule avait déjà un signalement similaire il y a 45 jours. Ruben suit cela automatiquement et devient plus précis à chaque visite.',
+    },
     simulation: {
       tag: 'Simulation en direct', titlePre: 'Regardez ', titleEm: 'Ruben', sub: 'Du premier message jusqu’à la réparation terminée, découvrez le parcours qui fonctionne déjà aujourd’hui dans de vrais garages.',
       tabs: ['Message', 'Devis', 'Rendez-vous', 'Suivi'],
@@ -396,7 +442,7 @@ export const COPY: Record<Locale, Copy> = {
       items: [
         { k: '01 · Votre entreprise', t: 'Connaît votre garage', p: 'Vos horaires, votre équipe, votre ton et vos préférences. Reste privé, rien qu\u2019à vous.' },
         { k: '02 · Le métier', t: 'Connaît la branche', p: 'Réparations, pièces, urgences et les questions que les clients posent toujours.' },
-        { k: '03 · Ensemble', t: 'Devient plus intelligent', p: 'Apprend anonymement quelles réponses et relances fonctionnent le mieux.' },
+        { k: '03 · Chaque véhicule', t: 'Se souvient de chaque réparation', p: 'Chaque diagnostic, chaque pièce remplacée et chaque réparation reste enregistré par véhicule — et alimente le diagnostic suivant sur ce même véhicule.' },
       ],
     },
     why: {
@@ -408,6 +454,8 @@ export const COPY: Record<Locale, Copy> = {
         'Factures PDF professionnelles.',
         'Rappels automatiques.',
         'Gain de temps chaque jour.',
+        'Ruben signale ce que vous auriez pu oublier avant de clôturer un dossier.',
+        'Posez une question à Ruben sur vos chiffres, obtenez une réponse immédiate basée sur vos vraies données.',
       ],
     },
     journey: {
