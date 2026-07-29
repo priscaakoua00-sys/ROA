@@ -20,5 +20,11 @@ export async function checkRateLimit(key: string, limit: number, windowSeconds: 
     await logServerError({ route: 'rate_limit', message: `check_rate_limit failed for bucket ${key}: ${error.message}` });
     return true;
   }
-  return data === true;
+  if (data !== true) {
+    // Not a crash, but worth a trace: a real block is either an attack in
+    // progress or a legitimate user hitting a limit worth re-tuning.
+    await logServerError({ route: 'rate_limit_blocked', message: `Blocked: bucket "${key}" exceeded ${limit} attempts per ${windowSeconds}s.` });
+    return false;
+  }
+  return true;
 }

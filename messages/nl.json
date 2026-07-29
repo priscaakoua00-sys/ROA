@@ -898,7 +898,8 @@
       "errorsTitle": "Foutenlogboek",
       "errorsIntro": "Technische fouten van het hele platform, alleen zichtbaar voor het ROAVAA-team.",
       "errorsEmpty": "Geen fouten geregistreerd.",
-      "errorsStackTrace": "Technische details bekijken"
+      "errorsStackTrace": "Technische details bekijken",
+      "errorsSearchPlaceholder": "Zoek op route of bericht…"
     },
     "automations": {
       "title": "Opvolging",
