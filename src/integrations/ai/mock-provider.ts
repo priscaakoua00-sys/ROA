@@ -8,6 +8,7 @@ import type {
   LeadSummaryInput,
   MaintenanceSuggestionInput,
   MediaDiagnosisInput,
+  QuoteDraftInput,
   RepairReportInput,
   SupportedLanguage,
   UrgencyInput,
@@ -19,6 +20,7 @@ import {
   leadSummarySchema,
   maintenanceSuggestionsSchema,
   mediaDiagnosisSchema,
+  quoteDraftSchema,
   repairReportSchema,
   urgencyAssessmentSchema,
   type AssistantAnswer,
@@ -27,6 +29,7 @@ import {
   type LeadSummary,
   type MaintenanceSuggestions,
   type MediaDiagnosis,
+  type QuoteDraft,
   type RecommendedRepair,
   type RepairReport,
   type UrgencyAssessment,
@@ -380,6 +383,55 @@ export class MockAIProvider implements AIProvider {
       meta: this.meta(0.5),
     };
   }
+
+  async draftQuote(input: QuoteDraftInput): Promise<AIResult<QuoteDraft>> {
+    const T = QUOTE_DRAFT_TEXT[input.language];
+    const lineItems: QuoteDraft['lineItems'] = [];
+
+    for (const partName of input.diagnosis.affectedParts) {
+      const match = input.catalogParts.find(
+        (p) =>
+          p.name.toLowerCase().includes(partName.toLowerCase()) ||
+          partName.toLowerCase().includes(p.name.toLowerCase()),
+      );
+      if (match) {
+        const unitPrice = Math.round(match.unitCost * (1 + input.marginPercent / 100) * 100) / 100;
+        lineItems.push({ description: match.name, kind: 'part', quantity: 1, unitPrice });
+      } else {
+        lineItems.push({ description: T.estimatedPart(partName), kind: 'part', quantity: 1, unitPrice: 0 });
+      }
+    }
+
+    const hours = parseEstimatedHours(input.diagnosis.estimatedRepairTime);
+    if (hours > 0) {
+      lineItems.push({
+        description: T.labor,
+        kind: 'labor',
+        quantity: Math.round(hours * 4) / 4,
+        unitPrice: input.hourlyRate,
+      });
+    }
+
+    return {
+      status: 'ok',
+      data: quoteDraftSchema.parse({ lineItems, disclaimer: T.disclaimer }),
+      meta: this.meta(lineItems.length > 0 ? 0.55 : 0.2),
+    };
+  }
+}
+
+/** Best-effort parse of a free-text repair-time estimate (e.g. "1-2 hours") into hours. Falls back to a conservative 1h — always editable before sending. */
+function parseEstimatedHours(text: string): number {
+  const lower = text.toLowerCase();
+  const range = /(\d+(?:[.,]\d+)?)\s*-\s*(\d+(?:[.,]\d+)?)\s*(h|hour|heure|uur)/.exec(lower);
+  if (range) {
+    return (Number(range[1]!.replace(',', '.')) + Number(range[2]!.replace(',', '.'))) / 2;
+  }
+  const single = /(\d+(?:[.,]\d+)?)\s*(h|hour|heure|uur)/.exec(lower);
+  if (single) return Number(single[1]!.replace(',', '.'));
+  const minutes = /(\d+)\s*(min|minute)/.exec(lower);
+  if (minutes) return Number(minutes[1]!) / 60;
+  return 1;
 }
 
 const MAINTENANCE_TEXT: Record<
@@ -412,5 +464,26 @@ const MAINTENANCE_TEXT: Record<
     timingBelt: { item: 'Contrôle de la distribution', reason: (m) => `À ${m.toLocaleString('fr-FR')} km, ceci tombe souvent dans l'intervalle de remplacement.` },
     tires: { item: 'Contrôle des pneus', reason: (a) => `Véhicule âgé de ${a} ans — le caoutchouc vieillit même à faible kilométrage.` },
     disclaimer: "Suggestions basées sur le kilométrage, l'âge et l'historique connu — à confirmer en personne avant de proposer au client.",
+  },
+};
+
+const QUOTE_DRAFT_TEXT: Record<
+  SupportedLanguage,
+  { estimatedPart: (name: string) => string; labor: string; disclaimer: string }
+> = {
+  nl: {
+    estimatedPart: (name) => `${name} — prijs te bevestigen`,
+    labor: 'Arbeidsloon',
+    disclaimer: 'Concept op basis van de diagnose en uw onderdelencatalogus — controleer en pas elke regel aan voordat u dit naar de klant verstuurt.',
+  },
+  en: {
+    estimatedPart: (name) => `${name} — price to confirm`,
+    labor: 'Labor',
+    disclaimer: 'Draft based on the diagnosis and your parts catalog — review and adjust every line before sending it to the customer.',
+  },
+  fr: {
+    estimatedPart: (name) => `${name} — prix à confirmer`,
+    labor: 'Main d\'œuvre',
+    disclaimer: 'Brouillon basé sur le diagnostic et votre catalogue de pièces — vérifiez et ajustez chaque ligne avant de l\'envoyer au client.',
   },
 };

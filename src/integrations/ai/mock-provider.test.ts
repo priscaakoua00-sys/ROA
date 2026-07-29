@@ -7,6 +7,7 @@ import {
   leadSummarySchema,
   maintenanceSuggestionsSchema,
   mediaDiagnosisSchema,
+  quoteDraftSchema,
   urgencyAssessmentSchema,
 } from './schemas';
 
@@ -203,6 +204,53 @@ describe('MockAIProvider', () => {
     if (result.status === 'ok') {
       expect(result.data.suggestions).toEqual([]);
       expect(result.data.disclaimer.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('drafts a quote matching an affected part to the catalog, applying margin, plus a labor line', async () => {
+    const result = await provider.draftQuote({
+      language: 'en',
+      vehicle: { make: 'Volkswagen', model: 'Golf', year: 2018 },
+      diagnosis: {
+        visibleProblems: ['Squealing noise when braking'],
+        affectedParts: ['Front brake pads'],
+        estimatedRepairTime: '1-2 hours',
+      },
+      catalogParts: [{ name: 'Front brake pads', unitCost: 40 }],
+      hourlyRate: 60,
+      marginPercent: 50,
+    });
+    expect(result.status).toBe('ok');
+    if (result.status === 'ok') {
+      expect(() => quoteDraftSchema.parse(result.data)).not.toThrow();
+      const part = result.data.lineItems.find((l) => l.kind === 'part');
+      expect(part?.unitPrice).toBe(60); // 40 cost * 1.5 margin
+      const labor = result.data.lineItems.find((l) => l.kind === 'labor');
+      expect(labor?.quantity).toBe(1.5); // average of "1-2 hours"
+      expect(labor?.unitPrice).toBe(60);
+    }
+  });
+
+  it('drafts a zero-priced placeholder line for a part with no catalog match', async () => {
+    const result = await provider.draftQuote({
+      language: 'en',
+      vehicle: { make: 'Toyota', model: 'Yaris', year: 2020 },
+      diagnosis: {
+        visibleProblems: ['Coolant leak'],
+        affectedParts: ['Radiator hose'],
+        estimatedRepairTime: '30 minutes',
+      },
+      catalogParts: [{ name: 'Front brake pads', unitCost: 40 }],
+      hourlyRate: 60,
+      marginPercent: 50,
+    });
+    expect(result.status).toBe('ok');
+    if (result.status === 'ok') {
+      const part = result.data.lineItems.find((l) => l.kind === 'part');
+      expect(part?.unitPrice).toBe(0);
+      expect(part?.description).toContain('Radiator hose');
+      const labor = result.data.lineItems.find((l) => l.kind === 'labor');
+      expect(labor?.quantity).toBe(0.5);
     }
   });
 });

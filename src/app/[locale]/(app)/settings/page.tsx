@@ -114,7 +114,7 @@ export default async function SettingsPage({
   if (!activeOrgId) redirect(`/${locale}/onboarding`);
   const { data: org } = await supabase
     .from('organizations')
-    .select('id, name, slug, default_language, phone, email, address, postal_code, city, kvk_number, vat_number, website, iban, bic, logo_url, default_margin_percent')
+    .select('id, name, slug, default_language, phone, email, address, postal_code, city, kvk_number, vat_number, website, iban, bic, logo_url, default_margin_percent, default_hourly_rate')
     .eq('id', activeOrgId)
     .maybeSingle();
   if (!org) redirect(`/${locale}/onboarding`);
@@ -388,16 +388,29 @@ export default async function SettingsPage({
                 <Field label={t('settings.iban')} name="iban" defaultValue={org.iban ?? ''} />
                 <Field label={t('settings.bic')} name="bic" defaultValue={org.bic ?? ''} />
               </div>
-              <div>
-                <Field
-                  label={t('settings.marginPercent')}
-                  name="marginPercent"
-                  type="number"
-                  min="0"
-                  step="1"
-                  defaultValue={String(org.default_margin_percent)}
-                />
-                <p className="mt-1 text-xs text-muted-foreground">{t('settings.marginPercentIntro')}</p>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div>
+                  <Field
+                    label={t('settings.marginPercent')}
+                    name="marginPercent"
+                    type="number"
+                    min="0"
+                    step="1"
+                    defaultValue={String(org.default_margin_percent)}
+                  />
+                  <p className="mt-1 text-xs text-muted-foreground">{t('settings.marginPercentIntro')}</p>
+                </div>
+                <div>
+                  <Field
+                    label={t('settings.hourlyRate')}
+                    name="hourlyRate"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    defaultValue={String(org.default_hourly_rate)}
+                  />
+                  <p className="mt-1 text-xs text-muted-foreground">{t('settings.hourlyRateIntro')}</p>
+                </div>
               </div>
               <div className="flex justify-end">
                 <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>

@@ -784,7 +784,9 @@
       "cardIntro": "Une page publique avec vos coordonnées et un QR code, à partager avec vos clients.",
       "cardView": "Voir ma carte de visite",
       "marginPercent": "Marge estimée (%)",
-      "marginPercentIntro": "Utilisée uniquement pour estimer votre bénéfice sur le tableau de bord — aucune donnée de coût réelle n'est enregistrée."
+      "marginPercentIntro": "Utilisée uniquement pour estimer votre bénéfice sur le tableau de bord — aucune donnée de coût réelle n'est enregistrée.",
+      "hourlyRate": "Taux horaire de main d'œuvre",
+      "hourlyRateIntro": "Utilisé par Ruben IA pour chiffrer la ligne de main d'œuvre lors de la génération d'un devis à partir d'un diagnostic — toujours modifiable avant envoi."
     },
     "knowledge": {
       "title": "Base de connaissances",
@@ -981,7 +983,10 @@
       "additionalChecks": "Vérifications complémentaires",
       "estimatedRepairTime": "Temps de réparation estimé",
       "recommendations": "Recommandations",
-      "limitReached": "Vous avez atteint le nombre d'analyses IA Ruben incluses ce mois-ci dans votre formule. Passez à une formule supérieure pour continuer."
+      "limitReached": "Vous avez atteint le nombre d'analyses IA Ruben incluses ce mois-ci dans votre formule. Passez à une formule supérieure pour continuer.",
+      "quoteDraft": "Générer un devis avec l'IA",
+      "quoteDrafting": "Ruben chiffre le devis...",
+      "quoteError": "Impossible de générer un devis à partir de ce diagnostic. Réessayez, ou créez-en un manuellement."
     },
     "maintenance": {
       "title": "Suggestions d'entretien",

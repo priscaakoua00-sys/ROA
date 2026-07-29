@@ -7,6 +7,8 @@ import { instantiateChecklist, logStatus } from '@/data/work-orders/helpers';
 import { sendEmail } from '@/integrations/email';
 import { formatCurrency } from '@/lib/pricing';
 import { SITE_URL } from '@/lib/site';
+import { getAIProvider } from '@/integrations/ai';
+import { loadParts } from '@/data/inventory/list';
 
 type Locale = 'nl' | 'en' | 'fr';
 type LineItemKind = 'part' | 'labor' | 'other';
@@ -479,4 +481,127 @@ export async function duplicateQuoteAction(formData: FormData) {
   }
 
   redirect(`/${locale}/quotes/${newQuote.id}?saved=1`);
+}
+
+/**
+ * Turns a completed photo/symptom diagnosis into a priced DRAFT quote: Ruben
+ * matches the diagnosis's affected parts against the garage's real catalog
+ * (applying its margin) and prices labor from the estimated repair time and
+ * hourly rate. Never re-diagnoses anything — only prices what was already
+ * found. Always lands as a draft for staff to review before sending.
+ */
+export async function draftQuoteFromDiagnosisAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const diagnosisId = String(formData.get('diagnosisId') ?? '');
+  const back = String(formData.get('back') ?? `/${locale}/dashboard`);
+  if (!diagnosisId) redirect(back);
+
+  const supabase = await createSupabaseServerClient();
+  const { data: diagnosis } = await supabase
+    .from('photo_diagnoses')
+    .select('organization_id, vehicle_id, lead_id, work_order_id, visible_problems, affected_parts, estimated_repair_time')
+    .eq('id', diagnosisId)
+    .maybeSingle();
+  if (!diagnosis) redirect(back);
+
+  let customerId: string | null = null;
+  let vehicleId: string | null = diagnosis.vehicle_id;
+  if (diagnosis.work_order_id) {
+    const { data: wo } = await supabase
+      .from('work_orders')
+      .select('customer_id, vehicle_id')
+      .eq('id', diagnosis.work_order_id)
+      .maybeSingle();
+    customerId = wo?.customer_id ?? null;
+    vehicleId = vehicleId ?? wo?.vehicle_id ?? null;
+  }
+  if (!customerId && diagnosis.lead_id) {
+    const { data: lead } = await supabase
+      .from('leads')
+      .select('customer_id, vehicle_id')
+      .eq('id', diagnosis.lead_id)
+      .maybeSingle();
+    customerId = lead?.customer_id ?? null;
+    vehicleId = vehicleId ?? lead?.vehicle_id ?? null;
+  }
+
+  let vehicle: { make: string | null; model: string | null; year: number | null } = { make: null, model: null, year: null };
+  if (vehicleId) {
+    const { data: v } = await supabase
+      .from('vehicles')
+      .select('make, model, year, customer_id')
+      .eq('id', vehicleId)
+      .maybeSingle();
+    if (v) {
+      vehicle = { make: v.make, model: v.model, year: v.year };
+      customerId = customerId ?? v.customer_id ?? null;
+    }
+  }
+  if (!customerId) redirect(`${back}?quoteError=1`);
+
+  const { data: org } = await supabase
+    .from('organizations')
+    .select('default_hourly_rate, default_margin_percent')
+    .eq('id', diagnosis.organization_id)
+    .maybeSingle();
+
+  const parts = await loadParts(supabase, diagnosis.organization_id);
+
+  const result = await getAIProvider().draftQuote({
+    language: locale,
+    vehicle,
+    diagnosis: {
+      visibleProblems: diagnosis.visible_problems ?? [],
+      affectedParts: diagnosis.affected_parts ?? [],
+      estimatedRepairTime: diagnosis.estimated_repair_time ?? '',
+    },
+    catalogParts: parts.map((p) => ({ name: p.name, unitCost: Number(p.unit_cost ?? 0) })),
+    hourlyRate: Number(org?.default_hourly_rate ?? 65),
+    marginPercent: Number(org?.default_margin_percent ?? 35),
+  });
+  if (result.status !== 'ok' || result.data.lineItems.length === 0) redirect(`${back}?quoteError=1`);
+
+  const { data: quoteNumber, error: numberError } = await supabase.rpc('next_quote_number', {
+    p_org: diagnosis.organization_id,
+  });
+  if (numberError || !quoteNumber) redirect(`${back}?quoteError=1`);
+
+  const vatRate = 21;
+  const subtotal = Math.round(
+    result.data.lineItems.reduce((sum, l) => sum + l.quantity * l.unitPrice, 0) * 100,
+  ) / 100;
+  const vatAmount = Math.round(subtotal * (vatRate / 100) * 100) / 100;
+  const total = Math.round((subtotal + vatAmount) * 100) / 100;
+
+  const { data: quote, error } = await supabase
+    .from('quotes')
+    .insert({
+      organization_id: diagnosis.organization_id,
+      quote_number: quoteNumber,
+      customer_id: customerId,
+      vehicle_id: vehicleId,
+      status: 'draft',
+      subtotal,
+      vat_rate: vatRate,
+      vat_amount: vatAmount,
+      total,
+      notes: result.data.disclaimer,
+    })
+    .select('id')
+    .maybeSingle();
+  if (error || !quote) redirect(`${back}?quoteError=1`);
+
+  await supabase.from('quote_line_items').insert(
+    result.data.lineItems.map((l, i) => ({
+      organization_id: diagnosis.organization_id,
+      quote_id: quote.id,
+      description: l.description,
+      kind: l.kind,
+      quantity: l.quantity,
+      unit_price: l.unitPrice,
+      sort_order: i,
+    })),
+  );
+
+  redirect(`/${locale}/quotes/${quote.id}?saved=1`);
 }

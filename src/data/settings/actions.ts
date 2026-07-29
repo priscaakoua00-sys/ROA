@@ -26,6 +26,8 @@ export async function updateCompanyAction(formData: FormData) {
   };
   const marginRaw = Number(formData.get('marginPercent') ?? 35);
   const marginPercent = Number.isFinite(marginRaw) ? Math.min(100, Math.max(0, marginRaw)) : 35;
+  const hourlyRateRaw = Number(formData.get('hourlyRate') ?? 65);
+  const hourlyRate = Number.isFinite(hourlyRateRaw) ? Math.max(0, hourlyRateRaw) : 65;
   if (!name) redirect(`/${locale}/settings?error=1`);
 
   const supabase = await createSupabaseServerClient();
@@ -47,6 +49,7 @@ export async function updateCompanyAction(formData: FormData) {
       iban: clean('iban'),
       bic: clean('bic'),
       default_margin_percent: marginPercent,
+      default_hourly_rate: hourlyRate,
     })
     .eq('id', id);
   redirect(`/${locale}/settings?saved=company`);

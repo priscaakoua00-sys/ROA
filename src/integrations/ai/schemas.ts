@@ -119,3 +119,19 @@ export const maintenanceSuggestionsSchema = z.object({
   disclaimer: z.string().min(1),
 });
 export type MaintenanceSuggestions = z.infer<typeof maintenanceSuggestionsSchema>;
+
+export const quoteDraftLineItemSchema = z.object({
+  description: z.string().min(1),
+  kind: z.enum(['part', 'labor', 'other']),
+  quantity: z.number().positive(),
+  /** Sale unit price (already includes margin for parts) — always editable before sending. */
+  unitPrice: z.number().min(0),
+});
+export type QuoteDraftLineItem = z.infer<typeof quoteDraftLineItemSchema>;
+
+export const quoteDraftSchema = z.object({
+  lineItems: z.array(quoteDraftLineItemSchema),
+  /** Shown alongside the draft: a reminder this is a starting point to review, not a final price. */
+  disclaimer: z.string().min(1),
+});
+export type QuoteDraft = z.infer<typeof quoteDraftSchema>;

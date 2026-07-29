@@ -784,7 +784,9 @@
       "cardIntro": "A public page with your contact details and a QR code, ready to share with customers.",
       "cardView": "View my business card",
       "marginPercent": "Estimated margin (%)",
-      "marginPercentIntro": "Used only to estimate your profit on the dashboard — no real cost data is recorded."
+      "marginPercentIntro": "Used only to estimate your profit on the dashboard — no real cost data is recorded.",
+      "hourlyRate": "Hourly labor rate",
+      "hourlyRateIntro": "Used by Ruben AI to price the labor line when drafting a quote from a diagnosis — always editable before sending."
     },
     "knowledge": {
       "title": "Knowledge base",
@@ -981,7 +983,10 @@
       "additionalChecks": "Additional checks",
       "estimatedRepairTime": "Estimated repair time",
       "recommendations": "Recommendations",
-      "limitReached": "You've reached this month's Ruben AI analyses included in your plan. Upgrade to continue."
+      "limitReached": "You've reached this month's Ruben AI analyses included in your plan. Upgrade to continue.",
+      "quoteDraft": "Draft a quote with AI",
+      "quoteDrafting": "Ruben is pricing it...",
+      "quoteError": "Couldn't draft a quote from this diagnosis. Try again, or create one manually."
     },
     "maintenance": {
       "title": "Maintenance suggestions",

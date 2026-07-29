@@ -10,6 +10,7 @@ import type {
   LeadSummaryInput,
   MaintenanceSuggestionInput,
   MediaDiagnosisInput,
+  QuoteDraftInput,
   RepairReportInput,
   UrgencyInput,
 } from './types';
@@ -20,6 +21,7 @@ import {
   leadSummarySchema,
   maintenanceSuggestionsSchema,
   mediaDiagnosisSchema,
+  quoteDraftSchema,
   repairReportSchema,
   urgencyAssessmentSchema,
   type AssistantAnswer,
@@ -28,6 +30,7 @@ import {
   type LeadSummary,
   type MaintenanceSuggestions,
   type MediaDiagnosis,
+  type QuoteDraft,
   type RepairReport,
   type UrgencyAssessment,
 } from './schemas';
@@ -472,5 +475,68 @@ export class AnthropicAIProvider implements AIProvider {
       return { status: 'handoff', reason: 'Model output failed validation.', meta: this.meta(0.2, Date.now() - started) };
     }
     return { status: 'ok', data: parsed.data, meta: this.meta(0.65, Date.now() - started) };
+  }
+
+  async draftQuote(input: QuoteDraftInput): Promise<AIResult<QuoteDraft>> {
+    const started = Date.now();
+    if (input.diagnosis.affectedParts.length === 0 && !input.diagnosis.estimatedRepairTime.trim()) {
+      return {
+        status: 'handoff',
+        reason: 'Diagnosis has no affected parts or repair-time estimate to price.',
+        meta: this.meta(0.1, Date.now() - started),
+      };
+    }
+
+    const tool: Tool = {
+      name: 'submit_quote_draft',
+      description: 'Submit the draft quote line items priced from this diagnosis.',
+      input_schema: {
+        type: 'object',
+        properties: {
+          lineItems: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                description: { type: 'string' },
+                kind: { type: 'string', enum: ['part', 'labor', 'other'] },
+                quantity: { type: 'number' },
+                unitPrice: { type: 'number' },
+              },
+              required: ['description', 'kind', 'quantity', 'unitPrice'],
+            },
+          },
+          disclaimer: { type: 'string' },
+        },
+        required: ['lineItems', 'disclaimer'],
+      },
+    };
+
+    const vehicleLabel = [input.vehicle.make, input.vehicle.model, input.vehicle.year].filter(Boolean).join(' ');
+    const catalogText = input.catalogParts.length > 0
+      ? input.catalogParts.map((p) => `- ${p.name}: cost price ${p.unitCost}`).join('\n')
+      : 'No parts catalog entries available.';
+    const inputText = [
+      `Vehicle: ${vehicleLabel || 'unknown'}`,
+      `Visible problems: ${input.diagnosis.visibleProblems.join('; ') || 'none recorded'}`,
+      `Affected parts (from diagnosis): ${input.diagnosis.affectedParts.join(', ') || 'none'}`,
+      `Estimated repair time: ${input.diagnosis.estimatedRepairTime || 'unknown'}`,
+      `Hourly labor rate: ${input.hourlyRate}`,
+      `Parts margin to apply on cost price: ${input.marginPercent}%`,
+      `Garage parts catalog:\n${catalogText}`,
+    ].join('\n');
+
+    const result = await this.callTool({
+      system: `You are Ruben, pricing a DRAFT quote for a car garage in ${LANGUAGE_NAME[input.language] ?? input.language}. Only price what the diagnosis below already found — never invent a new fault or a part that isn't in "Affected parts". For each affected part, if it matches (or closely matches) an entry in the garage's parts catalog, use that catalog part's cost price with the given margin applied (sale price = cost * (1 + margin/100)) — do not invent a cost. If a part has no catalog match, still add a line item with a clearly marked placeholder in the description (e.g. "(price to confirm)") and set unitPrice to 0 rather than guessing a number. Convert the estimated repair time into one labor line item (quantity in hours, at the given hourly rate) — use your best reasonable reading of the time range (e.g. "1-2 hours" -> 1.5). Always include a disclaimer stating this is a draft to review and adjust before sending to the customer.\n\n${inputText}`,
+      userContent: [{ type: 'text', text: 'Draft the quote line items for this diagnosis.' }],
+      tool,
+    });
+    if ('error' in result) return { status: 'error', error: result.error, meta: this.meta(0, Date.now() - started) };
+
+    const parsed = quoteDraftSchema.safeParse(result.input);
+    if (!parsed.success) {
+      return { status: 'handoff', reason: 'Model output failed validation.', meta: this.meta(0.2, Date.now() - started) };
+    }
+    return { status: 'ok', data: parsed.data, meta: this.meta(0.6, Date.now() - started) };
   }
 }
