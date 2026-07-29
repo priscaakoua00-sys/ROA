@@ -45,6 +45,9 @@ import { FlashToast } from '@/components/flash-toast';
 import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button';
 import { PlanFeatureList } from '@/components/pricing/plan-feature-list';
 import { seedDemoDataAction, deleteDemoDataAction } from '@/data/demo/actions';
+import { EmailSignaturePreview } from '@/components/settings/email-signature-preview';
+import { buildEmailSignatureHtml, buildEmailSignatureText } from '@/lib/email-signature';
+import { SITE_URL } from '@/lib/site';
 
 const WEEKDAYS = [1, 2, 3, 4, 5, 6, 0];
 const LANGS = ['nl', 'en', 'fr'] as const;
@@ -126,6 +129,17 @@ export default async function SettingsPage({
     const { data } = supabase.storage.from('org-logos').getPublicUrl(org.logo_url);
     logoUrl = data.publicUrl;
   }
+  const signatureOrg = {
+    name: org.name,
+    phone: org.phone,
+    email: org.email,
+    address: org.address,
+    postalCode: org.postal_code,
+    city: org.city,
+    website: org.website,
+    logoUrl,
+    cardUrl: `${SITE_URL}/${locale}/card/${org.slug}`,
+  };
 
   const [{ data: rules }, { data: svc }, subscription, vehicleCount, seatCount, aiAnalysesUsed, role] = await Promise.all([
     supabase
@@ -588,6 +602,24 @@ export default async function SettingsPage({
         >
           {t('settings.cardView')}
         </a>
+      </section>
+
+      {/* Email signature */}
+      <section className="mt-6 rounded-xl border border-border bg-card p-6 shadow-soft">
+        <h2 className="text-base font-semibold tracking-tight">{t('settings.signatureTitle')}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t('settings.signatureIntro')}</p>
+        <EmailSignaturePreview
+          html={buildEmailSignatureHtml(signatureOrg)}
+          text={buildEmailSignatureText(signatureOrg)}
+          labels={{
+            previewTitle: t('settings.signaturePreview'),
+            htmlTitle: t('settings.signatureHtmlTitle'),
+            htmlHint: t('settings.signatureHtmlHint'),
+            textTitle: t('settings.signatureTextTitle'),
+            copy: t('settings.signatureCopy'),
+            copied: t('settings.signatureCopied'),
+          }}
+        />
       </section>
 
       {/* Opening hours */}

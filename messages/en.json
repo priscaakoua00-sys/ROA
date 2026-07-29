@@ -808,7 +808,15 @@
       "demoSeedCta": "Load demo data",
       "demoSeededToast": "Demo data added.",
       "demoDeletedToast": "Demo data deleted.",
-      "demoErrorToast": "Action failed. Please try again."
+      "demoErrorToast": "Action failed. Please try again.",
+      "signatureTitle": "Email signature",
+      "signatureIntro": "Built automatically from your garage details - paste it into Gmail, Outlook, or any other mail client.",
+      "signaturePreview": "Preview",
+      "signatureHtmlTitle": "HTML source",
+      "signatureHtmlHint": "Paste this into your mail client's signature settings (HTML mode).",
+      "signatureTextTitle": "Plain text",
+      "signatureCopy": "Copy",
+      "signatureCopied": "Copied"
     },
     "knowledge": {
       "title": "Knowledge base",

@@ -808,7 +808,15 @@
       "demoSeedCta": "Demogegevens laden",
       "demoSeededToast": "Demogegevens toegevoegd.",
       "demoDeletedToast": "Demogegevens verwijderd.",
-      "demoErrorToast": "Actie mislukt. Probeer opnieuw."
+      "demoErrorToast": "Actie mislukt. Probeer opnieuw.",
+      "signatureTitle": "E-mailhandtekening",
+      "signatureIntro": "Automatisch opgebouwd uit uw garagegegevens - plak hem in Gmail, Outlook of een ander e-mailprogramma.",
+      "signaturePreview": "Voorbeeld",
+      "signatureHtmlTitle": "HTML-code",
+      "signatureHtmlHint": "Plak dit in de handtekeninginstellingen van uw e-mailprogramma (HTML-modus).",
+      "signatureTextTitle": "Platte tekst",
+      "signatureCopy": "Kopieer",
+      "signatureCopied": "Gekopieerd"
     },
     "knowledge": {
       "title": "Kennisbank",
