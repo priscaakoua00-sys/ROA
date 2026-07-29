@@ -5,6 +5,7 @@ import type {
   LeadSummaryInput,
   MaintenanceSuggestionInput,
   MediaDiagnosisInput,
+  QuoteDraftInput,
   RepairReportInput,
   UrgencyInput,
   AIResult,
@@ -16,6 +17,7 @@ import type {
   LeadSummary,
   MaintenanceSuggestions,
   MediaDiagnosis,
+  QuoteDraft,
   RepairReport,
   UrgencyAssessment,
 } from './schemas';
@@ -93,4 +95,13 @@ export interface AIProvider {
   suggestMaintenance(
     input: MaintenanceSuggestionInput,
   ): Promise<AIResult<MaintenanceSuggestions>>;
+
+  /**
+   * Turn a completed diagnosis into a priced draft quote: matches affected
+   * parts against the garage's real catalog (applying its margin), prices
+   * labor from the estimated repair time and hourly rate, and never
+   * re-diagnoses the vehicle — only prices what the diagnosis already found.
+   * Always a DRAFT: staff review and edit every line before sending.
+   */
+  draftQuote(input: QuoteDraftInput): Promise<AIResult<QuoteDraft>>;
 }

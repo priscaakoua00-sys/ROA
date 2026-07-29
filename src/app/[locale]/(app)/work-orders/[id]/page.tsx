@@ -79,11 +79,12 @@ export default async function WorkOrderDetailPage({
     diagError?: string;
     articleSaved?: string;
     partSaved?: string;
+    quoteError?: string;
   }>;
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  const { error, reportSaved, reportError, diagSaved, diagError, articleSaved, partSaved } = await searchParams;
+  const { error, reportSaved, reportError, diagSaved, diagError, articleSaved, partSaved, quoteError } = await searchParams;
   const t = await getTranslations('app');
 
   const supabase = await createSupabaseServerClient();
@@ -403,6 +404,7 @@ export default async function WorkOrderDetailPage({
         diagnoses={diagnoses}
         saved={diagSaved === '1'}
         error={diagError === '1'}
+        quoteError={quoteError === '1'}
       />
 
       {/* Report */}

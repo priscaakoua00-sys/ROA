@@ -784,7 +784,9 @@
       "cardIntro": "Een openbare pagina met uw gegevens en een QR-code, klaar om te delen met klanten.",
       "cardView": "Mijn visitekaartje bekijken",
       "marginPercent": "Geschatte marge (%)",
-      "marginPercentIntro": "Alleen gebruikt om uw winst op het dashboard te schatten — er worden geen echte kostengegevens vastgelegd."
+      "marginPercentIntro": "Alleen gebruikt om uw winst op het dashboard te schatten — er worden geen echte kostengegevens vastgelegd.",
+      "hourlyRate": "Uurtarief arbeid",
+      "hourlyRateIntro": "Gebruikt door Ruben AI om de arbeidsregel te prijzen bij het opstellen van een offerte vanuit een diagnose — altijd aan te passen voordat u verstuurt."
     },
     "knowledge": {
       "title": "Kennisbank",
@@ -981,7 +983,10 @@
       "additionalChecks": "Extra controles",
       "estimatedRepairTime": "Geschatte reparatietijd",
       "recommendations": "Aanbevelingen",
-      "limitReached": "U heeft het aantal Ruben AI-analyses van deze maand in uw abonnement bereikt. Upgrade om door te gaan."
+      "limitReached": "U heeft het aantal Ruben AI-analyses van deze maand in uw abonnement bereikt. Upgrade om door te gaan.",
+      "quoteDraft": "Offerte opstellen met AI",
+      "quoteDrafting": "Ruben berekent de offerte...",
+      "quoteError": "Kon geen offerte opstellen vanuit deze diagnose. Probeer opnieuw, of maak er handmatig een aan."
     },
     "maintenance": {
       "title": "Onderhoudssuggesties",

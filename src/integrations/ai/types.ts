@@ -149,3 +149,35 @@ export interface MaintenanceSuggestionInput {
   /** Titles of past work orders on this vehicle, most recent first — real history, not invented. */
   recentWorkOrderTitles: string[];
 }
+
+/** A catalog part the garage actually stocks, for matching against diagnosis findings. */
+export interface CatalogPart {
+  name: string;
+  /** Cost price; the drafted quote applies the org's margin on top. */
+  unitCost: number;
+}
+
+/**
+ * What's needed to draft a quote from a completed diagnosis: the findings
+ * themselves (never re-diagnosed here, only priced), the garage's actual
+ * parts catalog and hourly labor rate to price against, and its default
+ * margin. Always produces a DRAFT quote a human reviews and edits before
+ * anything is sent to the customer — this is a pricing draft, not a
+ * medical-grade estimate.
+ */
+export interface QuoteDraftInput {
+  language: SupportedLanguage;
+  vehicle: {
+    make: string | null;
+    model: string | null;
+    year: number | null;
+  };
+  diagnosis: {
+    visibleProblems: string[];
+    affectedParts: string[];
+    estimatedRepairTime: string;
+  };
+  catalogParts: CatalogPart[];
+  hourlyRate: number;
+  marginPercent: number;
+}

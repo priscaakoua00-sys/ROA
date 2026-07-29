@@ -72,11 +72,12 @@ export default async function VehicleDetailPage({
     diagError?: string;
     maintSaved?: string;
     maintError?: string;
+    quoteError?: string;
   }>;
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  const { saved, photoError, diagSaved, diagError, maintSaved, maintError } = await searchParams;
+  const { saved, photoError, diagSaved, diagError, maintSaved, maintError, quoteError } = await searchParams;
   const t = await getTranslations('app');
 
   const supabase = await createSupabaseServerClient();
@@ -393,6 +394,7 @@ export default async function VehicleDetailPage({
         diagnoses={diagnoses}
         saved={diagSaved === '1'}
         error={diagError === '1'}
+        quoteError={quoteError === '1'}
       />
 
       <MaintenanceSuggestionsPanel

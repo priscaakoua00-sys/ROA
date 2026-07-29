@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
-import { Camera, ShieldAlert } from 'lucide-react';
+import { Camera, ShieldAlert, FileText } from 'lucide-react';
 import { createPhotoDiagnosisAction } from '@/data/diagnosis/actions';
+import { draftQuoteFromDiagnosisAction } from '@/data/quotes/actions';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Badge, type BadgeProps } from '@/components/ui/badge';
 import { formatDateTimeUTC } from '@/lib/datetime';
@@ -41,6 +42,7 @@ export async function PhotoDiagnosisPanel({
   diagnoses,
   saved,
   error,
+  quoteError,
 }: {
   locale: string;
   leadId?: string;
@@ -49,8 +51,16 @@ export async function PhotoDiagnosisPanel({
   diagnoses: DiagnosisRow[];
   saved?: boolean;
   error?: boolean;
+  quoteError?: boolean;
 }) {
   const t = await getTranslations('app.diagnosis');
+  const backHref = workOrderId
+    ? `/${locale}/work-orders/${workOrderId}`
+    : vehicleId
+      ? `/${locale}/vehicles/${vehicleId}`
+      : leadId
+        ? `/${locale}/leads/${leadId}`
+        : `/${locale}/dashboard`;
   const angleLabel: Record<VehicleAngle, string> = {
     front: t('angleFront'),
     rear: t('angleRear'),
@@ -79,6 +89,7 @@ export async function PhotoDiagnosisPanel({
 
       {saved ? <p className="mt-3 text-sm text-success">{t('saved')}</p> : null}
       {error ? <p className="mt-3 text-sm text-destructive">{t('error')}</p> : null}
+      {quoteError ? <p className="mt-3 text-sm text-destructive">{t('quoteError')}</p> : null}
 
       <form
         action={createPhotoDiagnosisAction}
@@ -143,6 +154,7 @@ export async function PhotoDiagnosisPanel({
               key={d.id}
               diagnosis={d}
               locale={locale}
+              backHref={backHref}
               angleLabel={angleLabel}
               severityLabel={severityLabel}
               t={t}
@@ -157,12 +169,14 @@ export async function PhotoDiagnosisPanel({
 function DiagnosisCard({
   diagnosis,
   locale,
+  backHref,
   angleLabel,
   severityLabel,
   t,
 }: {
   diagnosis: DiagnosisRow;
   locale: string;
+  backHref: string;
   angleLabel: Record<VehicleAngle, string>;
   severityLabel: Record<DiagnosisSeverity, string>;
   t: Awaited<ReturnType<typeof getTranslations>>;
@@ -205,6 +219,18 @@ function DiagnosisCard({
       ) : null}
 
       <ReportSection label={t('recommendations')} items={diagnosis.recommendations} />
+
+      {diagnosis.affectedParts.length > 0 || diagnosis.estimatedRepairTime ? (
+        <form action={draftQuoteFromDiagnosisAction} className="mt-3 border-t border-border/70 pt-3">
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="diagnosisId" value={diagnosis.id} />
+          <input type="hidden" name="back" value={backHref} />
+          <SubmitButton variant="outline" size="sm" pendingLabel={t('quoteDrafting')}>
+            <FileText className="size-4" aria-hidden />
+            {t('quoteDraft')}
+          </SubmitButton>
+        </form>
+      ) : null}
 
       <p className="mt-3 flex items-start gap-1.5 border-t border-border/70 pt-2 text-xs text-muted-foreground">
         <ShieldAlert className="mt-0.5 size-3.5 shrink-0" aria-hidden />
