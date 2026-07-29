@@ -398,6 +398,26 @@
 .lp-chat .decide .sk { background: transparent; color: var(--lp-bone-dim); border: 1px solid var(--lp-line-d); padding: 0.5rem 1rem; border-radius: 999px; font-size: 0.85rem; }
 .lp-chat .decide .tag { margin-left: auto; color: var(--lp-bone-dim); }
 
+/* Diagnosis: ranked cause hypotheses with probability + reasoning */
+.lp-diag { padding: 6.5rem 0; }
+.lp-diag-grid { display: grid; gap: 3rem; align-items: center; }
+@media (min-width: 940px) { .lp-diag-grid { grid-template-columns: 0.85fr 1.15fr; } }
+.lp-copy-head h2 em { font-style: italic; color: var(--lp-amber); }
+.lp-diag-card { position: relative; border: 1px solid var(--lp-line-d); border-radius: 18px; background: linear-gradient(180deg, var(--lp-espresso-2), var(--lp-espresso-3)); padding: 1.6rem; box-shadow: 0 40px 90px -44px #000; }
+.lp-diag-head { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; padding-bottom: 1.1rem; border-bottom: 1px solid var(--lp-line-d); margin-bottom: 1.2rem; }
+.lp-diag-head .veh { font-family: 'Fraunces', serif; font-size: 1rem; color: var(--lp-bone); }
+.lp-diag-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.9rem; }
+.lp-diag-list li { border: 1px solid var(--lp-line-d); border-radius: 12px; padding: 0.9rem 1.05rem; background: rgba(242, 233, 216, 0.03); }
+.lp-diag-list li:first-child { border-color: rgba(205, 162, 80, 0.45); background: rgba(205, 162, 80, 0.07); }
+.lp-diag-list .row { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; }
+.lp-diag-list .cause { font-weight: 600; color: var(--lp-bone); font-size: 0.98rem; }
+.lp-diag-list .prob { flex: none; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 600; padding: 0.25rem 0.6rem; border-radius: 999px; background: var(--lp-amber); color: var(--lp-espresso); }
+.lp-diag-list li:not(:first-child) .prob { background: transparent; color: var(--lp-bone-dim); border: 1px solid var(--lp-line-d); }
+.lp-diag-list .reason { margin: 0.5rem 0 0; color: var(--lp-bone-dim); font-size: 0.88rem; line-height: 1.55; }
+.lp-diag-recur { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 1.2rem; padding: 0.95rem 1.05rem; border: 1px dashed rgba(205, 162, 80, 0.5); border-radius: 12px; }
+.lp-diag-recur .tag { color: var(--lp-amber); }
+.lp-diag-recur p { margin: 0; color: var(--lp-bone); font-size: 0.9rem; line-height: 1.5; }
+
 .lp-mem { padding: 6rem 0; }
 .lp-mem-grid { display: grid; gap: 1.5rem; margin-top: 2.6rem; }
 @media (min-width: 820px) { .lp-mem-grid { grid-template-columns: repeat(3, 1fr); } }

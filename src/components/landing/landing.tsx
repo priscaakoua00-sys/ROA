@@ -165,6 +165,38 @@ export function Landing({ locale }: { locale: Locale }) {
           </div>
         </section>
 
+        {/* DIAGNOSIS */}
+        <section className="lp-diag" id="diagnose">
+          <div className="lp-wrap lp-diag-grid">
+            <Reveal className="lp-copy-head">
+              <span className="lp-mono">{c.diagnosis.tag}</span>
+              <h2>{c.diagnosis.titlePre}<em>{c.diagnosis.titleEm}</em></h2>
+              <p className="lp-lead">{c.diagnosis.sub}</p>
+            </Reveal>
+            <Reveal delay={100} className="lp-diag-card">
+              <div className="lp-diag-head">
+                <span className="veh">{c.diagnosis.vehicle}</span>
+                <span className="lp-live lp-mono"><span className="pulse" />{c.device.live}</span>
+              </div>
+              <ul className="lp-diag-list">
+                {c.diagnosis.hypotheses.map((h) => (
+                  <li key={h.cause}>
+                    <div className="row">
+                      <span className="cause">{h.cause}</span>
+                      <span className="prob">{h.probability}</span>
+                    </div>
+                    <p className="reason">{h.reasoning}</p>
+                  </li>
+                ))}
+              </ul>
+              <div className="lp-diag-recur">
+                <span className="tag lp-mono">{c.diagnosis.recurringTag}</span>
+                <p>{c.diagnosis.recurringNote}</p>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
         {/* SIMULATION */}
         <section className="lp-simsec" id="simulatie">
           <div className="lp-wrap">
