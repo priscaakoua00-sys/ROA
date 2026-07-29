@@ -157,6 +157,38 @@ describe('MockAIProvider', () => {
     }
   });
 
+  it('boosts a hypothesis and explains why when it matches this vehicle\'s repair history', async () => {
+    const withoutHistory = await provider.diagnoseFromMedia({
+      language: 'en',
+      media: [],
+      note: 'Squealing noise when braking.',
+    });
+    expect(withoutHistory.status).toBe('ok');
+    if (withoutHistory.status !== 'ok') return;
+    const baseline = withoutHistory.data.hypotheses.find((h) => h.cause.toLowerCase().includes('brake pads'));
+    expect(baseline).toBeTruthy();
+
+    const withHistory = await provider.diagnoseFromMedia({
+      language: 'en',
+      media: [],
+      note: 'Squealing noise when braking.',
+      pastOutcomes: [
+        {
+          daysAgo: 45,
+          symptoms: ['Squealing noise when braking'],
+          hypotheses: [{ cause: 'Worn brake pads', probabilityPercent: 60 }],
+          partsReplaced: ['Brake pads'],
+        },
+      ],
+    });
+    expect(withHistory.status).toBe('ok');
+    if (withHistory.status !== 'ok') return;
+    const boosted = withHistory.data.hypotheses.find((h) => h.cause.toLowerCase().includes('brake pads'));
+    expect(boosted).toBeTruthy();
+    expect(boosted!.probabilityPercent).toBeGreaterThan(baseline!.probabilityPercent);
+    expect(boosted!.reasoning).toContain('45 day(s) ago');
+  });
+
   it('falls back to an honest generic diagnosis when the note matches nothing', async () => {
     const result = await provider.diagnoseFromMedia({
       language: 'en',

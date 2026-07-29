@@ -6,7 +6,7 @@ import { getAIProvider } from '@/integrations/ai';
 import type { ChecklistFindingInput, MediaDiagnosis } from '@/integrations/ai';
 import { isWorkOrderStatus } from '@/lib/work-order-status';
 import { dispatchWebhooks } from '@/lib/webhooks';
-import { instantiateChecklist, logStatus, checkForOversights } from './helpers';
+import { instantiateChecklist, logStatus, checkForOversights, captureRepairOutcome } from './helpers';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -125,6 +125,9 @@ export async function updateWorkOrderStatusAction(formData: FormData) {
     status: statusRaw,
   });
   await checkForOversights(supabase, wo.organization_id, woId, statusRaw, wo.title, locale);
+  if (statusRaw === 'delivered') {
+    await captureRepairOutcome(supabase, wo.organization_id, woId);
+  }
 
   redirect(`/${locale}/work-orders/${woId}`);
 }
