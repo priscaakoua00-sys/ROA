@@ -65,7 +65,8 @@ integrations/ai/
 ├── types.ts               shared types + AIResult envelope + inputs
 ├── schemas.ts             Zod schemas for every structured output (source of truth)
 ├── provider.ts            AIProvider interface
-├── mock-provider.ts       offline deterministic provider (current default)
+├── mock-provider.ts       offline deterministic provider (dev-only fallback)
+├── anthropic-provider.ts  real provider (Claude via @anthropic-ai/sdk)
 ├── emergency-keywords.ts  safety-critical keyword detection per language
 └── index.ts               getAIProvider() factory
 ```
@@ -75,9 +76,12 @@ integrations/ai/
   safety trigger).
 - Providers validate output with the Zod schema before returning. Raw model
   output is never trusted.
-- The current default is `MockAIProvider` (no key, no network).
-  `getAIProvider()` selects a real provider from `process.env.AI_PROVIDER` when
-  configured (Phase 2).
+- `getAIProvider()` selects `AnthropicAIProvider` automatically whenever
+  `ANTHROPIC_API_KEY` is set — no extra flag needed. `AI_PROVIDER` overrides
+  this explicitly (e.g. force `mock` even with a key present, for local dev).
+  If `AI_PROVIDER=anthropic` is set without a key, it throws rather than
+  silently falling back to the mock. `MockAIProvider` is only ever the
+  fallback when neither is configured.
 
 ## Data layer
 

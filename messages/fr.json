@@ -1144,7 +1144,8 @@
       "anonymousCustomer": "Client",
       "acceptanceWithDate": "Ce devis est proposé à titre indicatif et valable jusqu'au {validUntil}.",
       "acceptanceNoDate": "Ce devis est proposé à titre indicatif."
-    }
+    },
+    "robinIntro": "Je garde un œil sur vos e-mails et rendez-vous, et je prépare vos messages clients. Rien ne passe à travers aujourd'hui."
   },
   "language": {
     "label": "Langue",

@@ -170,10 +170,10 @@ export const COPY: Record<Locale, Copy> = {
     simulation: {
       tag: 'Live simulatie', titlePre: 'Bekijk ', titleEm: 'Ruben', sub: 'Van het eerste bericht tot de afgeronde reparatie volgt u dezelfde stroom die vandaag al in echte garages draait.',
       tabs: ['Bericht', 'Devis', 'Afspraak', 'Opvolging'],
-      step1: { who: 'Dhr. Peeters · WhatsApp', msg: 'Mijn Golf trekt naar links bij het remmen. Kan dat gevaarlijk zijn?', reply: 'Dat kan wijzen op versleten remblokken. Ik maak alvast een devis klaar en stel een moment voor.' },
+      step1: { who: 'Dhr. Peeters · bericht', msg: 'Mijn Golf trekt naar links bij het remmen. Kan dat gevaarlijk zijn?', reply: 'Dat kan wijzen op versleten remblokken. Ik maak alvast een devis klaar en stel een moment voor.' },
       step2: { label: 'Ruben stelt een devis op', lines: [{ d: 'Remblokken vooraan (set)', price: '€ 89,00' }, { d: 'Arbeid (45 min)', price: '€ 67,50' }, { d: 'BTW 21%', price: '€ 32,84' }], total: '€ 189,34' },
       step3: { label: 'Ruben stelt een afspraak voor', slots: ['Donderdag 09:00', 'Vrijdag 14:30'], confirmed: 'Bevestigd voor vrijdag 14:30' },
-      step4: { label: 'Ruben volgt de reparatie op', stages: ['Ontvangen', 'Diagnose', 'Reparatie', 'Klaar'], current: 2, note: 'Dhr. Peeters krijgt automatisch bericht zodra zijn Golf klaar is.' },
+      step4: { label: 'Ruben volgt de reparatie op', stages: ['Ontvangen', 'Diagnose', 'Reparatie', 'Klaar'], current: 2, note: 'Ruben maakt het klantbericht klaar zodra de Golf klaar is - u verstuurt het met één klik.' },
     },
     voice: {
       tag: 'Spraakbediening', title: 'Praat gewoon met Ruben.', sub: 'Typen is niet nodig. Spreek een opdracht in, Ruben voert ze meteen uit.',
@@ -297,10 +297,10 @@ export const COPY: Record<Locale, Copy> = {
     simulation: {
       tag: 'Live simulation', titlePre: 'Watch ', titleEm: 'Ruben', sub: 'From the first message to a finished repair, follow the same flow already running in real garages today.',
       tabs: ['Message', 'Quote', 'Appointment', 'Follow-up'],
-      step1: { who: 'Mr. Peeters · WhatsApp', msg: 'My Golf pulls left when braking. Could that be dangerous?', reply: 'That can indicate worn brake pads. I am preparing a quote and proposing a time.' },
+      step1: { who: 'Mr. Peeters · message', msg: 'My Golf pulls left when braking. Could that be dangerous?', reply: 'That can indicate worn brake pads. I am preparing a quote and proposing a time.' },
       step2: { label: 'Ruben drafts a quote', lines: [{ d: 'Front brake pads (set)', price: '€ 89.00' }, { d: 'Labour (45 min)', price: '€ 67.50' }, { d: 'VAT 21%', price: '€ 32.84' }], total: '€ 189.34' },
       step3: { label: 'Ruben proposes an appointment', slots: ['Thursday 09:00', 'Friday 14:30'], confirmed: 'Confirmed for Friday 14:30' },
-      step4: { label: 'Ruben tracks the repair', stages: ['Received', 'Diagnosis', 'Repair', 'Done'], current: 2, note: 'Mr. Peeters is automatically notified as soon as his Golf is ready.' },
+      step4: { label: 'Ruben tracks the repair', stages: ['Received', 'Diagnosis', 'Repair', 'Done'], current: 2, note: 'Ruben drafts the client message the moment the Golf is ready - you send it with one click.' },
     },
     voice: {
       tag: 'Voice control', title: 'Just talk to Ruben.', sub: 'No typing needed. Speak a command, Ruben carries it out instantly.',
@@ -424,10 +424,10 @@ export const COPY: Record<Locale, Copy> = {
     simulation: {
       tag: 'Simulation en direct', titlePre: 'Regardez ', titleEm: 'Ruben', sub: 'Du premier message jusqu’à la réparation terminée, découvrez le parcours qui fonctionne déjà aujourd’hui dans de vrais garages.',
       tabs: ['Message', 'Devis', 'Rendez-vous', 'Suivi'],
-      step1: { who: 'M. Peeters · WhatsApp', msg: 'Ma Golf tire à gauche au freinage. C\u2019est dangereux ?', reply: 'Cela peut indiquer des plaquettes usées. Je prépare un devis et propose un créneau.' },
+      step1: { who: 'M. Peeters · message', msg: 'Ma Golf tire à gauche au freinage. C\u2019est dangereux ?', reply: 'Cela peut indiquer des plaquettes usées. Je prépare un devis et propose un créneau.' },
       step2: { label: 'Ruben prépare un devis', lines: [{ d: 'Plaquettes de frein avant (jeu)', price: '89,00 €' }, { d: 'Main d’œuvre (45 min)', price: '67,50 €' }, { d: 'TVA 21 %', price: '32,84 €' }], total: '189,34 €' },
       step3: { label: 'Ruben propose un rendez-vous', slots: ['Jeudi 09:00', 'Vendredi 14:30'], confirmed: 'Confirmé pour vendredi 14:30' },
-      step4: { label: 'Ruben suit la réparation', stages: ['Reçu', 'Diagnostic', 'Réparation', 'Terminé'], current: 2, note: 'M. Peeters est prévenu automatiquement dès que sa Golf est prête.' },
+      step4: { label: 'Ruben suit la réparation', stages: ['Reçu', 'Diagnostic', 'Réparation', 'Terminé'], current: 2, note: 'Ruben prépare le message client dès que sa Golf est prête - vous l’envoyez en un clic.' },
     },
     voice: {
       tag: 'Commande vocale', title: 'Parlez simplement à Ruben.', sub: 'Pas besoin d\u2019écrire. Dites une consigne à voix haute, Ruben l\u2019exécute aussitôt.',

@@ -1144,7 +1144,8 @@
       "anonymousCustomer": "Customer",
       "acceptanceWithDate": "This quote is non-binding and valid until {validUntil}.",
       "acceptanceNoDate": "This quote is non-binding."
-    }
+    },
+    "robinIntro": "I'm keeping an eye on your emails and appointments, and preparing client messages for you. Nothing slips through today."
   },
   "language": {
     "label": "Language",

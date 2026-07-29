@@ -49,15 +49,22 @@ switch language without reason.
 
 ## Current scope
 
-Phase 1 (core business) is built and connected to Supabase: authentication,
-organizations with RLS, onboarding, customers, vehicles, leads with emergency
-detection and AI qualification, team and roles, appointments and agenda, work
-orders, public request form, dashboard, and internal conversations with
-AI-drafted replies. Full i18n (NL/EN/FR), tests, and CI.
+The full garage workflow is built and connected to Supabase — not just Phase 1:
+authentication, organizations with role-gated RLS, onboarding (with a demo-data
+option), customers, vehicles (RDW plate lookup), leads with emergency detection
+and AI qualification, team and roles, appointments and agenda, work orders
+(13-stage workflow + checklists), quotes and invoices (PDF, Stripe payment,
+public accept/refuse with proof), inventory, reports, automations, 2FA,
+activity log, customer portal, public API + webhooks, digital business card,
+email signature generator. Full i18n (NL/EN/FR), tests, and CI.
 
-Still simulated or not connected: the AI provider is a deterministic mock (no
-real model), and no real channels (email, WhatsApp, phone) are wired. See
-PILOT_READINESS.md.
+Still simulated or not connected: WhatsApp and phone are not integrated at all
+(only a manual `wa.me` click-to-chat link); client-facing automations are
+AI-drafted suggestions a human sends, never auto-sent; Stripe subscription
+billing is built but commercially gated off during launch. The AI provider
+itself is real (Anthropic) whenever `ANTHROPIC_API_KEY` is set, with a
+deterministic mock as the dev-only fallback. See PILOT_READINESS.md and
+docs/AUDIT_REPORT.md for the full connected/simulated breakdown.
 
 ## First functional scope (Phase 1, delivered)
 

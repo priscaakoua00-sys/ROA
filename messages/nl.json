@@ -1144,7 +1144,8 @@
       "anonymousCustomer": "Klant",
       "acceptanceWithDate": "Deze offerte is vrijblijvend en geldig tot {validUntil}.",
       "acceptanceNoDate": "Deze offerte is vrijblijvend."
-    }
+    },
+    "robinIntro": "Ik hou je e-mails en afspraken in de gaten, en berei klantberichten voor je klaar. Er glipt vandaag niks doorheen."
   },
   "language": {
     "label": "Taal",
