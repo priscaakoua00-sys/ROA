@@ -6,6 +6,7 @@ import { createSupabaseServerClient } from '@/data/supabase/server';
 import { getActiveOrgId } from '@/data/organizations/active';
 import { generateApiKey } from '@/lib/api-keys';
 import { isPrivateOrLoopbackHost } from '@/lib/url-safety';
+import { logServerError } from '@/lib/error-log';
 import type { WebhookEventType } from '@/lib/webhooks';
 
 type Locale = 'nl' | 'en' | 'fr';
@@ -65,7 +66,11 @@ export async function createWebhookEndpointAction(formData: FormData) {
   } catch {
     hostname = null;
   }
-  if (!url || !/^https:\/\//.test(url) || eventTypes.length === 0 || !hostname || isPrivateOrLoopbackHost(hostname)) {
+  if (hostname && isPrivateOrLoopbackHost(hostname)) {
+    await logServerError({ route: 'webhook_ssrf_blocked', message: `Blocked webhook registration for private/loopback host "${hostname}".` });
+    redirect(`/${locale}/settings?error=1#developers`);
+  }
+  if (!url || !/^https:\/\//.test(url) || eventTypes.length === 0 || !hostname) {
     redirect(`/${locale}/settings?error=1#developers`);
   }
 

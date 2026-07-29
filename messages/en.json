@@ -898,7 +898,8 @@
       "errorsTitle": "Error log",
       "errorsIntro": "Technical errors captured across the whole platform, visible only to the ROAVAA team.",
       "errorsEmpty": "No errors recorded.",
-      "errorsStackTrace": "View stack trace"
+      "errorsStackTrace": "View stack trace",
+      "errorsSearchPlaceholder": "Search by route or message…"
     },
     "automations": {
       "title": "Follow-ups",

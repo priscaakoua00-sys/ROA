@@ -8,6 +8,7 @@ import { loadRobinInsight } from '@/data/robin/load';
 import { ACTIVE_WORK_ORDER_STATUSES } from '@/lib/work-order-status';
 import { buildExecutiveContext } from '@/data/assistant/executive-context';
 import { getAIProvider } from '@/integrations/ai';
+import { logAiUsage } from '@/lib/ai-usage-log';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 type Locale = 'nl' | 'en' | 'fr';
@@ -484,6 +485,7 @@ export async function askRobinAction(
     ]);
     const context = `${dayToDayContext}\n${executiveContext}`;
     const result = await getAIProvider().answerAssistantQuestion({ language: locale, question, context });
+    await logAiUsage('answerAssistantQuestion', orgId, result);
     if (result.status === 'ok') {
       return { text: result.data.answer, links: [], topic: 'fallback' };
     }

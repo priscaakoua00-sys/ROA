@@ -8,6 +8,7 @@ import { TAGGED_VEHICLE_ANGLES } from '@/lib/vehicle-angles';
 import { getOrgEntitlements } from '@/data/subscriptions/get-subscription';
 import { countAiAnalysesThisMonth } from '@/data/subscriptions/usage';
 import { loadPastRepairOutcomes } from '@/data/work-orders/repair-outcomes';
+import { logAiUsage } from '@/lib/ai-usage-log';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -131,6 +132,7 @@ export async function createPhotoDiagnosisAction(formData: FormData) {
 
   const pastOutcomes = resolvedVehicleId ? await loadPastRepairOutcomes(supabase, resolvedVehicleId) : [];
   const result = await getAIProvider().diagnoseFromMedia({ language: locale, media, note, pastOutcomes });
+  await logAiUsage('diagnoseFromMedia', organizationId, result);
   if (result.status !== 'ok') redirect(`${backHref}?diagError=1`);
 
   const { data: diagnosis, error: insertError } = await supabase
