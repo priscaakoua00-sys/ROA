@@ -157,6 +157,7 @@ export default async function WorkOrderDetailPage({
     parts: { name: string; unit: string } | null;
   }[];
   const checklist = (checklistData ?? []) as ChecklistItem[];
+  const pendingChecklistCount = checklist.filter((c) => c.result === 'pending').length;
   const members = ((memData ?? []) as {
     user_id: string | null;
     full_name: string | null;
@@ -276,7 +277,11 @@ export default async function WorkOrderDetailPage({
                 ? t('diagnosis.limitReached')
                 : diagError === '1'
                   ? t('diagnosis.error')
-                  : null
+                  : error === 'insufficientStock'
+                    ? t('inventory.insufficientStock')
+                    : error === 'checklistIncomplete'
+                      ? t('workOrders.checklistIncomplete')
+                      : null
         }
       />
       <Link href="/work-orders" className="text-sm text-muted-foreground hover:underline">
@@ -288,7 +293,9 @@ export default async function WorkOrderDetailPage({
         {vehicle ? ` · ${[vehicle.make, vehicle.model].filter(Boolean).join(' ')}${vehicle.license_plate ? ' (' + vehicle.license_plate + ')' : ''}` : ''}
       </p>
 
-      {error ? <p className="mt-3 text-sm text-urgent">{t('team.error')}</p> : null}
+      {error && error !== 'insufficientStock' && error !== 'checklistIncomplete' ? (
+        <p className="mt-3 text-sm text-urgent">{t('team.error')}</p>
+      ) : null}
 
       <RelatedArticles orgId={wo.organization_id} query={wo.description ?? ''} />
 
@@ -301,6 +308,12 @@ export default async function WorkOrderDetailPage({
               <option key={s} value={s}>{t(`workOrderStatus.${s}`)}</option>
             ))}
           </select>
+          {pendingChecklistCount > 0 ? (
+            <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <input type="checkbox" name="forceDeliver" value="1" />
+              {t('workOrders.forceDeliverChecklist', { count: pendingChecklistCount })}
+            </label>
+          ) : null}
           <Button type="submit" variant="outline" size="sm">{t('team.save')}</Button>
         </form>
 

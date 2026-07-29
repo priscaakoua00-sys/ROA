@@ -541,7 +541,9 @@
       "reportSaved": "Rapport généré.",
       "reportEmpty": "Rien à signaler pour l'instant : complétez la checklist ou lancez un diagnostic photo d'abord.",
       "reportError": "La génération du rapport a échoué. Réessayez.",
-      "clientMessageTitle": "Message pour le client"
+      "clientMessageTitle": "Message pour le client",
+      "checklistIncomplete": "Des points de la checklist sont encore en attente — terminez-les ou cochez la case ci-dessous pour livrer quand même.",
+      "forceDeliverChecklist": "Livrer quand même ({count} point(s) de checklist en attente)"
     },
     "workOrderStatus": {
       "received": "Reçu",
@@ -888,7 +890,8 @@
       "entity": {
         "invoice": "la facture",
         "customer": "le client",
-        "work_order": "l'ordre de réparation"
+        "work_order": "l'ordre de réparation",
+        "quote": "devis"
       },
       "retentionNote": "Affiche les 150 événements les plus récents."
     },
@@ -922,7 +925,8 @@
       "noPartsAvailable": "Ajoutez d'abord des pièces dans Stock.",
       "usePartLabel": "Pièce",
       "usePartQuantity": "Quantité utilisée",
-      "usePartSubmit": "Enregistrer l'utilisation"
+      "usePartSubmit": "Enregistrer l'utilisation",
+      "insufficientStock": "Stock insuffisant pour enregistrer cette quantité."
     },
     "admin": {
       "errorsTitle": "Journal des erreurs",
@@ -1109,7 +1113,8 @@
       "actionSendReminder": "Envoyer un rappel",
       "reminderSent": "Rappel envoyé au client.",
       "reminderError": "Impossible d'envoyer le rappel (pas d'e-mail client, ou envoi désactivé).",
-      "actionDuplicate": "Dupliquer"
+      "actionDuplicate": "Dupliquer",
+      "locked": "Ce devis a déjà reçu une réponse du client et ne peut plus être modifié."
     },
     "quoteStatus": {
       "draft": "Brouillon",

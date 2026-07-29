@@ -1,8 +1,10 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { sendEmail } from '@/integrations/email';
+import { getClientIp } from '@/lib/client-ip';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -31,10 +33,13 @@ export async function respondToPublicQuoteAction(formData: FormData) {
     redirect(`/${locale}/quote/${quoteId}?error=1`);
   }
 
+  const [ip, h] = await Promise.all([getClientIp(), headers()]);
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase.rpc('public_quote_respond', {
     p_quote_id: quoteId,
     p_decision: decision,
+    p_ip: ip,
+    p_user_agent: h.get('user-agent'),
   });
   const result = data?.[0] as
     | { ok: boolean; new_status: string; quote_number: string; org_email: string | null; customer_first_name: string | null; total: number }

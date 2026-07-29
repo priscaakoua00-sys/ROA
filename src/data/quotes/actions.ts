@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { instantiateChecklist, logStatus } from '@/data/work-orders/helpers';
+import { logActivity } from '@/data/activity/log';
 import { sendEmail } from '@/integrations/email';
 import { formatCurrency } from '@/lib/pricing';
 import { SITE_URL } from '@/lib/site';
@@ -55,6 +56,12 @@ function kindOf(formData: FormData): LineItemKind {
 }
 
 const MANUAL_STATUSES = ['draft', 'sent', 'accepted', 'refused', 'expired'] as const;
+
+// Once a customer has accepted or refused (or the quote already converted to
+// an invoice, or expired), its line items are a legal record of what was
+// agreed — never silently rewritten after the fact. Only draft/sent quotes
+// stay editable.
+const LINE_ITEM_EDITABLE_STATUSES = ['draft', 'sent'] as const;
 
 /** Recomputes subtotal/VAT/total from the quote's line items and persists them. */
 async function recalcQuoteTotals(supabase: SupabaseClient, quoteId: string) {
@@ -162,6 +169,25 @@ export async function updateQuoteStatusAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   await supabase.from('quotes').update({ status }).eq('id', quoteId);
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const { data: quoteForLog } = await supabase
+    .from('quotes')
+    .select('organization_id, quote_number')
+    .eq('id', quoteId)
+    .maybeSingle();
+  if (quoteForLog) {
+    await logActivity(supabase, {
+      organizationId: quoteForLog.organization_id,
+      actorId: user?.id ?? null,
+      entityType: 'quote',
+      entityId: quoteId,
+      entityLabel: quoteForLog.quote_number,
+      action: 'updated',
+    });
+  }
+
   // Marking a quote "sent" is also when the customer actually gets it: email
   // them a link to the public quote page so they can review and respond
   // without calling in. Best-effort — a failed email must not block saving.
@@ -197,6 +223,12 @@ export async function updateQuoteVatRateAction(formData: FormData) {
   if (!quoteId || !Number.isFinite(vatRate) || vatRate < 0) redirect(`/${locale}/quotes/${quoteId}`);
 
   const supabase = await createSupabaseServerClient();
+  const { data: quote } = await supabase.from('quotes').select('status').eq('id', quoteId).maybeSingle();
+  if (!quote) redirect(`/${locale}/quotes`);
+  if (!LINE_ITEM_EDITABLE_STATUSES.includes(quote.status as (typeof LINE_ITEM_EDITABLE_STATUSES)[number])) {
+    redirect(`/${locale}/quotes/${quoteId}?error=quoteLocked`);
+  }
+
   await supabase.from('quotes').update({ vat_rate: vatRate }).eq('id', quoteId);
   await recalcQuoteTotals(supabase, quoteId);
   redirect(`/${locale}/quotes/${quoteId}?saved=1`);
@@ -216,8 +248,11 @@ export async function addQuoteLineItemAction(formData: FormData) {
   }
 
   const supabase = await createSupabaseServerClient();
-  const { data: quote } = await supabase.from('quotes').select('organization_id').eq('id', quoteId).maybeSingle();
+  const { data: quote } = await supabase.from('quotes').select('organization_id, status').eq('id', quoteId).maybeSingle();
   if (!quote) redirect(`/${locale}/quotes`);
+  if (!LINE_ITEM_EDITABLE_STATUSES.includes(quote.status as (typeof LINE_ITEM_EDITABLE_STATUSES)[number])) {
+    redirect(`/${locale}/quotes/${quoteId}?error=quoteLocked`);
+  }
 
   const { count } = await supabase
     .from('quote_line_items')
@@ -251,6 +286,12 @@ export async function updateQuoteLineItemAction(formData: FormData) {
   }
 
   const supabase = await createSupabaseServerClient();
+  const { data: quote } = await supabase.from('quotes').select('status').eq('id', quoteId).maybeSingle();
+  if (!quote) redirect(`/${locale}/quotes`);
+  if (!LINE_ITEM_EDITABLE_STATUSES.includes(quote.status as (typeof LINE_ITEM_EDITABLE_STATUSES)[number])) {
+    redirect(`/${locale}/quotes/${quoteId}?error=quoteLocked`);
+  }
+
   await supabase
     .from('quote_line_items')
     .update({ description, kind, quantity, unit_price: unitPrice })
@@ -267,6 +308,12 @@ export async function deleteQuoteLineItemAction(formData: FormData) {
   if (!itemId) redirect(`/${locale}/quotes/${quoteId}`);
 
   const supabase = await createSupabaseServerClient();
+  const { data: quote } = await supabase.from('quotes').select('status').eq('id', quoteId).maybeSingle();
+  if (!quote) redirect(`/${locale}/quotes`);
+  if (!LINE_ITEM_EDITABLE_STATUSES.includes(quote.status as (typeof LINE_ITEM_EDITABLE_STATUSES)[number])) {
+    redirect(`/${locale}/quotes/${quoteId}?error=quoteLocked`);
+  }
+
   await supabase.from('quote_line_items').delete().eq('id', itemId);
   await recalcQuoteTotals(supabase, quoteId);
 

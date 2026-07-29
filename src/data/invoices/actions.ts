@@ -15,15 +15,11 @@ function localeOf(formData: FormData): Locale {
   return (['nl', 'en', 'fr'] as const).includes(raw as Locale) ? (raw as Locale) : 'nl';
 }
 
-const STATUSES = [
-  'draft',
-  'to_prepare',
-  'sent',
-  'partially_paid',
-  'paid',
-  'overdue',
-  'cancelled',
-] as const;
+// 'paid'/'partially_paid' may only be reached through recordPaymentAction or
+// markInvoicePaidAction, which insert the backing invoice_payments row —
+// never through this generic status dropdown, which would otherwise let
+// staff mark an invoice paid with no payment ever recorded behind it.
+const MANUALLY_SETTABLE_STATUSES = ['draft', 'to_prepare', 'sent', 'overdue', 'cancelled'] as const;
 
 /** Recomputes subtotal/VAT/total from the invoice's line items and persists them. */
 async function recalcInvoiceTotals(supabase: SupabaseClient, invoiceId: string) {
@@ -140,8 +136,8 @@ export async function updateInvoiceStatusAction(formData: FormData) {
   if (!invoiceId) redirect(`/${locale}/invoices`);
 
   const status = String(formData.get('status') ?? '');
-  if (!STATUSES.includes(status as (typeof STATUSES)[number])) {
-    redirect(`/${locale}/invoices/${invoiceId}`);
+  if (!MANUALLY_SETTABLE_STATUSES.includes(status as (typeof MANUALLY_SETTABLE_STATUSES)[number])) {
+    redirect(`/${locale}/invoices/${invoiceId}?error=paidRequiresPayment`);
   }
 
   const supabase = await createSupabaseServerClient();
@@ -152,10 +148,7 @@ export async function updateInvoiceStatusAction(formData: FormData) {
     .maybeSingle();
   if (!invoice) redirect(`/${locale}/invoices`);
 
-  await supabase
-    .from('invoices')
-    .update({ status, paid_at: status === 'paid' ? new Date().toISOString() : null })
-    .eq('id', invoiceId);
+  await supabase.from('invoices').update({ status, paid_at: null }).eq('id', invoiceId);
 
   const {
     data: { user },
@@ -168,12 +161,6 @@ export async function updateInvoiceStatusAction(formData: FormData) {
     entityLabel: invoice.invoice_number,
     action: 'updated',
   });
-  if (status === 'paid') {
-    await dispatchWebhooks(supabase, invoice.organization_id, 'invoice.paid', {
-      invoiceId,
-      invoiceNumber: invoice.invoice_number,
-    });
-  }
 
   redirect(`/${locale}/invoices/${invoiceId}?saved=1`);
 }

@@ -54,6 +54,21 @@ export async function POST(req: Request) {
 
   const admin = createSupabaseAdminClient();
 
+  // Stripe redelivers events (retries, manual resend) and requires the
+  // endpoint to be idempotent. Claiming the event id here, before any side
+  // effect runs, means a redelivery is acknowledged without reprocessing —
+  // critical for checkout.session.completed, which otherwise double-credits
+  // an invoice_payments row on every redelivery of the same event.
+  const { error: dedupeError } = await admin
+    .from('processed_stripe_events')
+    .insert({ event_id: event.id, event_type: event.type });
+  if (dedupeError) {
+    if (dedupeError.code === '23505') return NextResponse.json({ received: true, duplicate: true });
+    // Any other insert failure: don't silently skip a never-processed event —
+    // fail so Stripe retries later instead of losing it.
+    return NextResponse.json({ error: 'dedupe insert failed' }, { status: 500 });
+  }
+
   async function upsertFromSubscription(subscription: Stripe.Subscription, organizationId: string) {
     const item = subscription.items.data[0];
     const priceId = item?.price?.id;

@@ -1,11 +1,11 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-export type ActivityEntityType = 'invoice' | 'customer' | 'work_order';
+export type ActivityEntityType = 'invoice' | 'customer' | 'work_order' | 'quote';
 export type ActivityAction = 'created' | 'updated';
 
 /**
  * Records one line in the organization's activity log — who created or
- * modified an invoice, customer, or work order, and when. Best-effort: a
+ * modified an invoice, customer, work order, or quote, and when. Best-effort: a
  * logging failure must never block the real action it's recording, so this
  * never throws.
  */

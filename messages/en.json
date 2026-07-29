@@ -541,7 +541,9 @@
       "reportSaved": "Report generated.",
       "reportEmpty": "Nothing to report yet: complete the checklist or run a photo diagnosis first.",
       "reportError": "Report generation failed. Please try again.",
-      "clientMessageTitle": "Message for the client"
+      "clientMessageTitle": "Message for the client",
+      "checklistIncomplete": "Some checklist items are still pending — complete them or tick the box below to deliver anyway.",
+      "forceDeliverChecklist": "Deliver anyway ({count} checklist item(s) still pending)"
     },
     "workOrderStatus": {
       "received": "Received",
@@ -888,7 +890,8 @@
       "entity": {
         "invoice": "invoice",
         "customer": "customer",
-        "work_order": "work order"
+        "work_order": "work order",
+        "quote": "quote"
       },
       "retentionNote": "Showing the 150 most recent events."
     },
@@ -922,7 +925,8 @@
       "noPartsAvailable": "Add parts to Inventory first.",
       "usePartLabel": "Part",
       "usePartQuantity": "Quantity used",
-      "usePartSubmit": "Record usage"
+      "usePartSubmit": "Record usage",
+      "insufficientStock": "Not enough stock to record this quantity."
     },
     "admin": {
       "errorsTitle": "Error log",
@@ -1109,7 +1113,8 @@
       "actionSendReminder": "Send a reminder",
       "reminderSent": "Reminder sent to the customer.",
       "reminderError": "Could not send the reminder (no customer email, or sending disabled).",
-      "actionDuplicate": "Duplicate"
+      "actionDuplicate": "Duplicate",
+      "locked": "This quote has already been responded to by the customer and can no longer be edited."
     },
     "quoteStatus": {
       "draft": "Draft",
