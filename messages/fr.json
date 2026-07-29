@@ -808,7 +808,15 @@
       "demoSeedCta": "Charger des donnees de demo",
       "demoSeededToast": "Donnees de demonstration ajoutees.",
       "demoDeletedToast": "Donnees de demonstration supprimees.",
-      "demoErrorToast": "Action echouee. Reessayez."
+      "demoErrorToast": "Action echouee. Reessayez.",
+      "signatureTitle": "Signature e-mail",
+      "signatureIntro": "Construite automatiquement a partir des donnees de votre garage - collez-la dans Gmail, Outlook ou tout autre client mail.",
+      "signaturePreview": "Apercu",
+      "signatureHtmlTitle": "Code HTML",
+      "signatureHtmlHint": "Collez ceci dans les parametres de signature de votre client mail (mode HTML).",
+      "signatureTextTitle": "Texte brut",
+      "signatureCopy": "Copier",
+      "signatureCopied": "Copie"
     },
     "knowledge": {
       "title": "Base de connaissances",
