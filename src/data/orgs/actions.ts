@@ -22,6 +22,8 @@ export async function createOrgAction(formData: FormData) {
   });
   if (!parsed.success) redirect(`/${locale}/onboarding?error=invalid`);
 
+  const startWithDemo = String(formData.get('startMode') ?? 'demo') === 'demo';
+
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -44,18 +46,27 @@ export async function createOrgAction(formData: FormData) {
       .eq('organization_id', org.id);
   }
 
+  // "Discover with demo data" is the default: a brand-new garage otherwise
+  // opens onto a completely empty app, which undersells everything ROAVAA
+  // can do. The seeded rows are tagged is_demo and can be wiped from
+  // Settings the moment the owner is ready to switch to their real garage.
+  if (startWithDemo) {
+    await supabase.rpc('seed_demo_data', { p_organization_id: org.id });
+  }
+
   // Card required at signup: send the new garage to Stripe Checkout to register
   // a card and start the 30-day trial (€0 today, first charge automatic at the
   // end). If Stripe isn't configured yet, this returns null and we simply land
   // on the dashboard — the trial still runs, no one is ever blocked.
+  const welcomeParam = startWithDemo ? 'welcome=1&demo=seeded' : 'welcome=1';
   const checkoutUrl = await createTrialCheckoutUrl({
     supabase,
     orgId: org.id,
     planKey: parsed.data.planKey,
     email: user?.email ?? null,
-    successPath: `/${locale}/dashboard?welcome=1`,
+    successPath: `/${locale}/dashboard?${welcomeParam}`,
     cancelPath: `/${locale}/dashboard`,
   });
 
-  redirect(checkoutUrl ?? `/${locale}/dashboard`);
+  redirect(checkoutUrl ?? `/${locale}/dashboard?${welcomeParam}`);
 }

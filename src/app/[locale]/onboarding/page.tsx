@@ -69,6 +69,31 @@ export default async function OnboardingPage({
           </select>
         </label>
         <fieldset className="space-y-1.5">
+          <legend className="text-sm font-medium">{t('onboarding.startModeLabel')}</legend>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <label
+              className={cn(
+                'flex cursor-pointer flex-col rounded-md border border-input px-3 py-2.5 text-sm transition hover:border-ring',
+                'has-[:checked]:border-gold has-[:checked]:bg-gold/5',
+              )}
+            >
+              <input type="radio" name="startMode" value="demo" defaultChecked className="sr-only" />
+              <span className="font-medium">{t('onboarding.startModeDemoTitle')}</span>
+              <span className="mt-0.5 text-xs text-muted-foreground">{t('onboarding.startModeDemoBody')}</span>
+            </label>
+            <label
+              className={cn(
+                'flex cursor-pointer flex-col rounded-md border border-input px-3 py-2.5 text-sm transition hover:border-ring',
+                'has-[:checked]:border-gold has-[:checked]:bg-gold/5',
+              )}
+            >
+              <input type="radio" name="startMode" value="real" className="sr-only" />
+              <span className="font-medium">{t('onboarding.startModeRealTitle')}</span>
+              <span className="mt-0.5 text-xs text-muted-foreground">{t('onboarding.startModeRealBody')}</span>
+            </label>
+          </div>
+        </fieldset>
+        <fieldset className="space-y-1.5">
           <legend className="text-sm font-medium">{t('onboarding.planLabel')}</legend>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
             {PLANS.map((p) => (

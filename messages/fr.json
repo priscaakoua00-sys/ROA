@@ -43,7 +43,12 @@
       "cta": "Creer le garage",
       "error": "Creation impossible. Reessayez.",
       "planLabel": "Choisissez votre formule",
-      "planHint": "30 jours gratuits, 0 € aujourd'hui. Vous pourrez en changer a tout moment."
+      "planHint": "30 jours gratuits, 0 € aujourd'hui. Vous pourrez en changer a tout moment.",
+      "startModeLabel": "Comment souhaitez-vous commencer ?",
+      "startModeDemoTitle": "Decouvrir ROAVAA avec des donnees de demonstration",
+      "startModeDemoBody": "Clients, vehicules, rendez-vous, devis, factures et stock deja remplis - voyez immediatement tout le potentiel de ROAVAA.",
+      "startModeRealTitle": "Commencer directement avec mon vrai garage",
+      "startModeRealBody": "Demarrez avec un garage vide et saisissez vos propres donnees."
     },
     "businessType": {
       "garage": "Garage auto",
@@ -742,9 +747,15 @@
       "webhookSecretCreatedTitle": "Votre nouveau secret webhook",
       "webhookSecretCreatedIntro": "Copiez-le maintenant — pour votre sécurité, il ne sera plus jamais affiché. Utilisez-le pour vérifier l'en-tête X-Roavaa-Signature des livraisons.",
       "webhookEvent": {
-        "lead": { "created": "Nouveau lead" },
-        "work_order": { "status_changed": "Changement de statut d'ordre de réparation" },
-        "invoice": { "paid": "Facture payée" }
+        "lead": {
+          "created": "Nouveau lead"
+        },
+        "work_order": {
+          "status_changed": "Changement de statut d'ordre de réparation"
+        },
+        "invoice": {
+          "paid": "Facture payée"
+        }
       },
       "apiDocsTitle": "Référence API",
       "apiDocsIntro": "Envoyez votre clé API en tant que jeton Bearer dans l'en-tête Authorization.",
@@ -786,7 +797,18 @@
       "marginPercent": "Marge estimée (%)",
       "marginPercentIntro": "Utilisée uniquement pour estimer votre bénéfice sur le tableau de bord — aucune donnée de coût réelle n'est enregistrée.",
       "hourlyRate": "Taux horaire de main d'œuvre",
-      "hourlyRateIntro": "Utilisé par Ruben IA pour chiffrer la ligne de main d'œuvre lors de la génération d'un devis à partir d'un diagnostic — toujours modifiable avant envoi."
+      "hourlyRateIntro": "Utilisé par Ruben IA pour chiffrer la ligne de main d'œuvre lors de la génération d'un devis à partir d'un diagnostic — toujours modifiable avant envoi.",
+      "demoTitle": "Donnees de demonstration",
+      "demoIntro": "Donnees d'exemple pour decouvrir ROAVAA - clients, vehicules, ordres de reparation, devis et factures.",
+      "demoActiveBadge": "Donnees de demo actives",
+      "demoActiveNote": "Ce garage contient encore des donnees de demonstration. Supprimez-les des que vous etes pret a travailler avec vos vrais clients.",
+      "demoDeleteCta": "Supprimer les donnees de demo",
+      "demoDeleteConfirm": "Tous les clients, vehicules, ordres de reparation, devis et factures de demonstration seront definitivement supprimes. Vos propres donnees ne sont pas affectees.",
+      "demoEmptyNote": "Ce garage n'a pas encore de donnees.",
+      "demoSeedCta": "Charger des donnees de demo",
+      "demoSeededToast": "Donnees de demonstration ajoutees.",
+      "demoDeletedToast": "Donnees de demonstration supprimees.",
+      "demoErrorToast": "Action echouee. Reessayez."
     },
     "knowledge": {
       "title": "Base de connaissances",

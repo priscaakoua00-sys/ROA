@@ -44,6 +44,7 @@ import { Badge } from '@/components/ui/badge';
 import { FlashToast } from '@/components/flash-toast';
 import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button';
 import { PlanFeatureList } from '@/components/pricing/plan-feature-list';
+import { seedDemoDataAction, deleteDemoDataAction } from '@/data/demo/actions';
 
 const WEEKDAYS = [1, 2, 3, 4, 5, 6, 0];
 const LANGS = ['nl', 'en', 'fr'] as const;
@@ -75,11 +76,12 @@ export default async function SettingsPage({
     mfaError?: string;
     newApiKey?: string;
     newWebhookSecret?: string;
+    demo?: string;
   }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { saved, error, stripe, security, mfaError, newApiKey, newWebhookSecret } = await searchParams;
+  const { saved, error, stripe, security, mfaError, newApiKey, newWebhookSecret, demo } = await searchParams;
   const t = await getTranslations('app');
   const tPricing = await getTranslations('pricing');
 
@@ -153,6 +155,21 @@ export default async function SettingsPage({
   const [apiKeys, webhookEndpoints] = canManageCompany
     ? await Promise.all([loadApiKeys(supabase, org.id), loadWebhookEndpoints(supabase, org.id)])
     : [[], []];
+
+  let hasDemoData = false;
+  let hasAnyCustomers = false;
+  if (canManageCompany) {
+    const [{ count: demoCount }, { count: customerCount }] = await Promise.all([
+      supabase
+        .from('customers')
+        .select('id', { count: 'exact', head: true })
+        .eq('organization_id', org.id)
+        .eq('is_demo', true),
+      supabase.from('customers').select('id', { count: 'exact', head: true }).eq('organization_id', org.id),
+    ]);
+    hasDemoData = (demoCount ?? 0) > 0;
+    hasAnyCustomers = (customerCount ?? 0) > 0;
+  }
   const currentPlan = PLANS.find((p) => p.key === subscription.planKey) ?? PLANS[0]!;
   const trialDaysLeft = subscription.trialEndsAt
     ? Math.max(0, Math.ceil((new Date(subscription.trialEndsAt).getTime() - Date.now()) / 86_400_000))
@@ -191,13 +208,17 @@ export default async function SettingsPage({
     <div className="container max-w-2xl py-10">
       <FlashToast
         success={saved ? t('settings.saved') : null}
-        error={error ? t('team.error') : null}
+        error={error ? t('team.error') : demo === 'error' ? t('settings.demoErrorToast') : null}
         info={
           stripe === 'pending'
             ? t('settings.billingPendingToast')
             : stripe === 'cancelled'
               ? t('settings.billingCancelledToast')
-              : null
+              : demo === 'seeded'
+                ? t('settings.demoSeededToast')
+                : demo === 'deleted'
+                  ? t('settings.demoDeletedToast')
+                  : null
         }
       />
       <div className="flex items-center justify-between">
@@ -327,6 +348,46 @@ export default async function SettingsPage({
           {t('settings.billingViewAll')}
         </Link>
       </section>
+
+      {/* Demo data */}
+      {canManageCompany && (hasDemoData || !hasAnyCustomers) ? (
+        <section className="mt-6 rounded-xl border border-border bg-card p-6 shadow-soft">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-base font-semibold tracking-tight">{t('settings.demoTitle')}</h2>
+            {hasDemoData ? <Badge variant="gold">{t('settings.demoActiveBadge')}</Badge> : null}
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">{t('settings.demoIntro')}</p>
+
+          {hasDemoData ? (
+            <div className="mt-4 rounded-lg border border-gold/30 bg-gold/5 p-4">
+              <p className="text-sm">{t('settings.demoActiveNote')}</p>
+              <form id="delete-demo-data" action={deleteDemoDataAction} className="mt-3">
+                <input type="hidden" name="locale" value={locale} />
+              </form>
+              <div className="mt-3">
+                <ConfirmDeleteButton
+                  formId="delete-demo-data"
+                  triggerLabel={t('settings.demoDeleteCta')}
+                  title={t('common.confirmDeleteTitle')}
+                  description={t('settings.demoDeleteConfirm')}
+                  cancelLabel={t('common.cancel')}
+                  confirmLabel={t('common.confirm')}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="mt-4 rounded-lg border border-border bg-background p-4">
+              <p className="text-sm text-muted-foreground">{t('settings.demoEmptyNote')}</p>
+              <form action={seedDemoDataAction} className="mt-3">
+                <input type="hidden" name="locale" value={locale} />
+                <Button type="submit" variant="outline" size="sm">
+                  {t('settings.demoSeedCta')}
+                </Button>
+              </form>
+            </div>
+          )}
+        </section>
+      ) : null}
 
       {/* Company */}
       <section className="mt-6 rounded-xl border border-border bg-card p-6 shadow-soft">

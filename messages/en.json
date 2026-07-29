@@ -43,7 +43,12 @@
       "cta": "Create garage",
       "error": "Could not create. Please try again.",
       "planLabel": "Choose your plan",
-      "planHint": "30 days free, €0 today. You can change it any time."
+      "planHint": "30 days free, €0 today. You can change it any time.",
+      "startModeLabel": "How would you like to start?",
+      "startModeDemoTitle": "Explore ROAVAA with demo data",
+      "startModeDemoBody": "Customers, vehicles, appointments, quotes, invoices and stock already filled in - see everything ROAVAA can do right away.",
+      "startModeRealTitle": "Start with my real garage",
+      "startModeRealBody": "Begin with an empty garage and enter your own data."
     },
     "businessType": {
       "garage": "Car garage",
@@ -742,9 +747,15 @@
       "webhookSecretCreatedTitle": "Your new webhook secret",
       "webhookSecretCreatedIntro": "Copy it now — for your security, it won't be shown again. Use it to verify the X-Roavaa-Signature header on deliveries.",
       "webhookEvent": {
-        "lead": { "created": "New lead" },
-        "work_order": { "status_changed": "Work order status change" },
-        "invoice": { "paid": "Invoice paid" }
+        "lead": {
+          "created": "New lead"
+        },
+        "work_order": {
+          "status_changed": "Work order status change"
+        },
+        "invoice": {
+          "paid": "Invoice paid"
+        }
       },
       "apiDocsTitle": "API reference",
       "apiDocsIntro": "Send your API key as a Bearer token in the Authorization header.",
@@ -786,7 +797,18 @@
       "marginPercent": "Estimated margin (%)",
       "marginPercentIntro": "Used only to estimate your profit on the dashboard — no real cost data is recorded.",
       "hourlyRate": "Hourly labor rate",
-      "hourlyRateIntro": "Used by Ruben AI to price the labor line when drafting a quote from a diagnosis — always editable before sending."
+      "hourlyRateIntro": "Used by Ruben AI to price the labor line when drafting a quote from a diagnosis — always editable before sending.",
+      "demoTitle": "Demo data",
+      "demoIntro": "Sample data to explore ROAVAA - customers, vehicles, work orders, quotes and invoices.",
+      "demoActiveBadge": "Demo data active",
+      "demoActiveNote": "This garage still has demo data in it. Remove it whenever you are ready to work with your real customers.",
+      "demoDeleteCta": "Delete demo data",
+      "demoDeleteConfirm": "All demo customers, vehicles, work orders, quotes and invoices will be permanently deleted. Your own data is not affected.",
+      "demoEmptyNote": "This garage has no data yet.",
+      "demoSeedCta": "Load demo data",
+      "demoSeededToast": "Demo data added.",
+      "demoDeletedToast": "Demo data deleted.",
+      "demoErrorToast": "Action failed. Please try again."
     },
     "knowledge": {
       "title": "Knowledge base",
