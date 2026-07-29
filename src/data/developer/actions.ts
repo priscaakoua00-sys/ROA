@@ -5,6 +5,7 @@ import { randomBytes } from 'crypto';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { getActiveOrgId } from '@/data/organizations/active';
 import { generateApiKey } from '@/lib/api-keys';
+import { isPrivateOrLoopbackHost } from '@/lib/url-safety';
 import type { WebhookEventType } from '@/lib/webhooks';
 
 type Locale = 'nl' | 'en' | 'fr';
@@ -58,7 +59,13 @@ export async function createWebhookEndpointAction(formData: FormData) {
   const locale = localeOf(formData);
   const url = String(formData.get('url') ?? '').trim();
   const eventTypes = formData.getAll('eventTypes').filter((v): v is string => typeof v === 'string' && EVENT_TYPES.includes(v as WebhookEventType));
-  if (!url || !/^https:\/\//.test(url) || eventTypes.length === 0) {
+  let hostname: string | null = null;
+  try {
+    hostname = new URL(url).hostname;
+  } catch {
+    hostname = null;
+  }
+  if (!url || !/^https:\/\//.test(url) || eventTypes.length === 0 || !hostname || isPrivateOrLoopbackHost(hostname)) {
     redirect(`/${locale}/settings?error=1#developers`);
   }
 

@@ -156,7 +156,13 @@ export default async function DashboardPage({
   const todayEndISO = new Date(todayStart.getTime() + 24 * 3_600_000).toISOString();
   const thirtyMinAgo = new Date(now.getTime() - 30 * 60_000).toISOString();
   const nowISO = now.toISOString();
+  const monthStartISO = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
+  const last14DaysStart = new Date(todayStart.getTime() - 13 * 86_400_000).toISOString();
+  const weekStartISO = new Date(todayStart.getTime() - 6 * 86_400_000).toISOString();
+  const prevWeekStartISO = new Date(todayStart.getTime() - 13 * 86_400_000).toISOString();
 
+  // None of these ~30 reads depend on each other's results — only on org.id and the
+  // date constants above — so they all go out in a single round-trip batch.
   const [
     { data: leadsData },
     newToday,
@@ -174,6 +180,20 @@ export default async function DashboardPage({
     { data: leadsTodayCust },
     { data: apptsTodayCust },
     followUpsDue,
+    newCustomersToday,
+    { data: todayApptsData },
+    { data: urgentWorkOrdersData },
+    { data: unreadMessagesData },
+    { data: invoicesSummaryData },
+    { data: paymentsTodayData },
+    { data: paymentsMonthData },
+    { data: payments14dData },
+    { data: deliveredThisMonthData },
+    { data: allCustomersData },
+    { data: allWorkOrdersData },
+    { data: allInvoicesData },
+    { data: allPaymentsData },
+    lowStockCount,
   ] = await Promise.all([
     supabase
       .from('leads')
@@ -207,16 +227,6 @@ export default async function DashboardPage({
     supabase.from('leads').select('customer_id').eq('organization_id', org.id).gte('created_at', todayISO),
     supabase.from('appointments').select('customer_id').eq('organization_id', org.id).gte('starts_at', todayISO).lt('starts_at', todayEndISO),
     loadFollowUpsDueCount(supabase, org.id, now, anon),
-  ]);
-
-  const [
-    newCustomersToday,
-    { data: todayApptsData },
-    { data: urgentWorkOrdersData },
-    { data: unreadMessagesData },
-    { data: invoicesSummaryData },
-    { data: paymentsTodayData },
-  ] = await Promise.all([
     supabase.from('customers').select('id', { count: 'exact', head: true }).eq('organization_id', org.id).gte('created_at', todayISO),
     supabase
       .from('appointments')
@@ -249,23 +259,6 @@ export default async function DashboardPage({
       .eq('organization_id', org.id)
       .in('status', ['to_prepare', 'sent', 'partially_paid', 'overdue']),
     supabase.from('invoice_payments').select('amount').eq('organization_id', org.id).gte('paid_at', todayISO),
-  ]);
-
-  const monthStartISO = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
-  const last14DaysStart = new Date(todayStart.getTime() - 13 * 86_400_000).toISOString();
-  const weekStartISO = new Date(todayStart.getTime() - 6 * 86_400_000).toISOString();
-  const prevWeekStartISO = new Date(todayStart.getTime() - 13 * 86_400_000).toISOString();
-
-  const [
-    { data: paymentsMonthData },
-    { data: payments14dData },
-    { data: deliveredThisMonthData },
-    { data: allCustomersData },
-    { data: allWorkOrdersData },
-    { data: allInvoicesData },
-    { data: allPaymentsData },
-    lowStockCount,
-  ] = await Promise.all([
     supabase.from('invoice_payments').select('amount').eq('organization_id', org.id).gte('paid_at', monthStartISO),
     supabase.from('invoice_payments').select('amount, paid_at').eq('organization_id', org.id).gte('paid_at', last14DaysStart),
     supabase

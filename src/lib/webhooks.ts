@@ -3,6 +3,7 @@ import 'server-only';
 import { createHmac } from 'crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { logServerError } from '@/lib/error-log';
+import { resolvesToPrivateHost } from '@/lib/url-safety';
 
 export type WebhookEventType = 'lead.created' | 'work_order.status_changed' | 'invoice.paid';
 
@@ -33,6 +34,15 @@ export async function dispatchWebhooks(
   await Promise.all(
     endpoints.map(async (endpoint) => {
       try {
+        const hostname = new URL(endpoint.url as string).hostname;
+        if (await resolvesToPrivateHost(hostname)) {
+          await logServerError({
+            route: 'webhook_dispatch',
+            message: `Webhook endpoint ${endpoint.id} resolves to a private/loopback address, skipping delivery for ${eventType}`,
+            organizationId,
+          });
+          return;
+        }
         const signature = createHmac('sha256', endpoint.secret as string).update(body).digest('hex');
         const response = await fetch(endpoint.url as string, {
           method: 'POST',

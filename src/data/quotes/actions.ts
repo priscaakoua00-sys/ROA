@@ -9,6 +9,7 @@ import { formatCurrency } from '@/lib/pricing';
 import { SITE_URL } from '@/lib/site';
 import { getAIProvider } from '@/integrations/ai';
 import { loadParts } from '@/data/inventory/list';
+import { loadOrgDefaults } from '@/data/organizations/defaults';
 
 type Locale = 'nl' | 'en' | 'fr';
 type LineItemKind = 'part' | 'labor' | 'other';
@@ -539,13 +540,10 @@ export async function draftQuoteFromDiagnosisAction(formData: FormData) {
   }
   if (!customerId) redirect(`${back}?quoteError=1`);
 
-  const { data: org } = await supabase
-    .from('organizations')
-    .select('default_hourly_rate, default_margin_percent')
-    .eq('id', diagnosis.organization_id)
-    .maybeSingle();
-
-  const parts = await loadParts(supabase, diagnosis.organization_id);
+  const [orgDefaults, parts] = await Promise.all([
+    loadOrgDefaults(supabase, diagnosis.organization_id),
+    loadParts(supabase, diagnosis.organization_id),
+  ]);
 
   const result = await getAIProvider().draftQuote({
     language: locale,
@@ -556,8 +554,8 @@ export async function draftQuoteFromDiagnosisAction(formData: FormData) {
       estimatedRepairTime: diagnosis.estimated_repair_time ?? '',
     },
     catalogParts: parts.map((p) => ({ name: p.name, unitCost: Number(p.unit_cost ?? 0) })),
-    hourlyRate: Number(org?.default_hourly_rate ?? 65),
-    marginPercent: Number(org?.default_margin_percent ?? 35),
+    hourlyRate: orgDefaults.hourlyRate,
+    marginPercent: orgDefaults.marginPercent,
   });
   if (result.status !== 'ok' || result.data.lineItems.length === 0) redirect(`${back}?quoteError=1`);
 
