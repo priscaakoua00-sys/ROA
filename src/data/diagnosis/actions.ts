@@ -142,7 +142,7 @@ export async function createPhotoDiagnosisAction(formData: FormData) {
       visible_problems: result.data.visibleProblems,
       affected_parts: result.data.affectedParts,
       severity: result.data.severity,
-      causes: result.data.causes,
+      hypotheses: result.data.hypotheses,
       additional_checks: result.data.additionalChecks,
       estimated_repair_time: result.data.estimatedRepairTime,
       recommendations: result.data.recommendations,

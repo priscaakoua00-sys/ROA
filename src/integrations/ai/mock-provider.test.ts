@@ -139,6 +139,24 @@ describe('MockAIProvider', () => {
     }
   });
 
+  it('ranks matched-symptom hypotheses by probability, each with its own reasoning', async () => {
+    const result = await provider.diagnoseFromMedia({
+      language: 'en',
+      media: [],
+      note: 'Squealing noise when braking.',
+    });
+    expect(result.status).toBe('ok');
+    if (result.status === 'ok') {
+      expect(result.data.hypotheses.length).toBeGreaterThanOrEqual(2);
+      for (const h of result.data.hypotheses) {
+        expect(h.probabilityPercent).toBeGreaterThan(0);
+        expect(h.reasoning.length).toBeGreaterThan(0);
+      }
+      const sorted = [...result.data.hypotheses].sort((a, b) => b.probabilityPercent - a.probabilityPercent);
+      expect(result.data.hypotheses[0]?.cause).toBe(sorted[0]?.cause);
+    }
+  });
+
   it('falls back to an honest generic diagnosis when the note matches nothing', async () => {
     const result = await provider.diagnoseFromMedia({
       language: 'en',

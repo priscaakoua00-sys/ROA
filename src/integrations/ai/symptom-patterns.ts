@@ -1,4 +1,4 @@
-import type { DiagnosisSeverity } from './schemas';
+import type { DiagnosisHypothesis, DiagnosisSeverity } from './schemas';
 import type { SupportedLanguage } from './types';
 
 /**
@@ -10,7 +10,7 @@ import type { SupportedLanguage } from './types';
  */
 interface SymptomTemplate {
   keywords: Record<SupportedLanguage, string[]>;
-  causes: Record<SupportedLanguage, string[]>;
+  hypotheses: Record<SupportedLanguage, DiagnosisHypothesis[]>;
   affectedParts: Record<SupportedLanguage, string[]>;
   severity: DiagnosisSeverity;
   additionalChecks: Record<SupportedLanguage, string[]>;
@@ -25,10 +25,43 @@ const TEMPLATES: SymptomTemplate[] = [
       en: ['squeal', 'squeak', 'grinding', 'brake'],
       fr: ['grince', 'crisse', 'frein'],
     },
-    causes: {
-      nl: ['Versleten remblokken', 'Versleten of kromgetrokken remschijven'],
-      en: ['Worn brake pads', 'Worn or warped brake discs'],
-      fr: ['Plaquettes de frein usées', 'Disques de frein usés ou voilés'],
+    hypotheses: {
+      nl: [
+        {
+          cause: 'Versleten remblokken',
+          probabilityPercent: 60,
+          reasoning: 'Een hoog piepend geluid tijdens remmen is het klassieke signaal van een slijtage-indicator die de schijf raakt — verreweg de meest voorkomende oorzaak.',
+        },
+        {
+          cause: 'Versleten of kromgetrokken remschijven',
+          probabilityPercent: 30,
+          reasoning: 'Bij knarsen of een pulserend rempedaal zijn de blokken vaak al doorgesleten tot op de schijf zelf.',
+        },
+      ],
+      en: [
+        {
+          cause: 'Worn brake pads',
+          probabilityPercent: 60,
+          reasoning: "A high-pitched squeal while braking is the classic sound of a wear indicator contacting the disc — by far the most common cause.",
+        },
+        {
+          cause: 'Worn or warped brake discs',
+          probabilityPercent: 30,
+          reasoning: 'Grinding or a pulsing brake pedal usually means the pads have already worn through to the discs themselves.',
+        },
+      ],
+      fr: [
+        {
+          cause: 'Plaquettes de frein usées',
+          probabilityPercent: 60,
+          reasoning: "Un grincement aigu au freinage est le signe classique d'un témoin d'usure au contact du disque — de loin la cause la plus fréquente.",
+        },
+        {
+          cause: 'Disques de frein usés ou voilés',
+          probabilityPercent: 30,
+          reasoning: 'Un crissement ou une pédale de frein qui pulse indique souvent que les plaquettes sont déjà usées jusqu’au disque.',
+        },
+      ],
     },
     affectedParts: {
       nl: ['Remblokken', 'Remschijven', 'Remvloeistofsysteem'],
@@ -54,10 +87,58 @@ const TEMPLATES: SymptomTemplate[] = [
       en: ['warning light', 'check engine', 'dashboard light'],
       fr: ['voyant', 'témoin', 'check engine'],
     },
-    causes: {
-      nl: ['Een foutcode via de boordcomputer geeft de exacte oorzaak.'],
-      en: ["A fault code from the car's computer will confirm the exact cause."],
-      fr: ["Un code défaut via l'ordinateur de bord donnera la cause exacte."],
+    hypotheses: {
+      nl: [
+        {
+          cause: 'Lambdasonde of uitlaatgasgerelateerd probleem',
+          probabilityPercent: 30,
+          reasoning: 'Lambdasonde- en emissiegerelateerde storingen zijn de meest voorkomende trigger voor een motorlampje op moderne voertuigen.',
+        },
+        {
+          cause: 'Ontstekingsprobleem (bougies of spoelen)',
+          probabilityPercent: 25,
+          reasoning: 'Ontstekingsfouten door versleten bougies of een falende spoel komen vaak samen voor met een onregelmatig stationair toerental.',
+        },
+        {
+          cause: 'Losse of defecte tankdop',
+          probabilityPercent: 15,
+          reasoning: 'Een losse of versleten tankdop veroorzaakt een EVAP-foutcode en is de eenvoudigste oorzaak om als eerste uit te sluiten.',
+        },
+      ],
+      en: [
+        {
+          cause: 'Oxygen sensor or emissions-related fault',
+          probabilityPercent: 30,
+          reasoning: 'Oxygen sensor and emissions-system faults are the single most frequent trigger for a check-engine light on modern vehicles.',
+        },
+        {
+          cause: 'Ignition system issue (spark plugs or coils)',
+          probabilityPercent: 25,
+          reasoning: 'Misfires from worn spark plugs or a failing ignition coil are a common cause and often come with a rough idle.',
+        },
+        {
+          cause: 'Loose or faulty fuel cap',
+          probabilityPercent: 15,
+          reasoning: 'A loose or worn fuel cap triggers an EVAP fault code and is the simplest possible cause to rule out first.',
+        },
+      ],
+      fr: [
+        {
+          cause: 'Sonde lambda ou problème lié aux émissions',
+          probabilityPercent: 30,
+          reasoning: "Les défauts de sonde lambda et de système d'émissions sont le déclencheur le plus fréquent d'un voyant moteur sur un véhicule récent.",
+        },
+        {
+          cause: "Problème d'allumage (bougies ou bobines)",
+          probabilityPercent: 25,
+          reasoning: "Des ratés d'allumage dus à des bougies usées ou une bobine défaillante sont une cause fréquente, souvent accompagnée d'un ralenti irrégulier.",
+        },
+        {
+          cause: 'Bouchon de réservoir desserré ou défectueux',
+          probabilityPercent: 15,
+          reasoning: "Un bouchon de réservoir desserré ou usé déclenche un code défaut EVAP — la cause la plus simple à écarter en premier.",
+        },
+      ],
     },
     affectedParts: {
       nl: ['Bougies', 'Lambdasonde', 'Elektronica/sensoren'],
@@ -83,10 +164,58 @@ const TEMPLATES: SymptomTemplate[] = [
       en: ['leak', 'leaking', 'puddle', 'stain under'],
       fr: ['fuite', 'tache', 'flaque'],
     },
-    causes: {
-      nl: ['Lekkage van motorolie', 'Lekkage van koelvloeistof', 'Lekkage van remvloeistof'],
-      en: ['Engine oil leak', 'Coolant leak', 'Brake fluid leak'],
-      fr: ["Fuite d'huile moteur", 'Fuite de liquide de refroidissement', 'Fuite de liquide de frein'],
+    hypotheses: {
+      nl: [
+        {
+          cause: 'Lekkage van motorolie',
+          probabilityPercent: 50,
+          reasoning: 'Een motorolielek is de meest voorkomende bron van een vlek onder een geparkeerd voertuig.',
+        },
+        {
+          cause: 'Lekkage van koelvloeistof',
+          probabilityPercent: 30,
+          reasoning: 'Als de vlek helder groen, roze of blauw is in plaats van donker en olieachtig, wijst dat eerder op koelvloeistof.',
+        },
+        {
+          cause: 'Lekkage van remvloeistof',
+          probabilityPercent: 15,
+          reasoning: 'Minder vaak, maar met hoger risico: controleer op een heldere tot amberkleurige, licht olieachtige vloeistof bij een wiel of de hoofdremcilinder.',
+        },
+      ],
+      en: [
+        {
+          cause: 'Engine oil leak',
+          probabilityPercent: 50,
+          reasoning: 'Engine oil is the most common source of a stain under a parked vehicle.',
+        },
+        {
+          cause: 'Coolant leak',
+          probabilityPercent: 30,
+          reasoning: 'If the stain is bright green, pink, or blue rather than dark and oily, coolant is the more likely source.',
+        },
+        {
+          cause: 'Brake fluid leak',
+          probabilityPercent: 15,
+          reasoning: 'Less common but higher risk — check for a clear-to-amber, slightly oily fluid near a wheel or the master cylinder.',
+        },
+      ],
+      fr: [
+        {
+          cause: "Fuite d'huile moteur",
+          probabilityPercent: 50,
+          reasoning: "L'huile moteur est la source la plus fréquente d'une tache sous un véhicule garé.",
+        },
+        {
+          cause: 'Fuite de liquide de refroidissement',
+          probabilityPercent: 30,
+          reasoning: "Si la tache est vert vif, rose ou bleue plutôt que foncée et grasse, le liquide de refroidissement est plus probable.",
+        },
+        {
+          cause: 'Fuite de liquide de frein',
+          probabilityPercent: 15,
+          reasoning: "Moins fréquent mais plus à risque : vérifiez la présence d'un liquide clair à ambré, légèrement gras, près d'une roue ou du maître-cylindre.",
+        },
+      ],
     },
     affectedParts: {
       nl: ['Motorolie', 'Koelsysteem', 'Remvloeistofsysteem', 'Pakkingen'],
@@ -112,10 +241,58 @@ const TEMPLATES: SymptomTemplate[] = [
       en: ['noise', 'vibration', 'rattle', 'clunk', 'creak'],
       fr: ['bruit', 'vibration', 'cliquetis', 'craquement'],
     },
-    causes: {
-      nl: ['Los onderdeel', 'Versleten lager', 'Probleem met de ophanging'],
-      en: ['A loose part', 'A worn bearing', 'A suspension issue'],
-      fr: ['Une pièce desserrée', 'Un roulement usé', 'Un problème de suspension'],
+    hypotheses: {
+      nl: [
+        {
+          cause: 'Los onderdeel',
+          probabilityPercent: 45,
+          reasoning: 'Een los onderdeel (hitteschild, bevestiging) is de eenvoudigste en meest voorkomende bron van een ratelend geluid, vooral over hobbels.',
+        },
+        {
+          cause: 'Versleten lager',
+          probabilityPercent: 30,
+          reasoning: 'Een versleten wiellager geeft doorgaans een laag zoemend of knarsend geluid dat meeschaalt met de snelheid.',
+        },
+        {
+          cause: 'Probleem met de ophanging',
+          probabilityPercent: 20,
+          reasoning: 'Versleten rubbers of kogelgewrichten veroorzaken vaak een bonk-geluid tijdens bochten of remmen.',
+        },
+      ],
+      en: [
+        {
+          cause: 'A loose part',
+          probabilityPercent: 45,
+          reasoning: 'A loose part (heat shield, mounting bracket) is the simplest and most common source of a rattle, especially over bumps.',
+        },
+        {
+          cause: 'A worn bearing',
+          probabilityPercent: 30,
+          reasoning: 'A worn wheel bearing typically produces a low humming or grinding noise that scales with vehicle speed.',
+        },
+        {
+          cause: 'A suspension issue',
+          probabilityPercent: 20,
+          reasoning: 'Worn bushings or ball joints often cause a clunk during turning or braking.',
+        },
+      ],
+      fr: [
+        {
+          cause: 'Une pièce desserrée',
+          probabilityPercent: 45,
+          reasoning: "Une pièce desserrée (bouclier thermique, fixation) est la source la plus simple et la plus fréquente d'un cliquetis, surtout sur les bosses.",
+        },
+        {
+          cause: 'Un roulement usé',
+          probabilityPercent: 30,
+          reasoning: "Un roulement de roue usé produit en général un bourdonnement ou un grincement grave qui s'accentue avec la vitesse.",
+        },
+        {
+          cause: 'Un problème de suspension',
+          probabilityPercent: 20,
+          reasoning: "Des silentblocs ou rotules usés provoquent souvent un bruit sourd en virage ou au freinage.",
+        },
+      ],
     },
     affectedParts: {
       nl: ['Wiellagers', 'Ophanging', 'Uitlaatophanging'],
@@ -141,10 +318,58 @@ const TEMPLATES: SymptomTemplate[] = [
       en: ["won't start", 'battery', 'no power', "doesn't start"],
       fr: ['ne démarre pas', 'batterie', 'rien ne se passe'],
     },
-    causes: {
-      nl: ['Lege of verouderde accu', 'Startprobleem', 'Defecte dynamo'],
-      en: ['Flat or worn battery', 'Starting issue', 'Faulty alternator'],
-      fr: ['Batterie à plat ou usée', 'Problème de démarrage', 'Alternateur défectueux'],
+    hypotheses: {
+      nl: [
+        {
+          cause: 'Lege of verouderde accu',
+          probabilityPercent: 55,
+          reasoning: 'Een lege of versleten accu is verreweg de meest voorkomende reden dat een voertuig niet start, zeker bij kou of na lang stilstaan.',
+        },
+        {
+          cause: 'Startprobleem (startmotor)',
+          probabilityPercent: 25,
+          reasoning: 'Test de accu eerst goed; is die in orde, dan is een versleten startmotor (solenoïde of tandwielen) de volgende meest waarschijnlijke oorzaak.',
+        },
+        {
+          cause: 'Defecte dynamo',
+          probabilityPercent: 20,
+          reasoning: 'Een falende dynamo laadt de accu onvoldoende op en kan na verloop van tijd een accustoring nabootsen — controleren als de accu steeds weer leegloopt.',
+        },
+      ],
+      en: [
+        {
+          cause: 'Flat or worn battery',
+          probabilityPercent: 55,
+          reasoning: "A flat or worn battery is by far the most common reason a vehicle won't start, especially in cold weather or after sitting idle.",
+        },
+        {
+          cause: 'Starting issue (starter motor)',
+          probabilityPercent: 25,
+          reasoning: "If the battery tests fine, a worn starter motor (solenoid or gears) is the next most likely cause.",
+        },
+        {
+          cause: 'Faulty alternator',
+          probabilityPercent: 20,
+          reasoning: "A failing alternator undercharges the battery over time and can eventually mimic a battery failure — worth checking if the battery keeps going flat.",
+        },
+      ],
+      fr: [
+        {
+          cause: 'Batterie à plat ou usée',
+          probabilityPercent: 55,
+          reasoning: "Une batterie à plat ou usée est de loin la raison la plus fréquente pour laquelle un véhicule ne démarre pas, surtout par temps froid ou après un long arrêt.",
+        },
+        {
+          cause: 'Problème de démarreur',
+          probabilityPercent: 25,
+          reasoning: "Si la batterie est en bon état, un démarreur usé (solénoïde ou pignons) est la cause suivante la plus probable.",
+        },
+        {
+          cause: 'Alternateur défectueux',
+          probabilityPercent: 20,
+          reasoning: "Un alternateur défaillant recharge mal la batterie au fil du temps et peut finir par imiter une panne de batterie — à vérifier si la batterie se décharge sans cesse.",
+        },
+      ],
     },
     affectedParts: {
       nl: ['Accu', 'Startmotor', 'Dynamo'],
@@ -170,10 +395,43 @@ const TEMPLATES: SymptomTemplate[] = [
       en: ['overheating', 'running hot', "ac isn't cooling", 'ac not working'],
       fr: ['surchauffe', 'chauffe trop', 'clim ne refroidit pas'],
     },
-    causes: {
-      nl: ['Probleem met het koelsysteem', 'Probleem met de airco'],
-      en: ['Cooling system issue', 'Air conditioning issue'],
-      fr: ['Problème de refroidissement', 'Problème de climatisation'],
+    hypotheses: {
+      nl: [
+        {
+          cause: 'Probleem met het koelsysteem',
+          probabilityPercent: 65,
+          reasoning: 'Oververhitting wijst vrijwel altijd op een koelsysteemprobleem: laag koelvloeistofpeil, een falende thermostaat of een verstopte radiateur.',
+        },
+        {
+          cause: 'Probleem met de airco',
+          probabilityPercent: 35,
+          reasoning: 'Airco-problemen zijn meestal een koudemiddellek of een falende compressor, en staan meestal los van de motortemperatuur.',
+        },
+      ],
+      en: [
+        {
+          cause: 'Cooling system issue',
+          probabilityPercent: 65,
+          reasoning: 'Overheating almost always points to a cooling-system issue — low coolant, a failing thermostat, or a blocked radiator.',
+        },
+        {
+          cause: 'Air conditioning issue',
+          probabilityPercent: 35,
+          reasoning: 'AC issues are usually a refrigerant leak or a failing compressor, and are typically unrelated to engine temperature.',
+        },
+      ],
+      fr: [
+        {
+          cause: 'Problème de circuit de refroidissement',
+          probabilityPercent: 65,
+          reasoning: "Une surchauffe indique presque toujours un problème de refroidissement : niveau de liquide bas, thermostat défaillant ou radiateur bouché.",
+        },
+        {
+          cause: 'Problème de climatisation',
+          probabilityPercent: 35,
+          reasoning: "Les problèmes de clim sont généralement une fuite de fluide frigorigène ou un compresseur défaillant, sans lien avec la température moteur.",
+        },
+      ],
     },
     affectedParts: {
       nl: ['Koelvloeistof', 'Thermostaat', 'Airco-compressor'],
@@ -196,7 +454,7 @@ const TEMPLATES: SymptomTemplate[] = [
 ];
 
 export interface SymptomMatch {
-  causes: string[];
+  hypotheses: DiagnosisHypothesis[];
   affectedParts: string[];
   severity: DiagnosisSeverity;
   additionalChecks: string[];
@@ -210,7 +468,7 @@ export function matchSymptom(note: string, language: SupportedLanguage): Symptom
   const hit = TEMPLATES.find((t) => t.keywords[language].some((kw) => haystack.includes(kw)));
   if (!hit) return null;
   return {
-    causes: hit.causes[language],
+    hypotheses: hit.hypotheses[language],
     affectedParts: hit.affectedParts[language],
     severity: hit.severity,
     additionalChecks: hit.additionalChecks[language],

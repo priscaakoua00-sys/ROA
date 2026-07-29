@@ -29,7 +29,7 @@ import { TimelineList, type TimelineItemView } from '@/components/timeline/timel
 import { PhotoDiagnosisPanel, type DiagnosisRow } from '@/components/diagnosis/photo-diagnosis-panel';
 import { OversightPanel } from '@/components/work-orders/oversight-panel';
 import { loadLatestWorkOrderOversight } from '@/data/work-orders/oversight';
-import type { DiagnosisSeverity, VehicleAngle } from '@/integrations/ai';
+import type { DiagnosisHypothesis, DiagnosisSeverity, VehicleAngle } from '@/integrations/ai';
 import { formatDateTimeUTC } from '@/lib/datetime';
 import {
   WORK_ORDER_STATUSES,
@@ -134,7 +134,7 @@ export default async function WorkOrderDetailPage({
     supabase
       .from('photo_diagnoses')
       .select(
-        'id, note, visible_problems, affected_parts, severity, causes, additional_checks, estimated_repair_time, recommendations, created_at, diagnosis_media(storage_path, angle)',
+        'id, note, visible_problems, affected_parts, severity, hypotheses, additional_checks, estimated_repair_time, recommendations, created_at, diagnosis_media(storage_path, angle)',
       )
       .eq('work_order_id', id)
       .order('created_at', { ascending: false }),
@@ -172,7 +172,7 @@ export default async function WorkOrderDetailPage({
     visible_problems: string[];
     affected_parts: string[];
     severity: DiagnosisSeverity;
-    causes: string[];
+    hypotheses: DiagnosisHypothesis[];
     additional_checks: string[];
     estimated_repair_time: string | null;
     recommendations: string[];
@@ -203,7 +203,7 @@ export default async function WorkOrderDetailPage({
     visibleProblems: d.visible_problems,
     affectedParts: d.affected_parts,
     severity: d.severity,
-    causes: d.causes,
+    hypotheses: d.hypotheses,
     additionalChecks: d.additional_checks,
     estimatedRepairTime: d.estimated_repair_time,
     recommendations: d.recommendations,

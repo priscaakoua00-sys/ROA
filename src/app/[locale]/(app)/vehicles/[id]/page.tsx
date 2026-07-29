@@ -23,7 +23,7 @@ import { loadMaintenanceSuggestions } from '@/data/maintenance/list';
 import { HistorySummaryPanel } from '@/components/vehicles/history-summary-panel';
 import { loadVehicleHistorySummaries } from '@/data/vehicles/history-summary';
 import { TimelineList, type TimelineItemView } from '@/components/timeline/timeline-list';
-import type { DiagnosisSeverity, VehicleAngle } from '@/integrations/ai';
+import type { DiagnosisHypothesis, DiagnosisSeverity, VehicleAngle } from '@/integrations/ai';
 import { isExternalPhotoUrl } from '@/lib/utils';
 import { FlashToast } from '@/components/flash-toast';
 import { WORK_ORDER_STATUS_VARIANT, type WorkOrderStatus } from '@/lib/work-order-status';
@@ -105,7 +105,7 @@ export default async function VehicleDetailPage({
     supabase
       .from('photo_diagnoses')
       .select(
-        'id, note, visible_problems, affected_parts, severity, causes, additional_checks, estimated_repair_time, recommendations, created_at, diagnosis_media(storage_path, angle)',
+        'id, note, visible_problems, affected_parts, severity, hypotheses, additional_checks, estimated_repair_time, recommendations, created_at, diagnosis_media(storage_path, angle)',
       )
       .eq('vehicle_id', id)
       .order('created_at', { ascending: false }),
@@ -123,7 +123,7 @@ export default async function VehicleDetailPage({
     visible_problems: string[];
     affected_parts: string[];
     severity: DiagnosisSeverity;
-    causes: string[];
+    hypotheses: DiagnosisHypothesis[];
     additional_checks: string[];
     estimated_repair_time: string | null;
     recommendations: string[];
@@ -146,7 +146,7 @@ export default async function VehicleDetailPage({
     visibleProblems: d.visible_problems,
     affectedParts: d.affected_parts,
     severity: d.severity,
-    causes: d.causes,
+    hypotheses: d.hypotheses,
     additionalChecks: d.additional_checks,
     estimatedRepairTime: d.estimated_repair_time,
     recommendations: d.recommendations,

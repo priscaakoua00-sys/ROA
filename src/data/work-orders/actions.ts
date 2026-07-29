@@ -273,7 +273,7 @@ export async function generateRepairReportAction(formData: FormData) {
       .in('result', ['attention', 'fail']),
     supabase
       .from('photo_diagnoses')
-      .select('visible_problems, affected_parts, severity, causes, additional_checks, estimated_repair_time, recommendations')
+      .select('visible_problems, affected_parts, severity, hypotheses, additional_checks, estimated_repair_time, recommendations')
       .eq('work_order_id', woId),
   ]);
 
@@ -309,7 +309,7 @@ export async function generateRepairReportAction(formData: FormData) {
         visibleProblems: d.visible_problems,
         affectedParts: d.affected_parts,
         severity: d.severity as MediaDiagnosis['severity'],
-        causes: d.causes,
+        hypotheses: d.hypotheses,
         additionalChecks: d.additional_checks,
         estimatedRepairTime: d.estimated_repair_time ?? '',
         recommendations: d.recommendations,
