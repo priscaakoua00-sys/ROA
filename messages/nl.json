@@ -43,7 +43,12 @@
       "cta": "Garage aanmaken",
       "error": "Aanmaken mislukt. Probeer opnieuw.",
       "planLabel": "Kies uw formule",
-      "planHint": "30 dagen gratis, vandaag €0. U kunt op elk moment wijzigen."
+      "planHint": "30 dagen gratis, vandaag €0. U kunt op elk moment wijzigen.",
+      "startModeLabel": "Hoe wilt u beginnen?",
+      "startModeDemoTitle": "Ontdek ROAVAA met demogegevens",
+      "startModeDemoBody": "Klanten, voertuigen, afspraken, offertes, facturen en voorraad al ingevuld - meteen zien wat ROAVAA kan.",
+      "startModeRealTitle": "Direct met mijn eigen garage",
+      "startModeRealBody": "Begin met een lege garage en voer uw eigen gegevens in."
     },
     "businessType": {
       "garage": "Autogarage",
@@ -742,9 +747,15 @@
       "webhookSecretCreatedTitle": "Uw nieuwe webhook-secret",
       "webhookSecretCreatedIntro": "Kopieer dit nu — voor uw veiligheid wordt het niet meer getoond. Gebruik het om de X-Roavaa-Signature header van leveringen te verifiëren.",
       "webhookEvent": {
-        "lead": { "created": "Nieuwe lead" },
-        "work_order": { "status_changed": "Statuswijziging werkorder" },
-        "invoice": { "paid": "Factuur betaald" }
+        "lead": {
+          "created": "Nieuwe lead"
+        },
+        "work_order": {
+          "status_changed": "Statuswijziging werkorder"
+        },
+        "invoice": {
+          "paid": "Factuur betaald"
+        }
       },
       "apiDocsTitle": "API-referentie",
       "apiDocsIntro": "Stuur uw API-sleutel als Bearer-token in de Authorization-header mee.",
@@ -786,7 +797,18 @@
       "marginPercent": "Geschatte marge (%)",
       "marginPercentIntro": "Alleen gebruikt om uw winst op het dashboard te schatten — er worden geen echte kostengegevens vastgelegd.",
       "hourlyRate": "Uurtarief arbeid",
-      "hourlyRateIntro": "Gebruikt door Ruben AI om de arbeidsregel te prijzen bij het opstellen van een offerte vanuit een diagnose — altijd aan te passen voordat u verstuurt."
+      "hourlyRateIntro": "Gebruikt door Ruben AI om de arbeidsregel te prijzen bij het opstellen van een offerte vanuit een diagnose — altijd aan te passen voordat u verstuurt.",
+      "demoTitle": "Demogegevens",
+      "demoIntro": "Voorbeeldgegevens om ROAVAA te verkennen - klanten, voertuigen, werkorders, offertes en facturen.",
+      "demoActiveBadge": "Demogegevens actief",
+      "demoActiveNote": "Deze garage bevat nog demogegevens. Verwijder ze wanneer u klaar bent om met uw eigen klanten te werken.",
+      "demoDeleteCta": "Demogegevens verwijderen",
+      "demoDeleteConfirm": "Alle demoklanten, -voertuigen, -werkorders, -offertes en -facturen worden definitief verwijderd. Uw eigen gegevens blijven staan.",
+      "demoEmptyNote": "Deze garage heeft nog geen gegevens.",
+      "demoSeedCta": "Demogegevens laden",
+      "demoSeededToast": "Demogegevens toegevoegd.",
+      "demoDeletedToast": "Demogegevens verwijderd.",
+      "demoErrorToast": "Actie mislukt. Probeer opnieuw."
     },
     "knowledge": {
       "title": "Kennisbank",
