@@ -274,7 +274,19 @@ export class AnthropicAIProvider implements AIProvider {
           visibleProblems: { type: 'array', items: { type: 'string' }, minItems: 1 },
           affectedParts: { type: 'array', items: { type: 'string' } },
           severity: { type: 'string', enum: ['low', 'medium', 'high', 'urgent'] },
-          causes: { type: 'array', items: { type: 'string' }, minItems: 1 },
+          hypotheses: {
+            type: 'array',
+            minItems: 1,
+            items: {
+              type: 'object',
+              properties: {
+                cause: { type: 'string' },
+                probabilityPercent: { type: 'integer', minimum: 0, maximum: 100 },
+                reasoning: { type: 'string' },
+              },
+              required: ['cause', 'probabilityPercent', 'reasoning'],
+            },
+          },
           additionalChecks: { type: 'array', items: { type: 'string' } },
           estimatedRepairTime: { type: 'string' },
           recommendations: { type: 'array', items: { type: 'string' } },
@@ -283,7 +295,7 @@ export class AnthropicAIProvider implements AIProvider {
           'visibleProblems',
           'affectedParts',
           'severity',
-          'causes',
+          'hypotheses',
           'additionalChecks',
           'estimatedRepairTime',
           'recommendations',
@@ -306,10 +318,13 @@ export class AnthropicAIProvider implements AIProvider {
       .filter(Boolean)
       .join('\n');
 
+    const hypothesesInstruction =
+      "For hypotheses: list every plausible cause you can support from the evidence given, ranked most likely first. Give each one an honest probabilityPercent (0-100, they need not sum to 100) and a one-sentence reasoning that is GROUNDED in the specific symptoms/photos provided — never a generic template sentence. If you can only support one real hypothesis, return just that one rather than padding the list.";
+
     const systemPrompt =
       imageBlocks.length > 0
-        ? `You are Ruben, a technical assistant for a car garage's mechanics — never a replacement for their judgment. Look closely at the attached photos of a vehicle and produce a diagnosis report in ${LANGUAGE_NAME[input.language] ?? input.language}: what's visibly wrong, which parts look affected, a severity level, possible causes (most likely first), further checks the mechanic should do in person, an estimated repair time, and practical recommendations. If the photos genuinely don't show enough to say anything useful, say so honestly in visibleProblems rather than guessing.`
-        : `You are Ruben, a technical assistant for a car garage's mechanics — never a replacement for their judgment. No photos were provided, only the mechanic's written description of the symptoms below. Reason from that description alone and produce a diagnosis report in ${LANGUAGE_NAME[input.language] ?? input.language}: what the description suggests is wrong, which parts are likely affected, a severity level, possible causes (most likely first), further checks the mechanic should do in person, an estimated repair time, and practical recommendations. State in visibleProblems that this reading comes from the description, not a visual inspection. If the description is too vague to say anything useful, say so honestly rather than guessing.`;
+        ? `You are Ruben, a technical assistant for a car garage's mechanics — never a replacement for their judgment. Look closely at the attached photos of a vehicle and produce a diagnosis report in ${LANGUAGE_NAME[input.language] ?? input.language}: what's visibly wrong, which parts look affected, a severity level, ranked cause hypotheses with reasoning, further checks the mechanic should do in person, an estimated repair time, and practical recommendations. ${hypothesesInstruction} If the photos genuinely don't show enough to say anything useful, say so honestly in visibleProblems rather than guessing.`
+        : `You are Ruben, a technical assistant for a car garage's mechanics — never a replacement for their judgment. No photos were provided, only the mechanic's written description of the symptoms below. Reason from that description alone and produce a diagnosis report in ${LANGUAGE_NAME[input.language] ?? input.language}: what the description suggests is wrong, which parts are likely affected, a severity level, ranked cause hypotheses with reasoning, further checks the mechanic should do in person, an estimated repair time, and practical recommendations. ${hypothesesInstruction} State in visibleProblems that this reading comes from the description, not a visual inspection. If the description is too vague to say anything useful, say so honestly rather than guessing.`;
 
     const result = await this.callTool({
       system: systemPrompt,
@@ -373,7 +388,7 @@ export class AnthropicAIProvider implements AIProvider {
     const diagnosesText = input.diagnoses
       .map(
         (d, i) =>
-          `- [photo diagnosis ${i + 1}] severity ${d.severity}. Visible problems: ${d.visibleProblems.join('; ')}. Affected parts: ${d.affectedParts.join(', ') || 'none'}. Causes: ${d.causes.join('; ')}. Estimated repair time: ${d.estimatedRepairTime}.`,
+          `- [photo diagnosis ${i + 1}] severity ${d.severity}. Visible problems: ${d.visibleProblems.join('; ')}. Affected parts: ${d.affectedParts.join(', ') || 'none'}. Cause hypotheses: ${d.hypotheses.map((h) => `${h.cause} (${h.probabilityPercent}%)`).join('; ')}. Estimated repair time: ${d.estimatedRepairTime}.`,
       )
       .join('\n');
 

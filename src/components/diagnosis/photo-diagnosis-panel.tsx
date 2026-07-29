@@ -6,7 +6,7 @@ import { SubmitButton } from '@/components/ui/submit-button';
 import { Badge, type BadgeProps } from '@/components/ui/badge';
 import { formatDateTimeUTC } from '@/lib/datetime';
 import { TAGGED_VEHICLE_ANGLES } from '@/lib/vehicle-angles';
-import type { DiagnosisSeverity, VehicleAngle } from '@/integrations/ai';
+import type { DiagnosisHypothesis, DiagnosisSeverity, VehicleAngle } from '@/integrations/ai';
 
 export interface DiagnosisMedia {
   url: string;
@@ -19,7 +19,7 @@ export interface DiagnosisRow {
   visibleProblems: string[];
   affectedParts: string[];
   severity: DiagnosisSeverity;
-  causes: string[];
+  hypotheses: DiagnosisHypothesis[];
   additionalChecks: string[];
   estimatedRepairTime: string | null;
   recommendations: string[];
@@ -208,7 +208,7 @@ function DiagnosisCard({
 
       <ReportSection label={t('visibleProblems')} items={diagnosis.visibleProblems} />
       <ReportSection label={t('affectedParts')} items={diagnosis.affectedParts} chips />
-      <ReportSection label={t('causes')} items={diagnosis.causes} />
+      <HypothesesSection label={t('causes')} hypotheses={diagnosis.hypotheses} />
       <ReportSection label={t('additionalChecks')} items={diagnosis.additionalChecks} />
 
       {diagnosis.estimatedRepairTime ? (
@@ -237,6 +237,29 @@ function DiagnosisCard({
         {t('disclaimer')}
       </p>
     </li>
+  );
+}
+
+function HypothesesSection({ label, hypotheses }: { label: string; hypotheses: DiagnosisHypothesis[] }) {
+  if (hypotheses.length === 0) return null;
+  const sorted = [...hypotheses].sort((a, b) => b.probabilityPercent - a.probabilityPercent);
+  return (
+    <div className="mt-2">
+      <p className="text-xs font-medium text-muted-foreground">{label}</p>
+      <ul className="mt-1 space-y-1.5">
+        {sorted.map((h) => (
+          <li key={h.cause} className="rounded-md border border-border/70 bg-background/60 px-2.5 py-1.5">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-sm font-medium">{h.cause}</span>
+              <span className="shrink-0 rounded-full bg-gold/15 px-2 py-0.5 text-xs font-semibold text-gold">
+                {h.probabilityPercent}%
+              </span>
+            </div>
+            <p className="mt-0.5 text-xs text-muted-foreground">{h.reasoning}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 

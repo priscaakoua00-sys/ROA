@@ -60,14 +60,24 @@ export type LanguageDetection = z.infer<typeof languageDetectionSchema>;
 export const diagnosisSeveritySchema = z.enum(['low', 'medium', 'high', 'urgent']);
 export type DiagnosisSeverity = z.infer<typeof diagnosisSeveritySchema>;
 
+export const diagnosisHypothesisSchema = z.object({
+  /** e.g. "Worn brake pads". */
+  cause: z.string().min(1),
+  /** Rough confidence this is the actual cause, 0-100. Hypotheses need not sum to 100. */
+  probabilityPercent: z.number().int().min(0).max(100),
+  /** Why this hypothesis follows from the given symptoms/photos — grounded, not generic. */
+  reasoning: z.string().min(1),
+});
+export type DiagnosisHypothesis = z.infer<typeof diagnosisHypothesisSchema>;
+
 export const mediaDiagnosisSchema = z.object({
   /** What's visibly wrong across the attached photos. */
   visibleProblems: z.array(z.string()).min(1),
   /** Parts that look potentially damaged or worn. */
   affectedParts: z.array(z.string()),
   severity: diagnosisSeveritySchema,
-  /** Possible causes, most likely first. */
-  causes: z.array(z.string()).min(1),
+  /** Possible causes, ranked most likely first, each with its own probability and reasoning. */
+  hypotheses: z.array(diagnosisHypothesisSchema).min(1),
   /** Further checks the mechanic should do in person to confirm. */
   additionalChecks: z.array(z.string()),
   /** Human-readable estimate, e.g. "1-2 hours". */

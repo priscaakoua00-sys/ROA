@@ -211,7 +211,13 @@ export class MockAIProvider implements AIProvider {
         visibleProblems: honestVisibleProblems.nl,
         affectedParts: [],
         severity: 'medium',
-        causes: ['Op basis van de foto’s alleen is nog geen precieze oorzaak te geven. Bekijk de foto’s zelf, of voeg een korte omschrijving toe.'],
+        hypotheses: [
+          {
+            cause: 'Onbekend zonder verdere informatie',
+            probabilityPercent: 20,
+            reasoning: 'Op basis van de foto’s alleen is nog geen precieze oorzaak te geven. Bekijk de foto’s zelf, of voeg een korte omschrijving toe.',
+          },
+        ],
         additionalChecks: [
           'Voertuig visueel inspecteren aan de hand van de foto’s.',
           'Klant om meer details vragen indien nodig.',
@@ -223,7 +229,13 @@ export class MockAIProvider implements AIProvider {
         visibleProblems: honestVisibleProblems.en,
         affectedParts: [],
         severity: 'medium',
-        causes: ["The photos alone aren't enough for a precise cause yet. Take a look yourself, or add a short note."],
+        hypotheses: [
+          {
+            cause: 'Unknown without more information',
+            probabilityPercent: 20,
+            reasoning: "The photos alone aren't enough for a precise cause yet. Take a look yourself, or add a short note.",
+          },
+        ],
         additionalChecks: [
           'Inspect the vehicle visually using the photos.',
           'Ask the customer for more detail if needed.',
@@ -235,7 +247,13 @@ export class MockAIProvider implements AIProvider {
         visibleProblems: honestVisibleProblems.fr,
         affectedParts: [],
         severity: 'medium',
-        causes: ["Les photos seules ne suffisent pas encore pour une cause précise. Jetez-y un œil, ou ajoutez une courte note."],
+        hypotheses: [
+          {
+            cause: 'Inconnu sans plus d’informations',
+            probabilityPercent: 20,
+            reasoning: "Les photos seules ne suffisent pas encore pour une cause précise. Jetez-y un œil, ou ajoutez une courte note.",
+          },
+        ],
         additionalChecks: [
           'Inspecter le véhicule visuellement à partir des photos.',
           'Demander plus de détails au client si nécessaire.',
@@ -250,7 +268,7 @@ export class MockAIProvider implements AIProvider {
           visibleProblems: honestVisibleProblems[input.language],
           affectedParts: match.affectedParts,
           severity: match.severity,
-          causes: match.causes,
+          hypotheses: match.hypotheses,
           additionalChecks: match.additionalChecks,
           estimatedRepairTime: match.estimatedRepairTime,
           recommendations: match.recommendations,
@@ -294,7 +312,7 @@ export class MockAIProvider implements AIProvider {
         ? d.affectedParts.map((part) => ({
             label: part,
             urgency: d.severity,
-            reason: d.causes[0] ?? d.recommendations[0] ?? '',
+            reason: d.hypotheses[0]?.cause ?? d.recommendations[0] ?? '',
           }))
         : [],
     );
