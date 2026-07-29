@@ -37,36 +37,59 @@ toute impression ou lancement public.
   questions frequentes, regles de securite.
 - Relances (automatisations): Roavaa calcule quoi faire aujourd'hui (rappels de
   rendez-vous, demandes sans reponse, suivi apres reparation, reactivation) avec
-  un message propose. L'envoi est manuel pour l'instant.
+  un message propose. L'envoi est manuel (voir section 2).
+- Devis: creation, lignes, TVA, conversion depuis un diagnostic, PDF (3 langues),
+  lien public d'acceptation/refus avec preuve horodatee + IP, verrouillage apres
+  reponse du client, conversion en ordre de reparation ou facture.
+- Factures: numerotation par garage, mentions legales (KvK, TVA), lignes,
+  paiement en ligne Stripe, rappels de paiement par e-mail, statuts.
+- Stock / pieces: entrees/sorties, alerte stock faible, cout vs prix de vente
+  jamais expose au client, protection contre le stock negatif.
+- Rapports: chiffre d'affaires reel (pas les devis), export PDF/CSV, filtres
+  par periode.
+- Vehicules: recherche par plaque (RDW), estimation de valeur indicative.
+- Multi-garage, 2FA, journal d'activite, portail client (lien magique), API
+  publique + webhooks sortants, carte de visite numerique, signature e-mail
+  automatique, mode demonstration (donnees realistes a la creation du compte).
 - Parametres: nom et langue du garage, horaires d'ouverture jour par jour,
-  services (duree, tampon, actif).
-- International NL / EN / FR partout. 41 tests. Quatre controles verts:
-  typecheck, lint, tests, build.
+  services (duree, tampon, actif) — reserve aux roles proprietaire/admin/manager.
+- International NL / EN / FR partout. **121 tests unitaires** (19 fichiers, 30
+  suites) + **26 tests e2e Playwright**. Quatre controles verts: typecheck,
+  lint, tests, build.
 
 ## 2. Ce qui est SIMULE ou pas encore connecte (a dire au testeur)
 
-- IA: fournisseur SIMULE (mock deterministe). Les resumes, urgences et brouillons
-  sont generes localement, PAS par un vrai modele. Aucune reponse n'est envoyee
-  automatiquement. Pour une vraie IA: brancher un fournisseur (cle + budget).
-- Canaux WhatsApp / e-mail / telephone: NON connectes. Le formulaire public et le
-  fil web fonctionnent. "Envoyer" une reponse enregistre le message, il n'est pas
-  livre au client.
-- Invitation d'employe: creee en base, mais l'e-mail d'invitation n'est pas
-  envoye. L'employe ne peut pas encore accepter via un lien.
-- Relances: proposees, mais envoyees a la main (l'envoi automatique attendra
-  l'e-mail).
-- Devis, factures, paiements, abonnements: pas construits.
-- Fuseau horaire: gere en heure locale simple pour le pilote (coherent a l'ecran).
+- IA: un vrai fournisseur (Anthropic) est actif des que `ANTHROPIC_API_KEY` est
+  definie ; sinon, un mock deterministe prend le relais pour le developpement.
+  Aucun diagnostic ni devis IA n'est jamais envoye sans validation humaine.
+- Canaux WhatsApp / telephone: NON connectes — aucune integration API, seulement
+  un lien manuel `wa.me` (l'utilisateur ouvre lui-meme son WhatsApp). L'e-mail
+  transactionnel (Resend), lui, est reellement connecte : devis, factures,
+  rappels de paiement/devis et invitations d'equipe partent reellement.
+- Invitation d'employe: un e-mail reel est envoye ET l'employe qui cree son
+  compte avec la meme adresse rejoint automatiquement le bon garage (corrige).
+- Relances: propositions uniquement — l'IA ne redige jamais rien qui parte
+  seul, un humain envoie toujours.
+- Abonnements Stripe: le parcours complet (checkout, activation, renouvellement,
+  annulation, webhooks idempotents) est construit et fonctionnel, mais
+  desactive commercialement pendant le lancement (`LAUNCH_FREE`).
+- Fuseau horaire: heure locale coherente a l'ecran (pas de vrai calcul IANA
+  Europe/Amsterdam avec DST) — suffisant pour l'usage actuel, a corriger avant
+  une expansion internationale.
 
 ## 3. Securite
 
-- RLS activee sur les 17 tables. Isolation par organisation via une fonction
-  securisee (current_user_org_ids). Un utilisateur ne voit que ses garages.
+- RLS activee sur les 48 tables (aucune exception). Isolation par organisation
+  via une fonction securisee (current_user_org_ids), et les ecritures les plus
+  sensibles (clients, vehicules, devis, factures, stock, ordres de reparation,
+  parametres du garage) sont en plus filtrees par role via role_has().
 - Fonctions SECURITY DEFINER limitees et intentionnelles: create_organization,
   submit_public_request, public_org_display, org_members, current_user_org_ids,
-  current_user_role. Le controle Supabase les signale comme "callable": c'est
-  VOULU (elles doivent etre appelables pour creer un garage, recevoir une demande
-  publique, afficher le nom public et evaluer les droits). Aucune erreur bloquante.
+  current_user_role, role_has, et les fonctions publiques dediees aux devis/
+  factures/portail client. Le controle Supabase les signale comme "callable":
+  c'est VOULU pour celles-ci (elles doivent etre appelables pour creer un
+  garage, recevoir une demande publique, afficher le nom public et evaluer les
+  droits). Aucune erreur bloquante.
 - Anti-spam: champ piege (honeypot) sur le formulaire public.
 - Ecrans d'erreur et 404 propres et multilingues.
 

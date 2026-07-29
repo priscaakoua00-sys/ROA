@@ -1,46 +1,92 @@
 # Roadmap
 
+> Corrected 2026-07-29 after a full audit (see `docs/AUDIT_REPORT.md`) found
+> this file badly out of date — it described an early Phase-1 snapshot while
+> quotes, invoices, reports, automations, settings, and subscriptions were all
+> already built and connected.
+
 ## Phase 1: Core business (DONE) ✅
 
-Complete and connected to a live Supabase database:
-
 - Authentication (sign up / in / out, forgot + reset password, email callback,
-  sessions, route protection, state-based redirects).
-- Organizations + multi-tenant model; **RLS on all 15 tables**; org isolation via
-  `current_user_org_ids()`.
-- Onboarding (create garage, default hours + default service seeded).
-- Customers, vehicles, full history per customer.
-- Leads: public request form, deterministic emergency detection, AI qualification
-  (summary / urgency / missing fields), dashboard, lead detail.
-- Team: members, invitations (pending), roles, enable / disable; assign a mechanic.
-- Appointments: availability engine (never proposes an occupied slot), proposed
-  slots, booking, agenda.
-- Work orders: create from a lead, status, assignee, task checklist.
+  sessions, route protection, rate limiting, state-based redirects).
+- Organizations + multi-tenant model; **RLS on every table** (48 at last
+  count), role-gated writes via `role_has()`, org isolation via
+  `current_user_org_ids()`. Multi-garage accounts supported.
+- Onboarding (create garage, default hours + default service seeded, choice of
+  demo data or a real empty start).
+- Customers, vehicles (RDW plate lookup, indicative valuation), full history.
+- Leads: public request form, deterministic emergency detection, AI
+  qualification, dashboard, lead detail.
+- Team: members, invitations (real email, auto-joins the right garage on
+  signup), roles, enable / disable; assign a mechanic.
+- Appointments: availability engine, proposed slots, booking, agenda.
+- Work orders: 13-stage workflow, checklists (gated before "delivered"),
+  task assignment.
 - Conversations: thread + AI-drafted reply (human validates and sends).
 - Dashboard with real counts + notifications.
-- i18n NL / EN / FR. 37 tests. Four green checks.
+- i18n NL / EN / FR. **121 unit tests** (19 files, 30 suites) + **26
+  Playwright e2e tests**. Four green checks: typecheck, lint, test, build.
 
-## Phase 2: Real intelligence (PENDING)
+## Phase 2: Real intelligence (DONE) ✅
 
-- Real AI provider behind the existing `AIProvider` interface (needs API key +
-  budget). Today the default is `MockAIProvider` (deterministic, offline).
-- Learning from human corrections; per-org preferences; prompt versioning.
-- Business knowledge base (global / industry / organization scopes).
+- Real `AnthropicAIProvider` behind the `AIProvider` interface, auto-selected
+  whenever `ANTHROPIC_API_KEY` is set; `MockAIProvider` remains the
+  deterministic dev-only fallback, never silently used in place of a
+  configured real provider.
+- Learning loop: `repair_outcomes` capture per delivered work order, fed back
+  into future diagnoses as ranked hypotheses with probability + reasoning.
+- Business knowledge base (per-organization articles: common failures, repair
+  times, parts, FAQ, safety rules).
+- Remaining: no admin-facing indicator of which provider is currently active,
+  and `ai_usage_log` doesn't yet record a prompt-version field — both tracked
+  as follow-up work.
 
-## Phase 3: Connections (PENDING)
+## Phase 3: Connections (PARTIALLY DONE)
 
-- Real message delivery (today "send" only stores the message).
-- At least one real channel first: **email** or **WhatsApp**. Then phone / SMS.
-- Employee invitation emails (accept via link).
-- Notification delivery (email), calendar sync.
-- Each channel needs an account + keys + budget.
+- Real email delivery (Resend): quotes, invoice payment reminders, quote
+  reminders, and team invitations all send a real message today.
+- Employee invitation emails: done, including auto-join on signup.
+- Notification delivery: in-app only; email digest not built.
+- **Still not connected**: WhatsApp and phone/SMS have no API integration at
+  all — only a manual `wa.me` click-to-chat link exists. Client-facing
+  automations (appointment reminders, follow-ups, reactivation) remain
+  AI-drafted suggestions that a human must send; nothing auto-sends to a
+  customer today. Calendar sync with an external calendar is not built.
 
-## Phase 4: Advanced modules (PENDING)
+## Phase 4: Advanced modules (DONE) ✅
 
-- Quotes, invoices, reports, advanced statistics.
-- Automations and real follow-ups (reminders, unanswered requests).
-- Full garage settings.
-- Subscriptions and payments.
+- Quotes: full lifecycle (create, line items, VAT, PDF in 3 languages, public
+  accept/refuse link with IP + timestamp proof, locked after response,
+  conversion to work order/invoice). No archive/soft-delete yet.
+- Invoices: numbering, Dutch legal fields, line items, Stripe online payment,
+  payment reminders, audit-logged status changes; "paid" only reachable
+  through an action that records a real payment.
+- Reports: real revenue (paid amounts, not quotes), PDF/CSV export, period
+  filters.
+- Automations: daily suggestions (reminders, no-response follow-up,
+  post-repair follow-up, reactivation) — advisory only, see Phase 3.
+- Full garage settings: company identity, hours, services, checklist
+  templates — writes now require owner/admin/manager (`role_has`), reads stay
+  open to every member who needs them to do their job.
+- Subscriptions: Stripe checkout, activation, renewal, cancellation, and
+  idempotent webhooks are all built and working; billing is commercially
+  disabled during launch (`LAUNCH_FREE`), which is a deliberate business
+  decision, not a technical gap.
+
+## Phase 5: Remaining gaps (tracked, not yet done)
+
+- WhatsApp/phone integration (would need a real provider account + budget —
+  none exists today).
+- Auto-sending client-facing automations once a channel above is chosen.
+- True IANA-timezone-aware appointment scheduling (Europe/Amsterdam with real
+  DST handling) — today's naive wall-clock approach is correct for
+  Netherlands-only use but should be fixed before any international/DST-edge
+  expansion.
+- GDPR self-service data export/deletion (today handled by contacting
+  `privacy@roavaa.com`).
+- Admin-facing "which AI provider is active" indicator + `ai_usage_log`
+  prompt-version tracking.
+- Quote archive/soft-delete.
 
 ## After the garage vertical is stable
 
@@ -50,5 +96,6 @@ The architecture stays the same; only the domain "brain" changes. The
 
 ## Recommended next step
 
-Real AI + one real channel (email or WhatsApp) + a full test with the first
-garage using non-sensitive data.
+Pick and connect one real customer-facing channel beyond email (WhatsApp is
+the natural next step for this market) before turning automations from
+suggestions into real auto-sends.
