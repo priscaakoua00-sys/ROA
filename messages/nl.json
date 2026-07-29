@@ -1245,7 +1245,8 @@
       "resetSent": "Als dit e-mailadres bestaat, is er een herstellink verstuurd."
     },
     "errors": {
-      "generic": "Er ging iets mis. Controleer uw gegevens en probeer opnieuw."
+      "generic": "Er ging iets mis. Controleer uw gegevens en probeer opnieuw.",
+      "rateLimited": "Te veel pogingen. Wacht enkele minuten en probeer het opnieuw."
     }
   },
   "request": {

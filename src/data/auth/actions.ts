@@ -3,6 +3,8 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { getClientIp } from '@/lib/client-ip';
 import {
   requestResetSchema,
   signInSchema,
@@ -32,6 +34,10 @@ export async function signInAction(formData: FormData) {
     password: formData.get('password'),
   });
   if (!parsed.success) redirect(`/${locale}/login?error=invalid`);
+
+  const ip = await getClientIp();
+  const allowed = await checkRateLimit(`login:${ip}:${parsed.data.email}`, 8, 15 * 60);
+  if (!allowed) redirect(`/${locale}/login?error=rate_limited`);
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
@@ -90,6 +96,12 @@ export async function requestResetAction(formData: FormData) {
   const locale = localeOf(formData);
   const parsed = requestResetSchema.safeParse({ email: formData.get('email') });
   if (!parsed.success) redirect(`/${locale}/forgot-password?error=invalid`);
+
+  const ip = await getClientIp();
+  const allowed = await checkRateLimit(`password-reset:${ip}:${parsed.data.email}`, 5, 15 * 60);
+  // Report success even when rate-limited — same "never reveal whether the
+  // email exists" reasoning applies to "you're sending too many of these".
+  if (!allowed) redirect(`/${locale}/forgot-password?message=sent`);
 
   const supabase = await createSupabaseServerClient();
   const origin = await originUrl();

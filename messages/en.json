@@ -1245,7 +1245,8 @@
       "resetSent": "If that email exists, a reset link has been sent."
     },
     "errors": {
-      "generic": "Something went wrong. Check your details and try again."
+      "generic": "Something went wrong. Check your details and try again.",
+      "rateLimited": "Too many attempts. Please wait a few minutes and try again."
     }
   },
   "request": {
