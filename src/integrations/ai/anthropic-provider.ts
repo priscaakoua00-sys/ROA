@@ -311,15 +311,25 @@ export class AnthropicAIProvider implements AIProvider {
       .map((m, i) => (m.angle ? `Photo ${i + 1}: ${m.angle}.` : null))
       .filter(Boolean)
       .join(' ');
+    const pastOutcomesText =
+      input.pastOutcomes && input.pastOutcomes.length > 0
+        ? `\nThis vehicle's repair history (most recent first):\n${input.pastOutcomes
+            .map(
+              (o, i) =>
+                `- [visit ${i + 1}, ${o.daysAgo} day(s) ago] symptoms: ${o.symptoms.join('; ') || 'none recorded'}. diagnosis at the time: ${o.hypotheses.map((h) => `${h.cause} (${h.probabilityPercent}%)`).join('; ') || 'none recorded'}. parts replaced: ${o.partsReplaced.join(', ') || 'none'}.`,
+            )
+            .join('\n')}`
+        : '';
     const textParts = [
       angleNote,
       input.note ? `Mechanic's note: ${input.note}` : 'The mechanic did not add a note.',
+      pastOutcomesText,
     ]
       .filter(Boolean)
       .join('\n');
 
     const hypothesesInstruction =
-      "For hypotheses: list every plausible cause you can support from the evidence given, ranked most likely first. Give each one an honest probabilityPercent (0-100, they need not sum to 100) and a one-sentence reasoning that is GROUNDED in the specific symptoms/photos provided — never a generic template sentence. If you can only support one real hypothesis, return just that one rather than padding the list.";
+      "For hypotheses: list every plausible cause you can support from the evidence given, ranked most likely first. Give each one an honest probabilityPercent (0-100, they need not sum to 100) and a one-sentence reasoning that is GROUNDED in the specific symptoms/photos provided — never a generic template sentence. If you can only support one real hypothesis, return just that one rather than padding the list. If this vehicle's repair history is given below and a current symptom or affected part matches something already treated on a past visit, say so explicitly in that hypothesis's reasoning and weight it higher — a recurrence is a strong signal, not a coincidence.";
 
     const systemPrompt =
       imageBlocks.length > 0

@@ -86,12 +86,26 @@ export interface DiagnosisMediaItem {
   angle?: VehicleAngle;
 }
 
+/**
+ * One past repair on this same vehicle, from the learning knowledge base
+ * (repair_outcomes) — used to sharpen a new diagnosis's hypotheses: a
+ * recurring symptom or a part already replaced once is a strong signal.
+ */
+export interface PastRepairOutcomeInput {
+  daysAgo: number;
+  symptoms: string[];
+  hypotheses: { cause: string; probabilityPercent: number }[];
+  partsReplaced: string[];
+}
+
 export interface MediaDiagnosisInput {
   language: SupportedLanguage;
   /** 1-8 items describing the same vehicle/problem, optionally from different angles. */
   media: DiagnosisMediaItem[];
   /** Optional short note the mechanic typed alongside the media. */
   note?: string;
+  /** This vehicle's past repair outcomes, most recent first, if any are on record. */
+  pastOutcomes?: PastRepairOutcomeInput[];
 }
 
 /** One inspection checklist item that needed attention, as filled in by the mechanic. */

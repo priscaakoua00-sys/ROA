@@ -8,6 +8,7 @@ import type {
   LeadSummaryInput,
   MaintenanceSuggestionInput,
   MediaDiagnosisInput,
+  PastRepairOutcomeInput,
   QuoteDraftInput,
   RepairReportInput,
   SupportedLanguage,
@@ -28,6 +29,7 @@ import {
   vehicleHistorySummarySchema,
   workOrderOversightReportSchema,
   type AssistantAnswer,
+  type DiagnosisHypothesis,
   type DraftedReply,
   type LanguageDetection,
   type LeadSummary,
@@ -42,6 +44,44 @@ import {
 } from './schemas';
 import { findEmergencyKeywords } from './emergency-keywords';
 import { matchSymptom } from './symptom-patterns';
+
+const RECURRENCE_NOTE: Record<SupportedLanguage, (daysAgo: number) => string> = {
+  nl: (daysAgo) =>
+    ` Dit komt overeen met een eerder bezoek ${daysAgo} dag(en) geleden waarbij hetzelfde probleem of onderdeel al aan bod kwam — dit verhoogt de waarschijnlijkheid.`,
+  en: (daysAgo) =>
+    ` This matches a previous visit ${daysAgo} day(s) ago where the same issue or part was already involved — raising the confidence here.`,
+  fr: (daysAgo) =>
+    ` Cela correspond à une visite précédente il y a ${daysAgo} jour(s) où le même problème ou la même pièce était déjà concerné(e) — ce qui renforce cette hypothèse.`,
+};
+
+/**
+ * The learning-loop step: if a hypothesis matches something already seen on
+ * this vehicle's repair history (repair_outcomes), boost its confidence and
+ * say why — this is what makes the diagnosis measurably sharper the more
+ * the garage uses it, instead of treating every visit as a blank slate.
+ */
+function applyPastOutcomes(
+  hypotheses: DiagnosisHypothesis[],
+  pastOutcomes: PastRepairOutcomeInput[],
+  language: SupportedLanguage,
+): DiagnosisHypothesis[] {
+  if (pastOutcomes.length === 0) return hypotheses;
+  return hypotheses.map((h) => {
+    const causeLower = h.cause.toLowerCase();
+    const match = pastOutcomes.find(
+      (o) =>
+        o.hypotheses.some(
+          (ph) => causeLower.includes(ph.cause.toLowerCase()) || ph.cause.toLowerCase().includes(causeLower),
+        ) || o.partsReplaced.some((p) => causeLower.includes(p.toLowerCase()) || p.toLowerCase().includes(causeLower)),
+    );
+    if (!match) return h;
+    return {
+      ...h,
+      probabilityPercent: Math.min(95, h.probabilityPercent + 15),
+      reasoning: h.reasoning + RECURRENCE_NOTE[language](match.daysAgo),
+    };
+  });
+}
 
 /**
  * Deterministic, offline provider used for local dev, tests and CI.
@@ -274,6 +314,7 @@ export class MockAIProvider implements AIProvider {
           recommendations: match.recommendations,
         }
       : fallback[input.language];
+    diagnosis.hypotheses = applyPastOutcomes(diagnosis.hypotheses, input.pastOutcomes ?? [], input.language);
 
     return {
       status: 'ok',
