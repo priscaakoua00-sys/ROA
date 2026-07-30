@@ -204,6 +204,12 @@ export default async function AgendaPage({
     for (const r of rules ?? []) {
       (rulesByWeekday[r.weekday] ??= []).push({ start: r.start_time, end: r.end_time });
     }
+    const { data: timeOff } = await supabase
+      .from('time_off')
+      .select('starts_at, ends_at')
+      .eq('organization_id', orgId)
+      .lt('starts_at', `${selectedDay}T23:59:59.999Z`)
+      .gt('ends_at', `${selectedDay}T00:00:00.000Z`);
     // "AI slot suggestion": free slots on this day given real opening hours and
     // real bookings, sized to the garage's first active service. Deterministic,
     // not a guess — same engine already used on the lead detail page.
@@ -211,7 +217,10 @@ export default async function AgendaPage({
       fromUTC: new Date(`${selectedDay}T00:00:00.000Z`),
       days: 1,
       rulesByWeekday,
-      appointments: selectedAppts.map((a) => ({ start: new Date(a.starts_at), end: new Date(a.ends_at) })),
+      appointments: [...selectedAppts, ...(timeOff ?? [])].map((a) => ({
+        start: new Date(a.starts_at),
+        end: new Date(a.ends_at),
+      })),
       durationMin: services[0]?.duration_minutes ?? 60,
       bufferMin: services[0]?.buffer_minutes ?? 0,
       maxPerDay: 8,

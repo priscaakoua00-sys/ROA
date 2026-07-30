@@ -824,7 +824,19 @@
       "signatureCopy": "Kopieer",
       "signatureCopied": "Gekopieerd",
       "apiKeyRevokeConfirmPassword": "Bevestig met wachtwoord",
-      "apiKeyRevokeWrongPassword": "Onjuist wachtwoord — de sleutel is niet ingetrokken."
+      "apiKeyRevokeWrongPassword": "Onjuist wachtwoord — de sleutel is niet ingetrokken.",
+      "privacyTitle": "Jouw gegevens",
+      "privacyIntro": "Exporteer alles wat we over je account bewaren, of vraag verwijdering aan volgens de AVG.",
+      "privacyExport": "Exporteer mijn gegevens",
+      "privacyDeleteRequest": "Verwijder mijn account",
+      "privacyDeleteConfirmTitle": "Account verwijderen?",
+      "privacyDeleteConfirmBody": "Je wordt direct verwijderd uit elke organisatie waar je lid van bent. Ben je eigenaar van een garage-organisatie, dan kunnen we je account pas verwijderen nadat het eigenaarschap is overgedragen of de organisatie is gesloten — neem daarvoor contact op met privacy@roavaa.com. Anders wordt je account binnen enkele dagen definitief verwijderd.",
+      "privacyDeleteConfirmConfirm": "Ja, verwijder mijn account",
+      "privacyDeletePending": "Je account staat gepland voor verwijdering. Dit kan enkele dagen duren.",
+      "privacyDeleteBlockedOwner": "We hebben je verzoek genoteerd, maar je bent nog eigenaar van een organisatie — verwijdering is on hold totdat het eigenaarschap is overgedragen of de organisatie is gesloten. Neem contact op met privacy@roavaa.com om verder te gaan.",
+      "privacyDeleteCancel": "Verzoek annuleren",
+      "privacyDeleteRequestedToast": "Verwijderingsverzoek ontvangen.",
+      "privacyDeleteCancelledToast": "Verwijderingsverzoek geannuleerd."
     },
     "knowledge": {
       "title": "Kennisbank",

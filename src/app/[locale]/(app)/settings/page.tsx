@@ -45,6 +45,7 @@ import { FlashToast } from '@/components/flash-toast';
 import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button';
 import { PlanFeatureList } from '@/components/pricing/plan-feature-list';
 import { seedDemoDataAction, deleteDemoDataAction } from '@/data/demo/actions';
+import { requestAccountDeletionAction, cancelAccountDeletionAction } from '@/data/account/actions';
 import { EmailSignaturePreview } from '@/components/settings/email-signature-preview';
 import { buildEmailSignatureHtml, buildEmailSignatureText } from '@/lib/email-signature';
 import { SITE_URL } from '@/lib/site';
@@ -80,11 +81,24 @@ export default async function SettingsPage({
     newApiKey?: string;
     newWebhookSecret?: string;
     demo?: string;
+    deletionRequested?: string;
+    deletionCancelled?: string;
   }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { saved, error, stripe, security, mfaError, newApiKey, newWebhookSecret, demo } = await searchParams;
+  const {
+    saved,
+    error,
+    stripe,
+    security,
+    mfaError,
+    newApiKey,
+    newWebhookSecret,
+    demo,
+    deletionRequested,
+    deletionCancelled,
+  } = await searchParams;
   const t = await getTranslations('app');
   const tPricing = await getTranslations('pricing');
 
@@ -158,6 +172,11 @@ export default async function SettingsPage({
     getCurrentRole(supabase, org.id),
   ]);
   const isPlatformOwner = isPlatformOwnerEmail(user.email);
+  const { data: deletionRequest } = await supabase
+    .from('account_deletion_requests')
+    .select('status, requested_at')
+    .eq('user_id', user.id)
+    .maybeSingle();
   const canManageSettings = roleHas(role, 'manage_settings');
   // Company identity (IBAN, VAT, margin) stays owner/admin-only at the RLS
   // layer (organizations_update_admin) — manager gets services/hours/
@@ -240,7 +259,11 @@ export default async function SettingsPage({
                 ? t('settings.demoSeededToast')
                 : demo === 'deleted'
                   ? t('settings.demoDeletedToast')
-                  : null
+                  : deletionRequested === '1'
+                    ? t('settings.privacyDeleteRequestedToast')
+                    : deletionCancelled === '1'
+                      ? t('settings.privacyDeleteCancelledToast')
+                      : null
         }
       />
       <div className="flex items-center justify-between">
@@ -596,6 +619,49 @@ export default async function SettingsPage({
             </a>
           </div>
         )}
+      </section>
+
+      {/* GDPR self-service: export / delete my data */}
+      <section id="privacy" className="mt-6 scroll-mt-20 rounded-xl border border-border bg-card p-6 shadow-soft">
+        <h2 className="text-base font-semibold tracking-tight">{t('settings.privacyTitle')}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t('settings.privacyIntro')}</p>
+
+        <div className="mt-4">
+          <a href={`/${locale}/account/export`}>
+            <Button variant="outline" size="sm">{t('settings.privacyExport')}</Button>
+          </a>
+        </div>
+
+        <div className="mt-4 border-t border-border pt-4">
+          {deletionRequest ? (
+            <div className="rounded-lg border border-gold/30 bg-gold/5 p-4">
+              <p className="text-sm font-medium">
+                {deletionRequest.status === 'blocked_owner'
+                  ? t('settings.privacyDeleteBlockedOwner')
+                  : t('settings.privacyDeletePending')}
+              </p>
+              <form action={cancelAccountDeletionAction} className="mt-3">
+                <input type="hidden" name="locale" value={locale} />
+                <Button type="submit" variant="outline" size="sm">{t('settings.privacyDeleteCancel')}</Button>
+              </form>
+            </div>
+          ) : (
+            <>
+              <form id="delete-account-form" action={requestAccountDeletionAction}>
+                <input type="hidden" name="locale" value={locale} />
+              </form>
+              <ConfirmDeleteButton
+                formId="delete-account-form"
+                triggerLabel={t('settings.privacyDeleteRequest')}
+                title={t('settings.privacyDeleteConfirmTitle')}
+                description={t('settings.privacyDeleteConfirmBody')}
+                cancelLabel={t('common.cancel')}
+                confirmLabel={t('settings.privacyDeleteConfirmConfirm')}
+                className="text-sm text-destructive hover:underline"
+              />
+            </>
+          )}
+        </div>
       </section>
 
       {/* Digital business card */}

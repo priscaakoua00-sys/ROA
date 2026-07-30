@@ -824,7 +824,19 @@
       "signatureCopy": "Copy",
       "signatureCopied": "Copied",
       "apiKeyRevokeConfirmPassword": "Confirm with password",
-      "apiKeyRevokeWrongPassword": "Incorrect password — the key was not revoked."
+      "apiKeyRevokeWrongPassword": "Incorrect password — the key was not revoked.",
+      "privacyTitle": "Your data",
+      "privacyIntro": "Export everything we hold about your account, or request deletion under GDPR.",
+      "privacyExport": "Export my data",
+      "privacyDeleteRequest": "Delete my account",
+      "privacyDeleteConfirmTitle": "Delete your account?",
+      "privacyDeleteConfirmBody": "You'll be removed from every organization you're a member of immediately. If you own a garage organization, we can't delete your account until ownership is transferred or the organization is closed — contact privacy@roavaa.com for that. Otherwise your account is permanently deleted within a few days.",
+      "privacyDeleteConfirmConfirm": "Yes, delete my account",
+      "privacyDeletePending": "Your account is scheduled for deletion. This can take a few days to process.",
+      "privacyDeleteBlockedOwner": "We've logged your request, but you still own an organization — deletion is on hold until ownership is transferred or the organization is closed. Contact privacy@roavaa.com to proceed.",
+      "privacyDeleteCancel": "Cancel request",
+      "privacyDeleteRequestedToast": "Deletion request received.",
+      "privacyDeleteCancelledToast": "Deletion request cancelled."
     },
     "knowledge": {
       "title": "Knowledge base",
