@@ -543,7 +543,11 @@
       "reportError": "Het genereren van het rapport is mislukt. Probeer het opnieuw.",
       "clientMessageTitle": "Bericht voor de klant",
       "checklistIncomplete": "Er staan nog checklistpunten open — controleer ze of vink hieronder aan om toch te leveren.",
-      "forceDeliverChecklist": "Toch leveren ({count} checklistpunt(en) nog open)"
+      "forceDeliverChecklist": "Toch leveren ({count} checklistpunt(en) nog open)",
+      "clientMessageSend": "Bericht versturen",
+      "clientMessageNoEmail": "Geen e-mailadres bekend voor deze klant — bericht kan niet worden verstuurd.",
+      "clientMessageSentToast": "Klantbericht verstuurd.",
+      "clientMessageError": "Versturen mislukt. Probeer opnieuw."
     },
     "workOrderStatus": {
       "received": "Ontvangen",
@@ -818,7 +822,9 @@
       "signatureHtmlHint": "Plak dit in de handtekeninginstellingen van uw e-mailprogramma (HTML-modus).",
       "signatureTextTitle": "Platte tekst",
       "signatureCopy": "Kopieer",
-      "signatureCopied": "Gekopieerd"
+      "signatureCopied": "Gekopieerd",
+      "apiKeyRevokeConfirmPassword": "Bevestig met wachtwoord",
+      "apiKeyRevokeWrongPassword": "Onjuist wachtwoord — de sleutel is niet ingetrokken."
     },
     "knowledge": {
       "title": "Kennisbank",

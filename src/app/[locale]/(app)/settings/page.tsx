@@ -222,7 +222,15 @@ export default async function SettingsPage({
     <div className="container max-w-2xl py-10">
       <FlashToast
         success={saved ? t('settings.saved') : null}
-        error={error ? t('team.error') : demo === 'error' ? t('settings.demoErrorToast') : null}
+        error={
+          error === 'reauth'
+            ? t('settings.apiKeyRevokeWrongPassword')
+            : error
+              ? t('team.error')
+              : demo === 'error'
+                ? t('settings.demoErrorToast')
+                : null
+        }
         info={
           stripe === 'pending'
             ? t('settings.billingPendingToast')
@@ -243,7 +251,7 @@ export default async function SettingsPage({
       </div>
 
       {saved ? <p className="mt-3 text-sm text-success">{t('settings.saved')}</p> : null}
-      {error ? <p className="mt-3 text-sm text-urgent">{t('team.error')}</p> : null}
+      {error && error !== 'reauth' ? <p className="mt-3 text-sm text-urgent">{t('team.error')}</p> : null}
 
       {/* Billing / plan */}
       <section className="mt-6 rounded-xl border border-border bg-card p-6 shadow-soft">
@@ -808,9 +816,16 @@ export default async function SettingsPage({
                       {key.revokedAt ? (
                         <Badge variant="muted">{t('settings.apiKeyRevoked')}</Badge>
                       ) : (
-                        <form action={revokeApiKeyAction}>
+                        <form action={revokeApiKeyAction} className="flex items-end gap-2">
                           <input type="hidden" name="locale" value={locale} />
                           <input type="hidden" name="keyId" value={key.id} />
+                          <input
+                            type="password"
+                            name="password"
+                            placeholder={t('settings.apiKeyRevokeConfirmPassword')}
+                            required
+                            className="rounded-md border border-input bg-background px-2 py-1 text-sm"
+                          />
                           <Button type="submit" variant="outline" size="sm">{t('settings.apiKeyRevoke')}</Button>
                         </form>
                       )}

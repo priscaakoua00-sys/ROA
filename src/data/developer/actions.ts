@@ -46,12 +46,26 @@ export async function createApiKeyAction(formData: FormData) {
   redirect(`/${locale}/settings?newApiKey=${encodeURIComponent(plaintextKey)}#developers`);
 }
 
+/**
+ * Revoking an API key is a highly sensitive action (it can cut off a live
+ * integration) — require the signed-in user to re-confirm their password
+ * before it takes effect, rather than a single click doing it.
+ */
 export async function revokeApiKeyAction(formData: FormData) {
   const locale = localeOf(formData);
   const keyId = String(formData.get('keyId') ?? '');
-  if (!keyId) redirect(`/${locale}/settings#developers`);
+  const password = String(formData.get('password') ?? '');
+  if (!keyId || !password) redirect(`/${locale}/settings?error=1#developers`);
 
   const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user?.email) redirect(`/${locale}/login`);
+
+  const { error: reauthError } = await supabase.auth.signInWithPassword({ email: user.email, password });
+  if (reauthError) redirect(`/${locale}/settings?error=reauth#developers`);
+
   await supabase.from('api_keys').update({ revoked_at: new Date().toISOString() }).eq('id', keyId);
   redirect(`/${locale}/settings?saved=1#developers`);
 }
