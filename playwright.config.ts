@@ -7,6 +7,15 @@ import { defineConfig, devices } from '@playwright/test';
 const SANDBOX_CHROMIUM = '/opt/pw-browsers/chromium';
 const executablePath = existsSync(SANDBOX_CHROMIUM) ? SANDBOX_CHROMIUM : undefined;
 
+// A future isolated staging/branch Supabase project can be wired in without
+// touching this file further: drop its credentials in `.env.e2e.local` and
+// it takes priority over `.env.local` for the dev server this suite boots
+// (see e2e/README.md). Falls through silently if the file doesn't exist —
+// `next dev` still loads `.env.local` on its own in that case.
+if (existsSync('.env.e2e.local')) {
+  process.loadEnvFile('.env.e2e.local');
+}
+
 /**
  * E2E config. Runs against a locally-started `next dev` server on a
  * dedicated port so it never collides with a developer's own dev server.

@@ -22,13 +22,46 @@ anonymous, read-only requests. Nothing here touches production data.
 
 ## What's deliberately not covered yet
 
-Testing the authenticated flows that matter most commercially — create a
-vehicle, run a work order through its stages, issue an invoice, take an
-online payment — means either signing in against a real database or
-building a fake data layer the app can be pointed at in test mode. Both are
-real scope: a disposable Supabase branch per test run (a few cents per run)
-or a mock-mode refactor of the data layer. This is flagged as the natural
-next step, not silently skipped.
+The 12 core business flows (signup + garage creation, customer + vehicle
+creation, request creation, quote creation + public accept + lock, quote →
+work order/invoice conversion, Stripe payment + webhook, employee invite +
+linking, full repair-order lifecycle, inventory management, customer portal,
+cross-garage isolation) all require creating real rows: a real signup, a real
+organization, real customers/vehicles/quotes/invoices.
+
+This repo has exactly **one** configured Supabase project
+(`NEXT_PUBLIC_SUPABASE_URL` in `.env.local`). Its own auth logs confirm it is
+**actively serving live production traffic** right now (real logins from real
+accounts, referer `roavaa.com`), not a dormant pre-launch database — so this
+is not a theoretical risk. Automating signup/create/delete flows against it
+would create and remove real rows in a database with real users on it — the
+founder has explicitly **not** authorized that, including for a one-off
+manual click-through. A dedicated Supabase branch for isolated e2e testing is
+a billed feature and likewise needs explicit sign-off before creation.
+
+**Until an isolated staging project or branch is connected and authorized,
+these 12 flows stay unautomated, and no manual click-through has been done
+against production either. Do not present them as covered or manually
+verified.** `business-flows.spec.ts` in this directory lists each one as
+`test.fixme(...)` — Playwright reports them as fixme, not passing — so the
+gap stays visible in `npx playwright test --list` instead of silently
+disappearing. Coverage for these flows today comes only from unit tests
+(`npx vitest run`) and manual code reading, documented per-flow in
+`docs/AUDIT_REPORT.md`.
+
+## Connecting a staging environment later
+
+1. Create a separate Supabase project, or a development branch of the
+   existing one, dedicated to e2e testing.
+2. Copy `.env.local` to `.env.e2e.local` and point
+   `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` /
+   `SUPABASE_SERVICE_ROLE_KEY` at that staging project instead.
+   `playwright.config.ts` loads `.env.e2e.local` in preference to
+   `.env.local` when present — no other config change is needed.
+3. Implement each flow in `business-flows.spec.ts` for real and remove its
+   `test.fixme(...)`. Because the staging project is isolated, tests are
+   free to create and delete rows (e.g. in `test.afterEach`) without any
+   risk to real data.
 
 ## Running locally
 
@@ -37,5 +70,5 @@ npm run test:e2e
 ```
 
 Requires `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in
-the environment (or `.env.local`) — the anon key is a public, RLS-protected
-credential, safe to use here and in CI.
+the environment (`.env.e2e.local` if present, else `.env.local`) — the anon
+key is a public, RLS-protected credential, safe to use here and in CI.
