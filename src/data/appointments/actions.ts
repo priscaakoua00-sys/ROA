@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { zonedTimeToUtc, startOfDayInZoneUtc, addDaysToDateLabel } from '@/lib/timezone';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -81,13 +82,16 @@ export async function createAppointmentAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   const { data: customer } = await supabase
     .from('customers')
-    .select('organization_id')
+    .select('organization_id, organizations(timezone)')
     .eq('id', customerId)
     .maybeSingle();
   if (!customer) redirect(`${backHref}&error=1`);
 
-  const start = new Date(`${day}T${time}:00.000Z`);
+  const timeZone = (customer.organizations as unknown as { timezone: string } | null)?.timezone ?? 'Europe/Amsterdam';
+  const start = zonedTimeToUtc(day, time, timeZone);
   const end = new Date(start.getTime() + durationMin * 60_000);
+  const dayStart = startOfDayInZoneUtc(day, timeZone);
+  const dayEnd = startOfDayInZoneUtc(addDaysToDateLabel(day, 1), timeZone);
 
   // Conflict check: two appointments for the same garage should never overlap.
   const { data: sameDay } = await supabase
@@ -95,8 +99,8 @@ export async function createAppointmentAction(formData: FormData) {
     .select('starts_at, ends_at')
     .eq('organization_id', customer.organization_id)
     .neq('status', 'cancelled')
-    .gte('starts_at', `${day}T00:00:00.000Z`)
-    .lt('starts_at', `${day}T23:59:59.999Z`);
+    .gte('starts_at', dayStart.toISOString())
+    .lt('starts_at', dayEnd.toISOString());
   const overlaps = (sameDay ?? []).some(
     (a) => start.getTime() < new Date(a.ends_at).getTime() && new Date(a.starts_at).getTime() < end.getTime(),
   );

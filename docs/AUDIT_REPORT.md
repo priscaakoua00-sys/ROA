@@ -64,7 +64,7 @@ code, pas recopiés d'un document précédent.
 | Stock et pièces | `created_by` renseigné mais colonne non contrainte NOT NULL ; raison de mouvement bien contrainte en base ; coût jamais exposé au client — **stock négatif possible sans avertissement** | **Critique** (le stock négatif) | Garde-fou ajouté : un usage qui dépasserait le stock disponible est refusé avec un message clair | `npx tsc/vitest/build` | **Corrigé** | Oui | Rendre `created_by` NOT NULL (mineur) | src/data/inventory/actions.ts, messages/{nl,en,fr}.json |
 | Ordres de réparation — historique de statut | Une ligne d'historique est bien créée à chaque changement | — | Aucune nécessaire | Lecture `updateWorkOrderStatusAction` | Sain | Oui | — | — |
 | Ordres de réparation — checklist avant clôture | Un ordre pouvait passer « livré » avec des points de checklist encore en attente, sans aucune alerte | **Critique** | Un ordre ne peut plus passer « livré » avec des points en attente, sauf case de dérogation explicite cochée par le personnel | `npx tsc/vitest/build` | **Corrigé** | Oui | — | src/data/work-orders/actions.ts, src/app/[locale]/(app)/work-orders/[id]/page.tsx, messages/{nl,en,fr}.json |
-| Agenda et fuseaux horaires | La table `time_off` existait en base mais n'était jamais consultée par le moteur de disponibilité — un congé/absence posé ne bloquait aucun créneau suggéré. Approche « heure murale naïve en UTC » toujours en place (pas de vrai calcul IANA Europe/Amsterdam avec DST) | Moyenne | `time_off` de l'organisation est maintenant fusionné avec les rendez-vous existants avant de calculer les créneaux libres, sur les deux écrans qui proposent des créneaux (agenda du jour, fiche lead) | `npx tsc/vitest/build` | **Corrigé** (le point UTC/IANA reste un choix assumé pour le pilote, documenté dans `src/lib/datetime.ts`) | Oui | Passer à un vrai calcul de fuseau horaire avant toute expansion internationale hors UTC/CET | src/app/[locale]/(app)/agenda/page.tsx, src/app/[locale]/(app)/leads/[id]/page.tsx |
+| Agenda et fuseaux horaires | La table `time_off` existait en base mais n'était jamais consultée par le moteur de disponibilité — un congé/absence posé ne bloquait aucun créneau suggéré. Les heures étaient stockées en « heure murale naïve étiquetée UTC » (`new Date(\`${day}T${time}:00.000Z\`)`) : aucun vrai calcul de fuseau IANA, aucune gestion du changement d'heure (DST), et les bornes « aujourd'hui » de plusieurs écrans (tableau de bord, Ruben, agenda, équipe) étaient calculées en UTC pur, ce qui pouvait faire apparaître/disparaître des rendez-vous à la mauvaise date près de minuit local | Moyenne | `time_off` branché dans le moteur de créneaux. Nouveau module `src/lib/timezone.ts` (basé sur `Intl`, sans dépendance externe) qui convertit correctement heure locale ⇄ UTC réel en tenant compte du fuseau IANA réel de l'organisation (`organizations.timezone`) et du changement d'heure. Branché sur : création manuelle de rendez-vous, moteur de suggestion de créneaux, bornes « aujourd'hui » du tableau de bord/Ruben/agenda/équipe, et affichage des heures de rendez-vous (agenda, fiche client, fiche lead, portail client) | `npx tsc/vitest/build` — 12 nouveaux tests dont un cas réel de changement d'heure (29 mars 2026, Europe/Amsterdam) | **Corrigé** | Oui | Un écran Paramètres pour changer le fuseau de l'organisation n'existe pas encore (valeur par défaut correcte pour le marché NL/BE/FR actuel) | src/lib/timezone.ts, src/data/appointments/{actions,propose}.ts, src/app/[locale]/(app)/{agenda,dashboard,team,leads/[id],customers/[id]}/page.tsx, src/app/[locale]/portal/page.tsx, src/data/robin/load.ts, supabase/migrations/20260730140000_portal_org_info_add_timezone.sql |
 | Automatisations et relances | Confirmé : jamais d'envoi automatique, dédoublonnage réel, mais pas de gestion de consentement/désinscription dans ce module (les champs existent ailleurs, pas utilisés ici) | Faible (conception assumée) | Non corrigé dans ce lot | Lecture `engine.ts` | Conforme à l'intention | Suggestion uniquement (voulu) | Ajouter une vérification de consentement si l'envoi automatique est un jour activé | — |
 | Rapports et statistiques | Confirmé : chiffres réels, chiffre d'affaires basé sur les paiements encaissés (pas les devis), filtres de période et exports PDF/CSV fonctionnels | — | Aucune nécessaire | Lecture `load.ts` + `summarize.ts` | Sain | Oui | — | — |
 | Authentification et autorisations | Rate limiting réellement branché sur connexion/lien magique/réinitialisation ; sessions et routes protégées vérifiées ; **aucune réauthentification** pour la révocation de clé API ou la désactivation 2FA (2FA bénéficie implicitement d'un niveau AAL2 Supabase, la révocation de clé API non) | Moyenne | La révocation de clé API exige désormais la ré-saisie du mot de passe du compte, vérifiée côté serveur (`signInWithPassword`) avant que la clé soit effectivement révoquée | `npx tsc/vitest/build` | **Corrigé** | Oui | — | src/data/developer/actions.ts, src/app/[locale]/(app)/settings/page.tsx, messages/{nl,en,fr}.json |
@@ -84,14 +84,13 @@ remplies.
 
 - ✅ **PRÊT POUR DÉMONSTRATION** — mode démo fonctionnel, aucun crash connu,
   parcours complet visible en 3 langues.
-- ⚠️ **PRÊT POUR GARAGE PILOTE** — les bugs critiques qui auraient cassé un
+- ✅ **PRÊT POUR GARAGE PILOTE** — les bugs critiques qui auraient cassé un
   pilote réel (invitation d'employé, facture marquée payée sans preuve,
   double crédit Stripe, devis accepté modifiable, ordre livré sans checklist,
   stock négatif) sont **désormais corrigés**, de même que la réauthentification
-  clé API et le branchement de `time_off` dans le moteur de créneaux. Reste
-  avant un vrai pilote multi-utilisateurs : le calcul de fuseau horaire reste
-  en heure murale UTC (choix assumé pour un usage NL/BE/FR), ce qui ne bloque
-  pas un premier pilote encadré mais doit être suivi.
+  clé API, le branchement de `time_off` dans le moteur de créneaux et le
+  calcul de fuseau horaire (désormais un vrai calcul IANA, avec changement
+  d'heure géré correctement — plus plausible pour un pilote NL/BE/FR).
 - ❌ **PRÊT POUR CLIENTS PAYANTS** — la facturation Stripe est désactivée
   commercialement par choix (`LAUNCH_FREE`), WhatsApp/téléphone ne sont pas
   connectés alors qu'ils font partie de la promesse commerciale du marché
@@ -113,12 +112,19 @@ contre un prix IA fabriqué (`enforceCatalogPricing`) ; rate limiting sur
 libre-service ; indicateur admin du fournisseur IA actif + `prompt_version`
 dans `ai_usage_log` (page `/admin/ai-usage`, lien depuis Paramètres pour le
 propriétaire de la plateforme) ; archivage/désarchivage des devis
-(réversible, colonne `archived_at`, filtre dédié dans la liste).
+(réversible, colonne `archived_at`, filtre dédié dans la liste) ; vrai calcul
+de fuseau horaire IANA (module `src/lib/timezone.ts`, changement d'heure géré
+correctement, testé) branché sur la création de rendez-vous, le moteur de
+créneaux, les compteurs « aujourd'hui » et l'affichage des heures partout où
+un rendez-vous est montré (agenda, tableau de bord, équipe, fiche client,
+fiche lead, portail client).
 
 Reste à faire :
 
-1. Moyenne : vrai calcul de fuseau horaire (bibliothèque IANA) avant toute
-   expansion hors Pays-Bas/Belgique/France.
+1. Faible : un écran Paramètres pour changer le fuseau horaire de
+   l'organisation n'existe pas encore — la valeur par défaut
+   (`Europe/Amsterdam`) est correcte pour le marché NL/BE/FR actuel, mais
+   une expansion vers un autre fuseau horaire nécessiterait cet écran.
 2. Faible : `created_by` NOT NULL sur les mouvements de stock (non fait —
    entrerait en conflit avec les données de démonstration qui ne renseignent
    pas ce champ pour les réappros système).

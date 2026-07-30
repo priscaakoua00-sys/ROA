@@ -7,7 +7,8 @@ import { createSupabaseServerClient } from '@/data/supabase/server';
 import { getActiveOrgId } from '@/data/organizations/active';
 import { createAppointmentAction, updateAppointmentStatusAction } from '@/data/appointments/actions';
 import { proposeSlots, type WeekdayRule } from '@/data/appointments/propose';
-import { formatMonthYearUTC, formatTimeUTC, weekdayShortLabelsUTC } from '@/lib/datetime';
+import { formatMonthYearUTC, weekdayShortLabelsUTC } from '@/lib/datetime';
+import { formatTimeInZone, startOfDayInZoneUtc, addDaysToDateLabel, zonedDateLabel } from '@/lib/timezone';
 import { ModuleBanner } from '@/components/module-banner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -112,6 +113,9 @@ export default async function AgendaPage({
   const orgId = await getActiveOrgId(supabase);
   if (!orgId) redirect(`/${locale}/onboarding`);
 
+  const { data: orgTz } = await supabase.from('organizations').select('timezone').eq('id', orgId).maybeSingle();
+  const timeZone = orgTz?.timezone ?? 'Europe/Amsterdam';
+
   const { year, month } = parseMonthParam(monthParam);
   const monthKey = `${year}-${pad2(month + 1)}`;
   const monthStart = new Date(Date.UTC(year, month, 1));
@@ -125,7 +129,7 @@ export default async function AgendaPage({
   const prevMonthKey = `${prevMonthDate.getUTCFullYear()}-${pad2(prevMonthDate.getUTCMonth() + 1)}`;
   const nextMonthKey = `${nextMonthDate.getUTCFullYear()}-${pad2(nextMonthDate.getUTCMonth() + 1)}`;
 
-  const todayISO = new Date().toISOString().slice(0, 10);
+  const todayISO = zonedDateLabel(new Date(), timeZone);
   const isCurrentMonth = todayISO.slice(0, 7) === monthKey;
   const dayParamValid = dayParam && /^\d{4}-\d{2}-\d{2}$/.test(dayParam) ? dayParam : null;
 
@@ -146,8 +150,14 @@ export default async function AgendaPage({
           ? todayISO
           : null;
 
-  const rangeStart = view === 'week' ? `${weekStart}T00:00:00.000Z` : monthStart.toISOString();
-  const rangeEnd = view === 'week' ? `${addDaysISO(weekStart, 7)}T00:00:00.000Z` : monthEnd.toISOString();
+  const rangeStart = (
+    view === 'week' ? startOfDayInZoneUtc(weekStart, timeZone) : startOfDayInZoneUtc(`${monthKey}-01`, timeZone)
+  ).toISOString();
+  const rangeEnd = (
+    view === 'week'
+      ? startOfDayInZoneUtc(addDaysISO(weekStart, 7), timeZone)
+      : startOfDayInZoneUtc(addDaysToDateLabel(`${monthKey}-01`, daysInMonth), timeZone)
+  ).toISOString();
 
   const { data } = await supabase
     .from('appointments')
@@ -162,7 +172,7 @@ export default async function AgendaPage({
 
   const byDay = new Map<string, Appt[]>();
   for (const a of appts) {
-    const key = a.starts_at.slice(0, 10);
+    const key = zonedDateLabel(new Date(a.starts_at), timeZone);
     (byDay.get(key) ?? byDay.set(key, []).get(key)!).push(a);
   }
 
@@ -204,17 +214,19 @@ export default async function AgendaPage({
     for (const r of rules ?? []) {
       (rulesByWeekday[r.weekday] ??= []).push({ start: r.start_time, end: r.end_time });
     }
+    const dayStart = startOfDayInZoneUtc(selectedDay, timeZone);
+    const dayEnd = startOfDayInZoneUtc(addDaysToDateLabel(selectedDay, 1), timeZone);
     const { data: timeOff } = await supabase
       .from('time_off')
       .select('starts_at, ends_at')
       .eq('organization_id', orgId)
-      .lt('starts_at', `${selectedDay}T23:59:59.999Z`)
-      .gt('ends_at', `${selectedDay}T00:00:00.000Z`);
+      .lt('starts_at', dayEnd.toISOString())
+      .gt('ends_at', dayStart.toISOString());
     // "AI slot suggestion": free slots on this day given real opening hours and
     // real bookings, sized to the garage's first active service. Deterministic,
     // not a guess — same engine already used on the lead detail page.
     suggestedTimes = proposeSlots({
-      fromUTC: new Date(`${selectedDay}T00:00:00.000Z`),
+      fromUTC: dayStart,
       days: 1,
       rulesByWeekday,
       appointments: [...selectedAppts, ...(timeOff ?? [])].map((a) => ({
@@ -224,7 +236,8 @@ export default async function AgendaPage({
       durationMin: services[0]?.duration_minutes ?? 60,
       bufferMin: services[0]?.buffer_minutes ?? 0,
       maxPerDay: 8,
-    }).map((iso) => iso.slice(11, 16));
+      timeZone,
+    }).map((iso) => formatTimeInZone(iso, timeZone, locale));
 
     if (newCustomerId) {
       const { data: cust } = await supabase
@@ -479,7 +492,7 @@ export default async function AgendaPage({
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0">
                       <div className="text-sm font-medium">
-                        {formatTimeUTC(a.starts_at, locale)} · {name(a)}
+                        {formatTimeInZone(a.starts_at, timeZone, locale)} · {name(a)}
                       </div>
                       <div className="truncate text-xs text-muted-foreground">
                         {a.services?.name ?? ''}

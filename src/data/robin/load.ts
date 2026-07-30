@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { loadFollowUpsDueCount } from '@/data/automations/due';
 import { computeRobinInsight, type RobinInsight } from './insight';
+import { startOfDayInZoneUtc, zonedDateLabel, addDaysToDateLabel } from '@/lib/timezone';
 
 const OPEN_STATUSES = ['new', 'qualifying', 'qualified', 'appointment_proposed'];
 
@@ -11,10 +12,12 @@ function fullName(c: { first_name: string | null; last_name: string | null } | n
 /** Fetches what Ruben needs to know to open a conversation with something useful to say. */
 export async function loadRobinInsight(supabase: SupabaseClient, orgId: string, anon: string): Promise<RobinInsight> {
   const now = new Date();
-  const todayStart = new Date(now);
-  todayStart.setUTCHours(0, 0, 0, 0);
+  const { data: orgTz } = await supabase.from('organizations').select('timezone').eq('id', orgId).maybeSingle();
+  const timeZone = orgTz?.timezone ?? 'Europe/Amsterdam';
+  const todayLabel = zonedDateLabel(now, timeZone);
+  const todayStart = startOfDayInZoneUtc(todayLabel, timeZone);
   const todayISO = todayStart.toISOString();
-  const todayEndISO = new Date(todayStart.getTime() + 24 * 3_600_000).toISOString();
+  const todayEndISO = startOfDayInZoneUtc(addDaysToDateLabel(todayLabel, 1), timeZone).toISOString();
   const thirtyMinAgo = new Date(now.getTime() - 30 * 60_000).toISOString();
 
   const [

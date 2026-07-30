@@ -9,7 +9,8 @@ import { portalSignOutAction } from '@/data/portal/actions';
 import { StageProgress } from '@/components/work-orders/stage-progress';
 import { WORK_ORDER_STAGE_OF, type WorkOrderStatus } from '@/lib/work-order-status';
 import { formatCurrency } from '@/lib/pricing';
-import { formatDateUTC, formatDateTimeUTC } from '@/lib/datetime';
+import { formatDateUTC } from '@/lib/datetime';
+import { formatDateTimeInZone } from '@/lib/timezone';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -103,7 +104,8 @@ export default async function PortalPage({
       .limit(10),
   ]);
 
-  const orgInfo = (orgInfoRows as { name: string; logo_url: string | null; phone: string | null; email: string | null }[] | null)?.[0] ?? null;
+  const orgInfo = (orgInfoRows as { name: string; logo_url: string | null; phone: string | null; email: string | null; timezone: string | null }[] | null)?.[0] ?? null;
+  const timeZone = orgInfo?.timezone ?? 'Europe/Amsterdam';
   const vehicles = vehiclesData ?? [];
   const workOrders = (workOrdersData ?? []) as unknown as {
     id: string;
@@ -277,7 +279,7 @@ export default async function PortalPage({
             {appointments.map((a) => (
               <li key={a.id} className="rounded-xl border border-border bg-card p-4 shadow-soft">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-medium">{formatDateTimeUTC(a.starts_at, locale)}</span>
+                  <span className="text-sm font-medium">{formatDateTimeInZone(a.starts_at, timeZone, locale)}</span>
                   <Badge variant="muted">{tApp(`appointmentStatus.${a.status}`)}</Badge>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">

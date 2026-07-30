@@ -18,6 +18,7 @@ import { Link } from '@/i18n/navigation';
 import { FlashToast } from '@/components/flash-toast';
 import { formatCurrency } from '@/lib/pricing';
 import { ACTIVE_WORK_ORDER_STATUSES } from '@/lib/work-order-status';
+import { startOfDayInZoneUtc, zonedDateLabel, addDaysToDateLabel } from '@/lib/timezone';
 
 const ROLES = ['owner', 'admin', 'manager', 'receptionist', 'mechanic', 'apprentice', 'accountant', 'viewer'] as const;
 
@@ -65,10 +66,12 @@ export default async function TeamPage({
   const me = members.find((m) => m.user_id === user.id);
   const canManage = me?.role === 'owner' || me?.role === 'admin';
 
+  const { data: orgTz } = await supabase.from('organizations').select('timezone').eq('id', orgId).maybeSingle();
+  const timeZone = orgTz?.timezone ?? 'Europe/Amsterdam';
   const now = new Date();
-  const todayStart = new Date(now);
-  todayStart.setUTCHours(0, 0, 0, 0);
-  const todayEnd = new Date(todayStart.getTime() + 24 * 3_600_000);
+  const todayLabel = zonedDateLabel(now, timeZone);
+  const todayStart = startOfDayInZoneUtc(todayLabel, timeZone);
+  const todayEnd = startOfDayInZoneUtc(addDaysToDateLabel(todayLabel, 1), timeZone);
 
   const [{ data: woRows }, { data: apptRows }, { data: paymentRows }] = await Promise.all([
     supabase.from('work_orders').select('id, status, assigned_to').eq('organization_id', orgId).not('assigned_to', 'is', null),

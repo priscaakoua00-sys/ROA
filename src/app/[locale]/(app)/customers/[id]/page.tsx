@@ -4,7 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { addVehicleAction } from '@/data/customers/actions';
-import { formatDateTimeUTC } from '@/lib/datetime';
+import { formatDateTimeInZone } from '@/lib/timezone';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Field } from '@/components/auth/auth-shell';
@@ -28,10 +28,11 @@ export default async function CustomerDetailPage({
 
   const { data: customer } = await supabase
     .from('customers')
-    .select('id, first_name, last_name, phone, email, preferred_language, notes')
+    .select('id, first_name, last_name, phone, email, preferred_language, notes, organization_id, organizations(timezone)')
     .eq('id', id)
     .maybeSingle();
   if (!customer) notFound();
+  const timeZone = (customer.organizations as unknown as { timezone: string } | null)?.timezone ?? 'Europe/Amsterdam';
 
   const [{ data: vehicles }, { data: leads }, { data: appts }] = await Promise.all([
     supabase
@@ -130,7 +131,7 @@ export default async function CustomerDetailPage({
                 className="flex items-center justify-between rounded-xl border border-border bg-card p-3 text-sm shadow-soft"
               >
                 <span>
-                  📅 {formatDateTimeUTC(a.starts_at, locale)}
+                  📅 {formatDateTimeInZone(a.starts_at, timeZone, locale)}
                   {(a.services as unknown as { name: string | null } | null)?.name
                     ? ` · ${(a.services as unknown as { name: string | null }).name}`
                     : ''}
