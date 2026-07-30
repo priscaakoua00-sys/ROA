@@ -46,6 +46,55 @@ const MODEL = 'claude-sonnet-5';
 
 const LANGUAGE_NAME: Record<string, string> = { nl: 'Dutch', en: 'English', fr: 'French' };
 
+const PRICE_TO_CONFIRM_SUFFIX: Record<string, string> = {
+  nl: 'prijs te bevestigen',
+  en: 'price to confirm',
+  fr: 'prix à confirmer',
+};
+
+function normalizePartName(s: string): string {
+  return s.trim().toLowerCase();
+}
+
+/**
+ * The model prices from a written catalog description — it can still get
+ * the arithmetic wrong or, worse, invent a plausible-looking price for a
+ * part with no catalog match. Never trust its numbers directly: recompute
+ * from the catalog cost price for anything that matches, and force any
+ * part-line with no catalog match to 0 with a visible placeholder, exactly
+ * like MockAIProvider already does deterministically.
+ */
+export function enforceCatalogPricing(
+  draft: QuoteDraft,
+  catalogParts: { name: string; unitCost: number }[],
+  marginPercent: number,
+  language: string,
+): QuoteDraft {
+  const suffix = PRICE_TO_CONFIRM_SUFFIX[language] ?? PRICE_TO_CONFIRM_SUFFIX.en!;
+  const lineItems = draft.lineItems.map((item) => {
+    if (item.kind !== 'part') return item;
+    const match = catalogParts.find((p) => {
+      const a = normalizePartName(p.name);
+      const b = normalizePartName(item.description);
+      return a === b || b.includes(a) || a.includes(b);
+    });
+    if (match) {
+      const unitPrice = Math.round(match.unitCost * (1 + marginPercent / 100) * 100) / 100;
+      return { ...item, unitPrice };
+    }
+    if (item.unitPrice > 0) {
+      const alreadyMarked = /confirm|bevestig/i.test(item.description);
+      return {
+        ...item,
+        unitPrice: 0,
+        description: alreadyMarked ? item.description : `${item.description} (${suffix})`,
+      };
+    }
+    return item;
+  });
+  return { ...draft, lineItems };
+}
+
 /**
  * Real, network-calling provider. Every structured output is produced via
  * forced tool-use (never free-text JSON parsing) and re-validated against
@@ -568,7 +617,8 @@ export class AnthropicAIProvider implements AIProvider {
     if (!parsed.success) {
       return { status: 'handoff', reason: 'Model output failed validation.', meta: this.meta(0.2, Date.now() - started) };
     }
-    return { status: 'ok', data: parsed.data, meta: this.meta(0.6, Date.now() - started) };
+    const enforced = enforceCatalogPricing(parsed.data, input.catalogParts, input.marginPercent, input.language);
+    return { status: 'ok', data: enforced, meta: this.meta(0.6, Date.now() - started) };
   }
 
   async summarizeVehicleHistory(

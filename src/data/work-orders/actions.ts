@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
+import { sendEmail } from '@/integrations/email';
 import { getAIProvider } from '@/integrations/ai';
 import type { ChecklistFindingInput, MediaDiagnosis } from '@/integrations/ai';
 import { isWorkOrderStatus } from '@/lib/work-order-status';
@@ -352,4 +353,39 @@ export async function generateRepairReportAction(formData: FormData) {
   });
 
   redirect(`/${locale}/work-orders/${woId}?reportSaved=1`);
+}
+
+/**
+ * The AI drafts the client message when the report is generated; nothing
+ * ever sent it. This is the human's explicit "send" action — one click,
+ * real delivery via Resend, never automatic.
+ */
+export async function sendRepairReportClientMessageAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const woId = String(formData.get('woId') ?? '');
+  const reportId = String(formData.get('reportId') ?? '');
+  if (!woId || !reportId) redirect(`/${locale}/work-orders/${woId}?error=1`);
+
+  const supabase = await createSupabaseServerClient();
+  const [{ data: report }, { data: wo }] = await Promise.all([
+    supabase
+      .from('work_order_reports')
+      .select('client_message_subject, client_message_body')
+      .eq('id', reportId)
+      .maybeSingle(),
+    supabase
+      .from('work_orders')
+      .select('customer_id, customers(email)')
+      .eq('id', woId)
+      .maybeSingle(),
+  ]);
+  const customer = wo?.customers as unknown as { email: string | null } | null;
+  if (!report || !customer?.email) redirect(`/${locale}/work-orders/${woId}?reportMessageError=1`);
+
+  const result = await sendEmail({
+    to: customer.email,
+    subject: report.client_message_subject,
+    text: report.client_message_body,
+  });
+  redirect(`/${locale}/work-orders/${woId}?${result.sent ? 'reportMessageSent=1' : 'reportMessageError=1'}`);
 }

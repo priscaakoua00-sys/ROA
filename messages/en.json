@@ -543,7 +543,11 @@
       "reportError": "Report generation failed. Please try again.",
       "clientMessageTitle": "Message for the client",
       "checklistIncomplete": "Some checklist items are still pending — complete them or tick the box below to deliver anyway.",
-      "forceDeliverChecklist": "Deliver anyway ({count} checklist item(s) still pending)"
+      "forceDeliverChecklist": "Deliver anyway ({count} checklist item(s) still pending)",
+      "clientMessageSend": "Send message",
+      "clientMessageNoEmail": "No email on file for this customer — the message cannot be sent.",
+      "clientMessageSentToast": "Client message sent.",
+      "clientMessageError": "Sending failed. Please try again."
     },
     "workOrderStatus": {
       "received": "Received",
@@ -818,7 +822,9 @@
       "signatureHtmlHint": "Paste this into your mail client's signature settings (HTML mode).",
       "signatureTextTitle": "Plain text",
       "signatureCopy": "Copy",
-      "signatureCopied": "Copied"
+      "signatureCopied": "Copied",
+      "apiKeyRevokeConfirmPassword": "Confirm with password",
+      "apiKeyRevokeWrongPassword": "Incorrect password — the key was not revoked."
     },
     "knowledge": {
       "title": "Knowledge base",

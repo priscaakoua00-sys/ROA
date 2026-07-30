@@ -13,6 +13,7 @@ import {
   uploadChecklistPhotoAction,
   addChecklistItemAction,
   generateRepairReportAction,
+  sendRepairReportClientMessageAction,
 } from '@/data/work-orders/actions';
 import { saveReportAsArticleAction } from '@/data/knowledge/actions';
 import { recordPartUsageAction } from '@/data/inventory/actions';
@@ -77,6 +78,8 @@ export default async function WorkOrderDetailPage({
     error?: string;
     reportSaved?: string;
     reportError?: string;
+    reportMessageSent?: string;
+    reportMessageError?: string;
     diagSaved?: string;
     diagError?: string;
     articleSaved?: string;
@@ -86,7 +89,18 @@ export default async function WorkOrderDetailPage({
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  const { error, reportSaved, reportError, diagSaved, diagError, articleSaved, partSaved, quoteError } = await searchParams;
+  const {
+    error,
+    reportSaved,
+    reportError,
+    reportMessageSent,
+    reportMessageError,
+    diagSaved,
+    diagError,
+    articleSaved,
+    partSaved,
+    quoteError,
+  } = await searchParams;
   const t = await getTranslations('app');
 
   const supabase = await createSupabaseServerClient();
@@ -98,7 +112,7 @@ export default async function WorkOrderDetailPage({
   const { data: wo } = await supabase
     .from('work_orders')
     .select(
-      'id, organization_id, title, description, status, assigned_to, lead_id, customer_id, vehicle_id, customers(first_name,last_name), vehicles(license_plate,make,model)',
+      'id, organization_id, title, description, status, assigned_to, lead_id, customer_id, vehicle_id, customers(first_name,last_name,email), vehicles(license_plate,make,model)',
     )
     .eq('id', id)
     .maybeSingle();
@@ -241,7 +255,7 @@ export default async function WorkOrderDetailPage({
     };
   });
 
-  const customer = wo.customers as unknown as { first_name: string | null; last_name: string | null } | null;
+  const customer = wo.customers as unknown as { first_name: string | null; last_name: string | null; email: string | null } | null;
   const vehicle = wo.vehicles as unknown as { license_plate: string | null; make: string | null; model: string | null } | null;
   const name = [customer?.first_name, customer?.last_name].filter(Boolean).join(' ') || t('leads.anonymous');
   const report = reportData as {
@@ -260,28 +274,32 @@ export default async function WorkOrderDetailPage({
         success={
           reportSaved === '1'
             ? t('workOrders.reportSaved')
-            : diagSaved === '1'
-              ? t('diagnosis.saved')
-              : articleSaved === '1'
-                ? t('knowledge.articleSaved')
-                : partSaved === '1'
-                  ? t('inventory.saved')
-                  : null
+            : reportMessageSent === '1'
+              ? t('workOrders.clientMessageSentToast')
+              : diagSaved === '1'
+                ? t('diagnosis.saved')
+                : articleSaved === '1'
+                  ? t('knowledge.articleSaved')
+                  : partSaved === '1'
+                    ? t('inventory.saved')
+                    : null
         }
         error={
           reportError === 'empty'
             ? t('workOrders.reportEmpty')
             : reportError === '1'
               ? t('workOrders.reportError')
-              : diagError === 'limit'
-                ? t('diagnosis.limitReached')
-                : diagError === '1'
-                  ? t('diagnosis.error')
-                  : error === 'insufficientStock'
-                    ? t('inventory.insufficientStock')
-                    : error === 'checklistIncomplete'
-                      ? t('workOrders.checklistIncomplete')
-                      : null
+              : reportMessageError === '1'
+                ? t('workOrders.clientMessageError')
+                : diagError === 'limit'
+                  ? t('diagnosis.limitReached')
+                  : diagError === '1'
+                    ? t('diagnosis.error')
+                    : error === 'insufficientStock'
+                      ? t('inventory.insufficientStock')
+                      : error === 'checklistIncomplete'
+                        ? t('workOrders.checklistIncomplete')
+                        : null
         }
       />
       <Link href="/work-orders" className="text-sm text-muted-foreground hover:underline">
@@ -461,6 +479,16 @@ export default async function WorkOrderDetailPage({
               <p className="text-xs font-medium text-muted-foreground">{t('workOrders.clientMessageTitle')}</p>
               <p className="mt-1 text-sm font-medium">{report.client_message_subject}</p>
               <p className="mt-1 whitespace-pre-line text-sm text-muted-foreground">{report.client_message_body}</p>
+              {customer?.email ? (
+                <form action={sendRepairReportClientMessageAction} className="mt-2">
+                  <input type="hidden" name="locale" value={locale} />
+                  <input type="hidden" name="woId" value={wo.id} />
+                  <input type="hidden" name="reportId" value={report.id} />
+                  <Button type="submit" variant="outline" size="sm">{t('workOrders.clientMessageSend')}</Button>
+                </form>
+              ) : (
+                <p className="mt-2 text-xs text-muted-foreground">{t('workOrders.clientMessageNoEmail')}</p>
+              )}
             </div>
             <form action={saveReportAsArticleAction}>
               <input type="hidden" name="locale" value={locale} />

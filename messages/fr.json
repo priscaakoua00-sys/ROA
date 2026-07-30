@@ -543,7 +543,11 @@
       "reportError": "La génération du rapport a échoué. Réessayez.",
       "clientMessageTitle": "Message pour le client",
       "checklistIncomplete": "Des points de la checklist sont encore en attente — terminez-les ou cochez la case ci-dessous pour livrer quand même.",
-      "forceDeliverChecklist": "Livrer quand même ({count} point(s) de checklist en attente)"
+      "forceDeliverChecklist": "Livrer quand même ({count} point(s) de checklist en attente)",
+      "clientMessageSend": "Envoyer le message",
+      "clientMessageNoEmail": "Aucun e-mail connu pour ce client — le message ne peut pas être envoyé.",
+      "clientMessageSentToast": "Message client envoyé.",
+      "clientMessageError": "Échec de l'envoi. Réessayez."
     },
     "workOrderStatus": {
       "received": "Reçu",
@@ -818,7 +822,9 @@
       "signatureHtmlHint": "Collez ceci dans les parametres de signature de votre client mail (mode HTML).",
       "signatureTextTitle": "Texte brut",
       "signatureCopy": "Copier",
-      "signatureCopied": "Copie"
+      "signatureCopied": "Copie",
+      "apiKeyRevokeConfirmPassword": "Confirmer avec le mot de passe",
+      "apiKeyRevokeWrongPassword": "Mot de passe incorrect — la clé n'a pas été révoquée."
     },
     "knowledge": {
       "title": "Base de connaissances",

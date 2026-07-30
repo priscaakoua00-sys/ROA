@@ -7,6 +7,7 @@ import { sendEmail } from '@/integrations/email';
 import { formatCurrency } from '@/lib/pricing';
 import { logActivity } from '@/data/activity/log';
 import { dispatchWebhooks } from '@/lib/webhooks';
+import { SITE_URL } from '@/lib/site';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -14,6 +15,21 @@ function localeOf(formData: FormData): Locale {
   const raw = String(formData.get('locale') ?? 'nl');
   return (['nl', 'en', 'fr'] as const).includes(raw as Locale) ? (raw as Locale) : 'nl';
 }
+
+const SENT_EMAIL_COPY: Record<Locale, { subject: (n: string) => string; body: (garage: string, n: string, amount: string, url: string) => string }> = {
+  nl: {
+    subject: (n) => `Uw factuur ${n}`,
+    body: (garage, n, amount, url) => `${garage} heeft factuur ${n} (${amount}) voor u klaargezet. Bekijk en betaal hier: ${url}`,
+  },
+  en: {
+    subject: (n) => `Your invoice ${n}`,
+    body: (garage, n, amount, url) => `${garage} has prepared invoice ${n} (${amount}) for you. View and pay here: ${url}`,
+  },
+  fr: {
+    subject: (n) => `Votre facture ${n}`,
+    body: (garage, n, amount, url) => `${garage} a préparé la facture ${n} (${amount}) pour vous. Consultez-la et réglez-la ici : ${url}`,
+  },
+};
 
 // 'paid'/'partially_paid' may only be reached through recordPaymentAction or
 // markInvoicePaidAction, which insert the backing invoice_payments row —
@@ -143,7 +159,7 @@ export async function updateInvoiceStatusAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   const { data: invoice } = await supabase
     .from('invoices')
-    .select('organization_id, invoice_number')
+    .select('organization_id, invoice_number, total, customers(email, preferred_language)')
     .eq('id', invoiceId)
     .maybeSingle();
   if (!invoice) redirect(`/${locale}/invoices`);
@@ -161,6 +177,26 @@ export async function updateInvoiceStatusAction(formData: FormData) {
     entityLabel: invoice.invoice_number,
     action: 'updated',
   });
+
+  // Marking an invoice "sent" is also when the customer actually gets it:
+  // email them a link to the public invoice page, same as quotes. Best-effort
+  // — a failed email must not block saving the status.
+  if (status === 'sent') {
+    const customer = invoice.customers as unknown as { email: string | null; preferred_language: string | null } | null;
+    if (customer?.email) {
+      const { data: org } = await supabase.from('organizations').select('name').eq('id', invoice.organization_id).maybeSingle();
+      const lang: Locale = (['nl', 'en', 'fr'] as const).includes(customer.preferred_language as Locale)
+        ? (customer.preferred_language as Locale)
+        : locale;
+      const copy = SENT_EMAIL_COPY[lang];
+      const url = `${SITE_URL}/${lang}/invoice/${invoiceId}`;
+      await sendEmail({
+        to: customer.email,
+        subject: copy.subject(invoice.invoice_number),
+        text: copy.body(org?.name ?? 'ROAVAA', invoice.invoice_number, formatCurrency(Number(invoice.total), lang), url),
+      }).catch(() => undefined);
+    }
+  }
 
   redirect(`/${locale}/invoices/${invoiceId}?saved=1`);
 }
