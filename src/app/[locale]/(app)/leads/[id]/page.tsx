@@ -5,7 +5,8 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { bookAppointmentAction } from '@/data/appointments/actions';
 import { proposeSlots, type WeekdayRule } from '@/data/appointments/propose';
-import { formatDateTimeUTC, formatTimeUTC } from '@/lib/datetime';
+import { formatTimeUTC } from '@/lib/datetime';
+import { formatDateTimeInZone } from '@/lib/timezone';
 import { draftReply } from '@/data/conversations/draft';
 import { sendReplyAction } from '@/data/conversations/actions';
 import { assignLeadAction } from '@/data/team/actions';
@@ -81,6 +82,7 @@ export default async function LeadDetailPage({
     { data: memData },
     { data: wos },
     { data: diagData },
+    { data: orgTz },
   ] = await Promise.all([
     supabase
       .from('services')
@@ -120,8 +122,10 @@ export default async function LeadDetailPage({
       )
       .eq('lead_id', lead.id)
       .order('created_at', { ascending: false }),
+    supabase.from('organizations').select('timezone').eq('id', lead.organization_id).maybeSingle(),
   ]);
   const service = services?.[0];
+  const timeZone = orgTz?.timezone ?? 'Europe/Amsterdam';
 
   const rulesByWeekday: Record<number, WeekdayRule[]> = {};
   for (const r of rules ?? []) {
@@ -141,6 +145,7 @@ export default async function LeadDetailPage({
           durationMin: service.duration_minutes,
           bufferMin: service.buffer_minutes,
           maxPerDay: 4,
+          timeZone,
         }).slice(0, 12)
       : [];
 
@@ -333,7 +338,7 @@ export default async function LeadDetailPage({
                   <input type="hidden" name="serviceId" value={service?.id ?? ''} />
                   <input type="hidden" name="duration" value={service?.duration_minutes ?? 60} />
                   <Button type="submit" variant="outline" size="sm">
-                    {formatDateTimeUTC(iso, locale)}
+                    {formatDateTimeInZone(iso, timeZone, locale)}
                   </Button>
                 </form>
               ))}

@@ -37,6 +37,7 @@ import { customerStatus } from '@/data/customers/status';
 import { countLowStockParts } from '@/data/inventory/list';
 import { getModuleImageSrc } from '@/lib/module-images';
 import { formatDateTimeUTC } from '@/lib/datetime';
+import { startOfDayInZoneUtc, zonedDateLabel, addDaysToDateLabel, formatDateTimeInZone } from '@/lib/timezone';
 import { formatCurrency } from '@/lib/pricing';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -144,16 +145,17 @@ export default async function DashboardPage({
   if (!orgId) redirect(`/${locale}/onboarding`);
   const { data: org } = await supabase
     .from('organizations')
-    .select('id, name, slug, default_margin_percent')
+    .select('id, name, slug, default_margin_percent, timezone')
     .eq('id', orgId)
     .maybeSingle();
   if (!org) redirect(`/${locale}/onboarding`);
+  const timeZone = org.timezone ?? 'Europe/Amsterdam';
 
   const now = new Date();
-  const todayStart = new Date(now);
-  todayStart.setUTCHours(0, 0, 0, 0);
+  const todayLabel = zonedDateLabel(now, timeZone);
+  const todayStart = startOfDayInZoneUtc(todayLabel, timeZone);
   const todayISO = todayStart.toISOString();
-  const todayEndISO = new Date(todayStart.getTime() + 24 * 3_600_000).toISOString();
+  const todayEndISO = startOfDayInZoneUtc(addDaysToDateLabel(todayLabel, 1), timeZone).toISOString();
   const thirtyMinAgo = new Date(now.getTime() - 30 * 60_000).toISOString();
   const nowISO = now.toISOString();
   const monthStartISO = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
@@ -662,7 +664,7 @@ export default async function DashboardPage({
                 <li key={a.id} className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-4 shadow-soft">
                   <div className="flex items-center gap-3 min-w-0">
                     <span className="shrink-0 rounded-lg bg-gold/12 px-2 py-1 text-xs font-semibold text-gold">
-                      {formatDateTimeUTC(a.starts_at, locale)}
+                      {formatDateTimeInZone(a.starts_at, timeZone, locale)}
                     </span>
                     <div className="min-w-0">
                       <div className="truncate text-sm font-medium">{fullName(a.customers)}</div>
@@ -720,7 +722,7 @@ export default async function DashboardPage({
                       {nextAppt ? (
                         <div className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">
                           <CalendarDays className="size-3" aria-hidden />
-                          {formatDateTimeUTC(nextAppt, locale)}
+                          {formatDateTimeInZone(nextAppt, timeZone, locale)}
                         </div>
                       ) : null}
                     </div>

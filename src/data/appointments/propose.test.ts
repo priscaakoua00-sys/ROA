@@ -44,4 +44,36 @@ describe('proposeSlots', () => {
     });
     expect(slots.length).toBe(0);
   });
+
+  it('proposes a real IANA-zone-aware slot: 09:00 local (Europe/Amsterdam, CEST) is 07:00 UTC in July', () => {
+    const slots = proposeSlots({
+      fromUTC: from,
+      days: 1,
+      rulesByWeekday: rules,
+      appointments: [],
+      durationMin: 60,
+      maxPerDay: 20,
+      timeZone: 'Europe/Amsterdam',
+    });
+    expect(slots[0]).toBe('2026-07-13T07:00:00.000Z');
+  });
+
+  it('hides a slot that has already passed in local time even though it is still in the future in UTC', () => {
+    // 06:00 UTC is 08:00 in Amsterdam (CEST) — the 09:00-10:00 local slot is
+    // still ahead, but had this stayed naive-UTC, an 06:30 UTC "now" would
+    // have wrongly treated a 07:00 UTC slot as available when it's actually
+    // already 09:00 local (i.e. now).
+    const nowAt0900Local = new Date('2026-07-13T07:00:00.000Z');
+    const slots = proposeSlots({
+      fromUTC: nowAt0900Local,
+      days: 1,
+      rulesByWeekday: rules,
+      appointments: [],
+      durationMin: 60,
+      maxPerDay: 20,
+      timeZone: 'Europe/Amsterdam',
+    });
+    expect(slots).not.toContain('2026-07-13T07:00:00.000Z');
+    expect(slots[0]).toBe('2026-07-13T08:00:00.000Z');
+  });
 });
