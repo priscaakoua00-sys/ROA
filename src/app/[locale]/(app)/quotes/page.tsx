@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { redirect } from 'next/navigation';
-import { FileText, Download, Copy, Bell, Phone, MessageCircle, ArrowRightCircle, Receipt } from 'lucide-react';
+import { FileText, Download, Copy, Bell, Phone, MessageCircle, ArrowRightCircle, Receipt, Archive, ArchiveRestore } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { getActiveOrgId } from '@/data/organizations/active';
@@ -10,6 +10,8 @@ import {
   duplicateQuoteAction,
   convertQuoteToWorkOrderAction,
   convertQuoteToInvoiceAction,
+  archiveQuoteAction,
+  unarchiveQuoteAction,
 } from '@/data/quotes/actions';
 import { formatCurrency } from '@/lib/pricing';
 import { formatDateUTC } from '@/lib/datetime';
@@ -29,8 +31,8 @@ const STATUS_VARIANT: Record<QuoteStatus, 'muted' | 'gold' | 'default' | 'succes
   converted: 'gold',
 };
 
-type Filter = 'all' | 'draft' | 'sent' | 'accepted' | 'refused' | 'expired' | 'converted';
-const FILTERS: Filter[] = ['all', 'draft', 'sent', 'accepted', 'refused', 'expired', 'converted'];
+type Filter = 'all' | 'draft' | 'sent' | 'accepted' | 'refused' | 'expired' | 'converted' | 'archived';
+const FILTERS: Filter[] = ['all', 'draft', 'sent', 'accepted', 'refused', 'expired', 'converted', 'archived'];
 
 interface QuoteRow {
   id: string;
@@ -41,6 +43,7 @@ interface QuoteRow {
   total: number;
   work_order_id: string | null;
   invoice_id: string | null;
+  archived_at: string | null;
   customers: { first_name: string | null; last_name: string | null; phone: string | null } | null;
   vehicles: { license_plate: string | null; make: string | null; model: string | null } | null;
 }
@@ -74,7 +77,7 @@ export default async function QuotesPage({
   const { data: quotesData } = await supabase
     .from('quotes')
     .select(
-      'id, quote_number, status, issue_date, valid_until, total, work_order_id, invoice_id, customers(first_name,last_name,phone), vehicles(license_plate,make,model)',
+      'id, quote_number, status, issue_date, valid_until, total, work_order_id, invoice_id, archived_at, customers(first_name,last_name,phone), vehicles(license_plate,make,model)',
     )
     .eq('organization_id', orgId)
     .order('created_at', { ascending: false })
@@ -86,8 +89,8 @@ export default async function QuotesPage({
     [c?.first_name, c?.last_name].filter(Boolean).join(' ') || t('leads.anonymous');
   const vehicleLabel = (q: QuoteRow) => [q.vehicles?.make, q.vehicles?.model].filter(Boolean).join(' ');
 
-  let quotes = allQuotes;
-  if (filter !== 'all') quotes = quotes.filter((qt) => qt.status === filter);
+  let quotes = filter === 'archived' ? allQuotes.filter((qt) => qt.archived_at) : allQuotes.filter((qt) => !qt.archived_at);
+  if (filter !== 'all' && filter !== 'archived') quotes = quotes.filter((qt) => qt.status === filter);
 
   if (q && q.trim()) {
     const term = q.trim().toLowerCase();
@@ -98,10 +101,11 @@ export default async function QuotesPage({
     );
   }
 
-  const draftCount = allQuotes.filter((qt) => qt.status === 'draft').length;
-  const sentCount = allQuotes.filter((qt) => qt.status === 'sent').length;
-  const acceptedCount = allQuotes.filter((qt) => qt.status === 'accepted').length;
-  const pendingAmount = allQuotes
+  const activeQuotes = allQuotes.filter((qt) => !qt.archived_at);
+  const draftCount = activeQuotes.filter((qt) => qt.status === 'draft').length;
+  const sentCount = activeQuotes.filter((qt) => qt.status === 'sent').length;
+  const acceptedCount = activeQuotes.filter((qt) => qt.status === 'accepted').length;
+  const pendingAmount = activeQuotes
     .filter((qt) => qt.status === 'sent' || qt.status === 'accepted')
     .reduce((acc, qt) => acc + Number(qt.total), 0);
 
@@ -161,7 +165,7 @@ export default async function QuotesPage({
                 : 'border-border bg-background text-foreground hover:border-gold/50 hover:bg-gold/5'
             }`}
           >
-            {f === 'all' ? t('quotes.filters.all') : t(`quoteStatus.${f}`)}
+            {f === 'all' ? t('quotes.filters.all') : f === 'archived' ? t('quotes.filters.archived') : t(`quoteStatus.${f}`)}
           </Link>
         ))}
       </div>
@@ -286,6 +290,34 @@ export default async function QuotesPage({
                       </button>
                     </form>
                   ) : null}
+
+                  {qt.archived_at ? (
+                    <form action={unarchiveQuoteAction}>
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="quoteId" value={qt.id} />
+                      <input type="hidden" name="back" value={backUrl} />
+                      <button
+                        type="submit"
+                        className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium transition hover:border-gold/40"
+                      >
+                        <ArchiveRestore className="size-3.5" aria-hidden />
+                        {t('quotes.actionUnarchive')}
+                      </button>
+                    </form>
+                  ) : (
+                    <form action={archiveQuoteAction}>
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="quoteId" value={qt.id} />
+                      <input type="hidden" name="back" value={backUrl} />
+                      <button
+                        type="submit"
+                        className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium transition hover:border-gold/40"
+                      >
+                        <Archive className="size-3.5" aria-hidden />
+                        {t('quotes.actionArchive')}
+                      </button>
+                    </form>
+                  )}
                 </div>
               </li>
             );

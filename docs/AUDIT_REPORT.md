@@ -112,12 +112,13 @@ contre un prix IA fabriqué (`enforceCatalogPricing`) ; rate limiting sur
 `time_off` branché dans le moteur de créneaux ; export/suppression RGPD en
 libre-service ; indicateur admin du fournisseur IA actif + `prompt_version`
 dans `ai_usage_log` (page `/admin/ai-usage`, lien depuis Paramètres pour le
-propriétaire de la plateforme).
+propriétaire de la plateforme) ; archivage/désarchivage des devis
+(réversible, colonne `archived_at`, filtre dédié dans la liste).
 
 Reste à faire :
 
 1. Moyenne : vrai calcul de fuseau horaire (bibliothèque IANA) avant toute
    expansion hors Pays-Bas/Belgique/France.
-2. Faible : archivage des devis ; `created_by` NOT NULL sur les mouvements de
-   stock (non fait — entrerait en conflit avec les données de démonstration
-   qui ne renseignent pas ce champ pour les réappros système).
+2. Faible : `created_by` NOT NULL sur les mouvements de stock (non fait —
+   entrerait en conflit avec les données de démonstration qui ne renseignent
+   pas ce champ pour les réappros système).

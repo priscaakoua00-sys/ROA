@@ -1136,13 +1136,16 @@
       "statPendingAmount": "Bedrag in afwachting",
       "search": "Offertenummer, klant, kenteken, voertuig...",
       "filters": {
-        "all": "Alle"
+        "all": "Alle",
+        "archived": "Gearchiveerd"
       },
       "actionSendReminder": "Herinnering sturen",
       "reminderSent": "Herinnering verstuurd naar de klant.",
       "reminderError": "Kon de herinnering niet versturen (geen klant-e-mail, of versturen staat uit).",
       "actionDuplicate": "Dupliceren",
-      "locked": "Deze offerte is al beantwoord door de klant en kan niet meer worden gewijzigd."
+      "locked": "Deze offerte is al beantwoord door de klant en kan niet meer worden gewijzigd.",
+      "actionArchive": "Archiveren",
+      "actionUnarchive": "Dearchiveren"
     },
     "quoteStatus": {
       "draft": "Concept",

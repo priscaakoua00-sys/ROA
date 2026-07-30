@@ -465,6 +465,30 @@ export async function sendQuoteReminderAction(formData: FormData) {
   redirect(`${back}${back.includes('?') ? '&' : '?'}${result.sent ? 'reminderSent=1' : 'reminderError=1'}`);
 }
 
+/** Hides a quote from the default list without deleting it — reversible via unarchiveQuoteAction. */
+export async function archiveQuoteAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const quoteId = String(formData.get('quoteId') ?? '');
+  const back = String(formData.get('back') ?? `/${locale}/quotes`);
+  if (!quoteId) redirect(back);
+
+  const supabase = await createSupabaseServerClient();
+  await supabase.from('quotes').update({ archived_at: new Date().toISOString() }).eq('id', quoteId);
+  redirect(back);
+}
+
+/** Restores a quote archived by mistake. */
+export async function unarchiveQuoteAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const quoteId = String(formData.get('quoteId') ?? '');
+  const back = String(formData.get('back') ?? `/${locale}/quotes`);
+  if (!quoteId) redirect(back);
+
+  const supabase = await createSupabaseServerClient();
+  await supabase.from('quotes').update({ archived_at: null }).eq('id', quoteId);
+  redirect(back);
+}
+
 /** Duplicates a quote (customer, vehicle, VAT rate, notes, and every line item) into a fresh draft — for near-identical repeat quotes. */
 export async function duplicateQuoteAction(formData: FormData) {
   const locale = localeOf(formData);
