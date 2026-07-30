@@ -951,7 +951,17 @@
       "errorsIntro": "Technical errors captured across the whole platform, visible only to the ROAVAA team.",
       "errorsEmpty": "No errors recorded.",
       "errorsStackTrace": "View stack trace",
-      "errorsSearchPlaceholder": "Search by route or message…"
+      "errorsSearchPlaceholder": "Search by route or message…",
+      "aiUsageTitle": "AI usage",
+      "aiUsageIntro": "Which AI provider is active, and recent call volume, latency and error rate.",
+      "aiUsageActiveProvider": "Active provider",
+      "aiUsageProviderMock": "Mock (offline, no API key configured)",
+      "aiUsageTotalCalls": "Calls logged",
+      "aiUsageAvgLatency": "Avg. latency",
+      "aiUsageErrorRate": "Error rate",
+      "aiUsageByProvider": "By provider",
+      "aiUsageEmpty": "No AI calls logged yet.",
+      "aiUsageRecentTitle": "Recent calls"
     },
     "automations": {
       "title": "Follow-ups",

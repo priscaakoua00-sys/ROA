@@ -110,12 +110,14 @@ Corrigés depuis la première version de cet audit : envoi réel sur facture
 contre un prix IA fabriqué (`enforceCatalogPricing`) ; rate limiting sur
 `/api/rdw/public-lookup` ; réauthentification avant révocation de clé API ;
 `time_off` branché dans le moteur de créneaux ; export/suppression RGPD en
-libre-service.
+libre-service ; indicateur admin du fournisseur IA actif + `prompt_version`
+dans `ai_usage_log` (page `/admin/ai-usage`, lien depuis Paramètres pour le
+propriétaire de la plateforme).
 
 Reste à faire :
 
 1. Moyenne : vrai calcul de fuseau horaire (bibliothèque IANA) avant toute
    expansion hors Pays-Bas/Belgique/France.
-2. Faible : indicateur admin du fournisseur IA actif + `prompt_version` dans
-   `ai_usage_log` ; archivage des devis ; `created_by` NOT NULL sur les
-   mouvements de stock.
+2. Faible : archivage des devis ; `created_by` NOT NULL sur les mouvements de
+   stock (non fait — entrerait en conflit avec les données de démonstration
+   qui ne renseignent pas ce champ pour les réappros système).

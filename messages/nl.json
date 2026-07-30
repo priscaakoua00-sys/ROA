@@ -951,7 +951,17 @@
       "errorsIntro": "Technische fouten van het hele platform, alleen zichtbaar voor het ROAVAA-team.",
       "errorsEmpty": "Geen fouten geregistreerd.",
       "errorsStackTrace": "Technische details bekijken",
-      "errorsSearchPlaceholder": "Zoek op route of bericht…"
+      "errorsSearchPlaceholder": "Zoek op route of bericht…",
+      "aiUsageTitle": "AI-gebruik",
+      "aiUsageIntro": "Welke AI-provider actief is, en recent belvolume, latentie en foutpercentage.",
+      "aiUsageActiveProvider": "Actieve provider",
+      "aiUsageProviderMock": "Mock (offline, geen API-sleutel geconfigureerd)",
+      "aiUsageTotalCalls": "Geregistreerde aanroepen",
+      "aiUsageAvgLatency": "Gem. latentie",
+      "aiUsageErrorRate": "Foutpercentage",
+      "aiUsageByProvider": "Per provider",
+      "aiUsageEmpty": "Nog geen AI-aanroepen geregistreerd.",
+      "aiUsageRecentTitle": "Recente aanroepen"
     },
     "automations": {
       "title": "Opvolging",

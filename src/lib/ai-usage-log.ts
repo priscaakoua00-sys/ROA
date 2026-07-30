@@ -19,6 +19,7 @@ export async function logAiUsage(method: string, organizationId: string | null, 
       status: result.status,
       confidence: result.meta.confidence,
       latency_ms: result.meta.latencyMs,
+      prompt_version: result.meta.promptVersion ?? null,
     });
   } catch {
     // Never let usage logging break the actual AI-backed request.
