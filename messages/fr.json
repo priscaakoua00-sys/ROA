@@ -824,7 +824,19 @@
       "signatureCopy": "Copier",
       "signatureCopied": "Copie",
       "apiKeyRevokeConfirmPassword": "Confirmer avec le mot de passe",
-      "apiKeyRevokeWrongPassword": "Mot de passe incorrect — la clé n'a pas été révoquée."
+      "apiKeyRevokeWrongPassword": "Mot de passe incorrect — la clé n'a pas été révoquée.",
+      "privacyTitle": "Vos données",
+      "privacyIntro": "Exportez tout ce que nous conservons sur votre compte, ou demandez la suppression conformément au RGPD.",
+      "privacyExport": "Exporter mes données",
+      "privacyDeleteRequest": "Supprimer mon compte",
+      "privacyDeleteConfirmTitle": "Supprimer votre compte ?",
+      "privacyDeleteConfirmBody": "Vous serez immédiatement retiré de chaque organisation dont vous êtes membre. Si vous êtes propriétaire d'une organisation-garage, nous ne pouvons pas supprimer votre compte tant que la propriété n'est pas transférée ou l'organisation fermée — contactez privacy@roavaa.com pour cela. Sinon, votre compte sera définitivement supprimé sous quelques jours.",
+      "privacyDeleteConfirmConfirm": "Oui, supprimer mon compte",
+      "privacyDeletePending": "La suppression de votre compte est planifiée. Cela peut prendre quelques jours.",
+      "privacyDeleteBlockedOwner": "Votre demande a été enregistrée, mais vous êtes toujours propriétaire d’une organisation — la suppression est en attente jusqu’au transfert de propriété ou à la fermeture de l’organisation. Contactez privacy@roavaa.com pour continuer.",
+      "privacyDeleteCancel": "Annuler la demande",
+      "privacyDeleteRequestedToast": "Demande de suppression reçue.",
+      "privacyDeleteCancelledToast": "Demande de suppression annulée."
     },
     "knowledge": {
       "title": "Base de connaissances",

@@ -76,6 +76,7 @@ export default async function LeadDetailPage({
     { data: services },
     { data: rules },
     { data: appts },
+    { data: timeOff },
     { data: convs },
     { data: memData },
     { data: wos },
@@ -97,6 +98,12 @@ export default async function LeadDetailPage({
       .select('starts_at, ends_at')
       .eq('organization_id', lead.organization_id)
       .gte('starts_at', new Date().toISOString())
+      .limit(300),
+    supabase
+      .from('time_off')
+      .select('starts_at, ends_at')
+      .eq('organization_id', lead.organization_id)
+      .gte('ends_at', new Date().toISOString())
       .limit(300),
     supabase
       .from('conversations')
@@ -127,7 +134,7 @@ export default async function LeadDetailPage({
           fromUTC: new Date(),
           days: 14,
           rulesByWeekday,
-          appointments: (appts ?? []).map((a) => ({
+          appointments: [...(appts ?? []), ...(timeOff ?? [])].map((a) => ({
             start: new Date(a.starts_at),
             end: new Date(a.ends_at),
           })),

@@ -64,11 +64,11 @@ code, pas recopiés d'un document précédent.
 | Stock et pièces | `created_by` renseigné mais colonne non contrainte NOT NULL ; raison de mouvement bien contrainte en base ; coût jamais exposé au client — **stock négatif possible sans avertissement** | **Critique** (le stock négatif) | Garde-fou ajouté : un usage qui dépasserait le stock disponible est refusé avec un message clair | `npx tsc/vitest/build` | **Corrigé** | Oui | Rendre `created_by` NOT NULL (mineur) | src/data/inventory/actions.ts, messages/{nl,en,fr}.json |
 | Ordres de réparation — historique de statut | Une ligne d'historique est bien créée à chaque changement | — | Aucune nécessaire | Lecture `updateWorkOrderStatusAction` | Sain | Oui | — | — |
 | Ordres de réparation — checklist avant clôture | Un ordre pouvait passer « livré » avec des points de checklist encore en attente, sans aucune alerte | **Critique** | Un ordre ne peut plus passer « livré » avec des points en attente, sauf case de dérogation explicite cochée par le personnel | `npx tsc/vitest/build` | **Corrigé** | Oui | — | src/data/work-orders/actions.ts, src/app/[locale]/(app)/work-orders/[id]/page.tsx, messages/{nl,en,fr}.json |
-| Agenda et fuseaux horaires | Approche « heure murale naïve en UTC » cohérente à l'écran (pas de vrai calcul IANA Europe/Amsterdam avec DST) ; une incohérence mineure identifiée dans le calcul de la borne « aujourd'hui » de l'assistant IA ; la table `time_off` existe en base mais n'est jamais consultée par le moteur de disponibilité ; pas de re-vérification serveur du chevauchement à l'insertion manuelle | Moyenne | Non corrigé dans ce lot | Lecture `src/lib/datetime.ts` + moteur de disponibilité | Fonctionnel pour l'usage NL actuel, avec lacunes identifiées | Oui | Passer à un vrai calcul de fuseau horaire avant toute expansion internationale ; brancher `time_off` dans le moteur de créneaux ; ajouter une re-vérification serveur | — |
+| Agenda et fuseaux horaires | La table `time_off` existait en base mais n'était jamais consultée par le moteur de disponibilité — un congé/absence posé ne bloquait aucun créneau suggéré. Approche « heure murale naïve en UTC » toujours en place (pas de vrai calcul IANA Europe/Amsterdam avec DST) | Moyenne | `time_off` de l'organisation est maintenant fusionné avec les rendez-vous existants avant de calculer les créneaux libres, sur les deux écrans qui proposent des créneaux (agenda du jour, fiche lead) | `npx tsc/vitest/build` | **Corrigé** (le point UTC/IANA reste un choix assumé pour le pilote, documenté dans `src/lib/datetime.ts`) | Oui | Passer à un vrai calcul de fuseau horaire avant toute expansion internationale hors UTC/CET | src/app/[locale]/(app)/agenda/page.tsx, src/app/[locale]/(app)/leads/[id]/page.tsx |
 | Automatisations et relances | Confirmé : jamais d'envoi automatique, dédoublonnage réel, mais pas de gestion de consentement/désinscription dans ce module (les champs existent ailleurs, pas utilisés ici) | Faible (conception assumée) | Non corrigé dans ce lot | Lecture `engine.ts` | Conforme à l'intention | Suggestion uniquement (voulu) | Ajouter une vérification de consentement si l'envoi automatique est un jour activé | — |
 | Rapports et statistiques | Confirmé : chiffres réels, chiffre d'affaires basé sur les paiements encaissés (pas les devis), filtres de période et exports PDF/CSV fonctionnels | — | Aucune nécessaire | Lecture `load.ts` + `summarize.ts` | Sain | Oui | — | — |
-| Authentification et autorisations | Rate limiting réellement branché sur connexion/lien magique/réinitialisation ; sessions et routes protégées vérifiées ; **aucune réauthentification** pour la révocation de clé API ou la désactivation 2FA (2FA bénéficie implicitement d'un niveau AAL2 Supabase, la révocation de clé API non) | Moyenne | Non corrigé dans ce lot | Lecture des actions sensibles | Fonctionnel avec lacune identifiée | Oui | Ajouter une re-confirmation de mot de passe avant révocation de clé API | — |
-| RGPD | Pas d'export/suppression en libre-service (traité par contact e-mail) ; Resend absent de la liste des sous-traitants de la politique de confidentialité ; données envoyées à l'IA déjà minimisées (aucun nom/téléphone/e-mail dans les prompts de diagnostic) | Moyenne | Resend ajouté à la liste des sous-traitants (3 langues) | `npx tsc/vitest/build` | **Partiellement corrigé** | Partiel | Construire l'export/suppression en libre-service | src/lib/legal.ts |
+| Authentification et autorisations | Rate limiting réellement branché sur connexion/lien magique/réinitialisation ; sessions et routes protégées vérifiées ; **aucune réauthentification** pour la révocation de clé API ou la désactivation 2FA (2FA bénéficie implicitement d'un niveau AAL2 Supabase, la révocation de clé API non) | Moyenne | La révocation de clé API exige désormais la ré-saisie du mot de passe du compte, vérifiée côté serveur (`signInWithPassword`) avant que la clé soit effectivement révoquée | `npx tsc/vitest/build` | **Corrigé** | Oui | — | src/data/developer/actions.ts, src/app/[locale]/(app)/settings/page.tsx, messages/{nl,en,fr}.json |
+| RGPD | Pas d'export/suppression en libre-service (traité par contact e-mail) ; Resend absent de la liste des sous-traitants de la politique de confidentialité ; données envoyées à l'IA déjà minimisées (aucun nom/téléphone/e-mail dans les prompts de diagnostic) | Moyenne | Resend ajouté à la liste des sous-traitants (3 langues). Export libre-service (JSON, profil + adhésions + journal d'activité personnel) via `/[locale]/account/export`. Suppression libre-service : quitte immédiatement chaque organisation dont l'utilisateur est simple membre (nouvelle fonction `leave_organization`), puis enregistre une demande d'effacement du compte. Si l'utilisateur possède encore une organisation, la demande est honnêtement marquée « bloquée » (la base refuse de toute façon la suppression tant qu'une organisation lui appartient — `on delete restrict`) ; sinon un job planifié (`api/cron/process-account-deletions`, rôle de service uniquement) supprime réellement le compte `auth.users` | `npx tsc/vitest/build` | **Corrigé** | Oui | — | supabase/migrations/20260730100000_account_deletion_self_service.sql, src/data/account/actions.ts, src/app/[locale]/(app)/account/export/route.ts, src/app/api/cron/process-account-deletions/route.ts, src/app/[locale]/(app)/settings/page.tsx, vercel.json, messages/{nl,en,fr}.json |
 | Propriété intellectuelle | « ROAVAA » toujours nom de travail (vérification BOIP/EUIPO non faite) ; licences des dépendances directes vérifiées permissives (MIT/ISC/Apache-2.0) ; aucun secret ni compte personnel codé en dur trouvé | — | Aucune nécessaire pour ce lot | Recherche exhaustive + scan licences | Sain, dépôt de marque à faire par la fondatrice | N/A | Déposer la marque avant impression/lancement public si souhaité | — |
 | Design et UX | Non ré-audité dans ce lot (portée déjà couverte lors de lots précédents de ce projet — responsive, états de chargement, mode démo) | — | — | — | — | — | Revue visuelle écran par écran non refaite dans cet audit | — |
 | Internationalisation | Parité de clés nl/en/fr confirmée par le test automatique existant (`src/i18n/messages.test.ts`, 3/3 verts) ; aucune chaîne codée en dur trouvée hors `global-error.tsx` (hors arbre i18n par nature) | — | Aucune nécessaire | `npx vitest run src/i18n/messages.test.ts` | Sain | Oui | — | — |
@@ -87,15 +87,15 @@ remplies.
 - ⚠️ **PRÊT POUR GARAGE PILOTE** — les bugs critiques qui auraient cassé un
   pilote réel (invitation d'employé, facture marquée payée sans preuve,
   double crédit Stripe, devis accepté modifiable, ordre livré sans checklist,
-  stock négatif) sont **désormais corrigés**. Reste avant un vrai pilote
-  multi-utilisateurs : les lacunes moyennes listées ci-dessus (agenda/fuseau
-  horaire, réauthentification clé API) ne bloquent pas un premier pilote
-  encadré, mais doivent être suivies.
+  stock négatif) sont **désormais corrigés**, de même que la réauthentification
+  clé API et le branchement de `time_off` dans le moteur de créneaux. Reste
+  avant un vrai pilote multi-utilisateurs : le calcul de fuseau horaire reste
+  en heure murale UTC (choix assumé pour un usage NL/BE/FR), ce qui ne bloque
+  pas un premier pilote encadré mais doit être suivi.
 - ❌ **PRÊT POUR CLIENTS PAYANTS** — la facturation Stripe est désactivée
   commercialement par choix (`LAUNCH_FREE`), WhatsApp/téléphone ne sont pas
   connectés alors qu'ils font partie de la promesse commerciale du marché
-  cible, et l'export/suppression RGPD en libre-service manque. À lever
-  avant tout encaissement réel.
+  cible. À lever avant tout encaissement réel.
 - ❌ **PRÊT POUR AUDIT D'ACQUISITION** — la documentation contredisait le code
   sur des points vérifiables (nombre de tests, fonctionnalités « non
   construites ») ; c'est maintenant corrigé dans le dépôt, mais le **dossier
@@ -105,15 +105,17 @@ remplies.
 
 ## Travail restant priorisé (au-delà de ce lot)
 
-1. Élevée : brancher un envoi réel sur la transition de statut facture
-   « envoyée » et sur le message client de fin de réparation.
-2. Élevée : ajouter un garde-fou code (pas seulement prompt) contre un prix
-   IA fabriqué pour une pièce inconnue.
-3. Moyenne : rate limiting sur `/api/rdw/public-lookup`.
-4. Moyenne : vrai calcul de fuseau horaire (bibliothèque IANA) avant toute
-   expansion hors Pays-Bas ; brancher `time_off` dans le moteur de créneaux.
-5. Moyenne : réauthentification avant révocation de clé API.
-6. Moyenne : export/suppression RGPD en libre-service.
-7. Faible : indicateur admin du fournisseur IA actif + `prompt_version` dans
+Corrigés depuis la première version de cet audit : envoi réel sur facture
+« envoyée » et sur le message client de fin de réparation ; garde-fou code
+contre un prix IA fabriqué (`enforceCatalogPricing`) ; rate limiting sur
+`/api/rdw/public-lookup` ; réauthentification avant révocation de clé API ;
+`time_off` branché dans le moteur de créneaux ; export/suppression RGPD en
+libre-service.
+
+Reste à faire :
+
+1. Moyenne : vrai calcul de fuseau horaire (bibliothèque IANA) avant toute
+   expansion hors Pays-Bas/Belgique/France.
+2. Faible : indicateur admin du fournisseur IA actif + `prompt_version` dans
    `ai_usage_log` ; archivage des devis ; `created_by` NOT NULL sur les
    mouvements de stock.
