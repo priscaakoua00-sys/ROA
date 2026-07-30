@@ -178,6 +178,11 @@ export default async function SettingsPage({
     .eq('user_id', user.id)
     .maybeSingle();
   const canManageSettings = roleHas(role, 'manage_settings');
+  const { data: whatsappConnection } = await supabase
+    .from('whatsapp_connections')
+    .select('status, phone_number')
+    .eq('organization_id', org.id)
+    .maybeSingle();
   // Company identity (IBAN, VAT, margin) stays owner/admin-only at the RLS
   // layer (organizations_update_admin) — manager gets services/hours/
   // checklist (below) but not this section.
@@ -667,6 +672,30 @@ export default async function SettingsPage({
             </>
           )}
         </div>
+      </section>
+
+      {/* WhatsApp Business connection — architecture only until a real
+          provider account exists; never anyone's personal number. */}
+      <section id="whatsapp" className="mt-6 scroll-mt-20 rounded-xl border border-border bg-card p-6 shadow-soft">
+        <h2 className="text-base font-semibold tracking-tight">{t('settings.whatsappTitle')}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t('settings.whatsappIntro')}</p>
+
+        <div className="mt-4 flex items-center gap-2">
+          <Badge variant="muted">
+            {whatsappConnection?.status === 'connected'
+              ? t('settings.whatsappStatusConnected')
+              : t('settings.whatsappStatusNotConnected')}
+          </Badge>
+          {whatsappConnection?.phone_number ? (
+            <span className="text-sm text-muted-foreground">{whatsappConnection.phone_number}</span>
+          ) : null}
+        </div>
+
+        <p className="mt-3 text-xs text-muted-foreground">{t('settings.whatsappComingSoonNote')}</p>
+
+        <Button type="button" variant="outline" size="sm" className="mt-3" disabled title={t('settings.whatsappComingSoonNote')}>
+          {t('settings.whatsappConnectButton')}
+        </Button>
       </section>
 
       {/* Digital business card */}

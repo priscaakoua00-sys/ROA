@@ -836,7 +836,13 @@
       "privacyDeleteBlockedOwner": "We hebben je verzoek genoteerd, maar je bent nog eigenaar van een organisatie — verwijdering is on hold totdat het eigenaarschap is overgedragen of de organisatie is gesloten. Neem contact op met privacy@roavaa.com om verder te gaan.",
       "privacyDeleteCancel": "Verzoek annuleren",
       "privacyDeleteRequestedToast": "Verwijderingsverzoek ontvangen.",
-      "privacyDeleteCancelledToast": "Verwijderingsverzoek geannuleerd."
+      "privacyDeleteCancelledToast": "Verwijderingsverzoek geannuleerd.",
+      "whatsappTitle": "WhatsApp Business",
+      "whatsappIntro": "Elke garage verbindt hier zijn eigen WhatsApp Business-nummer — nooit een persoonlijk nummer, en nooit gedeeld met een andere garage.",
+      "whatsappStatusConnected": "Verbonden",
+      "whatsappStatusNotConnected": "Niet verbonden",
+      "whatsappComingSoonNote": "Binnenkort beschikbaar — WhatsApp-koppeling vereist een geverifieerd zakelijk provideraccount, nog niet ingesteld.",
+      "whatsappConnectButton": "WhatsApp koppelen"
     },
     "knowledge": {
       "title": "Kennisbank",

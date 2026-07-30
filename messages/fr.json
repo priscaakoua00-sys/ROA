@@ -836,7 +836,13 @@
       "privacyDeleteBlockedOwner": "Votre demande a été enregistrée, mais vous êtes toujours propriétaire d’une organisation — la suppression est en attente jusqu’au transfert de propriété ou à la fermeture de l’organisation. Contactez privacy@roavaa.com pour continuer.",
       "privacyDeleteCancel": "Annuler la demande",
       "privacyDeleteRequestedToast": "Demande de suppression reçue.",
-      "privacyDeleteCancelledToast": "Demande de suppression annulée."
+      "privacyDeleteCancelledToast": "Demande de suppression annulée.",
+      "whatsappTitle": "WhatsApp Business",
+      "whatsappIntro": "Chaque garage connecte ici son propre numéro WhatsApp Business — jamais un numéro personnel, jamais partagé avec un autre garage.",
+      "whatsappStatusConnected": "Connecté",
+      "whatsappStatusNotConnected": "Non connecté",
+      "whatsappComingSoonNote": "Bientôt disponible — la connexion WhatsApp nécessite un compte fournisseur professionnel vérifié, pas encore configuré.",
+      "whatsappConnectButton": "Connecter WhatsApp"
     },
     "knowledge": {
       "title": "Base de connaissances",
