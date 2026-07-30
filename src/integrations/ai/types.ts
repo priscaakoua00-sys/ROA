@@ -23,6 +23,8 @@ export interface AIResultMeta {
   confidence: number;
   /** Optional measured latency in milliseconds. */
   latencyMs?: number;
+  /** Which revision of the system prompt produced this result, when applicable. */
+  promptVersion?: string;
 }
 
 /**

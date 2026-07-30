@@ -44,6 +44,13 @@ import { findEmergencyKeywords } from './emergency-keywords';
 
 const MODEL = 'claude-sonnet-5';
 
+/**
+ * Bumped whenever a system prompt below changes meaningfully — lets the
+ * admin AI-usage view (and any future regression investigation) tell which
+ * prompt revision produced a given logged call.
+ */
+const PROMPT_VERSION = '2026-07-30.1';
+
 const LANGUAGE_NAME: Record<string, string> = { nl: 'Dutch', en: 'English', fr: 'French' };
 
 const PRICE_TO_CONFIRM_SUFFIX: Record<string, string> = {
@@ -113,7 +120,7 @@ export class AnthropicAIProvider implements AIProvider {
   }
 
   private meta(confidence: number, latencyMs?: number): AIResultMeta {
-    return { provider: this.name, model: MODEL, confidence, latencyMs };
+    return { provider: this.name, model: MODEL, confidence, latencyMs, promptVersion: PROMPT_VERSION };
   }
 
   private async callTool(opts: {
