@@ -688,6 +688,8 @@
       "companyTitle": "Bedrijf",
       "name": "Naam",
       "language": "Standaardtaal",
+      "timezone": "Tijdzone",
+      "timezoneHint": "Gebruikt voor de agenda en afspraaktijden — kies de tijdzone waarin je garage echt werkt.",
       "hoursTitle": "Openingstijden",
       "hoursIntro": "Bepaalt welke momenten Roavaa kan voorstellen.",
       "servicesTitle": "Diensten",

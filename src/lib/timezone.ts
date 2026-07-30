@@ -7,6 +7,42 @@
  * clocks (cron jobs, "now", other timestamps).
  */
 
+/** Curated shortlist for the Settings picker — ROAVAA's current market plus common neighbours. */
+export const COMMON_TIMEZONES = [
+  'Europe/Amsterdam',
+  'Europe/Brussels',
+  'Europe/Paris',
+  'Europe/Luxembourg',
+  'Europe/Berlin',
+  'Europe/London',
+  'Europe/Dublin',
+  'Europe/Madrid',
+  'Europe/Lisbon',
+  'Europe/Rome',
+  'Europe/Zurich',
+  'Europe/Vienna',
+  'Europe/Copenhagen',
+  'Europe/Stockholm',
+  'Europe/Oslo',
+  'Europe/Warsaw',
+  'UTC',
+] as const;
+
+/**
+ * True for any timezone identifier Intl actually accepts — validates
+ * untrusted input (e.g. a form field). Intl.DateTimeFormat throws on a bad
+ * zone, which is the authoritative check ('UTC' is valid but, notably, isn't
+ * listed by Intl.supportedValuesOf('timeZone') on every runtime).
+ */
+export function isValidTimeZone(value: string): boolean {
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: value });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /** The real UTC offset (in minutes, e.g. 60 for CET) a zone has at a given instant. */
 export function getTimeZoneOffsetMinutes(date: Date, timeZone: string): number {
   const dtf = new Intl.DateTimeFormat('en-US', {

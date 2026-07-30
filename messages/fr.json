@@ -688,6 +688,8 @@
       "companyTitle": "Entreprise",
       "name": "Nom",
       "language": "Langue par défaut",
+      "timezone": "Fuseau horaire",
+      "timezoneHint": "Utilisé pour l’agenda et les heures de rendez-vous — choisissez le fuseau horaire réel de votre garage.",
       "hoursTitle": "Horaires d'ouverture",
       "hoursIntro": "Détermine les créneaux que Roavaa peut proposer.",
       "servicesTitle": "Services",

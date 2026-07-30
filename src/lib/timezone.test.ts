@@ -5,7 +5,23 @@ import {
   startOfDayInZoneUtc,
   zonedMinutesOfDay,
   formatTimeInZone,
+  isValidTimeZone,
+  COMMON_TIMEZONES,
 } from './timezone';
+
+describe('isValidTimeZone', () => {
+  it('accepts every zone in the Settings shortlist', () => {
+    for (const tz of COMMON_TIMEZONES) {
+      expect(isValidTimeZone(tz)).toBe(true);
+    }
+  });
+
+  it('rejects garbage input', () => {
+    expect(isValidTimeZone('not/a-real-zone')).toBe(false);
+    expect(isValidTimeZone('')).toBe(false);
+    expect(isValidTimeZone('DROP TABLE organizations;')).toBe(false);
+  });
+});
 
 describe('getTimeZoneOffsetMinutes', () => {
   it('is 0 for UTC', () => {
