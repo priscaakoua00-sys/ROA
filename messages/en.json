@@ -1136,13 +1136,16 @@
       "statPendingAmount": "Amount pending",
       "search": "Quote number, customer, plate, vehicle...",
       "filters": {
-        "all": "All"
+        "all": "All",
+        "archived": "Archived"
       },
       "actionSendReminder": "Send a reminder",
       "reminderSent": "Reminder sent to the customer.",
       "reminderError": "Could not send the reminder (no customer email, or sending disabled).",
       "actionDuplicate": "Duplicate",
-      "locked": "This quote has already been responded to by the customer and can no longer be edited."
+      "locked": "This quote has already been responded to by the customer and can no longer be edited.",
+      "actionArchive": "Archive",
+      "actionUnarchive": "Unarchive"
     },
     "quoteStatus": {
       "draft": "Draft",

@@ -1136,13 +1136,16 @@
       "statPendingAmount": "Montant en attente",
       "search": "N° de devis, client, plaque, véhicule...",
       "filters": {
-        "all": "Tous"
+        "all": "Tous",
+        "archived": "Archivé"
       },
       "actionSendReminder": "Envoyer un rappel",
       "reminderSent": "Rappel envoyé au client.",
       "reminderError": "Impossible d'envoyer le rappel (pas d'e-mail client, ou envoi désactivé).",
       "actionDuplicate": "Dupliquer",
-      "locked": "Ce devis a déjà reçu une réponse du client et ne peut plus être modifié."
+      "locked": "Ce devis a déjà reçu une réponse du client et ne peut plus être modifié.",
+      "actionArchive": "Archiver",
+      "actionUnarchive": "Désarchiver"
     },
     "quoteStatus": {
       "draft": "Brouillon",
