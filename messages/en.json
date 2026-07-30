@@ -688,6 +688,8 @@
       "companyTitle": "Company",
       "name": "Name",
       "language": "Default language",
+      "timezone": "Timezone",
+      "timezoneHint": "Used for scheduling and appointment times — pick the timezone your garage actually operates in.",
       "hoursTitle": "Opening hours",
       "hoursIntro": "Controls which times Roavaa can propose.",
       "servicesTitle": "Services",

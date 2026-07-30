@@ -46,6 +46,7 @@ import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button';
 import { PlanFeatureList } from '@/components/pricing/plan-feature-list';
 import { seedDemoDataAction, deleteDemoDataAction } from '@/data/demo/actions';
 import { requestAccountDeletionAction, cancelAccountDeletionAction } from '@/data/account/actions';
+import { COMMON_TIMEZONES } from '@/lib/timezone';
 import { EmailSignaturePreview } from '@/components/settings/email-signature-preview';
 import { buildEmailSignatureHtml, buildEmailSignatureText } from '@/lib/email-signature';
 import { SITE_URL } from '@/lib/site';
@@ -133,7 +134,7 @@ export default async function SettingsPage({
   if (!activeOrgId) redirect(`/${locale}/onboarding`);
   const { data: org } = await supabase
     .from('organizations')
-    .select('id, name, slug, default_language, phone, email, address, postal_code, city, kvk_number, vat_number, website, iban, bic, logo_url, default_margin_percent, default_hourly_rate')
+    .select('id, name, slug, default_language, phone, email, address, postal_code, city, kvk_number, vat_number, website, iban, bic, logo_url, default_margin_percent, default_hourly_rate, timezone')
     .eq('id', activeOrgId)
     .maybeSingle();
   if (!org) redirect(`/${locale}/onboarding`);
@@ -484,6 +485,15 @@ export default async function SettingsPage({
                     <option key={l} value={l}>{t(`settings.lang.${l}`)}</option>
                   ))}
                 </select>
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium">{t('settings.timezone')}</label>
+                <select name="timezone" defaultValue={org.timezone ?? 'Europe/Amsterdam'} className={inputCls}>
+                  {COMMON_TIMEZONES.map((tz) => (
+                    <option key={tz} value={tz}>{tz}</option>
+                  ))}
+                </select>
+                <p className="mt-1 text-xs text-muted-foreground">{t('settings.timezoneHint')}</p>
               </div>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <Field label={t('settings.phone')} name="phone" defaultValue={org.phone ?? ''} />

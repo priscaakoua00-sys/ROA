@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { getActiveOrgId } from '@/data/organizations/active';
+import { isValidTimeZone } from '@/lib/timezone';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -28,7 +29,9 @@ export async function updateCompanyAction(formData: FormData) {
   const marginPercent = Number.isFinite(marginRaw) ? Math.min(100, Math.max(0, marginRaw)) : 35;
   const hourlyRateRaw = Number(formData.get('hourlyRate') ?? 65);
   const hourlyRate = Number.isFinite(hourlyRateRaw) ? Math.max(0, hourlyRateRaw) : 65;
+  const timezoneRaw = String(formData.get('timezone') ?? '').trim();
   if (!name) redirect(`/${locale}/settings?error=1`);
+  if (timezoneRaw && !isValidTimeZone(timezoneRaw)) redirect(`/${locale}/settings?error=1`);
 
   const supabase = await createSupabaseServerClient();
   const id = await orgId(supabase);
@@ -50,6 +53,7 @@ export async function updateCompanyAction(formData: FormData) {
       bic: clean('bic'),
       default_margin_percent: marginPercent,
       default_hourly_rate: hourlyRate,
+      ...(timezoneRaw ? { timezone: timezoneRaw } : {}),
     })
     .eq('id', id);
   redirect(`/${locale}/settings?saved=company`);
