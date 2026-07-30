@@ -43,8 +43,8 @@ Built and working (all connected to real data, not mocked UI):
   with a deterministic `MockAIProvider` fallback for development — see
   "Simulated vs. connected" below for exactly what that covers.
 - i18n NL / EN / FR everywhere.
-- **121 unit tests** (19 files, 30 suites) + **26 Playwright e2e tests** (2
-  spec files). Four green checks: `typecheck`, `lint`, `test`, `build`.
+- **140 unit tests** (21 files) + **26 Playwright e2e tests** (2 spec files).
+  Four green checks: `typecheck`, `lint`, `test`, `build`.
 
 Simulated / not yet connected (see `docs/AUDIT_REPORT.md` for the full,
 per-module breakdown): WhatsApp and phone are not integrated at all — the only

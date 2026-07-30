@@ -26,10 +26,8 @@ export function generateMetadata() {
 
 export default async function PublicQuotePage({
   params,
-  searchParams,
 }: {
   params: Promise<{ locale: string; id: string }>;
-  searchParams: Promise<{ responded?: string; error?: string }>;
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);

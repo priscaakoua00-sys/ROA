@@ -53,9 +53,9 @@ toute impression ou lancement public.
   automatique, mode demonstration (donnees realistes a la creation du compte).
 - Parametres: nom et langue du garage, horaires d'ouverture jour par jour,
   services (duree, tampon, actif) — reserve aux roles proprietaire/admin/manager.
-- International NL / EN / FR partout. **121 tests unitaires** (19 fichiers, 30
-  suites) + **26 tests e2e Playwright**. Quatre controles verts: typecheck,
-  lint, tests, build.
+- International NL / EN / FR partout. **140 tests unitaires** (21 fichiers)
+  + **26 tests e2e Playwright** (2 fichiers). Quatre controles verts:
+  typecheck, lint, tests, build.
 
 ## 2. Ce qui est SIMULE ou pas encore connecte (a dire au testeur)
 
@@ -73,9 +73,9 @@ toute impression ou lancement public.
 - Abonnements Stripe: le parcours complet (checkout, activation, renouvellement,
   annulation, webhooks idempotents) est construit et fonctionnel, mais
   desactive commercialement pendant le lancement (`LAUNCH_FREE`).
-- Fuseau horaire: heure locale coherente a l'ecran (pas de vrai calcul IANA
-  Europe/Amsterdam avec DST) — suffisant pour l'usage actuel, a corriger avant
-  une expansion internationale.
+- Fuseau horaire: vrai calcul IANA par organisation (`organizations.timezone`,
+  base sur `Intl`), changement d'heure (DST) gere correctement — teste sur le
+  cas reel du 29 mars 2026 (Europe/Amsterdam).
 
 ## 3. Securite
 
@@ -141,13 +141,17 @@ Objectif: le testeur doit pouvoir gerer une journee type.
 14. Changer la langue NL / EN / FR et verifier les traductions.
 15. Verifier le rendu sur telephone, tablette et ordinateur.
 
-## 7. Limites connues
+## 7. Limites reelles actuelles
 
-- IA simulee (pas de vraie generation).
-- Pas d'envoi reel (e-mail, WhatsApp, SMS, telephone).
-- Fuseau horaire simplifie.
-- Pas de devis, factures, paiements.
-- Invitation employe sans e-mail d'acceptation.
+- WhatsApp / telephone: aucune API connectee, uniquement un lien manuel
+  `wa.me` (le garage clique et envoie lui-meme, jamais automatique).
+- IA: fournisseur reel (Anthropic) actif seulement si `ANTHROPIC_API_KEY` est
+  definie; sinon, mock deterministe pour le developpement. Aucun envoi IA sans
+  validation humaine.
+- Abonnements Stripe: parcours complet construit et fonctionnel, mais
+  desactive commercialement pendant le lancement pilote (`LAUNCH_FREE`).
+- Domaine roavaa.com et verification de marque BOIP/EUIPO: a faire avant tout
+  lancement public.
 
 ## 8. Retour arriere (rollback)
 
@@ -161,18 +165,21 @@ Objectif: le testeur doit pouvoir gerer une journee type.
 - Aucune donnee bancaire ou de paiement (non gere).
 - Pas de donnees clients sensibles au-dela du necessaire (RGPD) avant revue.
 - Ne pas publier de statistiques ou temoignages inventes.
-- Ne pas compter sur une reponse automatique de l'IA: elle est simulee, un humain
-  valide et envoie.
+- Ne pas compter sur une reponse automatique de l'IA sans supervision: un
+  humain valide et envoie toujours, meme avec le fournisseur reel actif.
 
 ## 10. Pour aller plus loin (necessite une decision + un budget)
 
-- IA reelle: cle API (Anthropic ou OpenAI) + budget. L'architecture est prete
-  (interface AIProvider, selection par variable d'environnement).
-- E-mail (recommande en premier, ex. Resend): debloque l'envoi reel des reponses,
-  les relances automatiques et les invitations d'employes.
-- WhatsApp Business, telephone: comptes + cles + budget.
+- IA reelle: deja implementee et active des que `ANTHROPIC_API_KEY` est
+  definie (interface `AIProvider`, selection automatique par variable
+  d'environnement, mock deterministe en secours sinon).
+- E-mail: deja reellement connecte (Resend) — devis, factures, rappels et
+  invitations d'equipe partent reellement.
+- WhatsApp Business, telephone: comptes + cles + budget (a la charge de
+  l'acquereur). L'UI de connexion existe deja, affichee "Bientot disponible".
 - Domaine roavaa.com: achat + connexion a Vercel.
 
-Le coeur du produit est complet et testable des maintenant avec le formulaire web
-et l'IA simulee. Les integrations reelles s'ajoutent ensuite sans changer
-l'architecture.
+Le coeur du produit est complet et testable des maintenant avec le formulaire
+web et l'IA (reelle si la cle est definie, sinon simulee pour le
+developpement). Les integrations restantes (WhatsApp Business, telephone)
+s'ajoutent ensuite sans changer l'architecture.

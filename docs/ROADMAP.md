@@ -24,8 +24,8 @@
   task assignment.
 - Conversations: thread + AI-drafted reply (human validates and sends).
 - Dashboard with real counts + notifications.
-- i18n NL / EN / FR. **121 unit tests** (19 files, 30 suites) + **26
-  Playwright e2e tests**. Four green checks: typecheck, lint, test, build.
+- i18n NL / EN / FR. **140 unit tests** (21 files) + **26 Playwright e2e
+  tests** (2 spec files). Four green checks: typecheck, lint, test, build.
 
 ## Phase 2: Real intelligence (DONE) ✅
 

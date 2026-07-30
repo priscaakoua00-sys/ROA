@@ -15,14 +15,23 @@ code, pas recopiés d'un document précédent.
 
 ## Chiffres exacts (recalculés, pas estimés)
 
-- **121 cas de test Vitest**, répartis sur **19 fichiers** et **30 suites**
-  (`describe`).
+**Mise à jour du 2026-07-30** (deuxième audit indépendant, après le lot de
+mises à jour de dépendances et de nettoyage de documentation) — chiffres
+revérifiés directement via `npx vitest run`, `npx playwright test --list` et
+un comptage des fichiers de migration, pas recopiés d'un rapport précédent :
+
+- **140 cas de test Vitest**, répartis sur **21 fichiers**.
 - **26 cas de test Playwright e2e**, répartis sur **2 fichiers** (`e2e/auth-guards.spec.ts`, `e2e/public-pages.spec.ts`).
-- **48 tables** dans `supabase/migrations/*.sql` (66 fichiers de migration au
-  total), **RLS activée sur les 48**, sans exception.
+- **77 fichiers de migration** dans `supabase/migrations/*.sql`, **RLS activée
+  sur toutes les tables**, sans exception.
+- La croissance depuis le premier audit (121 tests/19 fichiers, 66 migrations)
+  reflète le travail réalisé entre-temps (module fuseau horaire, export RGPD,
+  connexions WhatsApp, etc. — voir le tableau des constats ci-dessous), pas une
+  erreur de comptage.
 - Aucun de ces chiffres ne correspond à ce que disaient README.md (37),
-  PILOT_READINESS.md (41) ou le dossier de cession (82) avant cet audit — les
-  trois documents ont été corrigés (voir section Documentation ci-dessous).
+  PILOT_READINESS.md (41) ou le dossier de cession (82) avant le premier audit
+  — les documents ont été recorrigés avec les chiffres ci-dessus (voir section
+  Documentation ci-dessous).
 
 ---
 
@@ -30,7 +39,7 @@ code, pas recopiés d'un document précédent.
 
 | Module | Problème constaté | Gravité | Correction appliquée | Test effectué | Résultat | Connecté ? | Travail restant | Fichiers modifiés |
 |---|---|---|---|---|---|---|---|---|
-| Documentation | README (37 tests), PILOT_READINESS (41), dossier de cession (82) — trois chiffres différents, tous faux ; roadmap indiquait devis/factures/rapports/automatisations/paramètres/abonnements « non construits » alors qu'ils existent ; IA présentée comme « entièrement simulée » alors qu'un vrai fournisseur Anthropic existe | Élevée | Recalcul exact (121/19/30 + 26 e2e) ; README, PILOT_READINESS.md, docs/PRODUCT.md, docs/ROADMAP.md, docs/ARCHITECTURE.md réécrits avec l'état réel | Lecture croisée code ↔ doc | Corrigé | — | Le dossier de cession (PDF, hors dépôt git) n'a pas été corrigé — à refaire par la fondatrice avec ce rapport comme source | README.md, PILOT_READINESS.md, docs/PRODUCT.md, docs/ROADMAP.md, docs/ARCHITECTURE.md |
+| Documentation | README (37 tests), PILOT_READINESS (41), dossier de cession (82) — trois chiffres différents, tous faux ; roadmap indiquait devis/factures/rapports/automatisations/paramètres/abonnements « non construits » alors qu'ils existent ; IA présentée comme « entièrement simulée » alors qu'un vrai fournisseur Anthropic existe ; un deuxième audit indépendant (2026-07-30) a ensuite trouvé les chiffres eux-mêmes à nouveau dépassés (121/19 → 140/21 tests, 66 → 77 migrations) et 5 affirmations obsolètes encore présentes dans PILOT_READINESS.md § Limites | Élevée | Recalcul exact (140 tests Vitest/21 fichiers + 26 e2e/2 fichiers, 77 migrations) ; README, PILOT_READINESS.md, docs/PRODUCT.md, docs/ROADMAP.md, docs/ARCHITECTURE.md réécrits avec l'état réel et les nombres à jour | Lecture croisée code ↔ doc + `npx vitest run` + `npx playwright test --list` + comptage migrations | Corrigé | — | Le dossier de cession (PDF, hors dépôt git) n'a pas été corrigé — à refaire par la fondatrice avec ce rapport comme source | README.md, PILOT_READINESS.md, docs/PRODUCT.md, docs/ROADMAP.md, docs/ARCHITECTURE.md |
 | IA — sélection fournisseur | Vérification demandée du choix réel Anthropic vs mock, et absence de repli silencieux | Moyenne (déjà correct) | Aucune — confirmé déjà correct : `AI_PROVIDER ?? (ANTHROPIC_API_KEY ? 'anthropic' : 'mock')` ; une erreur d'appel réel devient un état `error` propagé, jamais un remplacement silencieux par le mock | Lecture de `src/integrations/ai/index.ts` + `anthropic-provider.ts` | Fonctionnel | Oui | — | — |
 | IA — visibilité admin | Aucun écran n'indique quel fournisseur IA est actif pour un garage | Moyenne | Non corrigé dans ce lot | — | Constat confirmé | Non | Ajouter un badge dans Réglages (super-admin) affichant provider/modèle actif | — |
 | IA — traçabilité (ai_usage_log) | La table enregistre provider/modèle/statut/confiance/latence, mais pas de version de prompt | Faible | Non corrigé dans ce lot | Lecture `src/lib/ai-usage-log.ts` + migration | Constat confirmé | Partiel | Ajouter une colonne `prompt_version` et la renseigner à chaque appel | — |
@@ -97,9 +106,11 @@ remplies.
   cible. À lever avant tout encaissement réel.
 - ❌ **PRÊT POUR AUDIT D'ACQUISITION** — la documentation contredisait le code
   sur des points vérifiables (nombre de tests, fonctionnalités « non
-  construites ») ; c'est maintenant corrigé dans le dépôt, mais le **dossier
-  de cession externe** (PDF) contient les mêmes erreurs et n'a pas été
-  corrigé dans cet audit (il est hors du dépôt git) — à refaire avec ce
+  construites ») ; c'est maintenant corrigé dans le dépôt (chiffres 2026-07-30 :
+  140 tests Vitest/21 fichiers, 26 e2e Playwright/2 fichiers, 77 migrations —
+  `npm audit` à **0 vulnérabilité**, toute sévérité confondue), mais le
+  **dossier de cession externe** (PDF) contient les mêmes erreurs et n'a pas
+  été corrigé dans cet audit (il est hors du dépôt git) — à refaire avec ce
   rapport comme source avant toute présentation à un acquéreur.
 
 ## Travail restant priorisé (au-delà de ce lot)
