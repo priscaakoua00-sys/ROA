@@ -26,7 +26,7 @@ const STATUS_VARIANT: Record<string, 'muted' | 'default' | 'gold' | 'urgent' | '
   no_show: 'urgent',
 };
 const STATUSES = ['proposed', 'pending', 'confirmed', 'completed', 'cancelled', 'no_show'] as const;
-type View = 'month' | 'week';
+type View = 'day' | 'week' | 'month';
 
 interface Appt {
   id: string;
@@ -101,7 +101,10 @@ export default async function AgendaPage({
     error,
     conflict,
   } = await searchParams;
-  const view: View = viewParam === 'week' ? 'week' : 'month';
+  // Day is the default: a mechanic opening this on a phone in the workshop
+  // wants "what's today", not a full month grid. Week/month stay one tap
+  // away for anyone planning ahead.
+  const view: View = viewParam === 'week' ? 'week' : viewParam === 'month' ? 'month' : 'day';
   const t = await getTranslations('app');
 
   const supabase = await createSupabaseServerClient();
@@ -133,7 +136,12 @@ export default async function AgendaPage({
   const isCurrentMonth = todayISO.slice(0, 7) === monthKey;
   const dayParamValid = dayParam && /^\d{4}-\d{2}-\d{2}$/.test(dayParam) ? dayParam : null;
 
-  // Week view navigates independently of the month grid — the week can span two months.
+  // Day and week views navigate independently of the month grid — both can
+  // span into a different or adjacent month.
+  const dayAnchor = dayParamValid ?? todayISO;
+  const prevDayAnchor = addDaysISO(dayAnchor, -1);
+  const nextDayAnchor = addDaysISO(dayAnchor, 1);
+
   const weekAnchor = dayParamValid ?? todayISO;
   const weekStart = mondayOf(weekAnchor);
   const weekDates = Array.from({ length: 7 }, (_, i) => addDaysISO(weekStart, i));
@@ -142,21 +150,29 @@ export default async function AgendaPage({
   const nextWeekAnchor = addDaysISO(weekStart, 7);
 
   const selectedDay =
-    view === 'week'
-      ? weekAnchor
-      : dayParamValid && dayParamValid.startsWith(monthKey)
-        ? dayParamValid
-        : isCurrentMonth
-          ? todayISO
-          : null;
+    view === 'day'
+      ? dayAnchor
+      : view === 'week'
+        ? weekAnchor
+        : dayParamValid && dayParamValid.startsWith(monthKey)
+          ? dayParamValid
+          : isCurrentMonth
+            ? todayISO
+            : null;
 
   const rangeStart = (
-    view === 'week' ? startOfDayInZoneUtc(weekStart, timeZone) : startOfDayInZoneUtc(`${monthKey}-01`, timeZone)
+    view === 'day'
+      ? startOfDayInZoneUtc(dayAnchor, timeZone)
+      : view === 'week'
+        ? startOfDayInZoneUtc(weekStart, timeZone)
+        : startOfDayInZoneUtc(`${monthKey}-01`, timeZone)
   ).toISOString();
   const rangeEnd = (
-    view === 'week'
-      ? startOfDayInZoneUtc(addDaysISO(weekStart, 7), timeZone)
-      : startOfDayInZoneUtc(addDaysToDateLabel(`${monthKey}-01`, daysInMonth), timeZone)
+    view === 'day'
+      ? startOfDayInZoneUtc(addDaysToDateLabel(dayAnchor, 1), timeZone)
+      : view === 'week'
+        ? startOfDayInZoneUtc(addDaysISO(weekStart, 7), timeZone)
+        : startOfDayInZoneUtc(addDaysToDateLabel(`${monthKey}-01`, daysInMonth), timeZone)
   ).toISOString();
 
   const { data } = await supabase
@@ -186,8 +202,10 @@ export default async function AgendaPage({
   // Link (from '@/i18n/navigation') already prefixes the locale itself —
   // these hrefs must stay locale-agnostic or they double-prefix into a 404
   // (e.g. /nl/nl/agenda).
-  const dayHref = (d: string) => (view === 'week' ? `/agenda?view=week&day=${d}` : `/agenda?month=${monthKey}&day=${d}`);
-  const monthTabHref = `/agenda?month=${(selectedDay ?? weekAnchor).slice(0, 7)}&day=${selectedDay ?? weekAnchor}`;
+  const dayHref = (d: string) =>
+    view === 'week' ? `/agenda?view=week&day=${d}` : view === 'month' ? `/agenda?month=${monthKey}&day=${d}` : `/agenda?day=${d}`;
+  const dayTabHref = `/agenda?day=${selectedDay ?? todayISO}`;
+  const monthTabHref = `/agenda?view=month&month=${(selectedDay ?? weekAnchor).slice(0, 7)}&day=${selectedDay ?? weekAnchor}`;
   const weekTabHref = `/agenda?view=week&day=${selectedDay ?? todayISO}`;
   const selectedAppts = selectedDay ? (byDay.get(selectedDay) ?? []) : [];
 
@@ -320,10 +338,10 @@ export default async function AgendaPage({
 
       {/* View switcher */}
       <div className="mt-4 flex gap-1.5">
-        {(['month', 'week'] as const).map((v) => (
+        {(['day', 'week', 'month'] as const).map((v) => (
           <Link
             key={v}
-            href={v === 'month' ? monthTabHref : weekTabHref}
+            href={v === 'day' ? dayTabHref : v === 'week' ? weekTabHref : monthTabHref}
             className={cn(
               'rounded-full border px-3 py-1 text-xs font-medium transition',
               view === v
@@ -336,7 +354,34 @@ export default async function AgendaPage({
         ))}
       </div>
 
-      {view === 'month' ? (
+      {view === 'day' ? (
+        <div className="mt-4 flex items-center justify-between">
+          <Link
+            href={`/agenda?day=${prevDayAnchor}`}
+            aria-label={t('agenda.prevDay')}
+            className="flex size-11 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:border-gold/40 hover:text-foreground"
+          >
+            <ChevronLeft className="size-4" aria-hidden />
+          </Link>
+          <div className="flex items-center gap-3">
+            <h2 className="text-base font-semibold capitalize tracking-tight">
+              {new Intl.DateTimeFormat(locale, { timeZone: 'UTC', weekday: 'short', day: 'numeric', month: 'long' }).format(new Date(`${dayAnchor}T00:00:00.000Z`))}
+            </h2>
+            {dayAnchor !== todayISO ? (
+              <Link href={`/agenda?day=${todayISO}`} className="text-xs text-gold hover:underline">
+                {t('agenda.today')}
+              </Link>
+            ) : null}
+          </div>
+          <Link
+            href={`/agenda?day=${nextDayAnchor}`}
+            aria-label={t('agenda.nextDay')}
+            className="flex size-11 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:border-gold/40 hover:text-foreground"
+          >
+            <ChevronRight className="size-4" aria-hidden />
+          </Link>
+        </div>
+      ) : view === 'month' ? (
         <>
           {/* Month navigation */}
           <div className="mt-4 flex items-center justify-between">

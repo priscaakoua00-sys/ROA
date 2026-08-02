@@ -684,6 +684,31 @@ export default async function SettingsPage({
         </div>
       </section>
 
+      {/* Install as an app — ROAVAA is already a real installable PWA; this
+          just explains how, since neither platform surfaces that on its own. */}
+      <section id="install-app" className="mt-6 scroll-mt-20 rounded-xl border border-border bg-card p-6 shadow-soft">
+        <h2 className="text-base font-semibold tracking-tight">{t('settings.installTitle')}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t('settings.installIntro')}</p>
+
+        <details className="mt-4 rounded-lg border border-border bg-background p-3.5 open:pb-4">
+          <summary className="cursor-pointer text-sm font-medium">{t('settings.installAndroidTitle')}</summary>
+          <ol className="mt-2.5 list-decimal space-y-1.5 pl-4 text-sm text-muted-foreground">
+            <li>{t('settings.installAndroidStep1')}</li>
+            <li>{t('settings.installAndroidStep2')}</li>
+            <li>{t('settings.installAndroidStep3')}</li>
+          </ol>
+        </details>
+
+        <details className="mt-2.5 rounded-lg border border-border bg-background p-3.5 open:pb-4">
+          <summary className="cursor-pointer text-sm font-medium">{t('settings.installIosTitle')}</summary>
+          <ol className="mt-2.5 list-decimal space-y-1.5 pl-4 text-sm text-muted-foreground">
+            <li>{t('settings.installIosStep1')}</li>
+            <li>{t('settings.installIosStep2')}</li>
+            <li>{t('settings.installIosStep3')}</li>
+          </ol>
+        </details>
+      </section>
+
       {/* WhatsApp Business connection — architecture only until a real
           provider account exists; never anyone's personal number. */}
       <section id="whatsapp" className="mt-6 scroll-mt-20 rounded-xl border border-border bg-card p-6 shadow-soft">

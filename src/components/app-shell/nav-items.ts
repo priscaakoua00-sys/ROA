@@ -37,9 +37,9 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { href: '/dashboard', labelKey: 'dashboard', icon: LayoutDashboard, mobilePrimary: true },
   { href: '/agenda', labelKey: 'agenda', icon: CalendarDays, mobilePrimary: true },
-  { href: '/leads', labelKey: 'leads', icon: Inbox },
-  { href: '/customers', labelKey: 'customers', icon: Users, mobilePrimary: true },
-  { href: '/vehicles', labelKey: 'vehicles', icon: Car, mobilePrimary: true },
+  { href: '/leads', labelKey: 'leads', icon: Inbox, mobilePrimary: true },
+  { href: '/customers', labelKey: 'customers', icon: Users },
+  { href: '/vehicles', labelKey: 'vehicles', icon: Car },
   { href: '/appraise', labelKey: 'appraise', icon: Scale },
   { href: '/work-orders', labelKey: 'workOrders', icon: Wrench, mobilePrimary: true },
   { href: '/inventory', labelKey: 'inventory', icon: Package },

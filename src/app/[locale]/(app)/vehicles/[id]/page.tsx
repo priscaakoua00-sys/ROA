@@ -11,6 +11,7 @@ import { ModuleBanner } from '@/components/module-banner';
 import { Button } from '@/components/ui/button';
 import type { BadgeProps } from '@/components/ui/badge';
 import { Field } from '@/components/auth/auth-shell';
+import { QuickActions } from '@/components/quick-actions';
 import { Link } from '@/i18n/navigation';
 import { CarIllustration } from '@/components/vehicles/car-illustration';
 import { VAN_MODEL_PATTERN } from '@/components/vehicles/vehicle-card';
@@ -93,7 +94,7 @@ export default async function VehicleDetailPage({
 
   const { data: v } = await supabase
     .from('vehicles')
-    .select('id, license_plate, make, model, year, mileage, vin, fuel, transmission, color, notes, customer_id, photo_url, customers(first_name,last_name)')
+    .select('id, license_plate, make, model, year, mileage, vin, fuel, transmission, color, notes, customer_id, photo_url, customers(first_name,last_name,phone,email)')
     .eq('id', id)
     .maybeSingle();
   if (!v) notFound();
@@ -156,7 +157,12 @@ export default async function VehicleDetailPage({
       .filter((m): m is { url: string; angle: VehicleAngle | null } => Boolean(m.url)),
   }));
 
-  const customer = v.customers as unknown as { first_name: string | null; last_name: string | null } | null;
+  const customer = v.customers as unknown as {
+    first_name: string | null;
+    last_name: string | null;
+    phone: string | null;
+    email: string | null;
+  } | null;
   const owner = [customer?.first_name, customer?.last_name].filter(Boolean).join(' ') || t('leads.anonymous');
   const title = [v.make, v.model].filter(Boolean).join(' ') || t('customers.vehicle');
 
@@ -200,6 +206,21 @@ export default async function VehicleDetailPage({
           <Link href={`/customers/${v.customer_id}`} className="hover:underline">{owner}</Link>
         ) : owner}
       </p>
+
+      <QuickActions
+        phone={customer?.phone}
+        email={customer?.email}
+        links={[
+          { href: '#diagnosis', label: t('vehicles.photoUpload'), icon: Camera, plain: true },
+          ...(v.customer_id
+            ? [
+                { href: `/agenda?newCustomerId=${v.customer_id}`, label: t('agenda.addTitle'), icon: CalendarDays },
+                { href: `/quotes/new?customerId=${v.customer_id}`, label: t('quotes.new'), icon: Receipt },
+                { href: `/work-orders/new?customerId=${v.customer_id}`, label: t('workOrders.new'), icon: Wrench },
+              ]
+            : []),
+        ]}
+      />
 
       {saved ? <p className="mt-3 text-sm text-success">{t('vehicles.saved')}</p> : null}
       {photoError ? <p className="mt-3 text-sm text-destructive">{t('vehicles.photoError')}</p> : null}
@@ -402,14 +423,16 @@ export default async function VehicleDetailPage({
         )}
       </section>
 
-      <PhotoDiagnosisPanel
-        locale={locale}
-        vehicleId={v.id}
-        diagnoses={diagnoses}
-        saved={diagSaved === '1'}
-        error={diagError === '1'}
-        quoteError={quoteError === '1'}
-      />
+      <div id="diagnosis" className="scroll-mt-20">
+        <PhotoDiagnosisPanel
+          locale={locale}
+          vehicleId={v.id}
+          diagnoses={diagnoses}
+          saved={diagSaved === '1'}
+          error={diagError === '1'}
+          quoteError={quoteError === '1'}
+        />
+      </div>
 
       <MaintenanceSuggestionsPanel
         locale={locale}

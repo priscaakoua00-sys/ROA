@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { notFound, redirect } from 'next/navigation';
+import { CalendarPlus, FileText, Wrench } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { addVehicleAction } from '@/data/customers/actions';
@@ -8,6 +9,7 @@ import { formatDateTimeInZone } from '@/lib/timezone';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Field } from '@/components/auth/auth-shell';
+import { QuickActions } from '@/components/quick-actions';
 import { Link } from '@/i18n/navigation';
 import { SITE_URL } from '@/lib/site';
 
@@ -64,9 +66,16 @@ export default async function CustomerDetailPage({
         {t('customers.back')}
       </Link>
       <h1 className="mt-3 text-2xl font-semibold tracking-tight">{name}</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        {[customer.phone, customer.email].filter(Boolean).join(' · ') || '·'}
-      </p>
+
+      <QuickActions
+        phone={customer.phone}
+        email={customer.email}
+        links={[
+          { href: `/agenda?newCustomerId=${customer.id}`, label: t('agenda.addTitle'), icon: CalendarPlus },
+          { href: `/quotes/new?customerId=${customer.id}`, label: t('quotes.new'), icon: FileText },
+          { href: `/work-orders/new?customerId=${customer.id}`, label: t('workOrders.new'), icon: Wrench },
+        ]}
+      />
 
       {customer.email ? (
         <div className="mt-4 rounded-xl border border-border bg-card p-4">

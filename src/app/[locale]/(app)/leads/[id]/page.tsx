@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { notFound, redirect } from 'next/navigation';
+import { Camera } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { bookAppointmentAction } from '@/data/appointments/actions';
@@ -13,6 +14,7 @@ import { assignLeadAction } from '@/data/team/actions';
 import { createWorkOrderAction } from '@/data/work-orders/actions';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { QuickActions } from '@/components/quick-actions';
 import { Link } from '@/i18n/navigation';
 import { PhotoDiagnosisPanel, type DiagnosisRow } from '@/components/diagnosis/photo-diagnosis-panel';
 import type { DiagnosisHypothesis, DiagnosisSeverity, VehicleAngle } from '@/integrations/ai';
@@ -252,6 +254,12 @@ export default async function LeadDetailPage({
         <Badge variant="muted">{t(`leads.status.${lead.status}`)}</Badge>
       </div>
 
+      <QuickActions
+        phone={customer?.phone}
+        email={customer?.email}
+        links={[{ href: '#diagnosis', label: t('vehicles.photoUpload'), icon: Camera, plain: true }]}
+      />
+
       <div className="mt-4 rounded-xl border border-border bg-card p-5 shadow-soft">
         <p className="text-sm">{lead.ai_summary ?? lead.description}</p>
         <div className="mt-3 grid grid-cols-2 gap-3 text-sm text-muted-foreground">
@@ -405,14 +413,16 @@ export default async function LeadDetailPage({
         </section>
       ) : null}
 
-      <PhotoDiagnosisPanel
-        locale={locale}
-        leadId={lead.id}
-        diagnoses={diagnoses}
-        saved={diagSaved === '1'}
-        error={diagError === '1'}
-        quoteError={quoteError === '1'}
-      />
+      <div id="diagnosis" className="scroll-mt-20">
+        <PhotoDiagnosisPanel
+          locale={locale}
+          leadId={lead.id}
+          diagnoses={diagnoses}
+          saved={diagSaved === '1'}
+          error={diagError === '1'}
+          quoteError={quoteError === '1'}
+        />
+      </div>
     </div>
   );
 }
