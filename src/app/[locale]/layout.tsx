@@ -34,6 +34,15 @@ export async function generateMetadata({
     description,
     applicationName: t('name'),
     verification: { google: 'B3jewEyxlRg7bAwRSN10vFGEkNCd_QRSvdwWT6qmt0w' },
+    // iOS Safari ignores manifest.webmanifest for "Add to Home Screen" — it
+    // needs its own meta tags to drop the browser chrome and use a sane
+    // title/status bar once installed. Android already gets this from the
+    // manifest; this only affects iOS.
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: 'black-translucent',
+      title: t('name'),
+    },
     alternates: {
       canonical: path,
       languages: {

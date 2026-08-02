@@ -391,13 +391,16 @@
       "conflictError": "This slot already overlaps another appointment. Pick a different time.",
       "view": {
         "month": "Month",
-        "week": "Week"
+        "week": "Week",
+        "day": "Day"
       },
       "prevWeek": "Previous week",
       "nextWeek": "Next week",
       "suggestedTimesTitle": "Suggested free slots",
       "suggestedTimesNote": "Computed from your opening hours, existing bookings, and the first active service's duration.",
-      "searchHint": "Name, phone, email, or license plate."
+      "searchHint": "Name, phone, email, or license plate.",
+      "prevDay": "Previous day",
+      "nextDay": "Next day"
     },
     "appointmentStatus": {
       "proposed": "Proposed",
@@ -547,7 +550,8 @@
       "clientMessageSend": "Send message",
       "clientMessageNoEmail": "No email on file for this customer — the message cannot be sent.",
       "clientMessageSentToast": "Client message sent.",
-      "clientMessageError": "Sending failed. Please try again."
+      "clientMessageError": "Sending failed. Please try again.",
+      "new": "New work order"
     },
     "workOrderStatus": {
       "received": "Received",
@@ -844,7 +848,17 @@
       "whatsappStatusConnected": "Connected",
       "whatsappStatusNotConnected": "Not connected",
       "whatsappComingSoonNote": "Coming soon — WhatsApp connection requires a verified business provider account, not yet set up.",
-      "whatsappConnectButton": "Connect WhatsApp"
+      "whatsappConnectButton": "Connect WhatsApp",
+      "installTitle": "Install ROAVAA on this phone",
+      "installIntro": "ROAVAA is a real installable app (PWA): add it to your home screen for quick access, a full screen with no browser bar, and offline access to pages you’ve already opened.",
+      "installAndroidTitle": "Android (Chrome)",
+      "installAndroidStep1": "Open roavaa.com in Chrome and sign in.",
+      "installAndroidStep2": "Tap the three-dot menu in the top right.",
+      "installAndroidStep3": "Choose “Install app” or “Add to Home screen” and confirm.",
+      "installIosTitle": "iPhone (Safari)",
+      "installIosStep1": "Open roavaa.com in Safari and sign in.",
+      "installIosStep2": "Tap the share icon (square with an arrow up) at the bottom.",
+      "installIosStep3": "Choose “Add to Home Screen”, then tap “Add”."
     },
     "knowledge": {
       "title": "Knowledge base",

@@ -391,13 +391,16 @@
       "conflictError": "Ce créneau chevauche déjà un autre rendez-vous. Choisissez une autre heure.",
       "view": {
         "month": "Mois",
-        "week": "Semaine"
+        "week": "Semaine",
+        "day": "Jour"
       },
       "prevWeek": "Semaine précédente",
       "nextWeek": "Semaine suivante",
       "suggestedTimesTitle": "Créneaux libres suggérés",
       "suggestedTimesNote": "Calculé à partir de vos horaires d'ouverture, des rendez-vous déjà pris et de la durée du premier service actif.",
-      "searchHint": "Nom, téléphone, e-mail ou plaque d'immatriculation."
+      "searchHint": "Nom, téléphone, e-mail ou plaque d'immatriculation.",
+      "prevDay": "Jour précédent",
+      "nextDay": "Jour suivant"
     },
     "appointmentStatus": {
       "proposed": "Proposé",
@@ -547,7 +550,8 @@
       "clientMessageSend": "Envoyer le message",
       "clientMessageNoEmail": "Aucun e-mail connu pour ce client — le message ne peut pas être envoyé.",
       "clientMessageSentToast": "Message client envoyé.",
-      "clientMessageError": "Échec de l'envoi. Réessayez."
+      "clientMessageError": "Échec de l'envoi. Réessayez.",
+      "new": "Nouvel ordre de réparation"
     },
     "workOrderStatus": {
       "received": "Reçu",
@@ -844,7 +848,17 @@
       "whatsappStatusConnected": "Connecté",
       "whatsappStatusNotConnected": "Non connecté",
       "whatsappComingSoonNote": "Bientôt disponible — la connexion WhatsApp nécessite un compte fournisseur professionnel vérifié, pas encore configuré.",
-      "whatsappConnectButton": "Connecter WhatsApp"
+      "whatsappConnectButton": "Connecter WhatsApp",
+      "installTitle": "Installer ROAVAA sur ce téléphone",
+      "installIntro": "ROAVAA est une vraie application installable (PWA) : ajoutez-la à votre écran d’accueil pour un accès rapide, un plein écran sans barre de navigateur, et un accès hors ligne aux pages déjà ouvertes.",
+      "installAndroidTitle": "Android (Chrome)",
+      "installAndroidStep1": "Ouvrez roavaa.com dans Chrome et connectez-vous.",
+      "installAndroidStep2": "Appuyez sur le menu à trois points en haut à droite.",
+      "installAndroidStep3": "Choisissez « Installer l’application » ou « Ajouter à l’écran d’accueil » et confirmez.",
+      "installIosTitle": "iPhone (Safari)",
+      "installIosStep1": "Ouvrez roavaa.com dans Safari et connectez-vous.",
+      "installIosStep2": "Appuyez sur l’icône de partage (carré avec une flèche vers le haut) en bas de l’écran.",
+      "installIosStep3": "Choisissez « Sur l’écran d’accueil », puis appuyez sur « Ajouter »."
     },
     "knowledge": {
       "title": "Base de connaissances",

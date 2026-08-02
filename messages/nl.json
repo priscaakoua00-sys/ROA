@@ -391,13 +391,16 @@
       "conflictError": "Dit tijdstip overlapt al met een andere afspraak. Kies een ander tijdstip.",
       "view": {
         "month": "Maand",
-        "week": "Week"
+        "week": "Week",
+        "day": "Dag"
       },
       "prevWeek": "Vorige week",
       "nextWeek": "Volgende week",
       "suggestedTimesTitle": "Voorgestelde vrije tijden",
       "suggestedTimesNote": "Berekend op basis van uw openingstijden, bestaande afspraken en de duur van de eerste actieve dienst.",
-      "searchHint": "Naam, telefoon, e-mail of kenteken."
+      "searchHint": "Naam, telefoon, e-mail of kenteken.",
+      "prevDay": "Vorige dag",
+      "nextDay": "Volgende dag"
     },
     "appointmentStatus": {
       "proposed": "Voorgesteld",
@@ -547,7 +550,8 @@
       "clientMessageSend": "Bericht versturen",
       "clientMessageNoEmail": "Geen e-mailadres bekend voor deze klant — bericht kan niet worden verstuurd.",
       "clientMessageSentToast": "Klantbericht verstuurd.",
-      "clientMessageError": "Versturen mislukt. Probeer opnieuw."
+      "clientMessageError": "Versturen mislukt. Probeer opnieuw.",
+      "new": "Nieuw werkorder"
     },
     "workOrderStatus": {
       "received": "Ontvangen",
@@ -844,7 +848,17 @@
       "whatsappStatusConnected": "Verbonden",
       "whatsappStatusNotConnected": "Niet verbonden",
       "whatsappComingSoonNote": "Binnenkort beschikbaar — WhatsApp-koppeling vereist een geverifieerd zakelijk provideraccount, nog niet ingesteld.",
-      "whatsappConnectButton": "WhatsApp koppelen"
+      "whatsappConnectButton": "WhatsApp koppelen",
+      "installTitle": "ROAVAA op deze telefoon installeren",
+      "installIntro": "ROAVAA is een echte app (PWA): installeer hem op uw beginscherm voor snelle toegang, een volledig scherm zonder browserbalk en gebruik zonder internet voor eerder geopende pagina’s.",
+      "installAndroidTitle": "Android (Chrome)",
+      "installAndroidStep1": "Open roavaa.com in Chrome en meld u aan.",
+      "installAndroidStep2": "Tik op het menu met de drie puntjes rechtsboven.",
+      "installAndroidStep3": "Kies “App installeren” of “Toevoegen aan startscherm” en bevestig.",
+      "installIosTitle": "iPhone (Safari)",
+      "installIosStep1": "Open roavaa.com in Safari en meld u aan.",
+      "installIosStep2": "Tik op het deelicoon (vierkant met pijl omhoog) onderin.",
+      "installIosStep3": "Kies “Zet op beginscherm” en tik op “Voeg toe”."
     },
     "knowledge": {
       "title": "Kennisbank",

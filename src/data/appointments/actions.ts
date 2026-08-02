@@ -59,7 +59,7 @@ const APPOINTMENT_STATUSES = [
 
 function viewParam(formData: FormData): string {
   const v = String(formData.get('view') ?? '');
-  return v === 'week' ? '&view=week' : '';
+  return v === 'week' ? '&view=week' : v === 'month' ? '&view=month' : '';
 }
 
 export async function createAppointmentAction(formData: FormData) {
