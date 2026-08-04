@@ -31,6 +31,7 @@ import {
 } from '@/data/developer/actions';
 import { loadApiKeys, loadWebhookEndpoints } from '@/data/developer/list';
 import { connectWhatsAppAction, disconnectWhatsAppAction } from '@/data/whatsapp/actions';
+import { connectPhoneAction, disconnectPhoneAction } from '@/data/telephony/actions';
 import { formatDateTimeUTC } from '@/lib/datetime';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/auth/auth-shell';
@@ -88,6 +89,9 @@ export default async function SettingsPage({
     whatsappConnected?: string;
     whatsappDisconnected?: string;
     whatsappError?: string;
+    phoneConnected?: string;
+    phoneDisconnected?: string;
+    phoneError?: string;
   }>;
 }) {
   const { locale } = await params;
@@ -106,6 +110,9 @@ export default async function SettingsPage({
     whatsappConnected,
     whatsappDisconnected,
     whatsappError,
+    phoneConnected,
+    phoneDisconnected,
+    phoneError,
   } = await searchParams;
   const t = await getTranslations('app');
   const tPricing = await getTranslations('pricing');
@@ -191,6 +198,11 @@ export default async function SettingsPage({
     .select('status, phone_number')
     .eq('organization_id', org.id)
     .maybeSingle();
+  const { data: phoneConnection } = await supabase
+    .from('phone_connections')
+    .select('status, phone_number')
+    .eq('organization_id', org.id)
+    .maybeSingle();
   // Company identity (IBAN, VAT, margin) stays owner/admin-only at the RLS
   // layer (organizations_update_admin) — manager gets services/hours/
   // checklist (below) but not this section.
@@ -263,7 +275,9 @@ export default async function SettingsPage({
                 ? t('settings.demoErrorToast')
                 : whatsappError === '1'
                   ? t('settings.whatsappErrorToast')
-                  : null
+                  : phoneError === '1'
+                    ? t('settings.phoneErrorToast')
+                    : null
         }
         info={
           stripe === 'pending'
@@ -282,7 +296,11 @@ export default async function SettingsPage({
                         ? t('settings.whatsappConnectedToast')
                         : whatsappDisconnected === '1'
                           ? t('settings.whatsappDisconnectedToast')
-                          : null
+                          : phoneConnected === '1'
+                            ? t('settings.phoneConnectedToast')
+                            : phoneDisconnected === '1'
+                              ? t('settings.phoneDisconnectedToast')
+                              : null
         }
       />
       <div className="flex items-center justify-between">
@@ -759,6 +777,55 @@ export default async function SettingsPage({
             </label>
             <Button type="submit" variant="outline" size="sm">
               {t('settings.whatsappConnectButton')}
+            </Button>
+          </form>
+        ) : (
+          <p className="mt-3 text-sm text-muted-foreground">{t('settings.readOnlyNotice')}</p>
+        )}
+      </section>
+
+      {/* Phone connection — real inbound-call automation via the
+          organization's OWN Twilio number; never a shared or personal one. */}
+      <section id="phone" className="mt-6 scroll-mt-20 rounded-xl border border-border bg-card p-6 shadow-soft">
+        <h2 className="text-base font-semibold tracking-tight">{t('settings.phoneTitle')}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t('settings.phoneIntro')}</p>
+
+        <div className="mt-4 flex items-center gap-2">
+          <Badge variant={phoneConnection?.status === 'connected' ? 'success' : 'muted'}>
+            {phoneConnection?.status === 'connected'
+              ? t('settings.phoneStatusConnected')
+              : t('settings.phoneStatusNotConnected')}
+          </Badge>
+          {phoneConnection?.phone_number ? (
+            <span className="text-sm text-muted-foreground">{phoneConnection.phone_number}</span>
+          ) : null}
+        </div>
+
+        {phoneConnection?.status === 'connected' ? (
+          canManageSettings ? (
+            <form action={disconnectPhoneAction} className="mt-4">
+              <input type="hidden" name="locale" value={locale} />
+              <Button type="submit" variant="outline" size="sm">
+                {t('settings.phoneDisconnectButton')}
+              </Button>
+            </form>
+          ) : null
+        ) : canManageSettings ? (
+          <form action={connectPhoneAction} className="mt-4 space-y-3">
+            <input type="hidden" name="locale" value={locale} />
+            <p className="text-xs text-muted-foreground">{t('settings.phoneConnectHelp')}</p>
+            <div className="rounded-md border border-border bg-background p-3 text-xs text-muted-foreground">
+              <p className="font-medium text-foreground">{t('settings.phoneWebhookLabel')}</p>
+              <code className="mt-1 block break-all">{`${SITE_URL}/api/telephony/inbound`}</code>
+            </div>
+            <Field label={t('settings.phoneAccountSidLabel')} name="accountSid" required />
+            <label className="block space-y-1.5 text-sm">
+              <span className="font-medium">{t('settings.phoneAuthTokenLabel')}</span>
+              <input type="password" name="authToken" required autoComplete="off" className={inputCls} />
+            </label>
+            <Field label={t('settings.phoneNumberLabel')} name="phoneNumber" placeholder="+31612345678" required />
+            <Button type="submit" variant="outline" size="sm">
+              {t('settings.phoneConnectButton')}
             </Button>
           </form>
         ) : (
