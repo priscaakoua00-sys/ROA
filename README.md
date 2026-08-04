@@ -104,3 +104,6 @@ npm run build
 - [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md): code structure.
 - [`docs/SECURITY.md`](./docs/SECURITY.md): security model.
 - [`docs/ROADMAP.md`](./docs/ROADMAP.md): phases.
+- [`docs/AUDIT_REPORT.md`](./docs/AUDIT_REPORT.md): line-by-line acquisition audit.
+- [`docs/SELF_HOSTING.md`](./docs/SELF_HOSTING.md): deploy without Vercel/Supabase Cloud.
+- [`HANDOVER.md`](./HANDOVER.md): start here if you received this code as a buyer.
