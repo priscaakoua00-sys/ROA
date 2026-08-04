@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { redirect } from 'next/navigation';
-import { ChevronLeft, ChevronRight, CalendarClock, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CalendarClock, Sparkles, Plus } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { getActiveOrgId } from '@/data/organizations/active';
@@ -337,21 +337,34 @@ export default async function AgendaPage({
       </div>
 
       {/* View switcher */}
-      <div className="mt-4 flex gap-1.5">
-        {(['day', 'week', 'month'] as const).map((v) => (
-          <Link
-            key={v}
-            href={v === 'day' ? dayTabHref : v === 'week' ? weekTabHref : monthTabHref}
-            className={cn(
-              'rounded-full border px-3 py-1 text-xs font-medium transition',
-              view === v
-                ? 'border-gold bg-gold text-primary-foreground'
-                : 'border-border bg-background text-foreground hover:border-gold/50 hover:bg-gold/5',
-            )}
+      <div className="mt-4 flex items-center justify-between gap-1.5">
+        <div className="flex gap-1.5">
+          {(['day', 'week', 'month'] as const).map((v) => (
+            <Link
+              key={v}
+              href={v === 'day' ? dayTabHref : v === 'week' ? weekTabHref : monthTabHref}
+              className={cn(
+                'rounded-full border px-3 py-1 text-xs font-medium transition',
+                view === v
+                  ? 'border-gold bg-gold text-primary-foreground'
+                  : 'border-border bg-background text-foreground hover:border-gold/50 hover:bg-gold/5',
+              )}
+            >
+              {t(`agenda.view.${v}`)}
+            </Link>
+          ))}
+        </div>
+        {selectedDay ? (
+          // Jumps straight past a full day of appointments to the "add" form
+          // below — on a busy day that list can be long on a phone screen.
+          <a
+            href="#add-appointment"
+            className="inline-flex items-center gap-1 rounded-full border border-gold/30 bg-gold/5 px-3 py-1 text-xs font-medium text-gold transition hover:bg-gold/10"
           >
-            {t(`agenda.view.${v}`)}
-          </Link>
-        ))}
+            <Plus className="size-3.5" aria-hidden />
+            {t('agenda.addTitle')}
+          </a>
+        ) : null}
       </div>
 
       {view === 'day' ? (
@@ -569,7 +582,7 @@ export default async function AgendaPage({
           )}
 
           {/* Add appointment */}
-          <div className="mt-4 border-t border-border pt-4">
+          <div id="add-appointment" className="mt-4 scroll-mt-20 border-t border-border pt-4">
             <h3 className="text-sm font-semibold">{t('agenda.addTitle')}</h3>
 
             {pickedCustomer ? (
