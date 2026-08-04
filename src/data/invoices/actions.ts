@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { sendEmail } from '@/integrations/email';
+import { sendWhatsAppMessage } from '@/integrations/whatsapp/send';
 import { formatCurrency } from '@/lib/pricing';
 import { logActivity } from '@/data/activity/log';
 import { dispatchWebhooks } from '@/lib/webhooks';
@@ -363,6 +364,44 @@ export async function sendPaymentReminderAction(formData: FormData) {
 
   const result = await sendEmail({ to: customer.email, subject, text });
   redirect(`${back}${back.includes('?') ? '&' : '?'}${result.sent ? 'reminderSent=1' : 'reminderError=1'}`);
+}
+
+/**
+ * Same reminder, sent over the organization's own connected WhatsApp number
+ * instead of email. Only ever reachable from a button the UI shows once
+ * whatsapp_connections.status === 'connected' for this org (see the
+ * automations/Relances page) — an unconnected org keeps the manual wa.me
+ * link it always had.
+ */
+export async function sendPaymentReminderWhatsAppAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const invoiceId = String(formData.get('invoiceId') ?? '');
+  const back = String(formData.get('back') ?? `/${locale}/invoices`);
+  if (!invoiceId) redirect(back);
+
+  const supabase = await createSupabaseServerClient();
+  const { data: invoice } = await supabase
+    .from('invoices')
+    .select('invoice_number, total, due_date, organization_id, customers(phone, preferred_language)')
+    .eq('id', invoiceId)
+    .maybeSingle();
+  const customer = invoice?.customers as unknown as { phone: string | null; preferred_language: string | null } | null;
+  if (!invoice || !customer?.phone) redirect(`${back}${back.includes('?') ? '&' : '?'}reminderError=1`);
+
+  const { data: org } = await supabase.from('organizations').select('name').eq('id', invoice.organization_id).maybeSingle();
+
+  const lang: Locale = (['nl', 'en', 'fr'] as const).includes(customer.preferred_language as Locale)
+    ? (customer.preferred_language as Locale)
+    : locale;
+  const { text } = REMINDER_TEXT[lang]({
+    garage: org?.name ?? 'Roavaa',
+    number: invoice.invoice_number,
+    amount: formatCurrency(Number(invoice.total), lang),
+    dueDate: invoice.due_date ?? '',
+  });
+
+  const result = await sendWhatsAppMessage(supabase, invoice.organization_id, customer.phone, text);
+  redirect(`${back}${back.includes('?') ? '&' : '?'}${result.status === 'sent' ? 'reminderSent=1' : 'reminderError=1'}`);
 }
 
 /* ----------------------------- Line items -------------------------------- */

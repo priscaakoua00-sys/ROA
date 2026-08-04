@@ -72,6 +72,7 @@ export async function addVehicleAction(formData: FormData) {
 
   const mileageRaw = clean('mileage');
   const yearRaw = clean('year');
+  const apkExpiryRaw = clean('apkExpiry');
 
   const { data: vehicle } = await supabase
     .from('vehicles')
@@ -88,6 +89,13 @@ export async function addVehicleAction(formData: FormData) {
       transmission: clean('transmission'),
       color: clean('color'),
       notes: clean('notes'),
+      // Carried over from the RDW lookup that ran while the mechanic filled
+      // this form (PlateFirstFields) — saves the reminder engine from ever
+      // having to re-fetch it live. Null if the plate had no APK data or the
+      // vehicle was entered manually; it self-heals later from the vehicle's
+      // own detail page (see sync_vehicle_apk / vehicles/[id]/page.tsx).
+      apk_expiry: apkExpiryRaw,
+      rdw_synced_at: apkExpiryRaw ? new Date().toISOString() : null,
     })
     .select('id')
     .maybeSingle();

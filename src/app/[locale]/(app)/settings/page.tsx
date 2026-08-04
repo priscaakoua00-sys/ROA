@@ -30,6 +30,7 @@ import {
   toggleWebhookEndpointAction,
 } from '@/data/developer/actions';
 import { loadApiKeys, loadWebhookEndpoints } from '@/data/developer/list';
+import { connectWhatsAppAction, disconnectWhatsAppAction } from '@/data/whatsapp/actions';
 import { formatDateTimeUTC } from '@/lib/datetime';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/auth/auth-shell';
@@ -84,6 +85,9 @@ export default async function SettingsPage({
     demo?: string;
     deletionRequested?: string;
     deletionCancelled?: string;
+    whatsappConnected?: string;
+    whatsappDisconnected?: string;
+    whatsappError?: string;
   }>;
 }) {
   const { locale } = await params;
@@ -99,6 +103,9 @@ export default async function SettingsPage({
     demo,
     deletionRequested,
     deletionCancelled,
+    whatsappConnected,
+    whatsappDisconnected,
+    whatsappError,
   } = await searchParams;
   const t = await getTranslations('app');
   const tPricing = await getTranslations('pricing');
@@ -254,7 +261,9 @@ export default async function SettingsPage({
               ? t('team.error')
               : demo === 'error'
                 ? t('settings.demoErrorToast')
-                : null
+                : whatsappError === '1'
+                  ? t('settings.whatsappErrorToast')
+                  : null
         }
         info={
           stripe === 'pending'
@@ -269,7 +278,11 @@ export default async function SettingsPage({
                     ? t('settings.privacyDeleteRequestedToast')
                     : deletionCancelled === '1'
                       ? t('settings.privacyDeleteCancelledToast')
-                      : null
+                      : whatsappConnected === '1'
+                        ? t('settings.whatsappConnectedToast')
+                        : whatsappDisconnected === '1'
+                          ? t('settings.whatsappDisconnectedToast')
+                          : null
         }
       />
       <div className="flex items-center justify-between">
@@ -716,7 +729,7 @@ export default async function SettingsPage({
         <p className="mt-1 text-sm text-muted-foreground">{t('settings.whatsappIntro')}</p>
 
         <div className="mt-4 flex items-center gap-2">
-          <Badge variant="muted">
+          <Badge variant={whatsappConnection?.status === 'connected' ? 'success' : 'muted'}>
             {whatsappConnection?.status === 'connected'
               ? t('settings.whatsappStatusConnected')
               : t('settings.whatsappStatusNotConnected')}
@@ -726,11 +739,31 @@ export default async function SettingsPage({
           ) : null}
         </div>
 
-        <p className="mt-3 text-xs text-muted-foreground">{t('settings.whatsappComingSoonNote')}</p>
-
-        <Button type="button" variant="outline" size="sm" className="mt-3" disabled title={t('settings.whatsappComingSoonNote')}>
-          {t('settings.whatsappConnectButton')}
-        </Button>
+        {whatsappConnection?.status === 'connected' ? (
+          canManageSettings ? (
+            <form action={disconnectWhatsAppAction} className="mt-4">
+              <input type="hidden" name="locale" value={locale} />
+              <Button type="submit" variant="outline" size="sm">
+                {t('settings.whatsappDisconnectButton')}
+              </Button>
+            </form>
+          ) : null
+        ) : canManageSettings ? (
+          <form action={connectWhatsAppAction} className="mt-4 space-y-3">
+            <input type="hidden" name="locale" value={locale} />
+            <p className="text-xs text-muted-foreground">{t('settings.whatsappConnectHelp')}</p>
+            <Field label={t('settings.whatsappPhoneNumberIdLabel')} name="phoneNumberId" required />
+            <label className="block space-y-1.5 text-sm">
+              <span className="font-medium">{t('settings.whatsappAccessTokenLabel')}</span>
+              <input type="password" name="accessToken" required autoComplete="off" className={inputCls} />
+            </label>
+            <Button type="submit" variant="outline" size="sm">
+              {t('settings.whatsappConnectButton')}
+            </Button>
+          </form>
+        ) : (
+          <p className="mt-3 text-sm text-muted-foreground">{t('settings.readOnlyNotice')}</p>
+        )}
       </section>
 
       {/* Digital business card */}

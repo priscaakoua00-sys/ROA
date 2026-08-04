@@ -24,7 +24,7 @@
   task assignment.
 - Conversations: thread + AI-drafted reply (human validates and sends).
 - Dashboard with real counts + notifications.
-- i18n NL / EN / FR. **140 unit tests** (21 files) + **26 Playwright e2e
+- i18n NL / EN / FR. **146 unit tests** (23 files) + **26 Playwright e2e
   tests** (2 spec files). Four green checks: typecheck, lint, test, build.
 
 ## Phase 2: Real intelligence (DONE) ✅
@@ -47,10 +47,15 @@
   reminders, and team invitations all send a real message today.
 - Employee invitation emails: done, including auto-join on signup.
 - Notification delivery: in-app only; email digest not built.
-- **Still not connected**: WhatsApp and phone/SMS have no API integration at
-  all — only a manual `wa.me` click-to-chat link exists. Client-facing
-  automations (appointment reminders, follow-ups, reactivation) remain
-  AI-drafted suggestions that a human must send; nothing auto-sends to a
+- **WhatsApp: real send capability added 2026-08-04** — each organization
+  connects its own WhatsApp Business Cloud API number (Settings > WhatsApp
+  Business); requires their own verified Meta Business Manager account. An
+  organization that hasn't connected one keeps the manual `wa.me` link.
+- **Still not connected**: phone/SMS has no API integration at all — no
+  voice AI, no call handling. Client-facing automations (appointment
+  reminders, follow-ups, reactivation) remain AI-drafted suggestions that a
+  human must send (now with a one-click real send by email or WhatsApp on
+  the follow-ups page for payment reminders); nothing auto-sends to a
   customer today. Calendar sync with an external calendar is not built.
 
 ## Phase 4: Advanced modules (DONE) ✅
@@ -75,8 +80,9 @@
 
 ## Phase 5: Remaining gaps (tracked, not yet done)
 
-- WhatsApp/phone integration (would need a real provider account + budget —
-  none exists today).
+- Phone/voice integration (would need a telephony + voice-AI provider account
+  and budget — none exists today). WhatsApp itself is done as of 2026-08-04
+  (see Phase 3) — each organization connects its own account.
 - Auto-sending client-facing automations once a channel above is chosen.
 - True IANA-timezone-aware appointment scheduling (Europe/Amsterdam with real
   DST handling) — today's naive wall-clock approach is correct for
@@ -96,6 +102,6 @@ The architecture stays the same; only the domain "brain" changes. The
 
 ## Recommended next step
 
-Pick and connect one real customer-facing channel beyond email (WhatsApp is
-the natural next step for this market) before turning automations from
+WhatsApp send is now built (2026-08-04); the natural next step is voice —
+phone/telephony has no integration at all — before turning automations from
 suggestions into real auto-sends.

@@ -53,19 +53,33 @@ toute impression ou lancement public.
   automatique, mode demonstration (donnees realistes a la creation du compte).
 - Parametres: nom et langue du garage, horaires d'ouverture jour par jour,
   services (duree, tampon, actif) — reserve aux roles proprietaire/admin/manager.
-- International NL / EN / FR partout. **140 tests unitaires** (21 fichiers)
+- International NL / EN / FR partout. **146 tests unitaires** (23 fichiers)
   + **26 tests e2e Playwright** (2 fichiers). Quatre controles verts:
   typecheck, lint, tests, build.
+- Date d'expiration APK (RDW) desormais persistee sur le vehicule
+  (`vehicles.apk_expiry`, mise a jour automatiquement a chaque ouverture de
+  sa fiche) : le moteur de relances "APK a renouveler" n'est plus limite aux
+  40 vehicules les plus recents par garage (ancienne limite technique pour
+  garder la page rapide) — desormais tous les vehicules dont l'APK arrive a
+  echeance sont couverts, sans appel RDW en direct sur cette page.
 
 ## 2. Ce qui est SIMULE ou pas encore connecte (a dire au testeur)
 
 - IA: un vrai fournisseur (Anthropic) est actif des que `ANTHROPIC_API_KEY` est
   definie ; sinon, un mock deterministe prend le relais pour le developpement.
   Aucun diagnostic ni devis IA n'est jamais envoye sans validation humaine.
-- Canaux WhatsApp / telephone: NON connectes — aucune integration API, seulement
-  un lien manuel `wa.me` (l'utilisateur ouvre lui-meme son WhatsApp). L'e-mail
-  transactionnel (Resend), lui, est reellement connecte : devis, factures,
-  rappels de paiement/devis et invitations d'equipe partent reellement.
+- WhatsApp: reellement connectable depuis le 2026-08-04 — chaque garage peut
+  connecter son PROPRE numero WhatsApp Business (Parametres > WhatsApp
+  Business, WhatsApp Cloud API de Meta) et envoyer de vrais messages
+  (aujourd'hui: rappel de paiement en retard). Necessite un compte Meta
+  Business Manager verifie par le garage lui-meme — le code est reel, le
+  compte professionnel n'est pas fourni. Tant qu'aucun numero n'est connecte,
+  le lien manuel `wa.me` existant reste disponible.
+- Telephone: NON connecte — aucune integration API ; un canal `phone` existe
+  pour enregistrer manuellement un appel, rien ne decroche ni ne compose.
+  L'e-mail transactionnel (Resend), lui, est reellement connecte : devis,
+  factures, rappels de paiement/devis et invitations d'equipe partent
+  reellement.
 - Invitation d'employe: un e-mail reel est envoye ET l'employe qui cree son
   compte avec la meme adresse rejoint automatiquement le bon garage (corrige).
 - Relances: propositions uniquement — l'IA ne redige jamais rien qui parte
@@ -143,8 +157,9 @@ Objectif: le testeur doit pouvoir gerer une journee type.
 
 ## 7. Limites reelles actuelles
 
-- WhatsApp / telephone: aucune API connectee, uniquement un lien manuel
-  `wa.me` (le garage clique et envoie lui-meme, jamais automatique).
+- WhatsApp: connectable par chaque garage (son propre compte Meta Business
+  Manager verifie, requis) ; tant qu'aucun numero n'est connecte, reste un
+  lien manuel `wa.me`. Telephone: aucune API connectee, aucun repondeur IA.
 - IA: fournisseur reel (Anthropic) actif seulement si `ANTHROPIC_API_KEY` est
   definie; sinon, mock deterministe pour le developpement. Aucun envoi IA sans
   validation humaine.
@@ -175,11 +190,16 @@ Objectif: le testeur doit pouvoir gerer une journee type.
   d'environnement, mock deterministe en secours sinon).
 - E-mail: deja reellement connecte (Resend) — devis, factures, rappels et
   invitations d'equipe partent reellement.
-- WhatsApp Business, telephone: comptes + cles + budget (a la charge de
-  l'acquereur). L'UI de connexion existe deja, affichee "Bientot disponible".
+- WhatsApp Business: le code d'envoi reel existe (WhatsApp Cloud API) ;
+  chaque garage doit encore creer et faire verifier son propre compte Meta
+  Business Manager (demarche commerciale de Meta, hors du code) avant de
+  pouvoir connecter un numero dans Parametres.
+- Telephone / repondeur vocal IA: reste a construire (aucune integration
+  telephonie aujourd'hui).
 - Domaine roavaa.com: achat + connexion a Vercel.
 
 Le coeur du produit est complet et testable des maintenant avec le formulaire
 web et l'IA (reelle si la cle est definie, sinon simulee pour le
-developpement). Les integrations restantes (WhatsApp Business, telephone)
-s'ajoutent ensuite sans changer l'architecture.
+developpement). L'integration restante la plus significative est la
+telephonie (repondeur vocal IA) ; WhatsApp est cote code termine et attend
+seulement le compte professionnel verifie de chaque garage.

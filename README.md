@@ -43,15 +43,24 @@ Built and working (all connected to real data, not mocked UI):
   with a deterministic `MockAIProvider` fallback for development — see
   "Simulated vs. connected" below for exactly what that covers.
 - i18n NL / EN / FR everywhere.
-- **140 unit tests** (21 files) + **26 Playwright e2e tests** (2 spec files).
+- **146 unit tests** (23 files) + **26 Playwright e2e tests** (2 spec files).
   Four green checks: `typecheck`, `lint`, `test`, `build`.
+- WhatsApp Business (Cloud API): each organization can connect its OWN
+  WhatsApp Business number (Settings > WhatsApp Business) and send real
+  messages through it — see `src/integrations/whatsapp/`. Requires the
+  organization's own Meta Business Manager account and business
+  verification; the code path is real, the account is not included.
 
 Simulated / not yet connected (see `docs/AUDIT_REPORT.md` for the full,
-per-module breakdown): WhatsApp and phone are not integrated at all — the only
-"WhatsApp" touchpoint is a manual `wa.me` click-to-chat link, not an API.
-Client-facing automations (reminders, follow-ups) are AI-drafted suggestions a
-human must send; nothing auto-sends to a customer. Stripe subscription billing
-is wired end-to-end but commercially disabled during launch (`LAUNCH_FREE`).
+per-module breakdown): phone/voice has no integration at all — a `phone` lead
+channel exists for logging a call manually, nothing answers or places one.
+WhatsApp is real for organizations that connect their own number (above); an
+organization that hasn't still gets the manual `wa.me` click-to-chat link it
+always had. Client-facing automations (reminders, follow-ups) are AI-drafted
+suggestions a human must send, or now a one-click real send (email or
+WhatsApp) — nothing auto-sends to a customer without a click. Stripe
+subscription billing is wired end-to-end but commercially disabled during
+launch (`LAUNCH_FREE`).
 
 ## Roadmap
 
