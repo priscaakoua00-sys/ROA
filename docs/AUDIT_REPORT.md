@@ -188,12 +188,46 @@ base Supabase) et corrigés lorsqu'ils tenaient :
   propre numéro. Nécessite toujours, côté organisation, un compte Meta
   Business Manager vérifié — démarche commerciale de Meta, hors du code.
   Migration `20260804082327_whatsapp_credentials_and_send.sql`.
-- **Répondeur vocal IA (téléphone)** : constat externe confirmé, non traité
-  dans cet addendum — aucune intégration téléphonie/voix n'existe. Plus gros
-  chantier des trois (compte opérateur téléphonique + pipeline voix
-  temps réel), volontairement laissé pour une session dédiée plutôt que
-  fait à la hâte dans celle-ci.
+- **Répondeur vocal IA (téléphone)** : au moment de la rédaction du
+  paragraphe ci-dessus, ce chantier avait été volontairement reporté à une
+  session dédiée. C'est fait depuis (voir addendum ci-dessous).
 
 Chiffres recalculés après cet addendum : **146 tests Vitest / 23 fichiers**
 (+6 tests, +2 fichiers), **79 migrations** (+2), `npm audit` toujours à 0
+vulnérabilité, `typecheck`/`lint`/`test`/`build` verts.
+
+---
+
+## Addendum 2026-08-04 (suite) — répondeur téléphonique automatique
+
+Fermé le même jour, dans une session distincte de l'addendum précédent :
+l'intégration téléphonie annoncée comme « plus gros chantier, reportée ».
+
+- **Réponse automatique aux appels entrants (Twilio)** : chaque organisation
+  connecte son propre numéro Twilio (Paramètres > Téléphone). Un appel
+  entrant déclenche un webhook (`src/app/api/telephony/inbound`,
+  `src/app/api/telephony/gather`) qui décroche automatiquement, écoute la
+  raison de l'appel (reconnaissance vocale native de Twilio), la fait
+  qualifier par le même moteur IA que le formulaire web public
+  (`qualifyLead` — détection d'urgence par mots-clés d'abord, IA ensuite),
+  puis enregistre une vraie demande (`leads`, canal `phone`) rattachée à un
+  client existant ou nouvellement créé par numéro de téléphone. Aucun
+  rendez-vous n'est pris pendant l'appel et aucune promesse n'est faite
+  au-delà de « votre demande est notée, on vous rappelle » — un humain reste
+  maître de la suite, comme pour tous les autres canaux assistés par IA de
+  cette application. Les appels sortants et les SMS ne sont pas construits.
+- **Sécurité** : les identifiants Twilio (Account SID + Auth Token) sont
+  stockés dans `phone_credentials`, **sans aucune policy RLS pour
+  `authenticated`** (même schéma que `whatsapp_credentials` : le webhook
+  entrant, qui n'a pas de session utilisateur, y accède via le client
+  admin service-role — jamais via une Server Action accessible à un
+  utilisateur connecté). Chaque requête entrante de Twilio est vérifiée par
+  sa signature HMAC (`x-twilio-signature`, calculée avec le jeton propre à
+  l'organisation) avant tout traitement, pour empêcher qu'une URL de webhook
+  découverte permette d'injecter de fausses demandes. Identifiants validés
+  contre l'API réelle de Twilio avant stockage.
+  Migration `20260804110000_phone_credentials_and_inbound.sql`.
+
+Chiffres recalculés après cet addendum : **154 tests Vitest / 24 fichiers**
+(+8 tests, +1 fichier), **80 migrations** (+1), `npm audit` toujours à 0
 vulnérabilité, `typecheck`/`lint`/`test`/`build` verts.
