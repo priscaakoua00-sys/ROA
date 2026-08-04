@@ -16,6 +16,7 @@ import { Link } from '@/i18n/navigation';
 import { CarIllustration } from '@/components/vehicles/car-illustration';
 import { VAN_MODEL_PATTERN } from '@/components/vehicles/vehicle-card';
 import { VehicleDossierSection } from '@/components/vehicles/vehicle-dossier';
+import { getVehicleDataProvider } from '@/integrations/vehicle-data';
 import { SHEET } from '@/lib/vehicle-sheet-copy';
 import type { Locale } from '@/components/landing/content';
 import { PhotoDiagnosisPanel, type DiagnosisRow } from '@/components/diagnosis/photo-diagnosis-panel';
@@ -94,10 +95,22 @@ export default async function VehicleDetailPage({
 
   const { data: v } = await supabase
     .from('vehicles')
-    .select('id, license_plate, make, model, year, mileage, vin, fuel, transmission, color, notes, customer_id, photo_url, customers(first_name,last_name,phone,email)')
+    .select('id, license_plate, make, model, year, mileage, vin, fuel, transmission, color, notes, customer_id, photo_url, apk_expiry, customers(first_name,last_name,phone,email)')
     .eq('id', id)
     .maybeSingle();
   if (!v) notFound();
+
+  // Opportunistic write-back: the dossier section below already fetches this
+  // vehicle's RDW data live for display; piggyback on it to keep apk_expiry
+  // current so the automations/Relances reminder engine never needs a live
+  // RDW call itself (see sync_vehicle_apk). Cheap: same RDW fetch is cached
+  // ~24h, so this rarely triggers a second network call.
+  if (v.license_plate) {
+    const dossier = await getVehicleDataProvider(undefined).lookup(v.license_plate);
+    if (dossier?.apkExpiry && dossier.apkExpiry !== v.apk_expiry) {
+      await supabase.rpc('sync_vehicle_apk', { p_vehicle_id: v.id, p_apk_expiry: dossier.apkExpiry });
+    }
+  }
 
   const needsSignedPhotoUrl = Boolean(v.photo_url) && !isExternalPhotoUrl(v.photo_url ?? '');
   const kind = VAN_MODEL_PATTERN.test(`${v.make ?? ''} ${v.model ?? ''}`) ? 'van' : 'hatch';

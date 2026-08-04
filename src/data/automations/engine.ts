@@ -27,7 +27,8 @@ const DAY = 24 * HOUR;
 
 /** How stale each kind must be before it's worth surfacing. */
 const QUOTE_PENDING_DAYS = 3;
-const APK_WARNING_DAYS = 60;
+/** Exported so the caller can pre-filter its apk_expiry query to the same window. */
+export const APK_WARNING_DAYS = 60;
 
 /**
  * Deterministic follow-up engine — the "brain" of the Suivi page. Given

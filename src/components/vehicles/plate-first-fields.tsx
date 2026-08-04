@@ -139,6 +139,8 @@ export function PlateFirstFields({ initialPlate = '' }: { initialPlate?: string 
         )}
       </div>
 
+      <input type="hidden" name="apkExpiry" value={apkExpiry ?? ''} />
+
       {/* APK reminder — Ruben spotting work the garage can sell. */}
       {apkWeeks !== null && (
         <div

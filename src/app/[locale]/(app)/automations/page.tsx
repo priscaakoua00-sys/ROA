@@ -5,10 +5,9 @@ import { Phone, MessageCircle, Mail, CalendarClock, Bell } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { getActiveOrgId } from '@/data/organizations/active';
-import { computeFollowUps, type FollowUp, type FollowUpKind } from '@/data/automations/engine';
+import { computeFollowUps, APK_WARNING_DAYS, type FollowUp, type FollowUpKind } from '@/data/automations/engine';
 import { markFollowUpAction } from '@/data/automations/actions';
-import { sendPaymentReminderAction } from '@/data/invoices/actions';
-import { lookupPlate } from '@/integrations/rdw/client';
+import { sendPaymentReminderAction, sendPaymentReminderWhatsAppAction } from '@/data/invoices/actions';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
 import { getOrgEntitlements } from '@/data/subscriptions/get-subscription';
@@ -28,8 +27,14 @@ const KINDS: FollowUpKind[] = [
   'reactivate',
 ];
 
-/** Vehicles checked against the RDW for an upcoming APK per page load. Keeps the page fast. */
-const MAX_APK_CHECKS = 40;
+/**
+ * Safety cap on the apk_expiry query — not a coverage limit like the old
+ * live-RDW version (MAX_APK_CHECKS) used to be: apk_expiry is indexed and
+ * pre-filtered to the warning window in the query itself, so every vehicle
+ * with a due/overdue APK is covered regardless of fleet size. This just
+ * bounds one pathological organization from loading an unbounded page.
+ */
+const MAX_APK_ROWS = 500;
 
 function nameOf(row: { customers: unknown }, fallback: string): string {
   const c = row.customers as { first_name: string | null; last_name: string | null } | null;
@@ -75,6 +80,13 @@ export default async function AutomationsPage({
   const orgId = await getActiveOrgId(supabase);
   if (!orgId) redirect(`/${locale}/onboarding`);
 
+  const { data: whatsappConnection } = await supabase
+    .from('whatsapp_connections')
+    .select('status')
+    .eq('organization_id', orgId)
+    .maybeSingle();
+  const whatsappConnected = whatsappConnection?.status === 'connected';
+
   const { limits } = await getOrgEntitlements(supabase, orgId);
   if (!limits.automations) {
     return (
@@ -88,6 +100,7 @@ export default async function AutomationsPage({
 
   const now = new Date();
   const in48h = new Date(now.getTime() + 48 * 3_600_000).toISOString();
+  const apkHorizon = new Date(now.getTime() + APK_WARNING_DAYS * 24 * 3_600_000).toISOString();
   const anon = t('leads.anonymous');
 
   const [{ data: appts }, { data: wos }, { data: leadRows }, { data: invoiceRows }, { data: quoteRows }, { data: vehicleRows }, { data: handledRows }] =
@@ -126,37 +139,36 @@ export default async function AutomationsPage({
         .limit(100),
       supabase
         .from('vehicles')
-        .select('id, license_plate, make, model, customers(first_name,last_name,phone,email)')
+        .select('id, license_plate, make, model, apk_expiry, customers(first_name,last_name,phone,email)')
         .eq('organization_id', orgId)
-        .not('license_plate', 'is', null)
-        .order('created_at', { ascending: false })
-        .limit(MAX_APK_CHECKS),
+        .not('apk_expiry', 'is', null)
+        .lte('apk_expiry', apkHorizon)
+        .order('apk_expiry', { ascending: true })
+        .limit(MAX_APK_ROWS),
       supabase.from('follow_ups').select('kind, ref_id').eq('organization_id', orgId),
     ]);
 
   const handled = new Set((handledRows ?? []).map((h) => `${h.kind}:${h.ref_id}`));
 
-  // Live RDW check — never stored, always fresh, same source the rest of the app uses.
+  // apk_expiry is persisted on the vehicle (see sync_vehicle_apk) and the
+  // query above already filters to the warning window — no live RDW call and
+  // no per-organization cap on how many vehicles get checked.
   const vehicleList = (vehicleRows ?? []) as unknown as {
     id: string;
-    license_plate: string;
+    license_plate: string | null;
     make: string | null;
     model: string | null;
+    apk_expiry: string;
     customers: { first_name: string | null; last_name: string | null; phone: string | null; email: string | null } | null;
   }[];
-  const apkResults = await Promise.all(
-    vehicleList.map(async (v) => ({ v, rdw: await lookupPlate(v.license_plate) })),
-  );
-  const apkVehicles = apkResults
-    .filter((r): r is { v: (typeof vehicleList)[number]; rdw: NonNullable<Awaited<ReturnType<typeof lookupPlate>>> } => !!r.rdw?.apkExpiry)
-    .map(({ v, rdw }) => ({
-      id: v.id,
-      label: [v.license_plate, [v.make, v.model].filter(Boolean).join(' ')].filter(Boolean).join(' · '),
-      apkExpiry: new Date(rdw.apkExpiry!),
-      name: nameOf(v, anon),
-      phone: contactOf(v).phone,
-      email: contactOf(v).email,
-    }));
+  const apkVehicles = vehicleList.map((v) => ({
+    id: v.id,
+    label: [v.license_plate, [v.make, v.model].filter(Boolean).join(' ')].filter(Boolean).join(' · '),
+    apkExpiry: new Date(v.apk_expiry),
+    name: nameOf(v, anon),
+    phone: contactOf(v).phone,
+    email: contactOf(v).email,
+  }));
 
   const followUps = computeFollowUps({
     now,
@@ -277,6 +289,20 @@ export default async function AutomationsPage({
                               >
                                 <Bell className="size-3.5" aria-hidden />
                                 {t('automations.actionSendReminder')}
+                              </button>
+                            </form>
+                          ) : null}
+                          {kind === 'invoice_overdue' && f.phone && whatsappConnected ? (
+                            <form action={sendPaymentReminderWhatsAppAction}>
+                              <input type="hidden" name="locale" value={locale} />
+                              <input type="hidden" name="invoiceId" value={f.refId} />
+                              <input type="hidden" name="back" value={`/${locale}/automations`} />
+                              <button
+                                type="submit"
+                                className="inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-700 transition hover:bg-emerald-500/20 dark:text-emerald-400"
+                              >
+                                <MessageCircle className="size-3.5" aria-hidden />
+                                {t('automations.actionSendReminderWhatsapp')}
                               </button>
                             </form>
                           ) : null}
