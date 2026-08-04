@@ -10,9 +10,9 @@ l'application, et par où commencer.
 - Le code source complet de l'application (Next.js / TypeScript), tel qu'il
   tourne aujourd'hui — rien de retiré, rien de masqué.
 - L'historique complet des migrations de base de données
-  (`supabase/migrations/`, 77 fichiers), rejouable de zéro sur n'importe quelle
+  (`supabase/migrations/`, 79 fichiers), rejouable de zéro sur n'importe quelle
   base Postgres/Supabase.
-- La suite de tests (140 tests unitaires Vitest + 26 tests end-to-end
+- La suite de tests (146 tests unitaires Vitest + 26 tests end-to-end
   Playwright) et la configuration CI (GitHub Actions).
 - Toute la documentation produit et technique : `README.md`,
   `PILOT_READINESS.md`, `docs/ARCHITECTURE.md`, `docs/SECURITY.md`,
@@ -39,7 +39,8 @@ service externes que le code appelle mais ne fournit pas :
 | Supabase (cloud **ou** auto-hébergé) | Base de données, authentification, stockage | Oui |
 | Anthropic (clé API) | IA réelle (qualification, brouillons, diagnostics) | Non — un mode `mock` déterministe fonctionne sans clé, pour développer/tester |
 | Resend | Envoi d'e-mails réels (devis, factures, invitations) | Non — l'app fonctionne sans, mais aucun e-mail ne part |
-| Stripe | Paiement en ligne des factures + abonnements | Non — désactivé par défaut (`LAUNCH_FREE`) |
+| Stripe | Paiement en ligne des factures + abonnements (iDEAL inclus, à activer côté tableau de bord Stripe) | Non — désactivé par défaut (`LAUNCH_FREE`) |
+| Meta Business Manager (par garage) | Envoi WhatsApp réel depuis le numéro professionnel du garage | Non — tant qu'aucun garage ne connecte son compte, le lien manuel `wa.me` reste disponible |
 | Nom de domaine | URL publique propre | Non — fonctionne sur l'URL d'hébergement par défaut |
 
 Aucun de ces comptes n'est inclus dans la vente : c'est la même situation
