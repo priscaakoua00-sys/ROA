@@ -137,3 +137,63 @@ Reste à faire :
 1. Faible : `created_by` NOT NULL sur les mouvements de stock (non fait —
    entrerait en conflit avec les données de démonstration qui ne renseignent
    pas ce champ pour les réappros système).
+
+---
+
+## Addendum 2026-08-04 — comparaison marché + deux écarts fermés
+
+Suite à une comparaison avec des logiciels garage concurrents (NL : AutoFlex,
+GarageOS ; internationaux : Shopmonkey, Tekmetric, AutoLeap), deux constats
+externes ont été vérifiés directement dans le code (pas seulement dans la
+base Supabase) et corrigés lorsqu'ils tenaient :
+
+- **Couplage RDW (kenteken → marque/modèle/carburant/date APK)** : le constat
+  externe « aucun couplage RDW » était faux — `src/integrations/rdw/client.ts`
+  fait ce couplage depuis le début et l'enregistre déjà sur `vehicles.make`/
+  `model`/`year`/`fuel`/`color`/`transmission`. Le vrai écart trouvé en
+  vérifiant le code : la date d'expiration APK, elle, n'était **jamais
+  persistée** — le moteur de relances (page Suivi/Relances) refaisait un
+  appel RDW en direct à chaque chargement, plafonné à `MAX_APK_CHECKS = 40`
+  véhicules les plus récents par garage pour rester rapide. Au-delà de 40
+  véhicules, les plus anciens n'avaient donc jamais de rappel APK, sans
+  avertissement nulle part. Corrigé : colonne `vehicles.apk_expiry` (+
+  `rdw_synced_at`), remplie à la création (formulaire plaque-first) et
+  resynchronisée automatiquement à chaque ouverture de la fiche véhicule
+  (`sync_vehicle_apk`, SECURITY DEFINER) ; le moteur de relances lit
+  désormais cette colonne indexée, sans plafond ni appel RDW sur le chemin
+  chaud. Migration `20260804081749_vehicles_persist_apk_expiry.sql`.
+- **Lien de paiement iDEAL sur facture** : déjà fonctionnel avant cet
+  addendum — `stripe.checkout.sessions.create` ne fixe pas
+  `payment_method_types`, ce qui fait que Stripe Checkout affiche
+  automatiquement tous les moyens de paiement activés sur le compte
+  (carte, Apple/Google Pay, iDEAL) sans rien à coder de plus. Aucune
+  correction nécessaire ; ne dépend que de l'activation d'iDEAL côté
+  tableau de bord Stripe par l'organisation propriétaire du compte.
+- **Détection d'urgence par l'IA** : vérifiée réelle, pas une valeur par
+  défaut — `src/data/leads/qualify.ts` fait d'abord une détection
+  déterministe par mots-clés de sécurité, puis appelle réellement
+  `getAIProvider().generateLeadSummary()` pour le reste ; confirmé par
+  lecture directe du code, pas seulement par le schéma de base.
+- **WhatsApp — envoi réel** : le constat externe (« juste préparé, jamais
+  connecté ») était exact. Fermé dans cet addendum : WhatsApp Cloud API
+  (Meta) directe, chaque organisation connecte son propre numéro (Paramètres
+  > WhatsApp Business), identifiants stockés dans une table dédiée
+  `whatsapp_credentials` **sans aucune policy RLS pour `authenticated`**
+  (accès uniquement via deux fonctions SECURITY DEFINER qui revérifient
+  elles-mêmes l'autorisation), jamais via le client admin service-role
+  (réservé au code serveur-à-serveur sans session utilisateur, voir
+  `src/data/supabase/admin.ts`). Envoi réel câblé sur le rappel de paiement
+  en retard (page Suivi/Relances) comme premier cas d'usage concret ; le
+  lien manuel `wa.me` reste affiché tant qu'un garage n'a pas connecté son
+  propre numéro. Nécessite toujours, côté organisation, un compte Meta
+  Business Manager vérifié — démarche commerciale de Meta, hors du code.
+  Migration `20260804082327_whatsapp_credentials_and_send.sql`.
+- **Répondeur vocal IA (téléphone)** : constat externe confirmé, non traité
+  dans cet addendum — aucune intégration téléphonie/voix n'existe. Plus gros
+  chantier des trois (compte opérateur téléphonique + pipeline voix
+  temps réel), volontairement laissé pour une session dédiée plutôt que
+  fait à la hâte dans celle-ci.
+
+Chiffres recalculés après cet addendum : **146 tests Vitest / 23 fichiers**
+(+6 tests, +2 fichiers), **79 migrations** (+2), `npm audit` toujours à 0
+vulnérabilité, `typecheck`/`lint`/`test`/`build` verts.
