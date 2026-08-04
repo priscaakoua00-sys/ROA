@@ -53,7 +53,7 @@ toute impression ou lancement public.
   automatique, mode demonstration (donnees realistes a la creation du compte).
 - Parametres: nom et langue du garage, horaires d'ouverture jour par jour,
   services (duree, tampon, actif) — reserve aux roles proprietaire/admin/manager.
-- International NL / EN / FR partout. **146 tests unitaires** (23 fichiers)
+- International NL / EN / FR partout. **154 tests unitaires** (24 fichiers)
   + **26 tests e2e Playwright** (2 fichiers). Quatre controles verts:
   typecheck, lint, tests, build.
 - Date d'expiration APK (RDW) desormais persistee sur le vehicule
@@ -75,8 +75,16 @@ toute impression ou lancement public.
   Business Manager verifie par le garage lui-meme — le code est reel, le
   compte professionnel n'est pas fourni. Tant qu'aucun numero n'est connecte,
   le lien manuel `wa.me` existant reste disponible.
-- Telephone: NON connecte — aucune integration API ; un canal `phone` existe
-  pour enregistrer manuellement un appel, rien ne decroche ni ne compose.
+- Telephone: reellement connectable depuis le 2026-08-04 — chaque garage peut
+  connecter son PROPRE numero Twilio (Parametres > Telephone). Un appel
+  entrant est alors decroche automatiquement, la raison de l'appel est
+  transcrite et qualifiee par la meme IA que le formulaire web public, puis
+  enregistree comme une demande reelle. Aucun rendez-vous n'est pris et aucune
+  promesse n'est faite pendant l'appel au-dela de "votre demande est notee,
+  on vous rappelle" — un humain reste maitre de la suite, comme pour tous les
+  autres canaux assistes par IA. Necessite un compte Twilio propre au garage
+  (numero + cout a la minute a sa charge) ; le code est reel, le compte n'est
+  pas fourni. Les appels sortants et les SMS ne sont pas construits.
   L'e-mail transactionnel (Resend), lui, est reellement connecte : devis,
   factures, rappels de paiement/devis et invitations d'equipe partent
   reellement.
@@ -159,7 +167,9 @@ Objectif: le testeur doit pouvoir gerer une journee type.
 
 - WhatsApp: connectable par chaque garage (son propre compte Meta Business
   Manager verifie, requis) ; tant qu'aucun numero n'est connecte, reste un
-  lien manuel `wa.me`. Telephone: aucune API connectee, aucun repondeur IA.
+  lien manuel `wa.me`. Telephone: connectable par chaque garage (son propre
+  compte Twilio requis) — repond, transcrit et qualifie l'appel, sans jamais
+  prendre de rendez-vous ni composer un appel sortant.
 - IA: fournisseur reel (Anthropic) actif seulement si `ANTHROPIC_API_KEY` est
   definie; sinon, mock deterministe pour le developpement. Aucun envoi IA sans
   validation humaine.
@@ -194,12 +204,15 @@ Objectif: le testeur doit pouvoir gerer une journee type.
   chaque garage doit encore creer et faire verifier son propre compte Meta
   Business Manager (demarche commerciale de Meta, hors du code) avant de
   pouvoir connecter un numero dans Parametres.
-- Telephone / repondeur vocal IA: reste a construire (aucune integration
-  telephonie aujourd'hui).
+- Telephone: le code de reponse automatique existe (Twilio) ; chaque garage
+  doit encore creer son propre compte Twilio et acheter un numero (cout a la
+  minute a sa charge) avant de le connecter dans Parametres. Les appels
+  sortants et les SMS restent a construire.
 - Domaine roavaa.com: achat + connexion a Vercel.
 
 Le coeur du produit est complet et testable des maintenant avec le formulaire
 web et l'IA (reelle si la cle est definie, sinon simulee pour le
-developpement). L'integration restante la plus significative est la
-telephonie (repondeur vocal IA) ; WhatsApp est cote code termine et attend
-seulement le compte professionnel verifie de chaque garage.
+developpement). WhatsApp et le repondeur telephonique automatique sont tous
+deux termines cote code et attendent seulement le compte professionnel
+propre a chaque garage (Meta Business Manager, Twilio). Ce qui reste
+reellement a construire : les appels sortants et les SMS.

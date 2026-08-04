@@ -43,19 +43,25 @@ Built and working (all connected to real data, not mocked UI):
   with a deterministic `MockAIProvider` fallback for development — see
   "Simulated vs. connected" below for exactly what that covers.
 - i18n NL / EN / FR everywhere.
-- **146 unit tests** (23 files) + **26 Playwright e2e tests** (2 spec files).
+- **154 unit tests** (24 files) + **26 Playwright e2e tests** (2 spec files).
   Four green checks: `typecheck`, `lint`, `test`, `build`.
 - WhatsApp Business (Cloud API): each organization can connect its OWN
   WhatsApp Business number (Settings > WhatsApp Business) and send real
   messages through it — see `src/integrations/whatsapp/`. Requires the
   organization's own Meta Business Manager account and business
   verification; the code path is real, the account is not included.
+- Phone (Twilio): each organization can connect its OWN Twilio phone number
+  (Settings > Phone). An inbound call is answered automatically, transcribed,
+  qualified by the same AI pipeline as the public web-request form, and
+  logged as a lead — see `src/integrations/telephony/`. Requires the
+  organization's own Twilio account and phone number; the code path is real,
+  the account is not included.
 
 Simulated / not yet connected (see `docs/AUDIT_REPORT.md` for the full,
-per-module breakdown): phone/voice has no integration at all — a `phone` lead
-channel exists for logging a call manually, nothing answers or places one.
-WhatsApp is real for organizations that connect their own number (above); an
-organization that hasn't still gets the manual `wa.me` click-to-chat link it
+per-module breakdown): outbound/placed calls and SMS have no integration —
+only inbound call answering is built. WhatsApp and phone are both real for
+organizations that connect their own account (above); an organization that
+hasn't connected WhatsApp still gets the manual `wa.me` click-to-chat link it
 always had. Client-facing automations (reminders, follow-ups) are AI-drafted
 suggestions a human must send, or now a one-click real send (email or
 WhatsApp) — nothing auto-sends to a customer without a click. Stripe

@@ -51,12 +51,17 @@
   connects its own WhatsApp Business Cloud API number (Settings > WhatsApp
   Business); requires their own verified Meta Business Manager account. An
   organization that hasn't connected one keeps the manual `wa.me` link.
-- **Still not connected**: phone/SMS has no API integration at all — no
-  voice AI, no call handling. Client-facing automations (appointment
-  reminders, follow-ups, reactivation) remain AI-drafted suggestions that a
-  human must send (now with a one-click real send by email or WhatsApp on
-  the follow-ups page for payment reminders); nothing auto-sends to a
-  customer today. Calendar sync with an external calendar is not built.
+- **Phone: automatic inbound call answering added 2026-08-04** — each
+  organization connects its own Twilio phone number (Settings > Phone); an
+  inbound call is answered, transcribed, AI-qualified, and logged as a lead
+  automatically. Requires their own Twilio account. Outbound calls and SMS
+  are not built.
+- **Still not connected**: outbound calls, SMS. Client-facing automations
+  (appointment reminders, follow-ups, reactivation) remain AI-drafted
+  suggestions that a human must send (now with a one-click real send by
+  email or WhatsApp on the follow-ups page for payment reminders); nothing
+  auto-sends to a customer today. Calendar sync with an external calendar is
+  not built.
 
 ## Phase 4: Advanced modules (DONE) ✅
 
@@ -80,9 +85,10 @@
 
 ## Phase 5: Remaining gaps (tracked, not yet done)
 
-- Phone/voice integration (would need a telephony + voice-AI provider account
-  and budget — none exists today). WhatsApp itself is done as of 2026-08-04
-  (see Phase 3) — each organization connects its own account.
+- Outbound calling and SMS (would need real per-minute/per-message budget on
+  each organization's own Twilio account — inbound call answering itself is
+  done as of 2026-08-04, see Phase 3). WhatsApp itself is also done as of
+  2026-08-04 (see Phase 3) — each organization connects its own account.
 - Auto-sending client-facing automations once a channel above is chosen.
 - True IANA-timezone-aware appointment scheduling (Europe/Amsterdam with real
   DST handling) — today's naive wall-clock approach is correct for
@@ -102,6 +108,7 @@ The architecture stays the same; only the domain "brain" changes. The
 
 ## Recommended next step
 
-WhatsApp send is now built (2026-08-04); the natural next step is voice —
-phone/telephony has no integration at all — before turning automations from
-suggestions into real auto-sends.
+WhatsApp send and automatic inbound call answering are now both built
+(2026-08-04); the natural next step is turning automations from suggestions
+into real auto-sends now that both channels exist, or outbound
+calling/SMS if a garage specifically needs it.
