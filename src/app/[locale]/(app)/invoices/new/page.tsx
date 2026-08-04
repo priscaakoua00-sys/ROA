@@ -86,7 +86,7 @@ export default async function NewInvoicePage({
           {wo.vehicle_id ? <input type="hidden" name="vehicleId" value={wo.vehicle_id} /> : null}
           <input type="hidden" name="workOrderId" value={wo.id} />
           <Field label={t('invoices.lineDescription')} name="description" defaultValue={wo.title} required />
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <Field label={t('invoices.lineQuantity')} name="quantity" type="number" defaultValue="1" min="0.01" step="0.01" />
             <Field label={t('invoices.lineUnitPrice')} name="unitPrice" type="number" required min="0" step="0.01" />
             <Field label={t('invoices.vatRate')} name="vatRate" type="number" defaultValue="21" />
@@ -154,7 +154,7 @@ export default async function NewInvoicePage({
               </label>
             ) : null}
             <Field label={t('invoices.lineDescription')} name="description" required />
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <Field label={t('invoices.lineQuantity')} name="quantity" type="number" defaultValue="1" min="0.01" step="0.01" />
               <Field label={t('invoices.lineUnitPrice')} name="unitPrice" type="number" required min="0" step="0.01" />
               <Field label={t('invoices.vatRate')} name="vatRate" type="number" defaultValue="21" />

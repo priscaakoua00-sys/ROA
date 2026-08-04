@@ -281,6 +281,7 @@ export default async function VehicleDetailPage({
               type="file"
               name="photo"
               accept="image/*"
+              capture="environment"
               required
               className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-primary/90"
             />

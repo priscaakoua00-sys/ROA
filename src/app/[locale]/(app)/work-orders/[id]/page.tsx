@@ -429,7 +429,7 @@ export default async function WorkOrderDetailPage({
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="woId" value={wo.id} />
                       <input type="hidden" name="itemId" value={item.id} />
-                      <input type="file" name="photo" accept="image/*" required className="text-xs text-muted-foreground" />
+                      <input type="file" name="photo" accept="image/*" capture="environment" required className="text-xs text-muted-foreground" />
                       <Button type="submit" variant="ghost" size="sm">{t('workOrders.checklistAddPhoto')}</Button>
                     </form>
                   )}
