@@ -28,6 +28,7 @@ import QRCode from 'qrcode';
 import { RevenueChart } from '@/components/dashboard/revenue-chart';
 import { DashboardGreeting } from '@/components/dashboard/greeting';
 import { RequestLinkCard } from '@/components/dashboard/request-link-card';
+import { seedDemoDataAction } from '@/data/demo/actions';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { getActiveOrgId } from '@/data/organizations/active';
 import { signOutAction } from '@/data/auth/actions';
@@ -643,6 +644,16 @@ export default async function DashboardPage({
                 <Link href="/team"><Button variant="outline" size="sm">{t('dashboard.openTeam')}</Button></Link>
               </li>
             </ol>
+            <div className="mt-4 rounded-lg border border-gold/30 bg-gold/5 p-4">
+              <p className="text-sm font-medium">{t('dashboard.startDemoOr')}</p>
+              <form action={seedDemoDataAction} className="mt-2">
+                <input type="hidden" name="locale" value={locale} />
+                <Button type="submit" variant="outline" size="sm">
+                  {t('dashboard.startDemoCta')}
+                </Button>
+              </form>
+              <p className="mt-2 text-xs text-muted-foreground">{t('dashboard.startDemoNote')}</p>
+            </div>
           </section>
         ) : null}
 
