@@ -14,13 +14,14 @@ export interface Part {
   supplier_name: string | null;
   supplier_phone: string | null;
   notes: string | null;
+  photo_url: string | null;
 }
 
 export async function loadParts(supabase: SupabaseClient, orgId: string): Promise<Part[]> {
   const { data } = await supabase
     .from('parts')
     .select(
-      'id, name, sku, category, unit, quantity_on_hand, reorder_threshold, unit_cost, supplier_name, supplier_phone, notes',
+      'id, name, sku, category, unit, quantity_on_hand, reorder_threshold, unit_cost, supplier_name, supplier_phone, notes, photo_url',
     )
     .eq('organization_id', orgId)
     .order('name', { ascending: true });

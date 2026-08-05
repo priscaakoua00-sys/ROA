@@ -962,6 +962,8 @@
       "title": "Inventory",
       "intro": "Your parts and supplies: quantities, reorder thresholds, and suppliers.",
       "saved": "Saved.",
+      "photoUpload": "Add a photo",
+      "photoChange": "Upload another photo",
       "lowStockSummary": "{count, plural, one {# part is below its reorder threshold} other {# parts are below their reorder threshold}}",
       "lowStock": "Low stock",
       "threshold": "Threshold: {count}",
