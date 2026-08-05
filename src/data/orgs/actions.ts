@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from '@/data/supabase/server';
 import { createOrgSchema } from '@/lib/validation/auth';
 import { normalizeCountry } from '@/integrations/vehicle-data';
 import { createTrialCheckoutUrl } from '@/data/subscriptions/checkout';
+import { LAUNCH_FREE } from '@/lib/pricing';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -54,19 +55,25 @@ export async function createOrgAction(formData: FormData) {
     await supabase.rpc('seed_demo_data', { p_organization_id: org.id });
   }
 
-  // Card required at signup: send the new garage to Stripe Checkout to register
-  // a card and start the 30-day trial (€0 today, first charge automatic at the
-  // end). If Stripe isn't configured yet, this returns null and we simply land
-  // on the dashboard — the trial still runs, no one is ever blocked.
+  // While LAUNCH_FREE is on, nobody signing up should be asked for a card —
+  // that directly contradicts "free during launch" and previously sent every
+  // new visitor straight to a Stripe Checkout page before they'd seen a
+  // single screen of the app. Once launch pricing actually starts, flip
+  // LAUNCH_FREE and this collects a card + starts the 30-day trial as
+  // designed (€0 today, first charge automatic at trial end); if Stripe
+  // isn't configured yet, it still returns null and falls back to the
+  // dashboard — nobody is ever blocked either way.
   const welcomeParam = startWithDemo ? 'welcome=1&demo=seeded' : 'welcome=1';
-  const checkoutUrl = await createTrialCheckoutUrl({
-    supabase,
-    orgId: org.id,
-    planKey: parsed.data.planKey,
-    email: user?.email ?? null,
-    successPath: `/${locale}/dashboard?${welcomeParam}`,
-    cancelPath: `/${locale}/dashboard`,
-  });
+  const checkoutUrl = LAUNCH_FREE
+    ? null
+    : await createTrialCheckoutUrl({
+        supabase,
+        orgId: org.id,
+        planKey: parsed.data.planKey,
+        email: user?.email ?? null,
+        successPath: `/${locale}/dashboard?${welcomeParam}`,
+        cancelPath: `/${locale}/dashboard`,
+      });
 
   redirect(checkoutUrl ?? `/${locale}/dashboard?${welcomeParam}`);
 }
