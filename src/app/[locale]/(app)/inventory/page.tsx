@@ -12,6 +12,7 @@ import {
   updatePartAction,
   deletePartAction,
   adjustStockAction,
+  uploadPartPhotoAction,
 } from '@/data/inventory/actions';
 import { ModuleBanner } from '@/components/module-banner';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ import { Field } from '@/components/auth/auth-shell';
 import { Link } from '@/i18n/navigation';
 import { FlashToast } from '@/components/flash-toast';
 import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button';
+import { isExternalPhotoUrl } from '@/lib/utils';
 
 export default async function InventoryPage({
   params,
@@ -46,6 +48,20 @@ export default async function InventoryPage({
   const canManageInventory = roleHas(role, 'manage_inventory');
   const lowStockCount = parts.filter((p) => p.quantity_on_hand <= p.reorder_threshold).length;
 
+  const storagePaths = parts
+    .map((p) => p.photo_url)
+    .filter((p): p is string => Boolean(p))
+    .filter((p) => !isExternalPhotoUrl(p));
+  const photoUrls = new Map<string, string>();
+  if (storagePaths.length > 0) {
+    const { data: signed } = await supabase.storage.from('part-photos').createSignedUrls(storagePaths, 3600);
+    signed?.forEach((s) => {
+      if (s.signedUrl && s.path) photoUrls.set(s.path, s.signedUrl);
+    });
+  }
+  const resolvePhoto = (photoUrl: string | null) =>
+    !photoUrl ? null : isExternalPhotoUrl(photoUrl) ? photoUrl : (photoUrls.get(photoUrl) ?? null);
+
   const inputCls =
     'rounded-md border border-input bg-background px-2 py-1 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring';
 
@@ -68,17 +84,32 @@ export default async function InventoryPage({
       <ul className="mt-4 space-y-3">
         {parts.map((p) => {
           const low = p.quantity_on_hand <= p.reorder_threshold;
+          const photoUrl = resolvePhoto(p.photo_url);
           return (
             <li key={p.id} className="rounded-xl border border-border bg-card p-4 shadow-soft">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold">{p.name}</span>
-                    {low ? <Badge variant="urgent">{t('inventory.lowStock')}</Badge> : null}
+                <div className="flex items-center gap-3">
+                  {photoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={photoUrl}
+                      alt={p.name}
+                      className="size-12 shrink-0 rounded-lg border border-border object-cover"
+                    />
+                  ) : (
+                    <div className="flex size-12 shrink-0 items-center justify-center rounded-lg border border-dashed border-border text-muted-foreground">
+                      <Package className="size-5" aria-hidden />
+                    </div>
+                  )}
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold">{p.name}</span>
+                      {low ? <Badge variant="urgent">{t('inventory.lowStock')}</Badge> : null}
+                    </div>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {[p.sku, p.category].filter(Boolean).join(' · ')}
+                    </p>
                   </div>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    {[p.sku, p.category].filter(Boolean).join(' · ')}
-                  </p>
                 </div>
                 <div className="text-right text-sm">
                   <span className="font-semibold">{p.quantity_on_hand}</span>
@@ -105,6 +136,30 @@ export default async function InventoryPage({
                     <summary className="cursor-pointer text-xs font-medium text-muted-foreground hover:text-foreground">
                       {t('inventory.editDetails')}
                     </summary>
+                    <form
+                      action={uploadPartPhotoAction}
+                      encType="multipart/form-data"
+                      className="mt-3 flex flex-wrap items-center gap-3"
+                    >
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="partId" value={p.id} />
+                      <label className="flex-1 text-sm">
+                        <span className="mb-1.5 block font-medium">
+                          {photoUrl ? t('inventory.photoChange') : t('inventory.photoUpload')}
+                        </span>
+                        <input
+                          type="file"
+                          name="photo"
+                          accept="image/*"
+                          capture="environment"
+                          required
+                          className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-primary/90"
+                        />
+                      </label>
+                      <Button type="submit" variant="outline" size="sm">
+                        {t('vehicles.photoSave')}
+                      </Button>
+                    </form>
                     <form action={updatePartAction} className="mt-3 space-y-2">
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="partId" value={p.id} />

@@ -959,6 +959,8 @@
       "title": "Stock",
       "intro": "Vos pièces et fournitures : quantités, seuils de réapprovisionnement et fournisseurs.",
       "saved": "Enregistré.",
+      "photoUpload": "Ajouter une photo",
+      "photoChange": "Changer la photo",
       "lowStockSummary": "{count, plural, one {# pièce est sous le seuil de réapprovisionnement} other {# pièces sont sous le seuil de réapprovisionnement}}",
       "lowStock": "Stock bas",
       "threshold": "Seuil : {count}",

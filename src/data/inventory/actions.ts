@@ -3,6 +3,9 @@
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { getActiveOrgId } from '@/data/organizations/active';
+import { isExternalPhotoUrl } from '@/lib/utils';
+
+const MAX_PHOTO_BYTES = 8 * 1024 * 1024;
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -153,4 +156,44 @@ export async function recordPartUsageAction(formData: FormData) {
   });
 
   redirect(`/${locale}/work-orders/${workOrderId}?partSaved=1`);
+}
+
+export async function uploadPartPhotoAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const partId = String(formData.get('partId') ?? '');
+  if (!partId) redirect(`/${locale}/inventory`);
+
+  const file = formData.get('photo');
+  if (!(file instanceof File) || file.size === 0) {
+    redirect(`/${locale}/inventory`);
+  }
+  if (!file.type.startsWith('image/') || file.size > MAX_PHOTO_BYTES) {
+    redirect(`/${locale}/inventory?error=1`);
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data: part } = await supabase
+    .from('parts')
+    .select('organization_id, photo_url')
+    .eq('id', partId)
+    .maybeSingle();
+  if (!part) redirect(`/${locale}/inventory`);
+
+  const ext = (file.name.split('.').pop() ?? 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+  const path = `${part.organization_id}/${partId}/${Date.now()}.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('part-photos')
+    .upload(path, file, { contentType: file.type });
+  if (uploadError) {
+    redirect(`/${locale}/inventory?error=1`);
+  }
+
+  const previousPath = part.photo_url;
+  await supabase.from('parts').update({ photo_url: path }).eq('id', partId);
+  if (previousPath && !isExternalPhotoUrl(previousPath)) {
+    await supabase.storage.from('part-photos').remove([previousPath]);
+  }
+
+  redirect(`/${locale}/inventory?saved=1`);
 }

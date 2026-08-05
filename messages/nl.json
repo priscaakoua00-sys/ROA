@@ -959,6 +959,8 @@
       "title": "Voorraad",
       "intro": "Uw onderdelen en benodigdheden: aantallen, bestelniveaus en leveranciers.",
       "saved": "Opgeslagen.",
+      "photoUpload": "Foto toevoegen",
+      "photoChange": "Andere foto uploaden",
       "lowStockSummary": "{count, plural, one {# onderdeel zit onder het bestelniveau} other {# onderdelen zitten onder het bestelniveau}}",
       "lowStock": "Lage voorraad",
       "threshold": "Drempel: {count}",
