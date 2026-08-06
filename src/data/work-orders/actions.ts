@@ -389,3 +389,66 @@ export async function sendRepairReportClientMessageAction(formData: FormData) {
   });
   redirect(`/${locale}/work-orders/${woId}?${result.sent ? 'reportMessageSent=1' : 'reportMessageError=1'}`);
 }
+
+/* -------------------------- Before/after photos --------------------------- */
+
+const PHOTO_STAGES = ['before', 'after'] as const;
+const MAX_WORK_ORDER_PHOTO_BYTES = 8 * 1024 * 1024;
+
+export async function uploadWorkOrderPhotoAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const woId = String(formData.get('woId') ?? '');
+  const stage = String(formData.get('stage') ?? '');
+  const photo = formData.get('photo');
+  if (!woId) redirect(`/${locale}/work-orders`);
+  if (!(PHOTO_STAGES as readonly string[]).includes(stage) || !(photo instanceof File) || photo.size === 0) {
+    redirect(`/${locale}/work-orders/${woId}?error=1`);
+  }
+  if (!(photo as File).type.startsWith('image/') || (photo as File).size > MAX_WORK_ORDER_PHOTO_BYTES) {
+    redirect(`/${locale}/work-orders/${woId}?error=1`);
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data: wo } = await supabase
+    .from('work_orders')
+    .select('organization_id, vehicle_id')
+    .eq('id', woId)
+    .maybeSingle();
+  if (!wo || !wo.vehicle_id) redirect(`/${locale}/work-orders/${woId}?error=1`);
+
+  const file = photo as File;
+  const ext = (file.name.split('.').pop() ?? 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+  const path = `${wo.organization_id}/${woId}/${Date.now()}.${ext}`;
+  const { error: uploadError } = await supabase.storage
+    .from('work-order-photos')
+    .upload(path, file, { contentType: file.type });
+  if (uploadError) redirect(`/${locale}/work-orders/${woId}?error=1`);
+
+  await supabase.from('work_order_photos').insert({
+    organization_id: wo.organization_id,
+    work_order_id: woId,
+    vehicle_id: wo.vehicle_id,
+    storage_path: path,
+    stage,
+  });
+  redirect(`/${locale}/work-orders/${woId}?photoSaved=1`);
+}
+
+export async function deleteWorkOrderPhotoAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const woId = String(formData.get('woId') ?? '');
+  const photoId = String(formData.get('photoId') ?? '');
+  if (!woId || !photoId) redirect(`/${locale}/work-orders/${woId}?error=1`);
+
+  const supabase = await createSupabaseServerClient();
+  const { data: photo } = await supabase
+    .from('work_order_photos')
+    .select('storage_path')
+    .eq('id', photoId)
+    .maybeSingle();
+  if (photo) {
+    await supabase.storage.from('work-order-photos').remove([photo.storage_path]);
+    await supabase.from('work_order_photos').delete().eq('id', photoId);
+  }
+  redirect(`/${locale}/work-orders/${woId}`);
+}

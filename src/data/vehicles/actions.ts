@@ -142,3 +142,65 @@ export async function summarizeVehicleHistoryAction(formData: FormData) {
 
   redirect(`/${locale}/vehicles/${vehicleId}?historySaved=1`);
 }
+
+/* ------------------------------- Documents -------------------------------- */
+
+const MAX_DOCUMENT_BYTES = 15 * 1024 * 1024;
+
+export async function uploadVehicleDocumentAction(formData: FormData) {
+  const rawLocale = String(formData.get('locale') ?? 'nl');
+  const locale: Locale = (['nl', 'en', 'fr'] as const).includes(rawLocale as Locale) ? (rawLocale as Locale) : 'nl';
+  const vehicleId = String(formData.get('vehicleId') ?? '');
+  if (!vehicleId) redirect(`/${locale}/vehicles`);
+
+  const file = formData.get('document');
+  if (!(file instanceof File) || file.size === 0) redirect(`/${locale}/vehicles/${vehicleId}`);
+  if (file.size > MAX_DOCUMENT_BYTES) redirect(`/${locale}/vehicles/${vehicleId}?docError=1`);
+
+  const supabase = await createSupabaseServerClient();
+  const { data: vehicle } = await supabase
+    .from('vehicles')
+    .select('organization_id')
+    .eq('id', vehicleId)
+    .maybeSingle();
+  if (!vehicle) redirect(`/${locale}/vehicles`);
+
+  const ext = (file.name.split('.').pop() ?? 'pdf').toLowerCase().replace(/[^a-z0-9]/g, '') || 'pdf';
+  const path = `${vehicle.organization_id}/${vehicleId}/${Date.now()}.${ext}`;
+  const { error: uploadError } = await supabase.storage
+    .from('vehicle-documents')
+    .upload(path, file, { contentType: file.type || 'application/octet-stream' });
+  if (uploadError) redirect(`/${locale}/vehicles/${vehicleId}?docError=1`);
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  await supabase.from('vehicle_documents').insert({
+    organization_id: vehicle.organization_id,
+    vehicle_id: vehicleId,
+    storage_path: path,
+    file_name: file.name.slice(0, 200),
+    uploaded_by: user?.id ?? null,
+  });
+  redirect(`/${locale}/vehicles/${vehicleId}?docSaved=1`);
+}
+
+export async function deleteVehicleDocumentAction(formData: FormData) {
+  const rawLocale = String(formData.get('locale') ?? 'nl');
+  const locale: Locale = (['nl', 'en', 'fr'] as const).includes(rawLocale as Locale) ? (rawLocale as Locale) : 'nl';
+  const vehicleId = String(formData.get('vehicleId') ?? '');
+  const documentId = String(formData.get('documentId') ?? '');
+  if (!vehicleId || !documentId) redirect(`/${locale}/vehicles/${vehicleId}?docError=1`);
+
+  const supabase = await createSupabaseServerClient();
+  const { data: doc } = await supabase
+    .from('vehicle_documents')
+    .select('storage_path')
+    .eq('id', documentId)
+    .maybeSingle();
+  if (doc) {
+    await supabase.storage.from('vehicle-documents').remove([doc.storage_path]);
+    await supabase.from('vehicle_documents').delete().eq('id', documentId);
+  }
+  redirect(`/${locale}/vehicles/${vehicleId}`);
+}

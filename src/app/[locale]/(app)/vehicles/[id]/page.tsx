@@ -1,10 +1,10 @@
 export const dynamic = 'force-dynamic';
 
 import { notFound, redirect } from 'next/navigation';
-import { History, CalendarDays, Wrench, Receipt, Camera, Inbox, MessageCircle } from 'lucide-react';
+import { History, CalendarDays, Wrench, Receipt, Camera, Inbox, MessageCircle, FileText, Trash2 } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
-import { updateVehicleAction, uploadVehiclePhotoAction } from '@/data/vehicles/actions';
+import { updateVehicleAction, uploadVehiclePhotoAction, uploadVehicleDocumentAction, deleteVehicleDocumentAction } from '@/data/vehicles/actions';
 import { getVehicleTimeline } from '@/data/timeline/build';
 import { formatDateTimeUTC } from '@/lib/datetime';
 import { ModuleBanner } from '@/components/module-banner';
@@ -79,12 +79,25 @@ export default async function VehicleDetailPage({
     quoteError?: string;
     historySaved?: string;
     historyError?: string;
+    docSaved?: string;
+    docError?: string;
   }>;
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  const { saved, photoError, diagSaved, diagError, maintSaved, maintError, quoteError, historySaved, historyError } =
-    await searchParams;
+  const {
+    saved,
+    photoError,
+    diagSaved,
+    diagError,
+    maintSaved,
+    maintError,
+    quoteError,
+    historySaved,
+    historyError,
+    docSaved,
+    docError,
+  } = await searchParams;
   const t = await getTranslations('app');
 
   const supabase = await createSupabaseServerClient();
@@ -115,21 +128,40 @@ export default async function VehicleDetailPage({
   const needsSignedPhotoUrl = Boolean(v.photo_url) && !isExternalPhotoUrl(v.photo_url ?? '');
   const kind = VAN_MODEL_PATTERN.test(`${v.make ?? ''} ${v.model ?? ''}`) ? 'van' : 'hatch';
 
-  const [{ data: diagData }, timeline, maintenanceSuggestions, historySummaries, signedVehiclePhoto] = await Promise.all([
-    supabase
-      .from('photo_diagnoses')
-      .select(
-        'id, note, visible_problems, affected_parts, severity, hypotheses, additional_checks, estimated_repair_time, recommendations, created_at, diagnosis_media(storage_path, angle)',
-      )
-      .eq('vehicle_id', id)
-      .order('created_at', { ascending: false }),
-    getVehicleTimeline(supabase, id),
-    loadMaintenanceSuggestions(supabase, id),
-    loadVehicleHistorySummaries(supabase, id),
-    needsSignedPhotoUrl
-      ? supabase.storage.from('vehicle-photos').createSignedUrl(v.photo_url as string, 3600)
-      : Promise.resolve({ data: null }),
-  ]);
+  const [{ data: diagData }, timeline, maintenanceSuggestions, historySummaries, signedVehiclePhoto, { data: docsData }] =
+    await Promise.all([
+      supabase
+        .from('photo_diagnoses')
+        .select(
+          'id, note, visible_problems, affected_parts, severity, hypotheses, additional_checks, estimated_repair_time, recommendations, created_at, diagnosis_media(storage_path, angle)',
+        )
+        .eq('vehicle_id', id)
+        .order('created_at', { ascending: false }),
+      getVehicleTimeline(supabase, id),
+      loadMaintenanceSuggestions(supabase, id),
+      loadVehicleHistorySummaries(supabase, id),
+      needsSignedPhotoUrl
+        ? supabase.storage.from('vehicle-photos').createSignedUrl(v.photo_url as string, 3600)
+        : Promise.resolve({ data: null }),
+      supabase
+        .from('vehicle_documents')
+        .select('id, file_name, storage_path, created_at')
+        .eq('vehicle_id', id)
+        .order('created_at', { ascending: false }),
+    ]);
+  const documents = (docsData ?? []) as { id: string; file_name: string; storage_path: string; created_at: string }[];
+  const documentUrls = new Map<string, string>();
+  if (documents.length > 0) {
+    const { data: signedDocs } = await supabase.storage
+      .from('vehicle-documents')
+      .createSignedUrls(
+        documents.map((d) => d.storage_path),
+        3600,
+      );
+    signedDocs?.forEach((s) => {
+      if (s.signedUrl && s.path) documentUrls.set(s.path, s.signedUrl);
+    });
+  }
   const photoUrl = v.photo_url && isExternalPhotoUrl(v.photo_url) ? v.photo_url : (signedVehiclePhoto?.data?.signedUrl ?? null);
   const diagRows = (diagData ?? []) as unknown as {
     id: string;
@@ -191,7 +223,9 @@ export default async function VehicleDetailPage({
                 ? t('maintenance.saved')
                 : historySaved === '1'
                   ? t('historySummary.saved')
-                  : null
+                  : docSaved === '1'
+                    ? t('vehicles.documentSaved')
+                    : null
         }
         error={
           photoError
@@ -204,7 +238,9 @@ export default async function VehicleDetailPage({
                   ? t('maintenance.error')
                   : historyError === '1'
                     ? t('historySummary.error')
-                    : null
+                    : docError === '1'
+                      ? t('vehicles.documentError')
+                      : null
         }
       />
       <ModuleBanner moduleKey="history" label={t('moduleBanner.history')} icon={History} />
@@ -353,6 +389,45 @@ export default async function VehicleDetailPage({
         saved={historySaved === '1'}
         error={historyError === '1'}
       />
+
+      <section className="mt-6 rounded-xl border border-border bg-card p-5 shadow-soft">
+        <h2 className="flex items-center gap-2 text-sm font-semibold tracking-tight">
+          <FileText className="size-4 text-gold" aria-hidden />
+          {t('vehicles.documentsTitle')}
+        </h2>
+        {documents.length === 0 ? (
+          <p className="mt-2 text-sm text-muted-foreground">{t('vehicles.documentsEmpty')}</p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {documents.map((d) => (
+              <li key={d.id} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background px-3 py-2">
+                <a
+                  href={documentUrls.get(d.storage_path) ?? '#'}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="min-w-0 flex-1 truncate text-sm hover:underline"
+                >
+                  {d.file_name}
+                </a>
+                <form action={deleteVehicleDocumentAction}>
+                  <input type="hidden" name="locale" value={locale} />
+                  <input type="hidden" name="vehicleId" value={v.id} />
+                  <input type="hidden" name="documentId" value={d.id} />
+                  <button type="submit" aria-label={t('vehicles.documentDelete')} className="shrink-0 text-muted-foreground hover:text-destructive">
+                    <Trash2 className="size-4" aria-hidden />
+                  </button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        )}
+        <form action={uploadVehicleDocumentAction} encType="multipart/form-data" className="mt-3 flex flex-wrap items-center gap-2">
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="vehicleId" value={v.id} />
+          <input type="file" name="document" required className="text-xs text-muted-foreground" />
+          <Button type="submit" variant="outline" size="sm">{t('vehicles.documentUpload')}</Button>
+        </form>
+      </section>
 
       {/* Timeline: a single chronological history, from arrival to delivery. */}
       <section className="mt-6">
