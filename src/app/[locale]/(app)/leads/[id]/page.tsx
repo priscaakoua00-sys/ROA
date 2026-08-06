@@ -351,6 +351,27 @@ export default async function LeadDetailPage({
                 </form>
               ))}
             </div>
+            {conv && slots[0] ? (
+              <form action={sendReplyAction} className="mt-3">
+                <input type="hidden" name="locale" value={locale} />
+                <input type="hidden" name="leadId" value={lead.id} />
+                <input type="hidden" name="conversationId" value={conv.id} />
+                <input type="hidden" name="isAi" value="1" />
+                <input
+                  type="hidden"
+                  name="body"
+                  value={
+                    slots[1]
+                      ? t('lead.proposeMessageTwo', {
+                          slot1: formatDateTimeInZone(slots[0], timeZone, locale),
+                          slot2: formatDateTimeInZone(slots[1], timeZone, locale),
+                        })
+                      : t('lead.proposeMessageOne', { slot1: formatDateTimeInZone(slots[0], timeZone, locale) })
+                  }
+                />
+                <Button type="submit" variant="outline" size="sm">{t('lead.sendProposal')}</Button>
+              </form>
+            ) : null}
           </>
         )}
       </section>

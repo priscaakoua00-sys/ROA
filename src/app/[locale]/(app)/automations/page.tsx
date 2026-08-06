@@ -8,11 +8,16 @@ import { getActiveOrgId } from '@/data/organizations/active';
 import { computeFollowUps, APK_WARNING_DAYS, type FollowUp, type FollowUpKind } from '@/data/automations/engine';
 import { markFollowUpAction } from '@/data/automations/actions';
 import { sendPaymentReminderAction, sendPaymentReminderWhatsAppAction } from '@/data/invoices/actions';
+import { sendReplyAction } from '@/data/conversations/actions';
+import { draftReply } from '@/data/conversations/draft';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
 import { getOrgEntitlements } from '@/data/subscriptions/get-subscription';
 import { PlanLockedNotice } from '@/components/plan-locked-notice';
 import { FlashToast } from '@/components/flash-toast';
+
+/** Caps how many unanswered leads get an AI-drafted reply on this page — one AI call each. */
+const MAX_AUTO_DRAFTS = 10;
 
 // Most urgent / actionable first — this ordering IS the priority list.
 const KINDS: FollowUpKind[] = [
@@ -214,6 +219,29 @@ export default async function AutomationsPage({
     handled,
   });
 
+  // Ruben drafts a reply for each unanswered lead so staff can approve and
+  // send with one click, right from this list — no need to open every lead.
+  const unansweredLeads = followUps.filter((f) => f.kind === 'unanswered').slice(0, MAX_AUTO_DRAFTS);
+  const leadIdToConversationId = new Map<string, string>();
+  if (unansweredLeads.length > 0) {
+    const { data: convRows } = await supabase
+      .from('conversations')
+      .select('id, lead_id')
+      .in('lead_id', unansweredLeads.map((f) => f.refId));
+    for (const c of convRows ?? []) {
+      if (c.lead_id) leadIdToConversationId.set(c.lead_id, c.id);
+    }
+  }
+  const rubenDrafts = new Map<string, { reply: string; handoff: boolean }>();
+  await Promise.all(
+    unansweredLeads
+      .filter((f) => leadIdToConversationId.has(f.refId))
+      .map(async (f) => {
+        const draft = await draftReply({ conversation: f.detail, language: locale as 'nl' | 'en' | 'fr' });
+        rubenDrafts.set(f.refId, { reply: draft.reply, handoff: draft.handoff });
+      }),
+  );
+
   return (
     <div className="container max-w-2xl py-10">
       <FlashToast success={reminderSent ? t('automations.reminderSent') : null} error={reminderError ? t('automations.reminderError') : null} />
@@ -248,6 +276,29 @@ export default async function AutomationsPage({
                         <p className="mt-1 rounded-md bg-surface px-2 py-1 text-xs text-muted-foreground">
                           {t(`automations.msg.${f.kind}`, { name: f.name, detail: f.detail })}
                         </p>
+                        {kind === 'unanswered' && leadIdToConversationId.has(f.refId) ? (
+                          rubenDrafts.get(f.refId)?.handoff ? (
+                            <p className="mt-2 rounded-md border border-urgent/30 bg-urgent/10 p-2 text-xs">
+                              {t('automations.rubenHandoff')}
+                            </p>
+                          ) : rubenDrafts.get(f.refId)?.reply ? (
+                            <div className="mt-2 rounded-md border border-gold/25 bg-gold/5 p-2.5">
+                              <p className="text-[10px] font-medium uppercase tracking-wide text-gold">{t('automations.rubenDraftLabel')}</p>
+                              <p className="mt-1 text-xs text-foreground">{rubenDrafts.get(f.refId)?.reply}</p>
+                              <form action={sendReplyAction} className="mt-2">
+                                <input type="hidden" name="locale" value={locale} />
+                                <input type="hidden" name="leadId" value={f.refId} />
+                                <input type="hidden" name="conversationId" value={leadIdToConversationId.get(f.refId)} />
+                                <input type="hidden" name="body" value={rubenDrafts.get(f.refId)?.reply} />
+                                <input type="hidden" name="isAi" value="1" />
+                                <Button type="submit" size="sm">{t('automations.rubenApproveSend')}</Button>
+                                <Link href={refHref(f)} className="ml-2 text-xs text-muted-foreground hover:underline">
+                                  {t('automations.rubenEditFirst')}
+                                </Link>
+                              </form>
+                            </div>
+                          ) : null
+                        ) : null}
                         <div className="mt-2 flex flex-wrap items-center gap-1.5">
                           {f.phone ? (
                             <a href={`tel:${f.phone}`} className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium transition hover:border-gold/40">
