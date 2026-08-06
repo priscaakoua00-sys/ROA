@@ -55,6 +55,8 @@ function kindOf(formData: FormData): LineItemKind {
   return (['part', 'labor', 'other'] as const).includes(raw as LineItemKind) ? (raw as LineItemKind) : 'other';
 }
 
+const QUOTE_LABEL: Record<Locale, string> = { nl: 'Offerte', en: 'Quote', fr: 'Devis' };
+
 const MANUAL_STATUSES = ['draft', 'sent', 'accepted', 'refused', 'expired'] as const;
 
 // Once a customer has accepted or refused (or the quote already converted to
@@ -354,7 +356,7 @@ export async function convertQuoteToWorkOrderAction(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  await logStatus(supabase, quote.organization_id, wo.id, 'received', user?.id ?? null, `Devis ${quote.quote_number}`);
+  await logStatus(supabase, quote.organization_id, wo.id, 'received', user?.id ?? null, `${QUOTE_LABEL[locale]} ${quote.quote_number}`);
   await instantiateChecklist(supabase, quote.organization_id, wo.id);
 
   await supabase.from('quotes').update({ work_order_id: wo.id }).eq('id', quoteId);
