@@ -267,18 +267,19 @@ export function RobinChat({ orgId }: { orgId: string }) {
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
         style={dragPos ? { left: dragPos.x, top: dragPos.y, right: 'auto', bottom: 'auto' } : undefined}
+        variant="outline"
         className={cn(
-          'fixed z-30 touch-none gap-2 rounded-full bg-gradient-to-br from-primary to-gold shadow-soft transition-transform duration-200 hover:scale-105 active:scale-95 md:z-50 md:touch-auto',
+          'fixed z-30 touch-none gap-2 rounded-full border-gold/40 bg-background/95 px-4 text-gold shadow-soft backdrop-blur transition-colors duration-200 hover:border-gold/60 hover:bg-gold/10 hover:text-gold active:scale-95 md:z-50 md:touch-auto',
           !dragPos && 'bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 md:bottom-5 md:right-5',
         )}
-        size="lg"
+        size="sm"
       >
-        <span className="relative flex size-2">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-foreground/60 opacity-75" />
-          <span className="relative inline-flex size-2 rounded-full bg-primary-foreground" />
+        <span className="relative flex size-1.5">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold/60 opacity-75" />
+          <span className="relative inline-flex size-1.5 rounded-full bg-gold" />
         </span>
-        <MessageCircle className="size-4" aria-hidden />
-        <span>{t('launcher')}</span>
+        <MessageCircle className="size-3.5" aria-hidden />
+        <span className="text-xs font-medium">{t('launcher')}</span>
       </Button>
 
       {hasOpened ? (
