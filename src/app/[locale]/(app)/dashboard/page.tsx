@@ -16,6 +16,7 @@ import {
   CalendarDays,
   MessageCircle,
   Receipt,
+  FileText,
   UserRoundPlus,
   TrendingUp,
   TrendingDown,
@@ -188,6 +189,7 @@ export default async function DashboardPage({
     { data: urgentWorkOrdersData },
     { data: unreadMessagesData },
     { data: invoicesSummaryData },
+    quotesPending,
     { data: paymentsTodayData },
     { data: paymentsMonthData },
     { data: payments14dData },
@@ -261,6 +263,7 @@ export default async function DashboardPage({
       .select('status, due_date')
       .eq('organization_id', org.id)
       .in('status', ['to_prepare', 'sent', 'partially_paid', 'overdue']),
+    supabase.from('quotes').select('id', { count: 'exact', head: true }).eq('organization_id', org.id).eq('status', 'sent'),
     supabase.from('invoice_payments').select('amount').eq('organization_id', org.id).gte('paid_at', todayISO),
     supabase.from('invoice_payments').select('amount').eq('organization_id', org.id).gte('paid_at', monthStartISO),
     supabase.from('invoice_payments').select('amount, paid_at').eq('organization_id', org.id).gte('paid_at', last14DaysStart),
@@ -428,6 +431,7 @@ export default async function DashboardPage({
     { icon: CalendarClock, label: t('dashboard.notifApptsToday'), value: apptsStartingToday.count ?? 0, href: '#appointments', tone: 'default' },
     { icon: Clock, label: t('dashboard.notifFollowups'), value: followUpsDue, href: '/automations', tone: 'default' },
     { icon: Receipt, label: t('dashboard.notifInvoices'), value: invoicesToPrepare, href: '/invoices', tone: 'default' },
+    { icon: FileText, label: t('dashboard.notifQuotesPending'), value: quotesPending.count ?? 0, href: '/quotes', tone: 'default' },
     { icon: UserX, label: t('dashboard.notifInactiveCustomers'), value: inactiveCustomersCount, href: '/customers?filter=inactive', tone: 'default' },
     { icon: Package, label: t('dashboard.notifLowStock'), value: lowStockCount, href: '/inventory', tone: 'urgent' },
   ];
@@ -870,10 +874,11 @@ export default async function DashboardPage({
               {t('dashboard.vehiclesViewAll')}
             </Link>
           </div>
-          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-5">
             {[
               { label: t('invoices.statToPrepare'), value: invoicesToPrepare },
               { label: t('invoices.statOverdue'), value: invoicesOverdue },
+              { label: t('dashboard.notifQuotesPending'), value: quotesPending.count ?? 0 },
               { label: t('invoices.statRevenueToday'), value: formatCurrency(revenueToday, locale) },
               { label: t('invoices.statRevenueMonth'), value: formatCurrency(revenueMonth, locale) },
             ].map((s) => (

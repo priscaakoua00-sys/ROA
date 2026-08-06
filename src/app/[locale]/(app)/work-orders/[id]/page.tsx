@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { notFound, redirect } from 'next/navigation';
-import { CalendarDays, Camera, ClipboardCheck, Wrench, FileText } from 'lucide-react';
+import { CalendarDays, Camera, ClipboardCheck, Wrench, FileText, Trash2 } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import {
@@ -14,6 +14,8 @@ import {
   addChecklistItemAction,
   generateRepairReportAction,
   sendRepairReportClientMessageAction,
+  uploadWorkOrderPhotoAction,
+  deleteWorkOrderPhotoAction,
 } from '@/data/work-orders/actions';
 import { saveReportAsArticleAction } from '@/data/knowledge/actions';
 import { recordPartUsageAction } from '@/data/inventory/actions';
@@ -86,6 +88,7 @@ export default async function WorkOrderDetailPage({
     articleSaved?: string;
     partSaved?: string;
     quoteError?: string;
+    photoSaved?: string;
   }>;
 }) {
   const { locale, id } = await params;
@@ -101,6 +104,7 @@ export default async function WorkOrderDetailPage({
     articleSaved,
     partSaved,
     quoteError,
+    photoSaved,
   } = await searchParams;
   const t = await getTranslations('app');
 
@@ -130,6 +134,7 @@ export default async function WorkOrderDetailPage({
     parts,
     { data: partUsageData },
     latestOversight,
+    { data: woPhotosData },
   ] = await Promise.all([
     supabase.from('work_order_tasks').select('id, description, done').eq('work_order_id', id).order('created_at', { ascending: true }),
     supabase.rpc('org_members', { p_org: wo.organization_id }),
@@ -162,7 +167,28 @@ export default async function WorkOrderDetailPage({
       .eq('reason', 'usage')
       .order('created_at', { ascending: false }),
     loadLatestWorkOrderOversight(supabase, id),
+    supabase
+      .from('work_order_photos')
+      .select('id, storage_path, stage, created_at')
+      .eq('work_order_id', id)
+      .order('created_at', { ascending: true }),
   ]);
+
+  const woPhotos = (woPhotosData ?? []) as { id: string; storage_path: string; stage: 'before' | 'after'; created_at: string }[];
+  const woPhotoUrls = new Map<string, string>();
+  if (woPhotos.length > 0) {
+    const { data: signedWoPhotos } = await supabase.storage
+      .from('work-order-photos')
+      .createSignedUrls(
+        woPhotos.map((p) => p.storage_path),
+        3600,
+      );
+    signedWoPhotos?.forEach((s) => {
+      if (s.signedUrl && s.path) woPhotoUrls.set(s.path, s.signedUrl);
+    });
+  }
+  const beforePhotos = woPhotos.filter((p) => p.stage === 'before');
+  const afterPhotos = woPhotos.filter((p) => p.stage === 'after');
 
   const tasks = (taskData ?? []) as Task[];
   const partUsage = (partUsageData ?? []) as unknown as {
@@ -288,7 +314,9 @@ export default async function WorkOrderDetailPage({
                   ? t('knowledge.articleSaved')
                   : partSaved === '1'
                     ? t('inventory.saved')
-                    : null
+                    : photoSaved === '1'
+                      ? t('workOrders.photoSaved')
+                      : null
         }
         error={
           reportError === 'empty'
@@ -449,6 +477,62 @@ export default async function WorkOrderDetailPage({
         </form>
       </section>
 
+      {/* Before/after photos */}
+      <section className="mt-6 rounded-xl border border-border bg-card p-5 shadow-soft">
+        <div className="flex items-center gap-2">
+          <Camera className="size-4 text-gold" aria-hidden />
+          <h2 className="text-base font-semibold tracking-tight">{t('workOrders.beforeAfterTitle')}</h2>
+        </div>
+        <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {(['before', 'after'] as const).map((stage) => {
+            const stagePhotos = stage === 'before' ? beforePhotos : afterPhotos;
+            return (
+              <div key={stage}>
+                <h3 className="text-sm font-medium text-muted-foreground">
+                  {stage === 'before' ? t('workOrders.photoBefore') : t('workOrders.photoAfter')}
+                </h3>
+                {stagePhotos.length > 0 ? (
+                  <div className="mt-2 grid grid-cols-3 gap-2">
+                    {stagePhotos.map((p) => {
+                      const url = woPhotoUrls.get(p.storage_path);
+                      return url ? (
+                        <div key={p.id} className="relative">
+                          <a href={url} target="_blank" rel="noreferrer">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={url} alt="" className="aspect-square w-full rounded-md border border-border object-cover" />
+                          </a>
+                          <form action={deleteWorkOrderPhotoAction} className="absolute right-1 top-1">
+                            <input type="hidden" name="locale" value={locale} />
+                            <input type="hidden" name="woId" value={wo.id} />
+                            <input type="hidden" name="photoId" value={p.id} />
+                            <button
+                              type="submit"
+                              aria-label={t('workOrders.photoDelete')}
+                              className="flex size-5 items-center justify-center rounded-full bg-background/90 text-muted-foreground shadow-soft hover:text-destructive"
+                            >
+                              <Trash2 className="size-3" aria-hidden />
+                            </button>
+                          </form>
+                        </div>
+                      ) : null;
+                    })}
+                  </div>
+                ) : (
+                  <p className="mt-2 text-xs text-muted-foreground">{t('workOrders.photoEmpty')}</p>
+                )}
+                <form action={uploadWorkOrderPhotoAction} encType="multipart/form-data" className="mt-2 flex items-center gap-2">
+                  <input type="hidden" name="locale" value={locale} />
+                  <input type="hidden" name="woId" value={wo.id} />
+                  <input type="hidden" name="stage" value={stage} />
+                  <input type="file" name="photo" accept="image/*" capture="environment" required className="text-xs text-muted-foreground" />
+                  <Button type="submit" variant="ghost" size="sm">{t('workOrders.checklistAddPhoto')}</Button>
+                </form>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
       {/* AI diagnosis */}
       <div id="diagnosis" className="scroll-mt-20">
         <PhotoDiagnosisPanel
@@ -479,6 +563,15 @@ export default async function WorkOrderDetailPage({
 
         {report ? (
           <div className="mt-4 space-y-3 border-t border-border pt-4">
+            <a
+              href={`/${locale}/work-orders/${wo.id}/report-pdf`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm text-gold hover:underline"
+            >
+              <FileText className="size-4" aria-hidden />
+              {t('workOrders.reportDownloadPdf')}
+            </a>
             <p className="text-sm">{report.summary}</p>
             {report.recommended_repairs.length > 0 ? (
               <ul className="space-y-1">

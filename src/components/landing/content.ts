@@ -130,8 +130,8 @@ export const COPY: Record<Locale, Copy> = {
       title: 'Alles wat uw garage nodig heeft, op één plek.', tag: 'De drie pijlers',
       items: [
         { t: 'Volledige voertuighistorie', p: 'Elke reparatie, elk gesprek en elke factuur op één tijdlijn per voertuig. Nooit meer zoeken in mappen of oude berichten.' },
-        { t: 'Devissen, reparaties en facturen', p: 'Maak een devis in seconden, zet het om in een reparatie en daarna in een factuur. Zonder ooit iets dubbel in te typen.' },
-        { t: 'Ruben, uw AI-medewerker', p: 'Beantwoordt klanten, bereidt devissen voor en houdt de werkplaats georganiseerd, dag en nacht.' },
+        { t: 'Offertes, reparaties en facturen', p: 'Maak een offerte in seconden, zet die om in een reparatie en daarna in een factuur. Zonder ooit iets dubbel in te typen.' },
+        { t: 'Ruben, uw AI-medewerker', p: 'Beantwoordt klanten, bereidt offertes voor en houdt de werkplaats georganiseerd, dag en nacht.' },
       ],
     },
     acts: {
@@ -169,16 +169,16 @@ export const COPY: Record<Locale, Copy> = {
     },
     simulation: {
       tag: 'Live simulatie', titlePre: 'Bekijk ', titleEm: 'Ruben', sub: 'Van het eerste bericht tot de afgeronde reparatie volgt u dezelfde stroom die vandaag al in echte garages draait.',
-      tabs: ['Bericht', 'Devis', 'Afspraak', 'Opvolging'],
-      step1: { who: 'Dhr. Peeters · bericht', msg: 'Mijn Golf trekt naar links bij het remmen. Kan dat gevaarlijk zijn?', reply: 'Dat kan wijzen op versleten remblokken. Ik maak alvast een devis klaar en stel een moment voor.' },
-      step2: { label: 'Ruben stelt een devis op', lines: [{ d: 'Remblokken vooraan (set)', price: '€ 89,00' }, { d: 'Arbeid (45 min)', price: '€ 67,50' }, { d: 'BTW 21%', price: '€ 32,84' }], total: '€ 189,34' },
+      tabs: ['Bericht', 'Offerte', 'Afspraak', 'Opvolging'],
+      step1: { who: 'Dhr. Peeters · bericht', msg: 'Mijn Golf trekt naar links bij het remmen. Kan dat gevaarlijk zijn?', reply: 'Dat kan wijzen op versleten remblokken. Ik maak alvast een offerte klaar en stel een moment voor.' },
+      step2: { label: 'Ruben stelt een offerte op', lines: [{ d: 'Remblokken vooraan (set)', price: '€ 89,00' }, { d: 'Arbeid (45 min)', price: '€ 67,50' }, { d: 'BTW 21%', price: '€ 32,84' }], total: '€ 189,34' },
       step3: { label: 'Ruben stelt een afspraak voor', slots: ['Donderdag 09:00', 'Vrijdag 14:30'], confirmed: 'Bevestigd voor vrijdag 14:30' },
       step4: { label: 'Ruben volgt de reparatie op', stages: ['Ontvangen', 'Diagnose', 'Reparatie', 'Klaar'], current: 2, note: 'Ruben maakt het klantbericht klaar zodra de Golf klaar is - u verstuurt het met één klik.' },
     },
     voice: {
       tag: 'Spraakbediening', title: 'Praat gewoon met Ruben.', sub: 'Typen is niet nodig. Spreek een opdracht in, Ruben voert ze meteen uit.',
       examples: [
-        { cmd: '"Ruben, maak een devis voor deze Golf."', result: 'Devis DEV-2026-014 aangemaakt' },
+        { cmd: '"Ruben, maak een offerte voor deze Golf."', result: 'Offerte DEV-2026-014 aangemaakt' },
         { cmd: '"Ruben, bel deze klant morgen terug."', result: 'Herinnering gepland voor morgen 09:00' },
         { cmd: '"Ruben, hoeveel hebben we deze week gefactureerd?"', result: '€ 4.280 gefactureerd deze week' },
       ],
@@ -196,7 +196,7 @@ export const COPY: Record<Locale, Copy> = {
       items: [
         'Geen enkele klant meer vergeten.',
         'Alle voertuiginformatie op één plek.',
-        'Devissen razendsnel verstuurd.',
+        'Offertes razendsnel verstuurd.',
         'Professionele PDF-facturen.',
         'Automatische herinneringen.',
         'Elke dag tijd bespaard.',
@@ -206,7 +206,7 @@ export const COPY: Record<Locale, Copy> = {
     },
     journey: {
       title: 'Eén voertuig, één volledig parcours.', tag: 'Van ontvangst tot historiek',
-      steps: ['Ontvangst', 'Inspectie', "Foto's", 'AI-diagnose', 'Devis', 'Akkoord klant', 'Reparatie', 'Factuur', 'Betaling', 'Historiek bewaard'],
+      steps: ['Ontvangst', 'Inspectie', "Foto's", 'AI-diagnose', 'Offerte', 'Akkoord klant', 'Reparatie', 'Factuur', 'Betaling', 'Historiek bewaard'],
     },
     pwa: {
       tag: 'Overal beschikbaar', title: 'Werkt op computer én telefoon.', sub: 'Installeer Roavaa rechtstreeks vanuit uw browser, zonder Play Store of App Store.',
