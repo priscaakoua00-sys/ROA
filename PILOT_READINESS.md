@@ -203,7 +203,10 @@ Objectif: le testeur doit pouvoir gerer une journee type.
 - WhatsApp Business: le code d'envoi reel existe (WhatsApp Cloud API) ;
   chaque garage doit encore creer et faire verifier son propre compte Meta
   Business Manager (demarche commerciale de Meta, hors du code) avant de
-  pouvoir connecter un numero dans Parametres.
+  pouvoir connecter un numero dans Parametres. La reception (un client qui
+  ecrit en premier sur WhatsApp et recoit une reponse automatique de Ruben)
+  n'est pas encore construite — c'est une extension future volontairement
+  laissee a l'acheteur (voir addendum ci-dessous).
 - Telephone: le code de reponse automatique existe (Twilio) ; chaque garage
   doit encore creer son propre compte Twilio et acheter un numero (cout a la
   minute a sa charge) avant de le connecter dans Parametres. Les appels
@@ -216,3 +219,40 @@ developpement). WhatsApp et le repondeur telephonique automatique sont tous
 deux termines cote code et attendent seulement le compte professionnel
 propre a chaque garage (Meta Business Manager, Twilio). Ce qui reste
 reellement a construire : les appels sortants et les SMS.
+
+## Addendum 2026-08-06 (fonctionnalites "impression premium")
+
+Lot de fonctionnalites ajoutees pour renforcer la valeur du produit avant une
+demonstration commerciale :
+
+- **Ruben (IA) mis en avant comme fonctionnalite centrale** : la page Relances
+  (Opvolging/Suivi) affiche desormais directement le brouillon de reponse
+  redige par Ruben pour chaque demande sans reponse, avec un bouton "Approuver
+  et envoyer" en un clic. Le garage garde toujours la validation finale — Ruben
+  ne repond jamais seul. Un bouton permet aussi d'envoyer les creneaux
+  proposes par Ruben directement au client par message (auparavant, ces
+  creneaux ne servaient qu'a reserver en interne).
+- **Historique vehicule complet** : ajout des pieces jointes de documents
+  (assurance, ancienne facture, notice constructeur...) et d'une galerie
+  photos avant/apres par ordre de reparation, en plus de l'historique deja
+  existant (entretiens, reparations, factures, diagnostics).
+- **Rapport d'intervention PDF** : chaque ordre de reparation peut generer un
+  vrai PDF telechargeable (resume, reparations recommandees, resultats de la
+  checklist, pieces utilisees) — distinct du rapport financier periodique
+  deja existant.
+- **Rappels automatiques** : nouvelle tache planifiee quotidienne qui envoie
+  automatiquement (e-mail toujours, WhatsApp si le garage a connecte son
+  numero) un rappel de controle technique (J-30/J-14/J-7) et un rappel
+  d'entretien pour les clients non revus depuis 180 jours.
+- **Tableau de bord** : ajout d'un indicateur "devis en attente" dedie.
+- **Correction du neerlandais** : la page d'accueil neerlandaise utilisait par
+  erreur le mot francais "devis"/"devissen" au lieu de "offerte"/"offertes"
+  a six endroits — corrige.
+
+**Volontairement laisse comme extension future pour l'acheteur** : l'API
+WhatsApp officielle (deja connectable pour l'envoi) et le repondeur
+telephonique IA (deja fonctionnel) restent la base pour de futures
+ameliorations plus poussees — reception automatique de messages WhatsApp avec
+reponse IA en boucle fermee, prise de rendez-vous vocale complete, appels
+sortants. Le code existant est concu pour etre etendu (meme schema de
+credentials par organisation, meme moteur IA) sans reecriture.
