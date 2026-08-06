@@ -10,7 +10,7 @@ l'application, et par où commencer.
 - Le code source complet de l'application (Next.js / TypeScript), tel qu'il
   tourne aujourd'hui — rien de retiré, rien de masqué.
 - L'historique complet des migrations de base de données
-  (`supabase/migrations/`, 80 fichiers), rejouable de zéro sur n'importe quelle
+  (`supabase/migrations/`, 83 fichiers), rejouable de zéro sur n'importe quelle
   base Postgres/Supabase.
 - La suite de tests (154 tests unitaires Vitest + 26 tests end-to-end
   Playwright) et la configuration CI (GitHub Actions).
