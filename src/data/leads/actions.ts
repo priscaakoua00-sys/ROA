@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/data/supabase/server';
 import { createSupabaseAdminClient } from '@/data/supabase/admin';
+import { logServerError } from '@/lib/error-log';
 import { publicRequestSchema } from '@/lib/validation/lead';
 import { dispatchWebhooks } from '@/lib/webhooks';
 import { qualifyLead } from './qualify';
@@ -89,20 +90,30 @@ export async function submitPublicRequestAction(formData: FormData) {
 
   // No Supabase Auth session for this anonymous form submission, so use the
   // service-role client to resolve the org and fire lead.created — same
-  // pattern as the Stripe webhook / billing-reminders cron.
+  // pattern as the Stripe webhook / billing-reminders cron. The lead itself
+  // is already saved by this point (checked above); a failure here is a
+  // missed webhook notification, not a reason to crash the visitor's
+  // confirmation page.
   if (leadId) {
-    const admin = createSupabaseAdminClient();
-    const { data: lead } = await admin
-      .from('leads')
-      .select('organization_id, customer_id, vehicle_id')
-      .eq('id', leadId)
-      .maybeSingle();
-    if (lead) {
-      await dispatchWebhooks(admin, lead.organization_id, 'lead.created', {
-        leadId,
-        customerId: lead.customer_id,
-        vehicleId: lead.vehicle_id,
-        description: parsed.data.description,
+    try {
+      const admin = createSupabaseAdminClient();
+      const { data: lead } = await admin
+        .from('leads')
+        .select('organization_id, customer_id, vehicle_id')
+        .eq('id', leadId)
+        .maybeSingle();
+      if (lead) {
+        await dispatchWebhooks(admin, lead.organization_id, 'lead.created', {
+          leadId,
+          customerId: lead.customer_id,
+          vehicleId: lead.vehicle_id,
+          description: parsed.data.description,
+        });
+      }
+    } catch (err) {
+      await logServerError({
+        route: 'lead_webhook_dispatch',
+        message: `Failed to dispatch lead.created for ${leadId}: ${err instanceof Error ? err.message : String(err)}`,
       });
     }
   }
