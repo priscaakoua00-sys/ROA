@@ -31,7 +31,11 @@ export default async function ForgotPasswordPage({
       {message === 'send_failed' ? (
         <p className="mb-4 text-sm text-urgent">{t('errors.resetSendFailed')}</p>
       ) : null}
-      {error ? <p className="mb-4 text-sm text-urgent">{t('errors.generic')}</p> : null}
+      {error === 'link_expired' ? (
+        <p className="mb-4 text-sm text-urgent">{t('errors.linkExpired')}</p>
+      ) : error ? (
+        <p className="mb-4 text-sm text-urgent">{t('errors.generic')}</p>
+      ) : null}
       <form action={requestResetAction} className="space-y-4">
         <input type="hidden" name="locale" value={locale} />
         <Field label={t('fields.email')} name="email" type="email" autoComplete="email" required />
