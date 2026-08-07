@@ -139,6 +139,21 @@ export async function updatePasswordAction(formData: FormData) {
   }
 
   const supabase = await createSupabaseServerClient();
+
+  // Preferred path: redeem the recovery token_hash HERE, on the real form
+  // submission — not via a bare GET on the emailed link, which mail-client
+  // link scanners (Gmail/Outlook safety pre-fetch) routinely auto-visit and
+  // consume before the user ever taps it. Supabase's own logs showed
+  // exactly this: "One-time token not found" on the user's actual click,
+  // seconds after the email was sent — the token was already burned by an
+  // automated visit. verifyOtp only ever runs from a genuine POST here, so
+  // a prefetcher loading the page via GET can no longer consume it.
+  const tokenHash = formData.get('tokenHash');
+  if (typeof tokenHash === 'string' && tokenHash) {
+    const { error: verifyError } = await supabase.auth.verifyOtp({ type: 'recovery', token_hash: tokenHash });
+    if (verifyError) redirect(`/${locale}/forgot-password?error=link_expired`);
+  }
+
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
   if (error) redirect(`/${locale}/reset-password?error=update`);
 
