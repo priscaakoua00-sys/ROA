@@ -1386,6 +1386,11 @@
       "subtitle": "Kies een nieuw wachtwoord.",
       "cta": "Wachtwoord opslaan"
     },
+    "recoveryConfirm": {
+      "title": "Wachtwoord herstellen",
+      "subtitle": "Klik hieronder om door te gaan met het instellen van een nieuw wachtwoord.",
+      "cta": "Doorgaan"
+    },
     "fields": {
       "fullName": "Volledige naam",
       "email": "E-mailadres",

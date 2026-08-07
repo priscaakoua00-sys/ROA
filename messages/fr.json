@@ -1386,6 +1386,11 @@
       "subtitle": "Choisissez un nouveau mot de passe.",
       "cta": "Enregistrer"
     },
+    "recoveryConfirm": {
+      "title": "Reinitialiser le mot de passe",
+      "subtitle": "Cliquez ci-dessous pour continuer et choisir un nouveau mot de passe.",
+      "cta": "Continuer"
+    },
     "fields": {
       "fullName": "Nom complet",
       "email": "E-mail",
