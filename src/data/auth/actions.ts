@@ -105,10 +105,18 @@ export async function requestResetAction(formData: FormData) {
 
   const supabase = await createSupabaseServerClient();
   const origin = await originUrl();
-  await supabase.auth.resetPasswordForEmail(parsed.data.email, {
+  const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
     redirectTo: `${origin}/${locale}/reset-password`,
   });
-  // Always report success (do not reveal whether the email exists).
+  // Supabase's own per-user cooldown on the /recover endpoint (independent of
+  // our checkRateLimit above) rejects a second request within ~60s. Surface
+  // that specifically — it doesn't reveal whether the email exists, and a
+  // silent "sent" here reads as "still nothing arrived" and drives repeated
+  // retries, which is exactly what happened in production on 2026-08-07.
+  if (error?.code === 'over_email_send_rate_limit') {
+    redirect(`/${locale}/forgot-password?message=slow_down`);
+  }
+  // Always report success for any other outcome (do not reveal whether the email exists).
   redirect(`/${locale}/forgot-password?message=sent`);
 }
 

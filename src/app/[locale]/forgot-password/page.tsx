@@ -23,6 +23,11 @@ export default async function ForgotPasswordPage({
           {t('messages.resetSent')}
         </p>
       ) : null}
+      {message === 'slow_down' ? (
+        <p className="mb-4 rounded-md border border-border bg-surface p-3 text-sm text-muted-foreground">
+          {t('messages.resetSlowDown')}
+        </p>
+      ) : null}
       {error ? <p className="mb-4 text-sm text-urgent">{t('errors.generic')}</p> : null}
       <form action={requestResetAction} className="space-y-4">
         <input type="hidden" name="locale" value={locale} />

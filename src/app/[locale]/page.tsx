@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Landing } from '@/components/landing/landing';
 import { COPY, type Locale } from '@/components/landing/content';
+import { isAppLocale, routing } from '@/i18n/routing';
 import { SITE_URL } from '@/lib/site';
 import { PLANS } from '@/lib/plans';
 
@@ -32,7 +33,14 @@ export default function HomePage({
 }
 
 async function HomeContent({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
+  const { locale: rawLocale } = await params;
+  // The [locale] layout already 404s an unsupported locale, but its guard
+  // and this page's render can't be assumed to be strictly sequential —
+  // production logged `COPY[locale].faq` throwing on `/[locale]` for 23
+  // distinct visitors, which only happens when this cast lies. Resolve to a
+  // real locale defensively instead of trusting the cast blindly, same
+  // pattern already used in src/i18n/request.ts.
+  const locale: Locale = isAppLocale(rawLocale) ? rawLocale : routing.defaultLocale;
   setRequestLocale(locale);
   const home = await getTranslations({ locale, namespace: 'home' });
   const pricing = await getTranslations({ locale, namespace: 'pricing' });
@@ -90,7 +98,7 @@ async function HomeContent({ params }: { params: Promise<{ locale: string }> }) 
       {
         '@type': 'FAQPage',
         '@id': `${SITE_URL}/${locale}#faq`,
-        mainEntity: COPY[locale as Locale].faq.items.map((item) => ({
+        mainEntity: COPY[locale].faq.items.map((item) => ({
           '@type': 'Question',
           name: item.q,
           acceptedAnswer: { '@type': 'Answer', text: item.a },
@@ -121,7 +129,7 @@ async function HomeContent({ params }: { params: Promise<{ locale: string }> }) 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Landing locale={locale as Locale} />
+      <Landing locale={locale} />
     </>
   );
 }
