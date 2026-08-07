@@ -1403,7 +1403,8 @@
       "generic": "Une erreur est survenue. Verifiez vos informations et reessayez.",
       "rateLimited": "Trop de tentatives. Veuillez patienter quelques minutes puis reessayer.",
       "passwordMismatch": "Les mots de passe ne correspondent pas.",
-      "resetSendFailed": "Nous n'avons pas pu envoyer d'e-mail pour le moment - aucun e-mail n'est parti. Reessayez dans quelques minutes ou contactez-nous si cela persiste."
+      "resetSendFailed": "Nous n'avons pas pu envoyer d'e-mail pour le moment - aucun e-mail n'est parti. Reessayez dans quelques minutes ou contactez-nous si cela persiste.",
+      "linkExpired": "Ce lien de reinitialisation a expire, a deja ete utilise, ou a ete ouvert dans un navigateur different de celui ou vous l'avez demande. Demandez-en un nouveau ci-dessous."
     }
   },
   "request": {

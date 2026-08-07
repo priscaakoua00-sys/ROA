@@ -1403,7 +1403,8 @@
       "generic": "Something went wrong. Check your details and try again.",
       "rateLimited": "Too many attempts. Please wait a few minutes and try again.",
       "resetSendFailed": "We couldn't send an email right now — nothing was sent. Please try again in a few minutes, or contact us if this keeps happening.",
-      "passwordMismatch": "Passwords do not match."
+      "passwordMismatch": "Passwords do not match.",
+      "linkExpired": "This reset link has expired, was already used, or was opened in a different browser than the one you requested it from. Request a new one below."
     }
   },
   "request": {
