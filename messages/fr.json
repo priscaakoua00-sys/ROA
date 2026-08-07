@@ -1025,7 +1025,18 @@
       "aiUsageErrorRate": "Taux d’erreur",
       "aiUsageByProvider": "Par fournisseur",
       "aiUsageEmpty": "Aucun appel IA enregistré pour l’instant.",
-      "aiUsageRecentTitle": "Appels récents"
+      "aiUsageRecentTitle": "Appels récents",
+      "usersTitle": "Definir un mot de passe temporaire",
+      "usersIntro": "Pour les utilisateurs bloques pendant que la recuperation par e-mail n'est pas encore fiable. Visible uniquement par l'equipe ROAVAA.",
+      "usersEmailPlaceholder": "E-mail de l'utilisateur",
+      "usersCta": "Generer un mot de passe temporaire",
+      "usersCopy": "Copier",
+      "usersWorking": "En cours…",
+      "usersSuccessFor": "Nouveau mot de passe temporaire pour",
+      "usersReminder": "Transmettez ce mot de passe de maniere securisee a l'utilisateur et demandez-lui de le changer immediatement apres connexion. Il n'est stocke nulle part - copiez-le maintenant.",
+      "usersNotFound": "Aucun compte trouve avec cette adresse e-mail.",
+      "usersFailed": "Le mot de passe n'a pas pu etre defini. Reessayez.",
+      "usersForbidden": "Acces refuse."
     },
     "automations": {
       "title": "Relances",
