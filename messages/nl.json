@@ -1402,6 +1402,7 @@
     "errors": {
       "generic": "Er ging iets mis. Controleer uw gegevens en probeer opnieuw.",
       "rateLimited": "Te veel pogingen. Wacht enkele minuten en probeer het opnieuw.",
+      "resetSendFailed": "We konden op dit moment geen e-mail verzenden — er is geen enkele e-mail vertrokken. Probeer het over enkele minuten opnieuw of neem contact met ons op als dit blijft gebeuren.",
       "passwordMismatch": "De wachtwoorden komen niet overeen."
     }
   },

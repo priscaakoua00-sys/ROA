@@ -111,13 +111,17 @@ export async function requestResetAction(formData: FormData) {
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
     redirectTo: `${origin}/${locale}/auth/callback?next=/reset-password`,
   });
-  // Supabase's own per-user cooldown on the /recover endpoint (independent of
-  // our checkRateLimit above) rejects a second request within ~60s. Surface
-  // that specifically — it doesn't reveal whether the email exists, and a
-  // silent "sent" here reads as "still nothing arrived" and drives repeated
-  // retries, which is exactly what happened in production on 2026-08-07.
+  // Supabase uses the SAME error code (over_email_send_rate_limit) for two
+  // different situations with different messages: the per-user ~60s cooldown
+  // ("For security purposes, you can only request this after N seconds" — a
+  // real email WAS just sent) and the project's hourly email-sending quota
+  // being exhausted ("email rate limit exceeded" — NO email was sent at all,
+  // for anyone, until the quota resets). Telling someone "it's already on
+  // its way, check spam" when nothing was sent is exactly the false
+  // reassurance reported on 2026-08-07 — distinguish them by message text.
   if (error?.code === 'over_email_send_rate_limit') {
-    redirect(`/${locale}/forgot-password?message=slow_down`);
+    const recentlySent = error.message?.toLowerCase().includes('security purposes');
+    redirect(`/${locale}/forgot-password?message=${recentlySent ? 'slow_down' : 'send_failed'}`);
   }
   // Always report success for any other outcome (do not reveal whether the email exists).
   redirect(`/${locale}/forgot-password?message=sent`);
