@@ -105,11 +105,12 @@ export async function requestResetAction(formData: FormData) {
 
   const supabase = await createSupabaseServerClient();
   const origin = await originUrl();
-  // Must round-trip through /auth/callback (which exchanges the emailed
-  // code for a real session) before landing on /reset-password — pointing
-  // straight at /reset-password left no session to update, ever.
+  // redirectTo backs Supabase's {{ .RedirectTo }} template variable; the
+  // actual emailed link is built from {{ .TokenHash }} directly to
+  // /auth/recovery (configured in the Supabase dashboard's email template),
+  // not from this value — see verifyRecoveryAction below for why.
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-    redirectTo: `${origin}/${locale}/auth/callback?next=/reset-password`,
+    redirectTo: `${origin}/${locale}/auth/recovery`,
   });
   // Supabase uses the SAME error code (over_email_send_rate_limit) for two
   // different situations with different messages: the per-user ~60s cooldown
@@ -127,6 +128,31 @@ export async function requestResetAction(formData: FormData) {
   redirect(`/${locale}/forgot-password?message=sent`);
 }
 
+/**
+ * Step 1 of recovery: redeems the emailed token_hash for a real session.
+ * Deliberately separate from the page render that receives it — the token
+ * is only ever consumed here, inside a server action fired by a genuine
+ * user click on "Continue", never by the GET that loads /auth/recovery.
+ * Mail-client link-safety scanners (Gmail/Outlook prefetch) routinely
+ * auto-GET every link in an incoming email; Supabase's own auth logs
+ * proved this was happening ("One-time token not found" on the user's
+ * real click, seconds after the email was sent) when the token used to be
+ * redeemed straight off the link. A prefetcher loading this page via GET
+ * can no longer burn the token — only a submitted form can.
+ */
+export async function verifyRecoveryAction(formData: FormData) {
+  const locale = localeOf(formData);
+  const tokenHash = String(formData.get('tokenHash') ?? '');
+  if (!tokenHash) redirect(`/${locale}/forgot-password?error=link_expired`);
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.verifyOtp({ type: 'recovery', token_hash: tokenHash });
+  if (error) redirect(`/${locale}/forgot-password?error=link_expired`);
+
+  redirect(`/${locale}/reset-password`);
+}
+
+/** Step 2: the recovery session from verifyRecoveryAction is already live in cookies by now. */
 export async function updatePasswordAction(formData: FormData) {
   const locale = localeOf(formData);
   const parsed = updatePasswordSchema.safeParse({
@@ -139,21 +165,6 @@ export async function updatePasswordAction(formData: FormData) {
   }
 
   const supabase = await createSupabaseServerClient();
-
-  // Preferred path: redeem the recovery token_hash HERE, on the real form
-  // submission — not via a bare GET on the emailed link, which mail-client
-  // link scanners (Gmail/Outlook safety pre-fetch) routinely auto-visit and
-  // consume before the user ever taps it. Supabase's own logs showed
-  // exactly this: "One-time token not found" on the user's actual click,
-  // seconds after the email was sent — the token was already burned by an
-  // automated visit. verifyOtp only ever runs from a genuine POST here, so
-  // a prefetcher loading the page via GET can no longer consume it.
-  const tokenHash = formData.get('tokenHash');
-  if (typeof tokenHash === 'string' && tokenHash) {
-    const { error: verifyError } = await supabase.auth.verifyOtp({ type: 'recovery', token_hash: tokenHash });
-    if (verifyError) redirect(`/${locale}/forgot-password?error=link_expired`);
-  }
-
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
   if (error) redirect(`/${locale}/reset-password?error=update`);
 

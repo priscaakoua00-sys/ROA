@@ -1386,6 +1386,11 @@
       "subtitle": "Choose a new password.",
       "cta": "Save password"
     },
+    "recoveryConfirm": {
+      "title": "Reset your password",
+      "subtitle": "Click below to continue setting a new password.",
+      "cta": "Continue"
+    },
     "fields": {
       "fullName": "Full name",
       "email": "Email",
