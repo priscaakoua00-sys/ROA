@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import { listUserOrgs, getActiveOrgId } from '@/data/organizations/active';
 import { AppShell } from '@/components/app-shell/app-shell';
 import { RobinChat } from '@/components/robin-chat';
@@ -32,7 +32,7 @@ export default async function AppLayout({
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   if (!user) redirect(`/${locale}/login`);
 
   const [orgs, { data: profile }] = await Promise.all([

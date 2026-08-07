@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Phone, MessageCircle, CalendarClock, Check, X } from 'lucide-react';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import { getActiveOrgId } from '@/data/organizations/active';
 import { createWorkOrderAction } from '@/data/work-orders/actions';
 import { refuseLeadAction } from '@/data/leads/actions';
@@ -56,7 +56,7 @@ export default async function LeadsPage({
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   if (!user) redirect(`/${locale}/login`);
 
   const orgId = await getActiveOrgId(supabase);

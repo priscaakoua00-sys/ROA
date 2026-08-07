@@ -1,7 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import { createOrgSchema } from '@/lib/validation/auth';
 import { normalizeCountry } from '@/integrations/vehicle-data';
 import { createTrialCheckoutUrl } from '@/data/subscriptions/checkout';
@@ -28,7 +28,7 @@ export async function createOrgAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
 
   const { data: org, error } = await supabase.rpc('create_organization', {
     p_name: parsed.data.name,

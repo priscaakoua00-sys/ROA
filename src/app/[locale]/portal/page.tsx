@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import { Car, FileText, Receipt, CalendarClock, LogOut } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import { portalSignOutAction } from '@/data/portal/actions';
 import { StageProgress } from '@/components/work-orders/stage-progress';
 import { WORK_ORDER_STAGE_OF, type WorkOrderStatus } from '@/lib/work-order-status';
@@ -48,7 +48,7 @@ export default async function PortalPage({
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   if (!user) redirect(`/${locale}/portal/login`);
 
   const { data: customerId } = await supabase.rpc('link_portal_customer');

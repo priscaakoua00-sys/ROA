@@ -30,7 +30,7 @@ import { RevenueChart } from '@/components/dashboard/revenue-chart';
 import { DashboardGreeting } from '@/components/dashboard/greeting';
 import { RequestLinkCard } from '@/components/dashboard/request-link-card';
 import { seedDemoDataAction } from '@/data/demo/actions';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import { getActiveOrgId } from '@/data/organizations/active';
 import { signOutAction } from '@/data/auth/actions';
 import { loadFollowUpsDueCount } from '@/data/automations/due';
@@ -140,7 +140,7 @@ export default async function DashboardPage({
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   if (!user) redirect(`/${locale}/login`);
 
   const orgId = await getActiveOrgId(supabase);

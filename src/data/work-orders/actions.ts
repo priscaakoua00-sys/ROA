@@ -1,7 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import { sendEmail } from '@/integrations/email';
 import { getAIProvider } from '@/integrations/ai';
 import type { ChecklistFindingInput, MediaDiagnosis } from '@/integrations/ai';
@@ -49,7 +49,7 @@ export async function createWorkOrderAction(formData: FormData) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   await logStatus(supabase, lead.organization_id, wo.id, 'received', user?.id ?? null);
   await instantiateChecklist(supabase, lead.organization_id, wo.id);
   // Converting a lead into a work order IS accepting it — reflect that so
@@ -93,7 +93,7 @@ export async function createManualWorkOrderAction(formData: FormData) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   await logStatus(supabase, customer.organization_id, wo.id, 'received', user?.id ?? null);
   await instantiateChecklist(supabase, customer.organization_id, wo.id);
 
@@ -133,7 +133,7 @@ export async function updateWorkOrderStatusAction(formData: FormData) {
   await supabase.from('work_orders').update({ status: statusRaw }).eq('id', woId);
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   await logStatus(supabase, wo.organization_id, woId, statusRaw, user?.id ?? null, note);
   await dispatchWebhooks(supabase, wo.organization_id, 'work_order.status_changed', {
     workOrderId: woId,
@@ -339,7 +339,7 @@ export async function generateRepairReportAction(formData: FormData) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
 
   await supabase.from('work_order_reports').insert({
     organization_id: wo.organization_id,

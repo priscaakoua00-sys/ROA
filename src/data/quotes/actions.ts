@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import { instantiateChecklist, logStatus } from '@/data/work-orders/helpers';
 import { logActivity } from '@/data/activity/log';
 import { sendEmail } from '@/integrations/email';
@@ -173,7 +173,7 @@ export async function updateQuoteStatusAction(formData: FormData) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   const { data: quoteForLog } = await supabase
     .from('quotes')
     .select('organization_id, quote_number')
@@ -355,7 +355,7 @@ export async function convertQuoteToWorkOrderAction(formData: FormData) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   await logStatus(supabase, quote.organization_id, wo.id, 'received', user?.id ?? null, `${QUOTE_LABEL[locale]} ${quote.quote_number}`);
   await instantiateChecklist(supabase, quote.organization_id, wo.id);
 

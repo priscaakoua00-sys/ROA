@@ -1,7 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import { isExternalPhotoUrl } from '@/lib/utils';
 import { getVehicleTimeline } from '@/data/timeline/build';
 import { getAIProvider } from '@/integrations/ai';
@@ -130,7 +130,7 @@ export async function summarizeVehicleHistoryAction(formData: FormData) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   const { error } = await supabase.from('vehicle_history_summaries').insert({
     organization_id: vehicle.organization_id,
     vehicle_id: vehicleId,
@@ -174,7 +174,7 @@ export async function uploadVehicleDocumentAction(formData: FormData) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   await supabase.from('vehicle_documents').insert({
     organization_id: vehicle.organization_id,
     vehicle_id: vehicleId,

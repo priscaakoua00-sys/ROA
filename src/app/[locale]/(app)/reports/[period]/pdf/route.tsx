@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { renderToBuffer } from '@react-pdf/renderer';
 import { getTranslations } from 'next-intl/server';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import { getActiveOrgId } from '@/data/organizations/active';
 import { loadReportData } from '@/data/reports/load';
 import { periodRange, type ReportPeriod } from '@/data/reports/summarize';
@@ -18,7 +18,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   if (!user) return new NextResponse('Unauthorized', { status: 401 });
 
   const orgId = await getActiveOrgId(supabase);

@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import { notFound, redirect } from 'next/navigation';
 import { History, CalendarDays, Wrench, Receipt, Camera, Inbox, MessageCircle, FileText, Trash2 } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import { updateVehicleAction, uploadVehiclePhotoAction, uploadVehicleDocumentAction, deleteVehicleDocumentAction } from '@/data/vehicles/actions';
 import { getVehicleTimeline } from '@/data/timeline/build';
 import { formatDateTimeUTC } from '@/lib/datetime';
@@ -103,7 +103,7 @@ export default async function VehicleDetailPage({
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   if (!user) redirect(`/${locale}/login`);
 
   const { data: v } = await supabase

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { renderToBuffer } from '@react-pdf/renderer';
 import QRCode from 'qrcode';
 import { getTranslations } from 'next-intl/server';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import { buildEpcQrPayload } from '@/lib/epc-qr';
 import { InvoiceDocument } from '@/components/pdf/invoice-document';
 
@@ -11,7 +11,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   if (!user) return new NextResponse('Unauthorized', { status: 401 });
 
   const { data: invoice } = await supabase

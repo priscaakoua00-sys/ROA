@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import { sendEmail } from '@/integrations/email';
 import { sendWhatsAppMessage } from '@/integrations/whatsapp/send';
 import { formatCurrency } from '@/lib/pricing';
@@ -134,7 +134,7 @@ export async function createInvoiceAction(formData: FormData) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   await logActivity(supabase, {
     organizationId: cust.organization_id,
     actorId: user?.id ?? null,
@@ -169,7 +169,7 @@ export async function updateInvoiceStatusAction(formData: FormData) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   await logActivity(supabase, {
     organizationId: invoice.organization_id,
     actorId: user?.id ?? null,
@@ -253,7 +253,7 @@ export async function recordPaymentAction(formData: FormData) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   await logActivity(supabase, {
     organizationId: invoice.organization_id,
     actorId: user?.id ?? null,
@@ -302,7 +302,7 @@ export async function markInvoicePaidAction(formData: FormData) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   await logActivity(supabase, {
     organizationId: invoice.organization_id,
     actorId: user?.id ?? null,

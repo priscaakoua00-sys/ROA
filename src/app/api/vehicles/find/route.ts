@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import { getActiveOrgId } from '@/data/organizations/active';
 import { normalizePlate } from '@/integrations/rdw/client';
 
@@ -13,7 +13,7 @@ export async function GET(request: Request) {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   if (!user) return NextResponse.json({ id: null }, { status: 401 });
 
   const target = normalizePlate(new URL(request.url).searchParams.get('plate') ?? '');

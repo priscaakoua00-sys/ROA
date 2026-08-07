@@ -1,7 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 
 type Locale = 'nl' | 'en' | 'fr';
 
@@ -26,7 +26,7 @@ export async function requestAccountDeletionAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   if (!user) redirect(`/${locale}/login`);
 
   const [{ data: ownedOrgs }, { data: memberships }] = await Promise.all([
@@ -57,7 +57,7 @@ export async function cancelAccountDeletionAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   if (!user) redirect(`/${locale}/login`);
 
   await supabase.from('account_deletion_requests').delete().eq('user_id', user.id);

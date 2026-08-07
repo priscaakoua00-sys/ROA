@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { randomBytes } from 'crypto';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import { getActiveOrgId } from '@/data/organizations/active';
 import { generateApiKey } from '@/lib/api-keys';
 import { isPrivateOrLoopbackHost } from '@/lib/url-safety';
@@ -29,7 +29,7 @@ export async function createApiKeyAction(formData: FormData) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   const { plaintextKey, keyHash, keyPrefix } = generateApiKey();
 
   const { error } = await supabase.from('api_keys').insert({
@@ -60,7 +60,7 @@ export async function revokeApiKeyAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   if (!user?.email) redirect(`/${locale}/login`);
 
   const { error: reauthError } = await supabase.auth.signInWithPassword({ email: user.email, password });
@@ -94,7 +94,7 @@ export async function createWebhookEndpointAction(formData: FormData) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   const secret = randomBytes(24).toString('base64url');
 
   const { error } = await supabase.from('webhook_endpoints').insert({
