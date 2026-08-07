@@ -1402,7 +1402,8 @@
     "errors": {
       "generic": "Une erreur est survenue. Verifiez vos informations et reessayez.",
       "rateLimited": "Trop de tentatives. Veuillez patienter quelques minutes puis reessayer.",
-      "passwordMismatch": "Les mots de passe ne correspondent pas."
+      "passwordMismatch": "Les mots de passe ne correspondent pas.",
+      "resetSendFailed": "Nous n'avons pas pu envoyer d'e-mail pour le moment - aucun e-mail n'est parti. Reessayez dans quelques minutes ou contactez-nous si cela persiste."
     }
   },
   "request": {
