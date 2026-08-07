@@ -23,6 +23,11 @@ export default async function LoginPage({
           {t('messages.checkEmail')}
         </p>
       ) : null}
+      {message === 'password_updated' ? (
+        <p className="mb-4 rounded-md border border-border bg-surface p-3 text-sm text-muted-foreground">
+          {t('messages.passwordUpdated')}
+        </p>
+      ) : null}
       {error ? (
         <p className="mb-4 text-sm text-urgent">
           {error === 'rate_limited' ? t('errors.rateLimited') : t('errors.generic')}

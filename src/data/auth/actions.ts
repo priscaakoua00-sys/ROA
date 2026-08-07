@@ -105,8 +105,11 @@ export async function requestResetAction(formData: FormData) {
 
   const supabase = await createSupabaseServerClient();
   const origin = await originUrl();
+  // Must round-trip through /auth/callback (which exchanges the emailed
+  // code for a real session) before landing on /reset-password — pointing
+  // straight at /reset-password left no session to update, ever.
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-    redirectTo: `${origin}/${locale}/reset-password`,
+    redirectTo: `${origin}/${locale}/auth/callback?next=/reset-password`,
   });
   // Supabase's own per-user cooldown on the /recover endpoint (independent of
   // our checkRateLimit above) rejects a second request within ~60s. Surface
@@ -122,12 +125,22 @@ export async function requestResetAction(formData: FormData) {
 
 export async function updatePasswordAction(formData: FormData) {
   const locale = localeOf(formData);
-  const parsed = updatePasswordSchema.safeParse({ password: formData.get('password') });
-  if (!parsed.success) redirect(`/${locale}/reset-password?error=invalid`);
+  const parsed = updatePasswordSchema.safeParse({
+    password: formData.get('password'),
+    confirmPassword: formData.get('confirmPassword'),
+  });
+  if (!parsed.success) {
+    const mismatch = parsed.error.issues.some((issue) => issue.message === 'mismatch');
+    redirect(`/${locale}/reset-password?error=${mismatch ? 'mismatch' : 'invalid'}`);
+  }
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
   if (error) redirect(`/${locale}/reset-password?error=update`);
 
-  redirect(`/${locale}/dashboard`);
+  // Sign the recovery session out and require a fresh login with the new
+  // password — confirms it actually works, instead of silently continuing
+  // on the token from the email link.
+  await supabase.auth.signOut();
+  redirect(`/${locale}/login?message=password_updated`);
 }

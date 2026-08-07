@@ -15,7 +15,12 @@ export const signUpSchema = z.object({
 });
 
 export const requestResetSchema = z.object({ email: emailSchema });
-export const updatePasswordSchema = z.object({ password: passwordSchema });
+export const updatePasswordSchema = z
+  .object({ password: passwordSchema, confirmPassword: z.string() })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'mismatch',
+    path: ['confirmPassword'],
+  });
 
 export const BUSINESS_TYPES = [
   'garage',

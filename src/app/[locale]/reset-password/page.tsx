@@ -16,12 +16,16 @@ export default async function ResetPasswordPage({
   const { error } = await searchParams;
   const t = await getTranslations('auth');
 
+  const errorMessage =
+    error === 'mismatch' ? t('errors.passwordMismatch') : error ? t('errors.generic') : null;
+
   return (
     <AuthShell title={t('reset.title')} subtitle={t('reset.subtitle')}>
-      {error ? <p className="mb-4 text-sm text-urgent">{t('errors.generic')}</p> : null}
+      {errorMessage ? <p className="mb-4 text-sm text-urgent">{errorMessage}</p> : null}
       <form action={updatePasswordAction} className="space-y-4">
         <input type="hidden" name="locale" value={locale} />
         <Field label={t('fields.newPassword')} name="password" type="password" autoComplete="new-password" required />
+        <Field label={t('fields.confirmPassword')} name="confirmPassword" type="password" autoComplete="new-password" required />
         <Button type="submit" className="w-full">{t('reset.cta')}</Button>
       </form>
       <div className="mt-4 text-center text-sm">
