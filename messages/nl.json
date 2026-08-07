@@ -1390,16 +1390,19 @@
       "fullName": "Volledige naam",
       "email": "E-mailadres",
       "password": "Wachtwoord",
-      "newPassword": "Nieuw wachtwoord"
+      "newPassword": "Nieuw wachtwoord",
+      "confirmPassword": "Bevestig nieuw wachtwoord"
     },
     "messages": {
       "checkEmail": "Bijna klaar. Controleer uw e-mail om uw account te bevestigen.",
       "resetSent": "Als dit e-mailadres bestaat, is er een herstellink verstuurd.",
-      "resetSlowDown": "Er is al een herstellink onderweg. Controleer ook uw spamfolder — dat duurt soms een paar minuten. Wacht even voor u het opnieuw probeert."
+      "resetSlowDown": "Er is al een herstellink onderweg. Controleer ook uw spamfolder — dat duurt soms een paar minuten. Wacht even voor u het opnieuw probeert.",
+      "passwordUpdated": "Uw wachtwoord is succesvol gewijzigd. U kunt nu inloggen."
     },
     "errors": {
       "generic": "Er ging iets mis. Controleer uw gegevens en probeer opnieuw.",
-      "rateLimited": "Te veel pogingen. Wacht enkele minuten en probeer het opnieuw."
+      "rateLimited": "Te veel pogingen. Wacht enkele minuten en probeer het opnieuw.",
+      "passwordMismatch": "De wachtwoorden komen niet overeen."
     }
   },
   "request": {

@@ -1390,16 +1390,19 @@
       "fullName": "Full name",
       "email": "Email",
       "password": "Password",
-      "newPassword": "New password"
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password"
     },
     "messages": {
       "checkEmail": "Almost there. Check your email to confirm your account.",
       "resetSent": "If that email exists, a reset link has been sent.",
-      "resetSlowDown": "A reset link is already on its way. Please also check your spam folder — it can take a few minutes. Wait a moment before requesting another."
+      "resetSlowDown": "A reset link is already on its way. Please also check your spam folder — it can take a few minutes. Wait a moment before requesting another.",
+      "passwordUpdated": "Your password has been changed successfully. You can now log in."
     },
     "errors": {
       "generic": "Something went wrong. Check your details and try again.",
-      "rateLimited": "Too many attempts. Please wait a few minutes and try again."
+      "rateLimited": "Too many attempts. Please wait a few minutes and try again.",
+      "passwordMismatch": "Passwords do not match."
     }
   },
   "request": {

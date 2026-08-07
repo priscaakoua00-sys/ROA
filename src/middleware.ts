@@ -58,7 +58,13 @@ export async function middleware(request: NextRequest) {
   const rest = '/' + parts.slice(2).join('/');
 
   const isApp = /^\/(dashboard|onboarding|team|settings|leads|agenda|customers|work-orders|vehicles|invoices|quotes|notifications|knowledge|automations|reports|inventory|admin)/.test(rest);
-  const isAuthPage = /^\/(login|signup|forgot-password|reset-password)/.test(rest);
+  // /reset-password is deliberately excluded: a password-recovery email link
+  // exchanges its code for a real session (via /auth/callback) before
+  // landing here, so the user IS "logged in" at that point. Grouping it
+  // with login/signup bounced every recovery link straight to /dashboard
+  // with the search params stripped, before the user ever saw the "set a
+  // new password" form.
+  const isAuthPage = /^\/(login|signup|forgot-password)/.test(rest);
 
   if (isApp && !user) {
     const to = request.nextUrl.clone();

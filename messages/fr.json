@@ -1390,16 +1390,19 @@
       "fullName": "Nom complet",
       "email": "E-mail",
       "password": "Mot de passe",
-      "newPassword": "Nouveau mot de passe"
+      "newPassword": "Nouveau mot de passe",
+      "confirmPassword": "Confirmer le nouveau mot de passe"
     },
     "messages": {
       "checkEmail": "Presque fini. Verifiez votre e-mail pour confirmer votre compte.",
       "resetSent": "Si cet e-mail existe, un lien de reinitialisation a ete envoye.",
-      "resetSlowDown": "Un lien de reinitialisation est deja en route. Verifiez aussi vos courriers indesirables (spam) - cela peut prendre quelques minutes. Patientez avant d'en redemander un."
+      "resetSlowDown": "Un lien de reinitialisation est deja en route. Verifiez aussi vos courriers indesirables (spam) - cela peut prendre quelques minutes. Patientez avant d'en redemander un.",
+      "passwordUpdated": "Votre mot de passe a ete modifie avec succes. Vous pouvez maintenant vous connecter."
     },
     "errors": {
       "generic": "Une erreur est survenue. Verifiez vos informations et reessayez.",
-      "rateLimited": "Trop de tentatives. Veuillez patienter quelques minutes puis reessayer."
+      "rateLimited": "Trop de tentatives. Veuillez patienter quelques minutes puis reessayer.",
+      "passwordMismatch": "Les mots de passe ne correspondent pas."
     }
   },
   "request": {
