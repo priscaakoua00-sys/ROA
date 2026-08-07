@@ -1025,7 +1025,18 @@
       "aiUsageErrorRate": "Error rate",
       "aiUsageByProvider": "By provider",
       "aiUsageEmpty": "No AI calls logged yet.",
-      "aiUsageRecentTitle": "Recent calls"
+      "aiUsageRecentTitle": "Recent calls",
+      "usersTitle": "Set a temporary password",
+      "usersIntro": "For users who are stuck while email password recovery isn't reliable yet. Visible to the ROAVAA team only.",
+      "usersEmailPlaceholder": "User's email address",
+      "usersCta": "Generate temporary password",
+      "usersCopy": "Copy",
+      "usersWorking": "Working…",
+      "usersSuccessFor": "New temporary password for",
+      "usersReminder": "Pass this password to the user securely and ask them to change it right after logging in. It is not stored anywhere — copy it now.",
+      "usersNotFound": "No account found with that email address.",
+      "usersFailed": "Couldn't set the password. Please try again.",
+      "usersForbidden": "Access denied."
     },
     "automations": {
       "title": "Follow-ups",

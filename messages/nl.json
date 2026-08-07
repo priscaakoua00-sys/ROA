@@ -1025,7 +1025,18 @@
       "aiUsageErrorRate": "Foutpercentage",
       "aiUsageByProvider": "Per provider",
       "aiUsageEmpty": "Nog geen AI-aanroepen geregistreerd.",
-      "aiUsageRecentTitle": "Recente aanroepen"
+      "aiUsageRecentTitle": "Recente aanroepen",
+      "usersTitle": "Tijdelijk wachtwoord instellen",
+      "usersIntro": "Voor gebruikers die vastzitten terwijl wachtwoord-herstel per e-mail nog niet betrouwbaar is. Alleen zichtbaar voor het ROAVAA-team.",
+      "usersEmailPlaceholder": "E-mailadres van de gebruiker",
+      "usersCta": "Tijdelijk wachtwoord genereren",
+      "usersCopy": "Kopieer",
+      "usersWorking": "Bezig…",
+      "usersSuccessFor": "Nieuw tijdelijk wachtwoord voor",
+      "usersReminder": "Geef dit wachtwoord veilig door aan de gebruiker en vraag hen het direct na het inloggen te wijzigen. Dit wachtwoord wordt nergens opgeslagen — kopieer het nu.",
+      "usersNotFound": "Geen account gevonden met dit e-mailadres.",
+      "usersFailed": "Het wachtwoord kon niet worden ingesteld. Probeer het opnieuw.",
+      "usersForbidden": "Geen toegang."
     },
     "automations": {
       "title": "Opvolging",
