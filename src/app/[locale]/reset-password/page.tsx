@@ -9,11 +9,11 @@ export default async function ResetPasswordPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; token_hash?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { error } = await searchParams;
+  const { error, token_hash: tokenHash } = await searchParams;
   const t = await getTranslations('auth');
 
   const errorMessage =
@@ -24,6 +24,7 @@ export default async function ResetPasswordPage({
       {errorMessage ? <p className="mb-4 text-sm text-urgent">{errorMessage}</p> : null}
       <form action={updatePasswordAction} className="space-y-4">
         <input type="hidden" name="locale" value={locale} />
+        {tokenHash ? <input type="hidden" name="tokenHash" value={tokenHash} /> : null}
         <Field label={t('fields.newPassword')} name="password" type="password" autoComplete="new-password" required />
         <Field label={t('fields.confirmPassword')} name="confirmPassword" type="password" autoComplete="new-password" required />
         <Button type="submit" className="w-full">{t('reset.cta')}</Button>
