@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import { notFound, redirect } from 'next/navigation';
 import { CalendarPlus, FileText, Wrench } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import { addVehicleAction } from '@/data/customers/actions';
 import { formatDateTimeInZone } from '@/lib/timezone';
 import { Button } from '@/components/ui/button';
@@ -25,7 +25,7 @@ export default async function CustomerDetailPage({
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   if (!user) redirect(`/${locale}/login`);
 
   const { data: customer } = await supabase

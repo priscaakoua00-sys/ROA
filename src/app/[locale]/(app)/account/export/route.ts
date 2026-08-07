@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 
 /**
  * GDPR data-portability self-service: every piece of personal data this
@@ -11,7 +11,7 @@ export async function GET() {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   if (!user) return new NextResponse('Unauthorized', { status: 401 });
 
   const [{ data: profile }, { data: memberships }, { data: activity }] = await Promise.all([

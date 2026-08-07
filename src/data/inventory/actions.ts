@@ -1,7 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import { getActiveOrgId } from '@/data/organizations/active';
 import { isExternalPhotoUrl } from '@/lib/utils';
 
@@ -92,7 +92,7 @@ export async function adjustStockAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
 
   const { data: part } = await supabase
     .from('parts')
@@ -126,7 +126,7 @@ export async function recordPartUsageAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
 
   const { data: part } = await supabase
     .from('parts')

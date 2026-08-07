@@ -1,7 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import { getActiveOrgId } from '@/data/organizations/active';
 import { getOrgEntitlements } from '@/data/subscriptions/get-subscription';
 import { countVehicles } from '@/data/subscriptions/usage';
@@ -176,7 +176,7 @@ export async function addCustomerAction(formData: FormData) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   await logActivity(supabase, {
     organizationId: orgId,
     actorId: user?.id ?? null,

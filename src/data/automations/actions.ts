@@ -1,7 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import { getActiveOrgId } from '@/data/organizations/active';
 
 type Locale = 'nl' | 'en' | 'fr';
@@ -19,7 +19,7 @@ export async function markFollowUpAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   const orgId = await getActiveOrgId(supabase);
   if (!orgId) redirect(`/${locale}/onboarding`);
 

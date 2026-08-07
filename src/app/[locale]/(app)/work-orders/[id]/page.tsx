@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import { notFound, redirect } from 'next/navigation';
 import { CalendarDays, Camera, ClipboardCheck, Wrench, FileText, Trash2 } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import {
   updateWorkOrderStatusAction,
   assignWorkOrderAction,
@@ -111,7 +111,7 @@ export default async function WorkOrderDetailPage({
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   if (!user) redirect(`/${locale}/login`);
 
   const { data: wo } = await supabase

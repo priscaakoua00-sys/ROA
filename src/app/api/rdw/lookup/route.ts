@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import { lookupPlate } from '@/integrations/rdw/client';
 
 /**
@@ -12,7 +12,7 @@ export async function GET(request: Request) {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   if (!user) {
     return NextResponse.json({ vehicle: null, error: 'unauthorized' }, { status: 401 });
   }

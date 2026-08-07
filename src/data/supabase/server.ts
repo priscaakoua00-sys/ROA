@@ -3,7 +3,7 @@ import 'server-only';
 import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
-import type { SupabaseClient } from '@supabase/supabase-js';
+import type { SupabaseClient, User } from '@supabase/supabase-js';
 
 /**
  * Server Supabase client. The `server-only` import makes it a build error to
@@ -55,3 +55,23 @@ export const createSupabaseServerClient = cache(async (): Promise<SupabaseClient
     },
   });
 });
+
+/**
+ * Same contract as `supabase.auth.getUser()` (`{ data: { user } }`), but
+ * never throws. A stale or already-rotated refresh token — e.g. the shared
+ * client above raced middleware's own independent refresh of the same
+ * near-expiry token — makes `getUser()` reject outright instead of just
+ * returning an error field. Every call site in this app destructures the
+ * user straight out of the result and treats a missing user as "not signed
+ * in" (redirect to /login); an uncaught rejection here instead skipped that
+ * handling and crashed the page. Use this everywhere `auth.getUser()` was
+ * called directly so a revoked/expired session degrades to a normal
+ * login redirect instead of the crash screen.
+ */
+export async function getSafeUser(supabase: SupabaseClient): Promise<{ data: { user: User | null } }> {
+  try {
+    return await supabase.auth.getUser();
+  } catch {
+    return { data: { user: null } };
+  }
+}

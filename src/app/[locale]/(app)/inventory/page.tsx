@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 import { Package } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { createSupabaseServerClient } from '@/data/supabase/server';
+import { createSupabaseServerClient, getSafeUser } from '@/data/supabase/server';
 import { getActiveOrgId } from '@/data/organizations/active';
 import { getCurrentRole, roleHas } from '@/lib/roles';
 import { loadParts } from '@/data/inventory/list';
@@ -38,7 +38,7 @@ export default async function InventoryPage({
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSafeUser(supabase);
   if (!user) redirect(`/${locale}/login`);
 
   const orgId = await getActiveOrgId(supabase);
