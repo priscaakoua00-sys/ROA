@@ -1394,7 +1394,8 @@
     },
     "messages": {
       "checkEmail": "Presque fini. Verifiez votre e-mail pour confirmer votre compte.",
-      "resetSent": "Si cet e-mail existe, un lien de reinitialisation a ete envoye."
+      "resetSent": "Si cet e-mail existe, un lien de reinitialisation a ete envoye.",
+      "resetSlowDown": "Un lien de reinitialisation est deja en route. Verifiez aussi vos courriers indesirables (spam) - cela peut prendre quelques minutes. Patientez avant d'en redemander un."
     },
     "errors": {
       "generic": "Une erreur est survenue. Verifiez vos informations et reessayez.",

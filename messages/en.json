@@ -1394,7 +1394,8 @@
     },
     "messages": {
       "checkEmail": "Almost there. Check your email to confirm your account.",
-      "resetSent": "If that email exists, a reset link has been sent."
+      "resetSent": "If that email exists, a reset link has been sent.",
+      "resetSlowDown": "A reset link is already on its way. Please also check your spam folder — it can take a few minutes. Wait a moment before requesting another."
     },
     "errors": {
       "generic": "Something went wrong. Check your details and try again.",

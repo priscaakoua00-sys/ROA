@@ -1394,7 +1394,8 @@
     },
     "messages": {
       "checkEmail": "Bijna klaar. Controleer uw e-mail om uw account te bevestigen.",
-      "resetSent": "Als dit e-mailadres bestaat, is er een herstellink verstuurd."
+      "resetSent": "Als dit e-mailadres bestaat, is er een herstellink verstuurd.",
+      "resetSlowDown": "Er is al een herstellink onderweg. Controleer ook uw spamfolder — dat duurt soms een paar minuten. Wacht even voor u het opnieuw probeert."
     },
     "errors": {
       "generic": "Er ging iets mis. Controleer uw gegevens en probeer opnieuw.",
